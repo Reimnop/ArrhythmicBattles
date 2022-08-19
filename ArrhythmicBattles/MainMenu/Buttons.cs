@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.UI;
+﻿using ArrhythmicBattles.Settings;
+using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.EntitySystem;
@@ -10,34 +11,41 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class Buttons : Entity, IRenderable
 {
+    public Vector2i Position
+    {
+        get => stackLayout.Position;
+        set => stackLayout.Position = value;
+    }
+
     private readonly VerticalStackLayout stackLayout;
     private readonly KeyboardNavigator navigator;
     private readonly EntityGroup entityGroup;
 
-    public Buttons(FlexFrameworkMain engine)
+    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, Vector2i buttonSize)
     {
         entityGroup = new EntityGroup();
-        
-        ButtonEntity playButton = new ButtonEntity(engine)
-            .WithText("PLAY")
+
+        ButtonEntity singleplayerButton = new ButtonEntity(engine)
+            .WithText("SINGLEPLAYER")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(768, 56);
-        
+            .WithSize(buttonSize);
+
         ButtonEntity multiplayerButton = new ButtonEntity(engine)
             .WithText("MULTIPLAYER")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(768, 56);
+            .WithSize(buttonSize);
         
-        ButtonEntity configButton = new ButtonEntity(engine)
-            .WithText("CONFIG")
+        ButtonEntity settingsButton = new ButtonEntity(engine)
+            .WithText("SETTINGS")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(768, 56);
+            .WithSize(buttonSize)
+            .AddPressedCallback(() => scene.LoadSettingsScene());
 
         ButtonEntity exitButton = new ButtonEntity(engine)
             .WithText("EXIT")
@@ -45,23 +53,22 @@ public class Buttons : Entity, IRenderable
             .WithTextPosOffset(10, 36)
             .WithTextUnfocusedColor(new Color4(233, 81, 83, 255))
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(768, 56)
+            .WithSize(buttonSize)
             .AddPressedCallback(() => engine.Close());
 
         stackLayout = new VerticalStackLayout(engine)
-            .WithPosition(48, 304)
-            .WithSize(768, 0);
-        
-        stackLayout.AddChild(playButton);
+            .WithPosition(48, 304);
+
+        stackLayout.AddChild(singleplayerButton);
         stackLayout.AddChild(multiplayerButton);
-        stackLayout.AddChild(configButton);
+        stackLayout.AddChild(settingsButton);
         stackLayout.AddChild(exitButton);
         
-        entityGroup.AddEntity(playButton, multiplayerButton, configButton, exitButton);
+        entityGroup.AddEntity(singleplayerButton, multiplayerButton, settingsButton, exitButton);
         
-        NavNode playNode = new NavNode(playButton);
+        NavNode playNode = new NavNode(singleplayerButton);
         NavNode multiplayerNode = new NavNode(multiplayerButton);
-        NavNode configNode = new NavNode(configButton);
+        NavNode configNode = new NavNode(settingsButton);
         NavNode exitNode = new NavNode(exitButton);
 
         playNode.Top = exitNode;
@@ -78,6 +85,8 @@ public class Buttons : Entity, IRenderable
     
     public override void Update(UpdateArgs args)
     {
+        base.Update(args);
+        
         stackLayout.Update(args);
         navigator.Update(args);
         entityGroup.Update(args);

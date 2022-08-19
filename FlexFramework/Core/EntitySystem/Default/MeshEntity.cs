@@ -18,10 +18,6 @@ public class MeshEntity : Entity, IRenderable
     {
         vertexDrawData = new VertexDrawData(null, 0, Matrix4.Identity, Color);
     }
-    
-    public override void Update(UpdateArgs args)
-    {
-    }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {

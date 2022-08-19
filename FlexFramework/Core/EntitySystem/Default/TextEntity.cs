@@ -108,10 +108,6 @@ public class TextEntity : Entity, IRenderable
         mesh.LoadData(vertices);
     }
 
-    public override void Update(UpdateArgs args)
-    {
-    }
-
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         if (!meshValid)

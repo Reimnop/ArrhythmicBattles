@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.7.4" />
     </ItemGroup>
 
@@ -22,6 +24,25 @@
       <None Update="Assets\banner.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Assets\icon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Icons\icon_l.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Icons\icon_m.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Icons\icon_s.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Icons\icon_xl.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\Icons" />
     </ItemGroup>
 
 </Project>

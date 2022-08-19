@@ -24,6 +24,8 @@ public abstract class UIElement : Entity
 
     public override void Update(UpdateArgs args)
     {
+        base.Update(args);
+        
         bool currentlyFocused = IsFocused;
 
         if (!wasFocused && currentlyFocused)

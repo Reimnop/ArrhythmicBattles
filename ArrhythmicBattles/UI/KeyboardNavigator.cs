@@ -101,6 +101,8 @@ public class KeyboardNavigator : Entity, IRenderable
 
     public override void Update(UpdateArgs args)
     {
+        base.Update(args);
+        
         highlightAnimator.Update(args.DeltaTime);
         meshEntity.Update(args);
         

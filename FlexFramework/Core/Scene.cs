@@ -6,12 +6,19 @@ namespace FlexFramework.Core;
 
 public abstract class Scene : IDisposable
 {
+    protected MatrixStack MatrixStack { get; }
+
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
 
     private double deltaTime = 0.0;
 
     protected FlexFrameworkMain Engine { get; private set; }
+
+    public Scene()
+    {
+        MatrixStack = new MatrixStack();
+    }
 
     internal void SetEngine(FlexFrameworkMain engine)
     {

@@ -21,10 +21,6 @@ public class TexturedEntity : Entity, IRenderable
         quadMesh = engine.PersistentResources.QuadMesh;
         vertexDrawData = new TexturedVertexDrawData(quadMesh.VertexArray, quadMesh.Count, Matrix4.Identity, null, Color);
     }
-    
-    public override void Update(UpdateArgs args)
-    {
-    }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {

@@ -24,6 +24,8 @@ public class VerticalStackLayout : UIElement
 
     public override void Update(UpdateArgs args)
     {
+        base.Update(args);
+        
         int offset = 0;
         foreach (UIElement child in Children)
         {

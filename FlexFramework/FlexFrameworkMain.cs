@@ -121,9 +121,9 @@ public class FlexFrameworkMain : NativeWindow
         }
 
         UpdateArgs args = new UpdateArgs(time, deltaTime);
-        
-        SceneManager.CurrentScene.UpdateInternal(args);
+
         SceneManager.CurrentScene.Update(args);
+        SceneManager.CurrentScene.UpdateInternal(args);
     }
 
     private unsafe void Render()
