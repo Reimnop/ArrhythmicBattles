@@ -12,10 +12,12 @@ public class SettingsScene : GuiScene
     private TextEntity textEntity;
 
     private readonly ABContext context;
+    private readonly ABSfxContext sfxContext;
 
-    public SettingsScene(ABContext context)
+    public SettingsScene(ABContext context, ABSfxContext sfxContext)
     {
         this.context = context;
+        this.sfxContext = sfxContext;
     }
     
     public override void Init()
@@ -33,7 +35,7 @@ public class SettingsScene : GuiScene
         
         if (Engine.Input.GetKeyDown(Keys.Escape))
         {
-            Engine.LoadScene<MainMenuScene>(context);
+            Engine.LoadScene<MainMenuScene>(context, sfxContext);
         }
     }
 

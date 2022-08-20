@@ -55,9 +55,12 @@ public class NavNode
     }
 }
 
+public delegate void NodeSelectedEventHandler(NavNode node);
+
 public class KeyboardNavigator : Entity, IRenderable
 {
     public NavNode RootNode { get; }
+    public event NodeSelectedEventHandler? OnNodeSelected;
     
     private readonly FlexFrameworkMain engine;
     private readonly MeshEntity meshEntity;
@@ -137,6 +140,8 @@ public class KeyboardNavigator : Entity, IRenderable
         currentNode.Element.IsFocused = false;
         node.Element.IsFocused = true;
         currentNode = node;
+        
+        OnNodeSelected?.Invoke(node);
         
         highlightAnimator.LerpTo(() => node.Element.GetBounds());
     }

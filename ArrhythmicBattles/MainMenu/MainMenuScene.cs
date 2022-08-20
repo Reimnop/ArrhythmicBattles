@@ -3,6 +3,7 @@ using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using DiscordRPC;
+using FlexFramework.Core.Audio;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering.Data;
@@ -35,9 +36,10 @@ public class MainMenuScene : GuiScene
                 MathHelper.Lerp(left.FooterYOffset, right.FooterYOffset, factor));
         }
     }
-    
+
     private readonly ABContext context;
-    
+    private readonly ABSfxContext sfxContext;
+
     private Texture2D bannerTexture;
     private ImageEntity bannerEntity;
     
@@ -51,16 +53,23 @@ public class MainMenuScene : GuiScene
     private MenuItemsOffset menuItemsOffset = new MenuItemsOffset(-656.0, -256.0, 64.0);
     private double deltaTime;
 
-    public MainMenuScene(ABContext context)
+    public MainMenuScene(ABContext context, ABSfxContext sfxContext)
     {
         this.context = context;
+        this.sfxContext = sfxContext;
     }
 
     public override void Init()
     {
         base.Init();
         
-        // Init other stuff
+        // Init audio
+        if (!sfxContext.MenuBackgroundMusic.Playing)
+        {
+            sfxContext.MenuBackgroundMusic.Play();
+        }
+
+        // Init entities
         bannerTexture = Texture2D.FromFile("banner", "Assets/banner.png");
         bannerEntity = new ImageEntity(Engine)
             .WithPosition(32, 32)
@@ -81,7 +90,7 @@ public class MainMenuScene : GuiScene
         // copyrightText.Text = "Copyright Arrhythmic Battles 2022\nThis project is Free Software under the GPLv3";
         copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
-        buttons = new Buttons(Engine, this, new Vector2i(512, 56));
+        buttons = new Buttons(Engine, this, sfxContext, new Vector2i(512, 56));
         
         StartCoroutine(ShowMenu());
 
@@ -90,7 +99,7 @@ public class MainMenuScene : GuiScene
         {
             Details = "In Main Menu",
             State = "Idle",
-            Timestamps = new Timestamps(DateTime.UtcNow),
+            Timestamps = new Timestamps(context.GameStartedTime),
             Assets = new Assets
             {
                 LargeImageKey = "ab_logo",
@@ -101,7 +110,7 @@ public class MainMenuScene : GuiScene
 
     public void LoadSettingsScene()
     {
-        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene<SettingsScene>(context)));
+        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene<SettingsScene>(context, sfxContext)));
     }
 
     private IEnumerator HideMenuAndDo(Action action)

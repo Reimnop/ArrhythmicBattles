@@ -21,7 +21,7 @@ public class Buttons : Entity, IRenderable
     private readonly KeyboardNavigator navigator;
     private readonly EntityGroup entityGroup;
 
-    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, Vector2i buttonSize)
+    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, ABSfxContext sfxContext, Vector2i buttonSize)
     {
         entityGroup = new EntityGroup();
 
@@ -30,14 +30,16 @@ public class Buttons : Entity, IRenderable
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize);
+            .WithSize(buttonSize)
+            .AddPressedCallback(() => sfxContext.SelectSfx.Play());
 
         ButtonEntity multiplayerButton = new ButtonEntity(engine)
             .WithText("MULTIPLAYER")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize);
+            .WithSize(buttonSize)
+            .AddPressedCallback(() => sfxContext.SelectSfx.Play());
         
         ButtonEntity settingsButton = new ButtonEntity(engine)
             .WithText("SETTINGS")
@@ -45,6 +47,7 @@ public class Buttons : Entity, IRenderable
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
             .WithSize(buttonSize)
+            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
             .AddPressedCallback(() => scene.LoadSettingsScene());
 
         ButtonEntity exitButton = new ButtonEntity(engine)
@@ -54,6 +57,7 @@ public class Buttons : Entity, IRenderable
             .WithTextUnfocusedColor(new Color4(233, 81, 83, 255))
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
             .WithSize(buttonSize)
+            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
             .AddPressedCallback(() => engine.Close());
 
         stackLayout = new VerticalStackLayout(engine)
@@ -81,6 +85,7 @@ public class Buttons : Entity, IRenderable
         exitNode.Bottom = playNode;
 
         navigator = new KeyboardNavigator(engine, playNode);
+        navigator.OnNodeSelected += node => sfxContext.SelectSfx.Play();
     }
     
     public override void Update(UpdateArgs args)

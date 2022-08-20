@@ -5,11 +5,10 @@ namespace FlexFramework.Core.Audio;
 public class AudioClip : IDisposable
 {
     public int Handle { get; }
-    public float[,] Samples { get; }
     public int SampleRate { get; }
     public int SizeInBytes { get; }
 
-    private AudioClip(ALFormat format, byte[] data, int sampleRate, int sizeInBytes = -1)
+    public AudioClip(ALFormat format, byte[] data, int sampleRate, int sizeInBytes = -1)
     {
         SizeInBytes = data.Length;
         SampleRate = sampleRate;
@@ -18,26 +17,6 @@ public class AudioClip : IDisposable
         
         Handle = AL.GenBuffer();
         AL.BufferData(Handle, format, ref data[0], size, sampleRate);
-        
-        AL.GetBuffer(Handle, ALGetBufferi.Channels, out int channels);
-        AL.GetBuffer(Handle, ALGetBufferi.Bits, out int bits);
-
-        int samplesCount = size / (bits / 8) / channels;
-
-        Samples = new float[channels, samplesCount];
-        for (int i = 0; i < channels; i++)
-        {
-            for (int j = 0; j < samplesCount; j++)
-            {
-                int index = j * (bits / 8) * channels + i;
-                float value = bits == 8
-                    ? data[index] / (float) (1 << 8)
-                    : (bits == 16 ? BitConverter.ToUInt16(data, index) / (float) (1 << 16) 
-                        : throw new NotSupportedException());
-
-                Samples[i, j] = value;
-            }
-        }
     }
 
     public static AudioClip FromWave(string path)
