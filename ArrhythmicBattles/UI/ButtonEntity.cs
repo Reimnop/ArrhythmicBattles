@@ -44,7 +44,7 @@ public class ButtonEntity : UIElement, IRenderable
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
-                float t = (float) Easing.InOutCirc(factor);
+                float t = (float) Easing.InOutQuad(factor);
                 return new Color4(
                     MathHelper.Lerp(left.R, right.R, t),
                     MathHelper.Lerp(left.G, right.G, t),
@@ -56,7 +56,7 @@ public class ButtonEntity : UIElement, IRenderable
             10.0);
 
         paddingAnimator = new SimpleAnimator<double>(
-            (left, right, factor) => MathHelper.Lerp(left, right, Easing.InOutCirc(factor)),
+            (left, right, factor) => MathHelper.Lerp(left, right, Easing.InOutQuad(factor)),
             value => textPaddingX = value,
             () => 0.0,
             10.0);

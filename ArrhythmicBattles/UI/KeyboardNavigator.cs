@@ -89,7 +89,7 @@ public class KeyboardNavigator : Entity, IRenderable
         highlightAnimator = new SimpleAnimator<Rectangle>(
             (left, right, factor) =>
             {
-                double t = Easing.InOutCirc(factor);
+                double t = Easing.InOutQuad(factor);
 
                 return new Rectangle(
                     (int) MathHelper.Lerp(left.X, right.X, t),

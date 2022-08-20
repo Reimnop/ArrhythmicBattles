@@ -8,4 +8,9 @@ public static class Easing
             ? (1.0 - Math.Sqrt(1 - Math.Pow(2.0 * x, 2.0))) / 2.0
             : (Math.Sqrt(1.0 - Math.Pow(-2.0 * x + 2.0, 2.0)) + 1.0) / 2.0;
     }
+
+    public static double InOutQuad(double x)
+    {
+        return x < 0.5 ? 2.0 * x * x : 1.0 - Math.Pow(-2.0 * x + 2.0, 2.0) / 2.0;
+    }
 }

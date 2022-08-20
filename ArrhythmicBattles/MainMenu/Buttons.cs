@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Settings;
+﻿using ArrhythmicBattles.MainGame;
+using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
@@ -21,7 +22,7 @@ public class Buttons : Entity, IRenderable
     private readonly KeyboardNavigator navigator;
     private readonly EntityGroup entityGroup;
 
-    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, ABSfxContext sfxContext, Vector2i buttonSize)
+    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, ABContext context, ABSfxContext sfxContext, Vector2i buttonSize)
     {
         entityGroup = new EntityGroup();
 
@@ -31,7 +32,8 @@ public class Buttons : Entity, IRenderable
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
             .WithSize(buttonSize)
-            .AddPressedCallback(() => sfxContext.SelectSfx.Play());
+            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
+            .AddPressedCallback(() => scene.LoadScene<GameScene>(context, sfxContext));
 
         ButtonEntity multiplayerButton = new ButtonEntity(engine)
             .WithText("MULTIPLAYER")
@@ -48,7 +50,7 @@ public class Buttons : Entity, IRenderable
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
             .WithSize(buttonSize)
             .AddPressedCallback(() => sfxContext.SelectSfx.Play())
-            .AddPressedCallback(() => scene.LoadSettingsScene());
+            .AddPressedCallback(() => scene.LoadScene<SettingsScene>(context, sfxContext));
 
         ButtonEntity exitButton = new ButtonEntity(engine)
             .WithText("EXIT")

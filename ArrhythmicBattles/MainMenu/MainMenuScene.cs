@@ -3,6 +3,7 @@ using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using DiscordRPC;
+using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
@@ -90,27 +91,14 @@ public class MainMenuScene : GuiScene
         // copyrightText.Text = "Copyright Arrhythmic Battles 2022\nThis project is Free Software under the GPLv3";
         copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
-        buttons = new Buttons(Engine, this, sfxContext, new Vector2i(512, 56));
+        buttons = new Buttons(Engine, this, context, sfxContext, new Vector2i(512, 56));
         
         StartCoroutine(ShowMenu());
-
-        // Set Discord presence
-        context.DiscordRpcClient.SetPresence(new RichPresence
-        {
-            Details = "In Main Menu",
-            State = "Idle",
-            Timestamps = new Timestamps(context.GameStartedTime),
-            Assets = new Assets
-            {
-                LargeImageKey = "ab_logo",
-                LargeImageText = "Arrhythmic Battles"
-            }
-        });
     }
 
-    public void LoadSettingsScene()
+    public void LoadScene<T>(params object?[]? args) where T : Scene
     {
-        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene<SettingsScene>(context, sfxContext)));
+        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene<T>(args)));
     }
 
     private IEnumerator HideMenuAndDo(Action action)
@@ -121,12 +109,13 @@ public class MainMenuScene : GuiScene
 
     private IEnumerator ShowMenu()
     {
+        // for some reason it won't work without waiting for a frame
         yield return null;
         
         double t = 0.0;
         while (t < 1.0)
         {
-            t += deltaTime * 2.5;
+            t += deltaTime * 5.0;
             menuItemsOffset = MenuItemsOffset.Lerp(
                 new MenuItemsOffset(-656.0, -256.0, 64.0),
                 new MenuItemsOffset(),
@@ -142,7 +131,7 @@ public class MainMenuScene : GuiScene
         double t = 0.0;
         while (t < 1.0)
         {
-            t += deltaTime * 2.5;
+            t += deltaTime * 5.0;
             menuItemsOffset = MenuItemsOffset.Lerp(
                 new MenuItemsOffset(),
                 new MenuItemsOffset(-656.0, -256.0, 64.0),
