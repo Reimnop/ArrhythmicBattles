@@ -1,5 +1,6 @@
-﻿using DiscordRPC;
-using FlexFramework.Core.Audio;
+﻿using ArrhythmicBattles.Util;
+using DiscordRPC;
+using FlexFramework;
 
 namespace ArrhythmicBattles;
 
@@ -7,11 +8,13 @@ public class ABContext : IDisposable
 {
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
+    public InputSystem InputSystem { get; }
 
-    public ABContext()
+    public ABContext(FlexFrameworkMain engine)
     {
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
+        InputSystem = new InputSystem(engine.Input);
     }
 
     private DiscordRpcClient InitDiscord()

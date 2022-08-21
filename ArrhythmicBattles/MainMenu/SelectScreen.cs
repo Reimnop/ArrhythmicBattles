@@ -1,18 +1,18 @@
 ﻿using ArrhythmicBattles.MainGame;
-using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
-using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.MainMenu;
 
-public class Buttons : Entity, IRenderable
+public class SelectScreen : Screen
 {
-    public Vector2i Position
+    private static readonly Vector2i ButtonSize = new Vector2i(512, 56); 
+    
+    public override Vector2i Position
     {
         get => stackLayout.Position;
         set => stackLayout.Position = value;
@@ -21,45 +21,49 @@ public class Buttons : Entity, IRenderable
     private readonly VerticalStackLayout stackLayout;
     private readonly KeyboardNavigator navigator;
     private readonly EntityGroup entityGroup;
+    private readonly InputCapture capture;
 
-    public Buttons(FlexFrameworkMain engine, MainMenuScene scene, ABContext context, ABSfxContext sfxContext, Vector2i buttonSize)
+    public SelectScreen(FlexFrameworkMain engine, MainMenuScene scene)
     {
+        capture = scene.Context.InputSystem.AcquireCapture();
+        InputInfo inputInfo = new InputInfo(scene.Context.InputSystem, capture);
+        
         entityGroup = new EntityGroup();
 
-        ButtonEntity singleplayerButton = new ButtonEntity(engine)
+        ButtonEntity singleplayerButton = new ButtonEntity(engine, inputInfo)
             .WithText("SINGLEPLAYER")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize)
-            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
-            .AddPressedCallback(() => scene.LoadScene<GameScene>(context, sfxContext));
+            .WithSize(ButtonSize)
+            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play())
+            .AddPressedCallback(() => scene.LoadScene<GameScene>(scene.Context, scene.SfxContext));
 
-        ButtonEntity multiplayerButton = new ButtonEntity(engine)
+        ButtonEntity multiplayerButton = new ButtonEntity(engine, inputInfo)
             .WithText("MULTIPLAYER")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize)
-            .AddPressedCallback(() => sfxContext.SelectSfx.Play());
+            .WithSize(ButtonSize)
+            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play());
         
-        ButtonEntity settingsButton = new ButtonEntity(engine)
+        ButtonEntity settingsButton = new ButtonEntity(engine, inputInfo)
             .WithText("SETTINGS")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize)
-            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
-            .AddPressedCallback(() => scene.LoadScene<SettingsScene>(context, sfxContext));
+            .WithSize(ButtonSize)
+            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play())
+            .AddPressedCallback(() => scene.SwitchScreen<SettingsScreen>(engine, scene));
 
-        ButtonEntity exitButton = new ButtonEntity(engine)
+        ButtonEntity exitButton = new ButtonEntity(engine, inputInfo)
             .WithText("EXIT")
             .WithOrigin(0.0, 1.0)
             .WithTextPosOffset(10, 36)
             .WithTextUnfocusedColor(new Color4(233, 81, 83, 255))
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(buttonSize)
-            .AddPressedCallback(() => sfxContext.SelectSfx.Play())
+            .WithSize(ButtonSize)
+            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play())
             .AddPressedCallback(() => engine.Close());
 
         stackLayout = new VerticalStackLayout(engine)
@@ -86,20 +90,18 @@ public class Buttons : Entity, IRenderable
         exitNode.Top = configNode;
         exitNode.Bottom = playNode;
 
-        navigator = new KeyboardNavigator(engine, playNode);
-        navigator.OnNodeSelected += node => sfxContext.SelectSfx.Play();
+        navigator = new KeyboardNavigator(inputInfo, playNode);
+        navigator.OnNodeSelected += node => scene.SfxContext.SelectSfx.Play();
     }
     
     public override void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         stackLayout.Update(args);
         navigator.Update(args);
         entityGroup.Update(args);
     }
     
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         navigator.Render(renderer, layerId, matrixStack, cameraData);
         entityGroup.Render(renderer, layerId, matrixStack, cameraData);
@@ -108,5 +110,6 @@ public class Buttons : Entity, IRenderable
     public override void Dispose()
     {
         entityGroup.Dispose();
+        capture.Dispose();
     }
 }

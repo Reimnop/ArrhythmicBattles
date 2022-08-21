@@ -62,7 +62,8 @@ public class KeyboardNavigator : Entity, IRenderable
     public NavNode RootNode { get; }
     public event NodeSelectedEventHandler? OnNodeSelected;
     
-    private readonly FlexFrameworkMain engine;
+    private readonly InputSystem input;
+    private readonly InputCapture capture;
     private readonly MeshEntity meshEntity;
     private readonly Mesh<Vertex> mesh;
     private readonly SimpleAnimator<Rectangle> highlightAnimator;
@@ -72,9 +73,11 @@ public class KeyboardNavigator : Entity, IRenderable
 
     private Vector2i currentRectSize;
 
-    public KeyboardNavigator(FlexFrameworkMain engine, NavNode rootNode)
+    public KeyboardNavigator(InputInfo inputInfo, NavNode rootNode)
     {
-        this.engine = engine;
+        input = inputInfo.InputSystem;
+        capture = inputInfo.InputCapture;
+        
         RootNode = rootNode;
         rootNode.Element.IsFocused = true;
         currentNode = rootNode;
@@ -89,7 +92,7 @@ public class KeyboardNavigator : Entity, IRenderable
         highlightAnimator = new SimpleAnimator<Rectangle>(
             (left, right, factor) =>
             {
-                double t = Easing.InOutQuad(factor);
+                double t = Easing.QuadInOut(factor);
 
                 return new Rectangle(
                     (int) MathHelper.Lerp(left.X, right.X, t),
@@ -109,22 +112,22 @@ public class KeyboardNavigator : Entity, IRenderable
         highlightAnimator.Update(args.DeltaTime);
         meshEntity.Update(args);
         
-        if (engine.Input.GetKeyDown(Keys.Up))
+        if (input.GetKeyDown(capture, Keys.Up))
         {
             AdvanceTo(currentNode.Top);
         }
         
-        if (engine.Input.GetKeyDown(Keys.Down))
+        if (input.GetKeyDown(capture, Keys.Down))
         {
             AdvanceTo(currentNode.Bottom);
         }
         
-        if (engine.Input.GetKeyDown(Keys.Left))
+        if (input.GetKeyDown(capture, Keys.Left))
         {
             AdvanceTo(currentNode.Left);
         }
         
-        if (engine.Input.GetKeyDown(Keys.Right))
+        if (input.GetKeyDown(capture, Keys.Right))
         {
             AdvanceTo(currentNode.Right);
         }

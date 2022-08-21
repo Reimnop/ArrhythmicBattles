@@ -33,8 +33,9 @@ NativeWindowSettings nws = new NativeWindowSettings()
     Icon = icon
 };
 
-using ABContext context = new ABContext();
 using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
+
+using ABContext context = new ABContext(flexFramework);
 using ABSfxContext sfxContext = new ABSfxContext();
 
 flexFramework.UseRenderer<DefaultRenderer>();

@@ -1,10 +1,7 @@
 ﻿using System.Collections;
-using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
-using DiscordRPC;
 using FlexFramework.Core;
-using FlexFramework.Core.Audio;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering.Data;
@@ -18,13 +15,13 @@ public class MainMenuScene : GuiScene
 {
     public struct MenuItemsOffset
     {
-        public double ButtonsXOffset { get; set; }
+        public double ScreenXOffset { get; set; }
         public double HeaderYOffset { get; set; }
         public double FooterYOffset { get; set; }
 
-        public MenuItemsOffset(double buttonX, double headerY, double footerY)
+        public MenuItemsOffset(double screenX, double headerY, double footerY)
         {
-            ButtonsXOffset = buttonX;
+            ScreenXOffset = screenX;
             HeaderYOffset = headerY;
             FooterYOffset = footerY;
         }
@@ -32,14 +29,14 @@ public class MainMenuScene : GuiScene
         public static MenuItemsOffset Lerp(MenuItemsOffset left, MenuItemsOffset right, double factor)
         {
             return new MenuItemsOffset(
-                MathHelper.Lerp(left.ButtonsXOffset, right.ButtonsXOffset, factor),
+                MathHelper.Lerp(left.ScreenXOffset, right.ScreenXOffset, factor),
                 MathHelper.Lerp(left.HeaderYOffset, right.HeaderYOffset, factor),
                 MathHelper.Lerp(left.FooterYOffset, right.FooterYOffset, factor));
         }
     }
 
-    private readonly ABContext context;
-    private readonly ABSfxContext sfxContext;
+    public ABContext Context { get; }
+    public ABSfxContext SfxContext { get; }
 
     private Texture2D bannerTexture;
     private ImageEntity bannerEntity;
@@ -49,15 +46,17 @@ public class MainMenuScene : GuiScene
     
     private TextEntity copyrightText;
 
-    private Buttons buttons;
-
     private MenuItemsOffset menuItemsOffset = new MenuItemsOffset(-656.0, -256.0, 64.0);
     private double deltaTime;
 
+    private SimpleAnimator<MenuItemsOffset> menuAnimator;
+    private Screen currentScreen;
+    private double screenYOffset = 0.0;
+
     public MainMenuScene(ABContext context, ABSfxContext sfxContext)
     {
-        this.context = context;
-        this.sfxContext = sfxContext;
+        Context = context;
+        SfxContext = sfxContext;
     }
 
     public override void Init()
@@ -65,10 +64,7 @@ public class MainMenuScene : GuiScene
         base.Init();
         
         // Init audio
-        if (!sfxContext.MenuBackgroundMusic.Playing)
-        {
-            sfxContext.MenuBackgroundMusic.Play();
-        }
+        SfxContext.MenuBackgroundMusic.Play();
 
         // Init entities
         bannerTexture = Texture2D.FromFile("banner", "Assets/banner.png");
@@ -91,9 +87,47 @@ public class MainMenuScene : GuiScene
         // copyrightText.Text = "Copyright Arrhythmic Battles 2022\nThis project is Free Software under the GPLv3";
         copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
-        buttons = new Buttons(Engine, this, context, sfxContext, new Vector2i(512, 56));
+        // Init screen
+        currentScreen = new SelectScreen(Engine, this);
+
+        menuAnimator = new SimpleAnimator<MenuItemsOffset>(
+            (left, right, factor) =>
+            {
+                double t = Easing.QuadInOut(factor);
+                return MenuItemsOffset.Lerp(left, right, Easing.CircInOut(t));
+            },
+            value => menuItemsOffset = value, 
+            () => new MenuItemsOffset(-Engine.ClientSize.X, -256.0, 64.0),
+            2.5);
         
+        // Init startup sequence
         StartCoroutine(ShowMenu());
+    }
+
+    public void SwitchScreen<T>(params object?[]? args) where T : Screen
+    {
+        currentScreen.Dispose();
+        
+        Screen? screen = (Screen?) Activator.CreateInstance(typeof(T), args);
+        if (screen == null)
+        {
+            throw new Exception("Could not load screen!");
+        }
+
+        currentScreen = screen;
+
+        StartCoroutine(AnimateSwitchScreen(screen));
+    }
+
+    private IEnumerator AnimateSwitchScreen(Screen screen)
+    {
+        for (double t = 0.0; t < 1.0; t += deltaTime * 10.0)
+        {
+            screenYOffset = Math.Sin(t * Math.PI) * 8.0;
+            yield return null;
+        }
+
+        screenYOffset = 0.0;
     }
 
     public void LoadScene<T>(params object?[]? args) where T : Scene
@@ -111,35 +145,14 @@ public class MainMenuScene : GuiScene
     {
         // for some reason it won't work without waiting for a frame
         yield return null;
-        
-        double t = 0.0;
-        while (t < 1.0)
-        {
-            t += deltaTime * 5.0;
-            menuItemsOffset = MenuItemsOffset.Lerp(
-                new MenuItemsOffset(-656.0, -256.0, 64.0),
-                new MenuItemsOffset(),
-                Easing.InOutCirc(t));
-            yield return WaitForEndOfFrame();
-        }
-
-        menuItemsOffset = new MenuItemsOffset();
+        menuAnimator.LerpTo(() => new MenuItemsOffset());
+        yield return menuAnimator.WaitUntilFinish();
     }
 
     private IEnumerator HideMenu()
     {
-        double t = 0.0;
-        while (t < 1.0)
-        {
-            t += deltaTime * 5.0;
-            menuItemsOffset = MenuItemsOffset.Lerp(
-                new MenuItemsOffset(),
-                new MenuItemsOffset(-656.0, -256.0, 64.0),
-                Easing.InOutCirc(t));
-            yield return WaitForEndOfFrame();
-        }
-
-        menuItemsOffset = new MenuItemsOffset(-656.0, -256.0, 64.0);
+        menuAnimator.LerpTo(() => new MenuItemsOffset(-656.0, -256.0, 64.0));
+        yield return menuAnimator.WaitUntilFinish();
     }
 
     public override void Update(UpdateArgs args)
@@ -150,16 +163,23 @@ public class MainMenuScene : GuiScene
         footer.Update(args);
         bannerEntity.Update(args);
         copyrightText.Update(args);
-        context.Update();
+        Context.Update();
+        
+        menuAnimator.Update(args.DeltaTime);
 
-        buttons.Position = new Vector2i(48 + (int) menuItemsOffset.ButtonsXOffset, 306);
-        buttons.Update(args);
+        currentScreen.Position = new Vector2i(48 + (int) menuItemsOffset.ScreenXOffset, 306);
+        currentScreen.Update(args);
     }
 
     public override void Render(Renderer renderer)
     {
         CameraData cameraData = Camera.GetCameraData(Engine.ClientSize);
-
+        
+        MatrixStack.Push();
+        MatrixStack.Translate(0.0, screenYOffset, 0.0);
+        currentScreen.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        MatrixStack.Pop();
+        
         MatrixStack.Push();
         MatrixStack.Translate(0.0, menuItemsOffset.HeaderYOffset, 0.0);
         MatrixStack.Push();
@@ -181,13 +201,13 @@ public class MainMenuScene : GuiScene
         MatrixStack.Translate(Engine.ClientSize.X - 16.0, 24.0, 0.0);
         copyrightText.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
-
-        buttons.Render(renderer, GuiLayerId, MatrixStack, cameraData);
     }
 
     public override void Dispose()
     {
+        SfxContext.MenuBackgroundMusic.Stop();
+        
         bannerEntity.Dispose();
-        buttons.Dispose();
+        currentScreen.Dispose();
     }
 }

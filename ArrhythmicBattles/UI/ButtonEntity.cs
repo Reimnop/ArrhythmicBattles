@@ -32,19 +32,24 @@ public class ButtonEntity : UIElement, IRenderable
 
     private double textPaddingX = 0.0;
     
+    private readonly InputSystem input;
+    private readonly InputCapture capture;
     private readonly TextEntity textEntity;
     private readonly SimpleAnimator<double> paddingAnimator;
     private readonly SimpleAnimator<Color4> colorAnimator;
 
-    public ButtonEntity(FlexFrameworkMain engine) : base(engine)
+    public ButtonEntity(FlexFrameworkMain engine, InputInfo inputInfo) : base(engine)
     {
+        input = inputInfo.InputSystem;
+        capture = inputInfo.InputCapture;
+        
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.HorizontalAlignment = HorizontalAlignment.Left;
 
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
-                float t = (float) Easing.InOutQuad(factor);
+                float t = (float) Easing.QuadInOut(factor);
                 return new Color4(
                     MathHelper.Lerp(left.R, right.R, t),
                     MathHelper.Lerp(left.G, right.G, t),
@@ -56,7 +61,7 @@ public class ButtonEntity : UIElement, IRenderable
             10.0);
 
         paddingAnimator = new SimpleAnimator<double>(
-            (left, right, factor) => MathHelper.Lerp(left, right, Easing.InOutQuad(factor)),
+            (left, right, factor) => MathHelper.Lerp(left, right, Easing.QuadInOut(factor)),
             value => textPaddingX = value,
             () => 0.0,
             10.0);
@@ -69,7 +74,7 @@ public class ButtonEntity : UIElement, IRenderable
         colorAnimator.Update(args.DeltaTime);
         paddingAnimator.Update(args.DeltaTime);
 
-        if (IsFocused && Engine.Input.GetKeyDown(Keys.Enter))
+        if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
         {
             PressedCallback?.Invoke();
         }
