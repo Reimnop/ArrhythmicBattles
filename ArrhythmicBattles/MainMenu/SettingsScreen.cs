@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.UI;
+using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
@@ -10,46 +11,89 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class SettingsScreen : Screen
 {
-    public override Vector2i Position { get; set; }
+    private static readonly Vector2i ButtonSize = new Vector2i(512, 56);
+    private static readonly Color4 DefaultColor = Color4.White;
+    private static readonly Color4 ExitColor = new Color4(233, 81, 83, 255);
+    
+    public override Vector2i Position
+    {
+        get => stackLayout.Position;
+        set => stackLayout.Position = value;
+    }
 
     private readonly FlexFrameworkMain engine;
-    private readonly TextEntity textEntity;
-    private readonly MainMenuScene mainMenuScene;
+    private readonly MainMenuScene scene;
+    private readonly VerticalStackLayout stackLayout;
+    private readonly KeyboardNavigator navigator;
     private readonly InputCapture capture;
+    private readonly InputInfo inputInfo;
 
-    public SettingsScreen(FlexFrameworkMain engine, MainMenuScene mainMenuScene)
+    private readonly List<ButtonEntity> buttonEntities = new List<ButtonEntity>();
+
+    public SettingsScreen(FlexFrameworkMain engine, MainMenuScene scene)
     {
         this.engine = engine;
-        this.mainMenuScene = mainMenuScene;
+        this.scene = scene;
 
-        capture = mainMenuScene.Context.InputSystem.AcquireCapture();
+        capture = scene.Context.InputSystem.AcquireCapture();
+        inputInfo = new InputInfo(scene.Context.InputSystem, capture);
+        
+        // Buttons
+        CreateButton("VIDEO", DefaultColor, () => { });
+        CreateButton("AUDIO", DefaultColor, () => { });
+        CreateButton("BACK", ExitColor, () => scene.SwitchScreen<SelectScreen>(engine, scene));
+        
+        // Layout stuff we shouldn't touch
+        stackLayout = new VerticalStackLayout(engine);
+        foreach (ButtonEntity buttonEntity in buttonEntities)
+        {
+            stackLayout.AddChild(buttonEntity);
+        }
 
-        textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24.0;
-        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nquack quack quack quack\n\nPress Esc to return to main menu";
+        List<NavNode> navNodes = new List<NavNode>();
+        foreach (ButtonEntity buttonEntity in buttonEntities)
+        {
+            navNodes.Add(new NavNode(buttonEntity));
+        }
+        Utils.LinkNodesWrapAroundVertical(navNodes.ToArray());
+
+        navigator = new KeyboardNavigator(inputInfo, navNodes[0]);
+        navigator.OnNodeSelected += node => scene.SfxContext.SelectSfx.Play();
+    }
+    
+    private void CreateButton(string text, Color4 color, Action pressedCallback)
+    {
+        ButtonEntity buttonEntity = new ButtonEntity(engine, inputInfo)
+            .WithText(text)
+            .WithOrigin(0.0, 1.0)
+            .WithTextPosOffset(10, 36)
+            .WithTextUnfocusedColor(color)
+            .WithTextFocusedColor(new Color4(33, 33, 33, 255))
+            .WithSize(ButtonSize)
+            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play())
+            .AddPressedCallback(pressedCallback);
+        buttonEntities.Add(buttonEntity);
     }
     
     public override void Update(UpdateArgs args)
     {
-        textEntity.Update(args);
-
-        if (mainMenuScene.Context.InputSystem.GetKeyDown(capture, Keys.Escape))
-        {
-            mainMenuScene.SwitchScreen<SelectScreen>(engine, mainMenuScene);
-        }
+        stackLayout.Update(args);
+        navigator.Update(args);
+        
+        buttonEntities.ForEach(button => button.Update(args));
     }
     
     public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
-        matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0);
-        textEntity.Render(renderer, layerId, matrixStack, cameraData);
-        matrixStack.Pop();
+        navigator.Render(renderer, layerId, matrixStack, cameraData);
+        
+        buttonEntities.ForEach(button => button.Render(renderer, layerId, matrixStack, cameraData));
     }
 
     public override void Dispose()
     {
-        textEntity.Dispose();
+        buttonEntities.ForEach(button => button.Dispose());
+        
         capture.Dispose();
     }
 }
