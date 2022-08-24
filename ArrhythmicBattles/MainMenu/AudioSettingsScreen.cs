@@ -46,6 +46,7 @@ public class AudioSettingsScreen : Screen
             sliderEntity.BarPosOffset = new Vector2i(300, 16);
             sliderEntity.Size = ControlSize;
             sliderEntity.UnfocusedColor = DefaultColor;
+            sliderEntity.FocusedColor = new Color4(33, 33, 33, 255);
             entities.Add(sliderEntity);
         }
         
@@ -56,6 +57,7 @@ public class AudioSettingsScreen : Screen
             sliderEntity.BarPosOffset = new Vector2i(300, 16);
             sliderEntity.Size = ControlSize;
             sliderEntity.UnfocusedColor = DefaultColor;
+            sliderEntity.FocusedColor = new Color4(33, 33, 33, 255);
             entities.Add(sliderEntity);
         }
         
