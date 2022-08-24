@@ -11,7 +11,6 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class SettingsScreen : Screen
 {
-    private static readonly Vector2i ButtonSize = new Vector2i(512, 56);
     private static readonly Color4 DefaultColor = Color4.White;
     private static readonly Color4 ExitColor = new Color4(233, 81, 83, 255);
     
@@ -40,7 +39,7 @@ public class SettingsScreen : Screen
         
         // Buttons
         CreateButton("VIDEO", DefaultColor, () => { });
-        CreateButton("AUDIO", DefaultColor, () => { });
+        CreateButton("AUDIO", DefaultColor, () => scene.SwitchScreen<AudioSettingsScreen>(engine, scene));
         CreateButton("BACK", ExitColor, () => scene.SwitchScreen<SelectScreen>(engine, scene));
         
         // Layout stuff we shouldn't touch
@@ -58,7 +57,7 @@ public class SettingsScreen : Screen
         Utils.LinkNodesWrapAroundVertical(navNodes.ToArray());
 
         navigator = new KeyboardNavigator(inputInfo, navNodes[0]);
-        navigator.OnNodeSelected += node => scene.SfxContext.SelectSfx.Play();
+        navigator.OnNodeSelected += node => scene.Context.Sound.SelectSfx.Play();
     }
     
     private void CreateButton(string text, Color4 color, Action pressedCallback)
@@ -66,11 +65,11 @@ public class SettingsScreen : Screen
         ButtonEntity buttonEntity = new ButtonEntity(engine, inputInfo)
             .WithText(text)
             .WithOrigin(0.0, 1.0)
-            .WithTextPosOffset(10, 36)
+            .WithTextPosOffset(16, 36)
+            .WithSize(512, 56)
             .WithTextUnfocusedColor(color)
             .WithTextFocusedColor(new Color4(33, 33, 33, 255))
-            .WithSize(ButtonSize)
-            .AddPressedCallback(() => scene.SfxContext.SelectSfx.Play())
+            .AddPressedCallback(() => scene.Context.Sound.SelectSfx.Play())
             .AddPressedCallback(pressedCallback);
         buttonEntities.Add(buttonEntity);
     }
@@ -81,6 +80,11 @@ public class SettingsScreen : Screen
         navigator.Update(args);
         
         buttonEntities.ForEach(button => button.Update(args));
+        
+        if (scene.Context.InputSystem.GetKeyDown(capture, Keys.Escape))
+        {
+            scene.SwitchScreen<SelectScreen>(engine, scene);
+        }
     }
     
     public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)

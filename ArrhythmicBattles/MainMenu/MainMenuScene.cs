@@ -36,7 +36,6 @@ public class MainMenuScene : GuiScene
     }
 
     public ABContext Context { get; }
-    public ABSfxContext SfxContext { get; }
 
     private Texture2D bannerTexture;
     private ImageEntity bannerEntity;
@@ -53,10 +52,9 @@ public class MainMenuScene : GuiScene
     private Screen currentScreen;
     private double screenYOffset = 0.0;
 
-    public MainMenuScene(ABContext context, ABSfxContext sfxContext)
+    public MainMenuScene(ABContext context)
     {
         Context = context;
-        SfxContext = sfxContext;
     }
 
     public override void Init()
@@ -64,7 +62,7 @@ public class MainMenuScene : GuiScene
         base.Init();
         
         // Init audio
-        SfxContext.MenuBackgroundMusic.Play();
+        Context.Sound.MenuBackgroundMusic.Play();
 
         // Init entities
         bannerTexture = Texture2D.FromFile("banner", "Assets/banner.png");
@@ -205,7 +203,7 @@ public class MainMenuScene : GuiScene
 
     public override void Dispose()
     {
-        SfxContext.MenuBackgroundMusic.Stop();
+        Context.Sound.MenuBackgroundMusic.Stop();
         
         bannerEntity.Dispose();
         currentScreen.Dispose();

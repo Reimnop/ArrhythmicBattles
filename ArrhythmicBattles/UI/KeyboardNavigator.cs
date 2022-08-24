@@ -159,7 +159,7 @@ public class KeyboardNavigator : Entity, IRenderable
 
         currentRectSize = actualRectSize;
         
-        Vertex[] vertices = MeshGenerator.GenerateRoundedRectangle(new Vector2d(actualRectSize.X, actualRectSize.Y), 8)
+        Vertex[] vertices = MeshGenerator.GenerateRoundedRectangle(Vector2d.Zero, new Vector2d(actualRectSize.X, actualRectSize.Y), 8)
             .Select(pos => new Vertex((float) pos.X, (float) pos.Y, 0.0f, actualRectSize.X / (float) pos.X, actualRectSize.Y / (float) pos.Y))
             .ToArray();
         mesh.LoadData(vertices);

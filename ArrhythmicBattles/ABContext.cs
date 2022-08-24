@@ -9,12 +9,14 @@ public class ABContext : IDisposable
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
     public InputSystem InputSystem { get; }
+    public ABSound Sound { get; }
 
     public ABContext(FlexFrameworkMain engine)
     {
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
+        Sound = new ABSound();
     }
 
     private DiscordRpcClient InitDiscord()
@@ -33,5 +35,6 @@ public class ABContext : IDisposable
     public void Dispose()
     {
         DiscordRpcClient.Dispose();
+        Sound.Dispose();
     }
 }

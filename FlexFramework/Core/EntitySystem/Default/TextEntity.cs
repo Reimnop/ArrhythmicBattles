@@ -72,7 +72,6 @@ public class TextEntity : Entity, IRenderable
     private bool meshValid = false;
 
     private readonly FlexFrameworkMain engine;
-    private readonly TextDrawData textDrawData;
     private readonly Mesh<TextVertex> mesh;
 
     public TextEntity(FlexFrameworkMain engine, Font font)
@@ -86,8 +85,6 @@ public class TextEntity : Entity, IRenderable
         mesh.Attribute(4, 2 * sizeof(float), VertexAttribType.Float, false);
         mesh.Attribute(2, 6 * sizeof(float), VertexAttribType.Float, false);
         mesh.Attribute(1, 8 * sizeof(float), VertexAttribIntegerType.Int);
-        
-        textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, Matrix4.Identity, Color);
     }
 
     public void InvalidateMesh()
@@ -120,11 +117,10 @@ public class TextEntity : Entity, IRenderable
         {
             return;
         }
-
-        textDrawData.Count = mesh.Count;
-        textDrawData.Transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
-        textDrawData.Color = Color;
         
+        Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
+        TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color);
+
         renderer.EnqueueDrawData(layerId, textDrawData);
     }
     

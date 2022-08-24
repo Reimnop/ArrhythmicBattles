@@ -2,9 +2,9 @@
 
 namespace FlexFramework.Rendering.Data;
 
-public class CustomDrawData : IDrawData
+public struct CustomDrawData : IDrawData
 {
-    public DrawFunc DrawFunc { get; set; }
+    public DrawFunc DrawFunc { get; }
 
     public CustomDrawData(DrawFunc drawFunc)
     {

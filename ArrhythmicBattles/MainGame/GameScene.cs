@@ -10,12 +10,10 @@ namespace ArrhythmicBattles.MainGame;
 public class GameScene : Scene
 {
     private readonly ABContext context;
-    private readonly ABSfxContext sfxContext;
 
-    public GameScene(ABContext context, ABSfxContext sfxContext)
+    public GameScene(ABContext context)
     {
         this.context = context;
-        this.sfxContext = sfxContext;
     }
     
     public override void Init()
@@ -27,7 +25,7 @@ public class GameScene : Scene
     {
         if (Engine.Input.GetKey(Keys.Escape))
         {
-            Engine.LoadScene<MainMenuScene>(context, sfxContext);
+            Engine.LoadScene<MainMenuScene>(context);
         }
     }
 

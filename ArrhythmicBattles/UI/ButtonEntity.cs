@@ -30,12 +30,9 @@ public class ButtonEntity : UIElement, IRenderable
 
     public Vector2i TextPosOffset { get; set; }
 
-    private double textPaddingX = 0.0;
-    
     private readonly InputSystem input;
     private readonly InputCapture capture;
     private readonly TextEntity textEntity;
-    private readonly SimpleAnimator<double> paddingAnimator;
     private readonly SimpleAnimator<Color4> colorAnimator;
 
     public ButtonEntity(FlexFrameworkMain engine, InputInfo inputInfo) : base(engine)
@@ -59,12 +56,6 @@ public class ButtonEntity : UIElement, IRenderable
             value => textEntity.Color = value,
             () => TextUnfocusedColor,
             10.0);
-
-        paddingAnimator = new SimpleAnimator<double>(
-            (left, right, factor) => MathHelper.Lerp(left, right, Easing.QuadInOut(factor)),
-            value => textPaddingX = value,
-            () => 0.0,
-            10.0);
     }
 
     public override void Update(UpdateArgs args)
@@ -72,7 +63,6 @@ public class ButtonEntity : UIElement, IRenderable
         base.Update(args);
         
         colorAnimator.Update(args.DeltaTime);
-        paddingAnimator.Update(args.DeltaTime);
 
         if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
         {
@@ -83,13 +73,11 @@ public class ButtonEntity : UIElement, IRenderable
     protected override void OnFocused()
     {
         colorAnimator.LerpTo(() => TextFocusedColor);
-        paddingAnimator.LerpTo(() => 16.0);
     }
 
     protected override void OnUnfocused()
     {
         colorAnimator.LerpTo(() => TextUnfocusedColor);
-        paddingAnimator.LerpTo(() => 0.0);
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
@@ -100,7 +88,6 @@ public class ButtonEntity : UIElement, IRenderable
         matrixStack.Push();
         matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0);
         matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0);
-        matrixStack.Translate(textPaddingX, 0.0, 0.0);
         textEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
         

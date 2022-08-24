@@ -2,12 +2,12 @@
 
 namespace ArrhythmicBattles;
 
-public class ABSfxContext : IDisposable
+public class ABSound : IDisposable
 {
     public StandaloneAudioClip SelectSfx { get; }
     public StandaloneAudioClip MenuBackgroundMusic { get; }
 
-    public ABSfxContext()
+    public ABSound()
     {
         SelectSfx = StandaloneAudioClip.FromWave("Assets/Audio/Select.wav");
         SelectSfx.Looping = false;

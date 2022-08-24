@@ -4,17 +4,27 @@ namespace ArrhythmicBattles.Util;
 
 public static class MeshGenerator
 {
-    public static Vector2d[] GenerateRoundedRectangle(Vector2d size, double radius, int resolution = 8)
+    public static Vector2d[] GenerateBorder(Vector2d min, Vector2d max, double thickness)
+    {
+        List<Vector2d> vertices = new List<Vector2d>();
+        vertices.AddRange(GenerateRectangle(min, new Vector2d(min.X + thickness, max.Y)));
+        vertices.AddRange(GenerateRectangle(new Vector2d(max.X - thickness, min.Y), max));
+        vertices.AddRange(GenerateRectangle(new Vector2d(min.X + thickness, min.Y), new Vector2d(max.X - thickness, min.Y + thickness)));
+        vertices.AddRange(GenerateRectangle(new Vector2d(min.X + thickness, max.Y - thickness), new Vector2d(max.X - thickness, max.Y)));
+        return vertices.ToArray();
+    }
+    
+    public static Vector2d[] GenerateRoundedRectangle(Vector2d min, Vector2d max, double radius, int resolution = 8)
     {
         if (radius == 0.0)
         {
-            return GenerateRectangle(Vector2d.Zero, size);
+            return GenerateRectangle(min, max);
         }
         
-        Vector2d a = new Vector2d(size.X - radius, size.Y - radius);
-        Vector2d b = new Vector2d(radius, size.Y - radius);
-        Vector2d c = new Vector2d(radius, radius);
-        Vector2d d = new Vector2d(size.X - radius, radius);
+        Vector2d a = new Vector2d(max.X - radius, max.Y - radius);
+        Vector2d b = new Vector2d(min.X + radius, max.Y - radius);
+        Vector2d c = new Vector2d(min.X + radius, min.Y + radius);
+        Vector2d d = new Vector2d(max.X - radius, min.Y + radius);
 
         List<Vector2d> vertices = new List<Vector2d>();
         vertices.AddRange(GenerateCircleArch(resolution, 0.0, Math.PI * 0.5)
@@ -25,9 +35,9 @@ public static class MeshGenerator
             .Select(value => value * radius + c));
         vertices.AddRange(GenerateCircleArch(resolution, Math.PI * 1.5, Math.PI * 2.0)
             .Select(value => value * radius + d));
-        vertices.AddRange(GenerateRectangle(new Vector2d(0.0, radius), b));
-        vertices.AddRange(GenerateRectangle(d, new Vector2d(size.X, size.Y - radius)));
-        vertices.AddRange(GenerateRectangle(new Vector2d(radius, 0.0), new Vector2d(size.X - radius, size.Y)));
+        vertices.AddRange(GenerateRectangle(new Vector2d(min.X, min.Y + radius), b));
+        vertices.AddRange(GenerateRectangle(d, new Vector2d(max.X, max.Y - radius)));
+        vertices.AddRange(GenerateRectangle(new Vector2d(min.X + radius, min.Y), new Vector2d(max.X - radius, max.Y)));
         return vertices.ToArray();
     }
 

@@ -36,13 +36,12 @@ NativeWindowSettings nws = new NativeWindowSettings()
 using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
 
 using ABContext context = new ABContext(flexFramework);
-using ABSfxContext sfxContext = new ABSfxContext();
 
 flexFramework.UseRenderer<DefaultRenderer>();
 flexFramework.LoadFonts(2048,
     new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
     new FontFileInfo("inconsolata-small", 18, "Assets/Fonts/Inconsolata-Regular.ttf"));
-flexFramework.LoadScene<MainMenuScene>(context, sfxContext);
+flexFramework.LoadScene<MainMenuScene>(context);
 
 while (!flexFramework.ShouldClose())
 {

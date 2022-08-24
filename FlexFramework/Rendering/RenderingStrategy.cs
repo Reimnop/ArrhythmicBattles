@@ -4,14 +4,13 @@ namespace FlexFramework.Rendering;
 
 public abstract class RenderingStrategy : IDisposable
 {
-    protected T EnsureDrawDataType<T>(IDrawData drawData) where T : class
+    protected T EnsureDrawDataType<T>(IDrawData drawData)
     {
-        T? castedDrawData = drawData as T;
-        if (castedDrawData is null)
+        if (drawData is T castedDrawData)
         {
-            throw new InvalidCastException();
+            return castedDrawData;
         }
-        return castedDrawData;
+        throw new InvalidCastException();
     }
     
     public abstract void Draw(GLStateManager glStateManager, IDrawData drawData);
