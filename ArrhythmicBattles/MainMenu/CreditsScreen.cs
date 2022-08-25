@@ -10,7 +10,7 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class CreditsScreen : Screen
 {
-    public override Vector2i Position { get; set; }
+    public override Vector2d Position { get; set; }
 
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;

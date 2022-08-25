@@ -18,8 +18,8 @@ public enum ImageMode
 
 public class ImageEntity : UIElement, IRenderable
 {
-    public override Vector2i Position { get; set; } = Vector2i.Zero;
-    public override Vector2i Size { get; set; } = Vector2i.One * 128;
+    public override Vector2d Position { get; set; } = Vector2d.Zero;
+    public override Vector2d Size { get; set; } = Vector2d.One * 128.0;
     public override Vector2d Origin { get; set; } = Vector2d.Zero;
     public override bool IsFocused { get; set; }
 

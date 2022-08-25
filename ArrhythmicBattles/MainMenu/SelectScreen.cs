@@ -13,7 +13,7 @@ public class SelectScreen : Screen
     private static readonly Color4 DefaultColor = Color4.White;
     private static readonly Color4 ExitColor = new Color4(233, 81, 83, 255);
     
-    public override Vector2i Position
+    public override Vector2d Position
     {
         get => stackLayout.Position;
         set => stackLayout.Position = value;

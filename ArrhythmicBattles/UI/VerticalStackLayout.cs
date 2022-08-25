@@ -7,8 +7,8 @@ namespace ArrhythmicBattles.UI;
 
 public class VerticalStackLayout : UIElement
 {
-    public override Vector2i Position { get; set; }
-    public override Vector2i Size { get; set; }
+    public override Vector2d Position { get; set; }
+    public override Vector2d Size { get; set; }
     public override Vector2d Origin { get; set; }
     public override bool IsFocused { get; set; }
 
@@ -27,11 +27,11 @@ public class VerticalStackLayout : UIElement
     {
         base.Update(args);
         
-        int offset = 0;
+        double offset = 0;
         foreach (UIElement child in Children)
         {
-            Vector2i originOffset = new Vector2i((int) (child.Origin.X * child.Size.X), (int) (child.Origin.Y * child.Size.Y)) + Position;
-            child.Position = new Vector2i(0, offset) + originOffset;
+            Vector2d originOffset = new Vector2d(child.Origin.X * child.Size.X, child.Origin.Y * child.Size.Y) + Position;
+            child.Position = new Vector2d(0.0, offset) + originOffset;
             offset += child.Size.Y;
         }
     }

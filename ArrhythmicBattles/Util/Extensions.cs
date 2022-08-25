@@ -19,7 +19,7 @@ public static class Extensions
         return element.WithPosition(new Vector2i(x, y));
     }
     
-    public static T WithSize<T>(this T element, Vector2i value) where T : UIElement
+    public static T WithSize<T>(this T element, Vector2d value) where T : UIElement
     {
         element.Size = value;
         return element;

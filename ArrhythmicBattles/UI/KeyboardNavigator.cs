@@ -66,12 +66,12 @@ public class KeyboardNavigator : Entity, IRenderable
     private readonly InputCapture capture;
     private readonly MeshEntity meshEntity;
     private readonly Mesh<Vertex> mesh;
-    private readonly SimpleAnimator<Rectangle> highlightAnimator;
+    private readonly SimpleAnimator<RectangleF> highlightAnimator;
 
     private NavNode currentNode;
-    private Rectangle currentHighlightRect;
+    private RectangleF currentHighlightRect;
 
-    private Vector2i currentRectSize;
+    private Vector2 currentRectSize;
 
     public KeyboardNavigator(InputInfo inputInfo, NavNode rootNode)
     {
@@ -89,16 +89,16 @@ public class KeyboardNavigator : Entity, IRenderable
         meshEntity = new MeshEntity();
         meshEntity.Mesh = mesh;
 
-        highlightAnimator = new SimpleAnimator<Rectangle>(
+        highlightAnimator = new SimpleAnimator<RectangleF>(
             (left, right, factor) =>
             {
-                double t = Easing.QuadInOut(factor);
+                float t = (float) Easing.QuadInOut(factor);
 
-                return new Rectangle(
-                    (int) MathHelper.Lerp(left.X, right.X, t),
-                    (int) MathHelper.Lerp(left.Y, right.Y, t),
-                    (int) MathHelper.Lerp(left.Width, right.Width, t),
-                    (int) MathHelper.Lerp(left.Height, right.Height, t));
+                return new RectangleF(
+                    MathHelper.Lerp(left.X, right.X, t),
+                    MathHelper.Lerp(left.Y, right.Y, t),
+                    MathHelper.Lerp(left.Width, right.Width, t),
+                    MathHelper.Lerp(left.Height, right.Height, t));
             },
             value => currentHighlightRect = value,
             () => rootNode.Element.GetBounds(),
@@ -151,7 +151,7 @@ public class KeyboardNavigator : Entity, IRenderable
 
     private void RegenRectIfNecessary()
     {
-        Vector2i actualRectSize = new Vector2i(currentHighlightRect.Width, currentHighlightRect.Height);
+        Vector2 actualRectSize = new Vector2(currentHighlightRect.Width, currentHighlightRect.Height);
         if (currentRectSize == actualRectSize)
         {
             return;

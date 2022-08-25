@@ -8,8 +8,8 @@ namespace FlexFramework.Core.EntitySystem.Default;
 
 public abstract class UIElement : Entity
 {
-    public abstract Vector2i Position { get; set; }
-    public abstract Vector2i Size { get; set; }
+    public abstract Vector2d Position { get; set; }
+    public abstract Vector2d Size { get; set; }
     public abstract Vector2d Origin { get; set; }
     public abstract bool IsFocused { get; set; }
 
@@ -49,13 +49,13 @@ public abstract class UIElement : Entity
     public bool IsMouseOver()
     {
         Vector2d mousePos = GetMousePos();
-        Rectangle rectangle = GetBounds();
-        return rectangle.Contains((int) mousePos.X, (int) mousePos.Y);
+        RectangleF rectangle = GetBounds();
+        return rectangle.Contains((float) mousePos.X, (float) mousePos.Y);
     }
 
-    public Rectangle GetBounds()
+    public RectangleF GetBounds()
     {
-        return new Rectangle(Position.X - (int) (Origin.X * Size.X), Position.Y - (int) (Origin.Y * Size.Y), Size.X, Size.Y);
+        return new RectangleF((float) (Position.X - Origin.X * Size.X), (float) (Position.Y - Origin.Y * Size.Y), (float) Size.X, (float) Size.Y);
     }
 
     protected virtual void OnUnfocused()

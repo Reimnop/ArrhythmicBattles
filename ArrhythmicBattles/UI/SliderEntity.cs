@@ -12,8 +12,8 @@ namespace ArrhythmicBattles.UI;
 
 public class SliderEntity : UIElement, IRenderable
 {
-    public override Vector2i Position { get; set; }
-    public override Vector2i Size { get; set; }
+    public override Vector2d Position { get; set; }
+    public override Vector2d Size { get; set; }
     public override Vector2d Origin { get; set; }
     public override bool IsFocused { get; set; }
 
