@@ -7,7 +7,7 @@ using FlexFramework.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.UI;
+namespace FlexFramework.Core.EntitySystem.Default;
 
 public enum ImageMode
 {

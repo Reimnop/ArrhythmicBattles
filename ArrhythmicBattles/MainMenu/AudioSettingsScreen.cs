@@ -2,6 +2,7 @@
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.EntitySystem;
+using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
 using OpenTK.Mathematics;

@@ -4,7 +4,7 @@ using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.UI;
+namespace FlexFramework.Core.EntitySystem.Default;
 
 public abstract class UIElement : Entity
 {
