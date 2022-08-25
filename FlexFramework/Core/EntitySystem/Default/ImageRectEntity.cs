@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.EntitySystem.Default;
 
-public class TexturedEntity : Entity, IRenderable
+public class ImageRectEntity : Entity, IRenderable
 {
     public Texture2D? Texture { get; set; }
     public bool MaintainAspectRatio { get; set; } = true;
@@ -15,7 +15,7 @@ public class TexturedEntity : Entity, IRenderable
 
     private readonly Mesh<Vertex> quadMesh;
 
-    public TexturedEntity(FlexFrameworkMain engine)
+    public ImageRectEntity(FlexFrameworkMain engine)
     {
         quadMesh = engine.PersistentResources.QuadMesh;
     }
@@ -34,7 +34,7 @@ public class TexturedEntity : Entity, IRenderable
         }
         
         Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
-        TexturedVertexDrawData vertexDrawData = new TexturedVertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
+        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();

@@ -4,11 +4,11 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Rendering.DefaultRenderingStrategies;
 
-public class VertexRenderStrategy : RenderingStrategy
+public class IndexedVertexRenderStrategy : RenderingStrategy
 {
     private readonly ShaderProgram unlitShader;
 
-    public VertexRenderStrategy(ShaderProgram unlitShader)
+    public IndexedVertexRenderStrategy(ShaderProgram unlitShader)
     {
         this.unlitShader = unlitShader;
     }
@@ -31,7 +31,7 @@ public class VertexRenderStrategy : RenderingStrategy
 
         GL.Uniform4(3, vertexDrawData.Color);
 
-        GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Count);
+        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
     }
 
     public override void Dispose()

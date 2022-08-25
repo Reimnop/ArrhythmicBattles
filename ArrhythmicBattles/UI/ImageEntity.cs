@@ -72,7 +72,7 @@ public class ImageEntity : UIElement, IRenderable
         matrixStack.Translate(Position.X, Position.Y, 0.0);
         
         Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
-        TexturedVertexDrawData vertexDrawData = new TexturedVertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
+        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
