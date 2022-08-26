@@ -59,8 +59,8 @@ public class DefaultRenderer : Renderer
 
     private ShaderProgram LoadProgram(string name, string path)
     {
-        using Shader vertexShader = new Shader($"{path}-vs", File.ReadAllText($"{path}.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader($"{path}-fs", File.ReadAllText($"{path}.frag"), ShaderType.FragmentShader);
+        using Shader vertexShader = new Shader($"{name}-vs", File.ReadAllText($"{path}.vert"), ShaderType.VertexShader);
+        using Shader fragmentShader = new Shader($"{name}-fs", File.ReadAllText($"{path}.frag"), ShaderType.FragmentShader);
 
         ShaderProgram program = new ShaderProgram(name);
         program.LinkShaders(vertexShader, fragmentShader);

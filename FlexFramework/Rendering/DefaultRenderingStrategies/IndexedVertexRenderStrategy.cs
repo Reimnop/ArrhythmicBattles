@@ -15,7 +15,7 @@ public class IndexedVertexRenderStrategy : RenderingStrategy
     
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
-        VertexDrawData vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
+        IndexedVertexDrawData vertexDrawData = EnsureDrawDataType<IndexedVertexDrawData>(drawData);
         
         glStateManager.UseProgram(unlitShader.Handle);
         glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
