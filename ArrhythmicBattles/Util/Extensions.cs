@@ -19,7 +19,7 @@ public static class Extensions
         return element.WithPosition(new Vector2i(x, y));
     }
     
-    public static T WithSize<T>(this T element, Vector2d value) where T : UIElement
+    public static T WithSize<T>(this T element, Vector2 value) where T : UIElement
     {
         element.Size = value;
         return element;
@@ -30,15 +30,15 @@ public static class Extensions
         return element.WithSize(new Vector2i(x, y));
     }
     
-    public static T WithOrigin<T>(this T element, Vector2d value) where T : UIElement
+    public static T WithOrigin<T>(this T element, Vector2 value) where T : UIElement
     {
         element.Origin = value;
         return element;
     }
     
-    public static T WithOrigin<T>(this T element, double x, double y) where T : UIElement
+    public static T WithOrigin<T>(this T element, float x, float y) where T : UIElement
     {
-        return element.WithOrigin(new Vector2d(x, y));
+        return element.WithOrigin(new Vector2(x, y));
     }
     
     // image extension

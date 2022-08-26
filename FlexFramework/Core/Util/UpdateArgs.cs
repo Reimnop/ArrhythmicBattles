@@ -2,10 +2,10 @@
 
 public struct UpdateArgs
 {
-    public double Time { get; }
-    public double DeltaTime { get; }
+    public float Time { get; }
+    public float DeltaTime { get; }
 
-    public UpdateArgs(double time, double deltaTime)
+    public UpdateArgs(float time, float deltaTime)
     {
         Time = time;
         DeltaTime = deltaTime;

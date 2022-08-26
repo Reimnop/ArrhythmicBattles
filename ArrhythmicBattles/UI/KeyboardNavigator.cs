@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using ArrhythmicBattles.Util;
-using FlexFramework;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.EntitySystem.Default;
@@ -92,7 +91,7 @@ public class KeyboardNavigator : Entity, IRenderable
         highlightAnimator = new SimpleAnimator<RectangleF>(
             (left, right, factor) =>
             {
-                float t = (float) Easing.QuadInOut(factor);
+                float t = Easing.QuadInOut(factor);
 
                 return new RectangleF(
                     MathHelper.Lerp(left.X, right.X, t),
@@ -102,7 +101,7 @@ public class KeyboardNavigator : Entity, IRenderable
             },
             value => currentHighlightRect = value,
             () => rootNode.Element.GetBounds(),
-            10.0);
+            10.0f);
     }
 
     public override void Update(UpdateArgs args)
@@ -159,8 +158,8 @@ public class KeyboardNavigator : Entity, IRenderable
 
         currentRectSize = actualRectSize;
         
-        Vertex[] vertices = MeshGenerator.GenerateRoundedRectangle(Vector2d.Zero, new Vector2d(actualRectSize.X, actualRectSize.Y), 8)
-            .Select(pos => new Vertex((float) pos.X, (float) pos.Y, 0.0f, actualRectSize.X / (float) pos.X, actualRectSize.Y / (float) pos.Y))
+        Vertex[] vertices = MeshGenerator.GenerateRoundedRectangle(Vector2.Zero, new Vector2(actualRectSize.X, actualRectSize.Y), 8)
+            .Select(pos => new Vertex(pos.X, pos.Y, 0.0f, actualRectSize.X / pos.X, actualRectSize.Y / pos.Y))
             .ToArray();
         mesh.LoadData(vertices);
     }
@@ -170,7 +169,7 @@ public class KeyboardNavigator : Entity, IRenderable
         RegenRectIfNecessary();
         
         matrixStack.Push();
-        matrixStack.Translate(currentHighlightRect.X, currentHighlightRect.Y, 0.0);
+        matrixStack.Translate(currentHighlightRect.X, currentHighlightRect.Y, 0.0f);
         meshEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
     }

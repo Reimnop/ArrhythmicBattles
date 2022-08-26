@@ -5,11 +5,11 @@ namespace FlexFramework.Core;
 
 public abstract class Camera
 {
-    public Vector3d Position { get; set; } = Vector3d.Zero;
-    public Quaterniond Rotation { get; set; } = Quaterniond.Identity;
+    public Vector3 Position { get; set; } = Vector3.Zero;
+    public Quaternion Rotation { get; set; } = Quaternion.Identity;
     
-    public abstract double DepthNear { get; set; }
-    public abstract double DepthFar { get; set; }
+    public abstract float DepthNear { get; set; }
+    public abstract float DepthFar { get; set; }
 
     public abstract CameraData GetCameraData(Vector2i viewportSize);
 }

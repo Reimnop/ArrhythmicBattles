@@ -6,6 +6,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using ArrhythmicBattles.MainMenu;
+using ArrhythmicBattles.Util;
 using OpenTK.Windowing.Common.Input;
 using StbImageSharp;
 

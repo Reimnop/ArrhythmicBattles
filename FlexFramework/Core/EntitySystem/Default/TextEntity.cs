@@ -21,7 +21,7 @@ public class TextEntity : Entity, IRenderable
         }
     }
 
-    public double BaselineOffset
+    public float BaselineOffset
     {
         get => baselineOffset;
         set
@@ -65,7 +65,7 @@ public class TextEntity : Entity, IRenderable
 
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
-    private double baselineOffset = 0.0;
+    private float baselineOffset = 0.0f;
     private Font font = null;
     private string text = "";
 
@@ -117,8 +117,8 @@ public class TextEntity : Entity, IRenderable
         {
             return;
         }
-        
-        Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
+
+        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color);
 
         renderer.EnqueueDrawData(layerId, textDrawData);

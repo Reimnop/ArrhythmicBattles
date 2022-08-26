@@ -15,22 +15,22 @@ public class StandaloneAudioClip
     private float pitch = 1.0f;
     private bool loop = true;
 
-    public double Gain
+    public float Gain
     {
         get => gain;
         set
         {
-            gain = (float) value;
+            gain = value;
             AL.Source(SourceHandle, ALSourcef.Gain, gain);
         }
     }
 
-    public double Pitch
+    public float Pitch
     {
         get => pitch;
         set
         {
-            pitch = (float) value;
+            pitch = value;
             AL.Source(SourceHandle, ALSourcef.Pitch, pitch);
         }
     }
@@ -52,7 +52,7 @@ public class StandaloneAudioClip
 
     public bool Playing => AL.GetSourceState(SourceHandle) == ALSourceState.Playing;
 
-    public Vector3d Position
+    public Vector3 Position
     {
         get
         {
@@ -61,7 +61,7 @@ public class StandaloneAudioClip
         }
         set
         {
-            Vector3 position = (Vector3) value;
+            Vector3 position = value;
             AL.Source(SourceHandle, ALSource3f.Position, ref position);
         }
     }
@@ -75,7 +75,7 @@ public class StandaloneAudioClip
         }
     }
 
-    public double PlayPosition => SamplePosition / (double) SampleRate;
+    public float PlayPosition => SamplePosition / (float) SampleRate;
 
     public StandaloneAudioClip(ALFormat format, byte[] data, int sampleRate, int sizeInBytes = -1)
     {

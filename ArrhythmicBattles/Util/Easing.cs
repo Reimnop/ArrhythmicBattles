@@ -3,21 +3,21 @@
 // Copy pasted code from my other project
 public static class Easing
 {
-	private const double PI = 3.14159265359;
-	private const double PI2 = PI / 2;
-	private const double B1 = 1 / 2.75;
-	private const double B2 = 2 / 2.75;
-	private const double B3 = 1.5 / 2.75;
-	private const double B4 = 2.5 / 2.75;
-	private const double B5 = 2.25 / 2.75;
-	private const double B6 = 2.625 / 2.75;
+	private const float PI = 3.14159265359f;
+	private const float PI2 = PI / 2f;
+	private const float B1 = 1 / 2.75f;
+	private const float B2 = 2 / 2.75f;
+	private const float B3 = 1.5f / 2.75f;
+	private const float B4 = 2.5f / 2.75f;
+	private const float B5 = 2.25f / 2.75f;
+	private const float B6 = 2.625f / 2.75f;
 
     /// <summary>
 	/// Linear.
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double Linear(double t)
+	public static float Linear(float t)
 		=> t;
 
 	/// <summary>
@@ -25,7 +25,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double Instant(double t)
+	public static float Instant(float t)
 	{
 		if (t == 1.0f) return 1.0f;
 		return 0.0f;
@@ -38,10 +38,10 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double SineIn(double t)
+	public static float SineIn(float t)
 	{
 		if (t == 1) return 1;
-		return -Math.Cos(PI2 * t) + 1;
+		return -MathF.Cos(PI2 * t) + 1;
 	}
 
 	/// <summary>
@@ -49,9 +49,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double SineOut(double t)
+	public static float SineOut(float t)
 	{
-		return Math.Sin(PI2 * t);
+		return MathF.Sin(PI2 * t);
 	}
 
 	/// <summary>
@@ -59,9 +59,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double SineInOut(double t)
+	public static float SineInOut(float t)
 	{
-		return -Math.Cos(PI * t) / 2 + 0.5f;
+		return -MathF.Cos(PI * t) / 2 + 0.5f;
 	}
 
 	#endregion
@@ -73,9 +73,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ElasticIn(double t)
+	public static float ElasticIn(float t)
 	{
-		return (Math.Sin(13 * PI2 * t) * Math.Pow(2, 10 * (t - 1)));
+		return (MathF.Sin(13 * PI2 * t) * MathF.Pow(2, 10 * (t - 1)));
 	}
 
 	/// <summary>
@@ -83,10 +83,10 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ElasticOut(double t)
+	public static float ElasticOut(float t)
 	{
 		if (t == 1) return 1;
-		return (Math.Sin(-13 * PI2 * (t + 1)) * Math.Pow(2, -10 * t) + 1);
+		return (MathF.Sin(-13 * PI2 * (t + 1)) * MathF.Pow(2, -10 * t) + 1);
 	}
 
 	/// <summary>
@@ -94,14 +94,14 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ElasticInOut(double t)
+	public static float ElasticInOut(float t)
 	{
 		if (t < 0.5)
 		{
-			return (0.5f * Math.Sin(13 * PI2 * (2 * t)) * Math.Pow(2, 10 * ((2 * t) - 1)));
+			return (0.5f * MathF.Sin(13 * PI2 * (2 * t)) * MathF.Pow(2, 10 * ((2 * t) - 1)));
 		}
 
-		return (0.5f * (Math.Sin(-13 * PI2 * ((2 * t - 1) + 1)) * Math.Pow(2, -10 * (2 * t - 1)) + 2));
+		return (0.5f * (MathF.Sin(-13 * PI2 * ((2 * t - 1) + 1)) * MathF.Pow(2, -10 * (2 * t - 1)) + 2));
 	}
 
 	#endregion
@@ -113,7 +113,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BackIn(double t)
+	public static float BackIn(float t)
 	{
 		return (t * t * (2.70158f * t - 1.70158f));
 	}
@@ -123,7 +123,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BackOut(double t)
+	public static float BackOut(float t)
 	{
 		return (1 - (--t) * (t) * (-2.70158f * t - 1.70158f));
 	}
@@ -133,7 +133,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BackInOut(double t)
+	public static float BackInOut(float t)
 	{
 		t *= 2;
 		if (t < 1) return (t * t * (2.70158f * t - 1.70158f) / 2);
@@ -150,7 +150,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BounceIn(double t)
+	public static float BounceIn(float t)
 	{
 		t = 1 - t;
 		if (t < B1) return (1 - 7.5625f * t * t);
@@ -164,7 +164,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BounceOut(double t)
+	public static float BounceOut(float t)
 	{
 		if (t < B1) return (7.5625f * t * t);
 		if (t < B2) return (7.5625f * (t - B3) * (t - B3) + .75f);
@@ -177,7 +177,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double BounceInOut(double t)
+	public static float BounceInOut(float t)
 	{
 		if (t < .5)
 		{
@@ -204,7 +204,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double QuadIn(double t)
+	public static float QuadIn(float t)
 	{
 		return (t * t);
 	}
@@ -214,7 +214,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double QuadOut(double t)
+	public static float QuadOut(float t)
 	{
 		return (-t * (t - 2));
 	}
@@ -224,7 +224,7 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double QuadInOut(double t)
+	public static float QuadInOut(float t)
 	{
 		return (t <= .5 ? t * t * 2 : 1 - (--t) * t * 2);
 	}
@@ -238,9 +238,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double CircIn(double t)
+	public static float CircIn(float t)
 	{
-		return (-(Math.Sqrt(1 - t * t) - 1));
+		return (-(MathF.Sqrt(1 - t * t) - 1));
 	}
 
 	/// <summary>
@@ -248,9 +248,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double CircOut(double t)
+	public static float CircOut(float t)
 	{
-		return (Math.Sqrt(1 - (t - 1) * (t - 1)));
+		return (MathF.Sqrt(1 - (t - 1) * (t - 1)));
 	}
 
 	/// <summary>
@@ -258,9 +258,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double CircInOut(double t)
+	public static float CircInOut(float t)
 	{
-		return (t <= .5 ? (Math.Sqrt(1 - t * t * 4) - 1) / -2 : (Math.Sqrt(1 - (t * 2 - 2) * (t * 2 - 2)) + 1) / 2);
+		return (t <= .5 ? (MathF.Sqrt(1 - t * t * 4) - 1) / -2 : (MathF.Sqrt(1 - (t * 2 - 2) * (t * 2 - 2)) + 1) / 2);
 	}
 
 	#endregion
@@ -272,9 +272,9 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ExpoIn(double t)
+	public static float ExpoIn(float t)
 	{
-		return (Math.Pow(2, 10 * (t - 1)));
+		return (MathF.Pow(2, 10 * (t - 1)));
 	}
 
 	/// <summary>
@@ -282,10 +282,10 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ExpoOut(double t)
+	public static float ExpoOut(float t)
 	{
 		if (t == 1) return 1;
-		return (-Math.Pow(2, -10 * t) + 1);
+		return (-MathF.Pow(2, -10 * t) + 1);
 	}
 
 	/// <summary>
@@ -293,10 +293,10 @@ public static class Easing
 	/// </summary>
 	/// <param name="t">Time elapsed.</param>
 	/// <returns>Eased timescale.</returns>
-	public static double ExpoInOut(double t)
+	public static float ExpoInOut(float t)
 	{
 		if (t == 1) return 1;
-		return (t < .5 ? Math.Pow(2, 10 * (t * 2 - 1)) / 2 : (-Math.Pow(2, -10 * (t * 2 - 1)) + 2) / 2);
+		return (t < .5 ? MathF.Pow(2, 10 * (t * 2 - 1)) / 2 : (-MathF.Pow(2, -10 * (t * 2 - 1)) + 2) / 2);
 	}
 
 	#endregion

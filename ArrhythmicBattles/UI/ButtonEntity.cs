@@ -12,9 +12,9 @@ namespace ArrhythmicBattles.UI;
 
 public class ButtonEntity : UIElement, IRenderable
 {
-    public override Vector2d Position { get; set; }
-    public override Vector2d Size { get; set; }
-    public override Vector2d Origin { get; set; }
+    public override Vector2 Position { get; set; }
+    public override Vector2 Size { get; set; }
+    public override Vector2 Origin { get; set; }
     public override bool IsFocused { get; set; }
 
     public string Text
@@ -46,7 +46,7 @@ public class ButtonEntity : UIElement, IRenderable
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
-                float t = (float) Easing.QuadInOut(factor);
+                float t = Easing.QuadInOut(factor);
                 return new Color4(
                     MathHelper.Lerp(left.R, right.R, t),
                     MathHelper.Lerp(left.G, right.G, t),
@@ -55,7 +55,7 @@ public class ButtonEntity : UIElement, IRenderable
             },
             value => textEntity.Color = value,
             () => TextUnfocusedColor,
-            10.0);
+            10.0f);
     }
 
     public override void Update(UpdateArgs args)
@@ -83,11 +83,11 @@ public class ButtonEntity : UIElement, IRenderable
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0);
+        matrixStack.Translate(Position.X, Position.Y, 0.0f);
 
         matrixStack.Push();
-        matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0);
-        matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0);
+        matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0f);
+        matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0f);
         textEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
         

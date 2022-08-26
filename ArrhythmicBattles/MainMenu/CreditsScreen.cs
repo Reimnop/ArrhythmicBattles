@@ -10,7 +10,7 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class CreditsScreen : Screen
 {
-    public override Vector2d Position { get; set; }
+    public override Vector2 Position { get; set; }
 
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;
@@ -25,7 +25,7 @@ public class CreditsScreen : Screen
         capture = mainMenuScene.Context.InputSystem.AcquireCapture();
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24.0;
+        textEntity.BaselineOffset = 24.0f;
         textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nLuce no\n\nPress Esc to return to main menu";
     }
     
@@ -42,7 +42,7 @@ public class CreditsScreen : Screen
     public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0);
+        matrixStack.Translate(Position.X, Position.Y, 0.0f);
         textEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
     }

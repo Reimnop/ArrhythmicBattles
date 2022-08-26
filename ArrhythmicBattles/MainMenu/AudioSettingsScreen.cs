@@ -12,11 +12,11 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class AudioSettingsScreen : Screen
 {
-    private static readonly Vector2d ControlSize = new Vector2i(512, 56);
+    private static readonly Vector2 ControlSize = new Vector2i(512, 56);
     private static readonly Color4 DefaultColor = Color4.White;
     private static readonly Color4 ExitColor = new Color4(233, 81, 83, 255);
     
-    public override Vector2d Position
+    public override Vector2 Position
     {
         get => stackLayout.Position;
         set => stackLayout.Position = value;
@@ -86,7 +86,7 @@ public class AudioSettingsScreen : Screen
     {
         ButtonEntity buttonEntity = new ButtonEntity(engine, inputInfo)
             .WithText(text)
-            .WithOrigin(0.0, 1.0)
+            .WithOrigin(0.0f, 1.0f)
             .WithTextPosOffset(16, 36)
             .WithSize(ControlSize)
             .WithTextUnfocusedColor(color)

@@ -13,7 +13,7 @@ public class SelectScreen : Screen
     private static readonly Color4 DefaultColor = Color4.White;
     private static readonly Color4 ExitColor = new Color4(233, 81, 83, 255);
     
-    public override Vector2d Position
+    public override Vector2 Position
     {
         get => stackLayout.Position;
         set => stackLayout.Position = value;
@@ -65,7 +65,7 @@ public class SelectScreen : Screen
     {
         ButtonEntity buttonEntity = new ButtonEntity(engine, inputInfo)
             .WithText(text)
-            .WithOrigin(0.0, 1.0)
+            .WithOrigin(0.0f, 1.0f)
             .WithTextPosOffset(16, 36)
             .WithSize(512, 56)
             .WithTextUnfocusedColor(color)

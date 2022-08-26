@@ -10,10 +10,10 @@ public class Input
     private readonly KeyboardState keyboard;
     private readonly MouseState mouse;
 
-    public Vector2d MousePosition => mouse.Position;
-    public Vector2d MouseDelta => mouse.Delta;
-    public Vector2d MouseScroll => mouse.Scroll;
-    public Vector2d MouseScrollDelta => mouse.ScrollDelta;
+    public Vector2 MousePosition => mouse.Position;
+    public Vector2 MouseDelta => mouse.Delta;
+    public Vector2 MouseScroll => mouse.Scroll;
+    public Vector2 MouseScrollDelta => mouse.ScrollDelta;
 
     public bool AnyKeyDown => IsInputAvailable() && keyboard.IsAnyKeyDown;
     public bool AnyMouseButtonDown => IsInputAvailable() && mouse.IsAnyButtonDown;

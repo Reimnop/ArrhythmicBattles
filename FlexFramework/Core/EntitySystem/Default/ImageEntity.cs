@@ -18,9 +18,9 @@ public enum ImageMode
 
 public class ImageEntity : UIElement, IRenderable
 {
-    public override Vector2d Position { get; set; } = Vector2d.Zero;
-    public override Vector2d Size { get; set; } = Vector2d.One * 128.0;
-    public override Vector2d Origin { get; set; } = Vector2d.Zero;
+    public override Vector2 Position { get; set; } = Vector2.Zero;
+    public override Vector2 Size { get; set; } = Vector2.One * 128.0f;
+    public override Vector2 Origin { get; set; } = Vector2.Zero;
     public override bool IsFocused { get; set; }
 
     public Texture2D? Texture { get; set; }
@@ -42,36 +42,36 @@ public class ImageEntity : UIElement, IRenderable
         }
 
         matrixStack.Push();
-        matrixStack.Translate(0.5 - Origin.X, 0.5 - Origin.Y, 0.0);
+        matrixStack.Translate(0.5f - Origin.X, 0.5f - Origin.Y, 0.0f);
         switch (ImageMode)
         {
             case ImageMode.Fill:
-                matrixStack.Scale(Size.X, Size.Y, 1.0);
+                matrixStack.Scale(Size.X, Size.Y, 1.0f);
                 break;
             case ImageMode.Fit:
-                if (Size.X / (double) Size.Y > Texture.Width / (double) Texture.Height)
+                if (Size.X / Size.Y > Texture.Width / (float) Texture.Height)
                 {
-                    matrixStack.Scale(Size.Y * Texture.Width / (double) Texture.Height, Size.Y, 1.0);
+                    matrixStack.Scale(Size.Y * Texture.Width / Texture.Height, Size.Y, 1.0f);
                 }
                 else
                 {
-                    matrixStack.Scale(Size.X, Size.X * Texture.Height / (double) Texture.Width, 1.0);
+                    matrixStack.Scale(Size.X, Size.X * Texture.Height / Texture.Width, 1.0f);
                 }
                 break;
             case ImageMode.Stretch:
-                if (Size.X / (double) Size.Y > Texture.Width / (double) Texture.Height)
+                if (Size.X / Size.Y > Texture.Width / (float) Texture.Height)
                 {
-                    matrixStack.Scale(Size.X, Size.X * Texture.Height / (double) Texture.Width, 1.0);
+                    matrixStack.Scale(Size.X, Size.X * Texture.Height / Texture.Width, 1.0f);
                 }
                 else
                 {
-                    matrixStack.Scale(Size.Y * Texture.Width / (double) Texture.Height, Size.Y, 1.0);
+                    matrixStack.Scale(Size.Y * Texture.Width / Texture.Height, Size.Y, 1.0f);
                 }
                 break;
         }
-        matrixStack.Translate(Position.X, Position.Y, 0.0);
+        matrixStack.Translate(Position.X, Position.Y, 0.0f);
         
-        Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
+        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);

@@ -11,7 +11,7 @@ public abstract class Scene : IDisposable
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
 
-    private double deltaTime = 0.0;
+    private float deltaTime = 0.0f;
 
     protected FlexFrameworkMain Engine { get; private set; }
 
@@ -87,9 +87,9 @@ public abstract class Scene : IDisposable
         }
     }
 
-    protected IEnumerator WaitForSeconds(double time)
+    protected IEnumerator WaitForSeconds(float time)
     {
-        double t = 0.0;
+        float t = 0.0f;
         while (t < time)
         {
             t += deltaTime;

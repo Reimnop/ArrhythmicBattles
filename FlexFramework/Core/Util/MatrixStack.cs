@@ -6,10 +6,10 @@ public class MatrixStack
 {
     private struct LocalGlobalPair
     {
-        public Matrix4d LocalTransformation;
-        public Matrix4d GlobalTransformation;
+        public Matrix4 LocalTransformation;
+        public Matrix4 GlobalTransformation;
 
-        public LocalGlobalPair(Matrix4d local, Matrix4d global)
+        public LocalGlobalPair(Matrix4 local, Matrix4 global)
         {
             LocalTransformation = local;
             GlobalTransformation = global;
@@ -18,16 +18,16 @@ public class MatrixStack
 
     private readonly Stack<LocalGlobalPair> internalStack = new Stack<LocalGlobalPair>();
     
-    public Matrix4d LocalTransformation { get; private set; } = Matrix4d.Identity;
-    public Matrix4d GlobalTransformation { get; private set; } = Matrix4d.Identity;
+    public Matrix4 LocalTransformation { get; private set; } = Matrix4.Identity;
+    public Matrix4 GlobalTransformation { get; private set; } = Matrix4.Identity;
 
     public void Push()
     {
         internalStack.Push(new LocalGlobalPair(LocalTransformation, GlobalTransformation));
-        LocalTransformation = Matrix4d.Identity;
+        LocalTransformation = Matrix4.Identity;
     }
 
-    public void PushMatrix(Matrix4d matrix)
+    public void PushMatrix(Matrix4 matrix)
     {
         Push();
         Transform(matrix);
@@ -40,46 +40,46 @@ public class MatrixStack
         GlobalTransformation = pair.GlobalTransformation;
     }
 
-    public void Transform(Matrix4d matrix)
+    public void Transform(Matrix4 matrix)
     {
         LocalTransformation *= matrix;
         GlobalTransformation = LocalTransformation * internalStack.Peek().GlobalTransformation;
     }
 
-    public void Translate(Vector3d value)
+    public void Translate(Vector3 value)
     {
-        Transform(Matrix4d.CreateTranslation(value));
+        Transform(Matrix4.CreateTranslation(value));
     }
     
-    public void Translate(double x, double y, double z)
+    public void Translate(float x, float y, float z)
     {
-        Transform(Matrix4d.CreateTranslation(x, y, z));
+        Transform(Matrix4.CreateTranslation(x, y, z));
     }
     
-    public void Scale(Vector3d value)
+    public void Scale(Vector3 value)
     {
-        Transform(Matrix4d.Scale(value));
+        Transform(Matrix4.CreateScale(value));
     }
     
-    public void Scale(double x, double y, double z)
+    public void Scale(float x, float y, float z)
     {
-        Transform(Matrix4d.Scale(x, y, z));
+        Transform(Matrix4.CreateScale(x, y, z));
     }
     
-    public void Rotate(Quaterniond value)
+    public void Rotate(Quaternion value)
     {
-        Transform(Matrix4d.CreateFromQuaternion(value));
+        Transform(Matrix4.CreateFromQuaternion(value));
     }
     
-    public void Rotate(Vector3d axis, double angle)
+    public void Rotate(Vector3 axis, float angle)
     {
-        Transform(Matrix4d.CreateFromAxisAngle(axis, angle));
+        Transform(Matrix4.CreateFromAxisAngle(axis, angle));
     }
 
     public void Reset()
     {
         internalStack.Clear();
-        LocalTransformation = Matrix4d.Identity;
-        GlobalTransformation = Matrix4d.Identity;
+        LocalTransformation = Matrix4.Identity;
+        GlobalTransformation = Matrix4.Identity;
     }
 }

@@ -8,9 +8,9 @@ namespace FlexFramework.Core.EntitySystem.Default;
 
 public abstract class UIElement : Entity
 {
-    public abstract Vector2d Position { get; set; }
-    public abstract Vector2d Size { get; set; }
-    public abstract Vector2d Origin { get; set; }
+    public abstract Vector2 Position { get; set; }
+    public abstract Vector2 Size { get; set; }
+    public abstract Vector2 Origin { get; set; }
     public abstract bool IsFocused { get; set; }
 
     private bool wasFocused = false;
@@ -40,22 +40,22 @@ public abstract class UIElement : Entity
         wasFocused = currentlyFocused;
     }
 
-    private Vector2d GetMousePos()
+    private Vector2 GetMousePos()
     {
-        Vector2d mousePos = Engine.Input.MousePosition;
-        return new Vector2d(mousePos.X, Engine.ClientSize.Y - mousePos.Y);
+        Vector2 mousePos = Engine.Input.MousePosition;
+        return new Vector2(mousePos.X, Engine.ClientSize.Y - mousePos.Y);
     }
 
     public bool IsMouseOver()
     {
-        Vector2d mousePos = GetMousePos();
+        Vector2 mousePos = GetMousePos();
         RectangleF rectangle = GetBounds();
-        return rectangle.Contains((float) mousePos.X, (float) mousePos.Y);
+        return rectangle.Contains(mousePos.X, mousePos.Y);
     }
 
     public RectangleF GetBounds()
     {
-        return new RectangleF((float) (Position.X - Origin.X * Size.X), (float) (Position.Y - Origin.Y * Size.Y), (float) Size.X, (float) Size.Y);
+        return new RectangleF(Position.X - Origin.X * Size.X, Position.Y - Origin.Y * Size.Y, Size.X, Size.Y);
     }
 
     protected virtual void OnUnfocused()

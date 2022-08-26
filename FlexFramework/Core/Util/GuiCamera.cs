@@ -6,8 +6,8 @@ public class GuiCamera : Camera
 {
     private readonly FlexFrameworkMain engine;
 
-    public override double DepthNear { get; set; } = -10.0;
-    public override double DepthFar { get; set; } = 10.0;
+    public override float DepthNear { get; set; } = -10.0f;
+    public override float DepthFar { get; set; } = 10.0f;
     
     public GuiCamera(FlexFrameworkMain engine)
     {
@@ -16,8 +16,8 @@ public class GuiCamera : Camera
 
     public override CameraData GetCameraData(Vector2i viewportSize)
     {
-        Matrix4d view = Matrix4d.Invert(Matrix4d.CreateFromQuaternion(Rotation) * Matrix4d.CreateTranslation(Position));
-        Matrix4d projection = Matrix4d.CreateOrthographicOffCenter(0.0, engine.ClientSize.X, engine.ClientSize.Y, 0.0, DepthNear, DepthFar);
+        Matrix4 view = Matrix4.Invert(Matrix4.CreateFromQuaternion(Rotation) * Matrix4.CreateTranslation(Position));
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0.0f, engine.ClientSize.X, engine.ClientSize.Y, 0.0f, DepthNear, DepthFar);
         
         return new CameraData(view, projection);
     }

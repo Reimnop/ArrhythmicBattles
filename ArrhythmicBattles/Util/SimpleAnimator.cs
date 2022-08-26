@@ -2,7 +2,7 @@
 
 namespace ArrhythmicBattles.Util;
 
-public delegate T LerpFunc<T>(T left, T right, double factor);
+public delegate T LerpFunc<T>(T left, T right, float factor);
 public delegate void ValueConsumer<T>(T value);
 public delegate T ValueProvider<T>();
 
@@ -13,13 +13,13 @@ public class SimpleAnimator<T> where T : struct
     private readonly LerpFunc<T> lerpFunc;
     private readonly ValueConsumer<T>? valueConsumer;
 
-    private readonly double speed = 0.0;
+    private readonly float speed = 0.0f;
 
-    private double t = 1.0;
+    private float t = 1.0f;
     private ValueProvider<T>? valueProvider;
     private T oldValue;
 
-    public SimpleAnimator(LerpFunc<T> lerpFunc, ValueConsumer<T>? valueConsumer, ValueProvider<T> valueProvider, double speed)
+    public SimpleAnimator(LerpFunc<T> lerpFunc, ValueConsumer<T>? valueConsumer, ValueProvider<T> valueProvider, float speed)
     {
         this.lerpFunc = lerpFunc;
         this.valueConsumer = valueConsumer;
@@ -37,11 +37,11 @@ public class SimpleAnimator<T> where T : struct
         }
     }
 
-    public void Update(double deltaTime)
+    public void Update(float deltaTime)
     {
         t += deltaTime * speed;
 
-        CurrentValue = lerpFunc(oldValue, valueProvider(), Math.Min(t, 1.0));
+        CurrentValue = lerpFunc(oldValue, valueProvider(), Math.Min(t, 1.0f));
         valueConsumer?.Invoke(CurrentValue);
     }
 
@@ -49,6 +49,6 @@ public class SimpleAnimator<T> where T : struct
     {
         oldValue = CurrentValue;
         this.valueProvider = valueProvider;
-        t = 0.0;
+        t = 0.0f;
     }
 }

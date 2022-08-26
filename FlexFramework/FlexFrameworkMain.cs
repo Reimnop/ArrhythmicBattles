@@ -22,7 +22,7 @@ public class FlexFrameworkMain : NativeWindow
     public AudioManager AudioManager { get; }
     public Input Input { get; }
 
-    private double time = 0.0;
+    private float time = 0.0f;
 
     private GCHandle leakedGcHandle;
 
@@ -105,15 +105,15 @@ public class FlexFrameworkMain : NativeWindow
         ProcessInputEvents();
         ProcessWindowEvents(false);
 
-        double currentTime = GLFW.GetTime();
-        double deltaTime = currentTime - time;
+        float currentTime = (float) GLFW.GetTime();
+        float deltaTime = currentTime - time;
         time = currentTime;
 
         UpdateScene(deltaTime);
         Render();
     }
 
-    private void UpdateScene(double deltaTime)
+    private void UpdateScene(float deltaTime)
     {
         if (SceneManager.CurrentScene == null)
         {

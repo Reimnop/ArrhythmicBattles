@@ -11,22 +11,22 @@ public class AudioSource : IDisposable
     private float pitch = 1.0f;
     private bool loop = true;
 
-    public double Gain
+    public float Gain
     {
         get => gain;
         set
         {
-            gain = (float) value;
+            gain = value;
             AL.Source(Handle, ALSourcef.Gain, gain);
         }
     }
 
-    public double Pitch
+    public float Pitch
     {
         get => pitch;
         set
         {
-            pitch = (float) value;
+            pitch = value;
             AL.Source(Handle, ALSourcef.Pitch, pitch);
         }
     }
@@ -48,7 +48,7 @@ public class AudioSource : IDisposable
 
     public bool Playing => AL.GetSourceState(Handle) == ALSourceState.Playing;
 
-    public Vector3d Position
+    public Vector3 Position
     {
         get
         {
@@ -57,7 +57,7 @@ public class AudioSource : IDisposable
         }
         set
         {
-            Vector3 position = (Vector3) value;
+            Vector3 position = value;
             AL.Source(Handle, ALSource3f.Position, ref position);
         }
     }
@@ -80,7 +80,7 @@ public class AudioSource : IDisposable
         }
     }
 
-    public double PlayPosition => SamplePosition / (double) Clip.SampleRate;
+    public float PlayPosition => SamplePosition / (float) Clip.SampleRate;
 
     public int SamplePosition
     {

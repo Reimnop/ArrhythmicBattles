@@ -8,7 +8,7 @@ public abstract class Entity : IDisposable
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
 
-    private double deltaTime;
+    private float deltaTime;
 
     #region Coroutine Stuff
     
@@ -52,9 +52,9 @@ public abstract class Entity : IDisposable
         }
     }
 
-    protected IEnumerator WaitForSeconds(double time)
+    protected IEnumerator WaitForSeconds(float time)
     {
-        double t = 0.0;
+        float t = 0.0f;
         while (t < time)
         {
             t += deltaTime;

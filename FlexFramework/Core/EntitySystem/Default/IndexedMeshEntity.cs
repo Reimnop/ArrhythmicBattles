@@ -19,8 +19,8 @@ public class IndexedMeshEntity : Entity, IRenderable
         {
             return;
         }
-        
-        Matrix4 transformation = (matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection).ToMatrix4();
+
+        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         IndexedVertexDrawData vertexDrawData = new IndexedVertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color);
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);

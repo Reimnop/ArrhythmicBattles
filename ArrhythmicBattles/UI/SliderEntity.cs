@@ -12,9 +12,9 @@ namespace ArrhythmicBattles.UI;
 
 public class SliderEntity : UIElement, IRenderable
 {
-    public override Vector2d Position { get; set; }
-    public override Vector2d Size { get; set; }
-    public override Vector2d Origin { get; set; }
+    public override Vector2 Position { get; set; }
+    public override Vector2 Size { get; set; }
+    public override Vector2 Origin { get; set; }
     public override bool IsFocused { get; set; }
 
     public string Text
@@ -59,7 +59,7 @@ public class SliderEntity : UIElement, IRenderable
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
-                float t = (float) Easing.QuadInOut(factor);
+                float t = Easing.QuadInOut(factor);
                 return new Color4(
                     MathHelper.Lerp(left.R, right.R, t),
                     MathHelper.Lerp(left.G, right.G, t),
@@ -73,7 +73,7 @@ public class SliderEntity : UIElement, IRenderable
                 barMeshEntityLowOpacity.Color = new Color4(value.R, value.G, value.B, value.A * 0.25f);
             },
             () => UnfocusedColor,
-            10.0);
+            10.0f);
     }
 
     public void InitMaxValue(int value)
@@ -127,26 +127,26 @@ public class SliderEntity : UIElement, IRenderable
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0);
+        matrixStack.Translate(Position.X, Position.Y, 0.0f);
 
         // draw title
         matrixStack.Push();
-        matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0);
+        matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0f);
         matrixStack.Push();
-        matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0);
+        matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0f);
         textEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
         matrixStack.Pop();
 
         // draw bars
         matrixStack.Push();
-        matrixStack.Translate(BarPosOffset.X, BarPosOffset.Y, 0.0);
+        matrixStack.Translate(BarPosOffset.X, BarPosOffset.Y, 0.0f);
         for (int i = 0; i < Value; i++)
         {
             matrixStack.Push();
-            matrixStack.Translate(0.5, 0.5, 0.0);
-            matrixStack.Scale(16.0, 24.0, 0.0);
-            matrixStack.Translate(i * 20.0, 0.0, 0.0);
+            matrixStack.Translate(0.5f, 0.5f, 0.0f);
+            matrixStack.Scale(16.0f, 24.0f, 0.0f);
+            matrixStack.Translate(i * 20.0f, 0.0f, 0.0f);
             barMeshEntity.Render(renderer, layerId, matrixStack, cameraData);
             matrixStack.Pop();
         }
@@ -154,13 +154,13 @@ public class SliderEntity : UIElement, IRenderable
         
         // draw bars with lower opacity
         matrixStack.Push();
-        matrixStack.Translate(BarPosOffset.X, BarPosOffset.Y, 0.0);
+        matrixStack.Translate(BarPosOffset.X, BarPosOffset.Y, 0.0f);
         for (int i = Value; i < BarsCount; i++)
         {
             matrixStack.Push();
-            matrixStack.Translate(0.5, 0.5, 0.0);
-            matrixStack.Scale(16.0, 24.0, 0.0);
-            matrixStack.Translate(i * 20.0, 0.0, 0.0);
+            matrixStack.Translate(0.5f, 0.5f, 0.0f);
+            matrixStack.Scale(16.0f, 24.0f, 0.0f);
+            matrixStack.Translate(i * 20.0f, 0.0f, 0.0f);
             barMeshEntityLowOpacity.Render(renderer, layerId, matrixStack, cameraData);
             matrixStack.Pop();
         }

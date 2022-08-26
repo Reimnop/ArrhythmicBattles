@@ -4,10 +4,10 @@ namespace FlexFramework.Core.Util;
 
 public struct CameraData
 {
-    public Matrix4d View { get; }
-    public Matrix4d Projection { get; }
+    public Matrix4 View { get; }
+    public Matrix4 Projection { get; }
 
-    public CameraData(Matrix4d view, Matrix4d projection)
+    public CameraData(Matrix4 view, Matrix4 projection)
     {
         View = view;
         Projection = projection;

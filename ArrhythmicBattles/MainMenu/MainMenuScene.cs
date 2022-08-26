@@ -15,18 +15,18 @@ public class MainMenuScene : GuiScene
 {
     public struct MenuItemsOffset
     {
-        public double ScreenXOffset { get; set; }
-        public double HeaderYOffset { get; set; }
-        public double FooterYOffset { get; set; }
+        public float ScreenXOffset { get; set; }
+        public float HeaderYOffset { get; set; }
+        public float FooterYOffset { get; set; }
 
-        public MenuItemsOffset(double screenX, double headerY, double footerY)
+        public MenuItemsOffset(float screenX, float headerY, float footerY)
         {
             ScreenXOffset = screenX;
             HeaderYOffset = headerY;
             FooterYOffset = footerY;
         }
 
-        public static MenuItemsOffset Lerp(MenuItemsOffset left, MenuItemsOffset right, double factor)
+        public static MenuItemsOffset Lerp(MenuItemsOffset left, MenuItemsOffset right, float factor)
         {
             return new MenuItemsOffset(
                 MathHelper.Lerp(left.ScreenXOffset, right.ScreenXOffset, factor),
@@ -45,12 +45,12 @@ public class MainMenuScene : GuiScene
     
     private TextEntity copyrightText;
 
-    private MenuItemsOffset menuItemsOffset = new MenuItemsOffset(-656.0, -256.0, 64.0);
-    private double deltaTime;
+    private MenuItemsOffset menuItemsOffset = new MenuItemsOffset(-656.0f, -256.0f, 64.0f);
+    private float deltaTime;
 
     private SimpleAnimator<MenuItemsOffset> menuAnimator;
     private Screen currentScreen;
-    private double screenYOffset = 0.0;
+    private float screenYOffset = 0.0f;
 
     public MainMenuScene(ABContext context)
     {
@@ -91,12 +91,12 @@ public class MainMenuScene : GuiScene
         menuAnimator = new SimpleAnimator<MenuItemsOffset>(
             (left, right, factor) =>
             {
-                double t = Easing.QuadInOut(factor);
+                float t = Easing.QuadInOut(factor);
                 return MenuItemsOffset.Lerp(left, right, Easing.CircInOut(t));
             },
             value => menuItemsOffset = value, 
-            () => new MenuItemsOffset(-Engine.ClientSize.X, -256.0, 64.0),
-            2.5);
+            () => new MenuItemsOffset(-Engine.ClientSize.X, -256.0f, 64.0f),
+            2.5f);
         
         // Init startup sequence
         StartCoroutine(ShowMenu());
@@ -119,13 +119,13 @@ public class MainMenuScene : GuiScene
 
     private IEnumerator AnimateSwitchScreen(Screen screen)
     {
-        for (double t = 0.0; t < 1.0; t += deltaTime * 10.0)
+        for (float t = 0.0f; t < 1.0f; t += deltaTime * 10.0f)
         {
-            screenYOffset = Math.Sin(t * Math.PI) * 8.0;
+            screenYOffset = MathF.Sin(t * MathF.PI) * 8.0f;
             yield return null;
         }
 
-        screenYOffset = 0.0;
+        screenYOffset = 0.0f;
     }
 
     public void LoadScene<T>(params object?[]? args) where T : Scene
@@ -149,7 +149,7 @@ public class MainMenuScene : GuiScene
 
     private IEnumerator HideMenu()
     {
-        menuAnimator.LerpTo(() => new MenuItemsOffset(-656.0, -256.0, 64.0));
+        menuAnimator.LerpTo(() => new MenuItemsOffset(-656.0f, -256.0f, 64.0f));
         yield return menuAnimator.WaitUntilFinish();
     }
 
@@ -174,29 +174,29 @@ public class MainMenuScene : GuiScene
         CameraData cameraData = Camera.GetCameraData(Engine.ClientSize);
         
         MatrixStack.Push();
-        MatrixStack.Translate(0.0, screenYOffset, 0.0);
+        MatrixStack.Translate(0.0f, screenYOffset, 0.0f);
         currentScreen.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
         
         MatrixStack.Push();
-        MatrixStack.Translate(0.0, menuItemsOffset.HeaderYOffset, 0.0);
+        MatrixStack.Translate(0.0f, menuItemsOffset.HeaderYOffset, 0.0f);
         MatrixStack.Push();
-        MatrixStack.Translate(0.5, 0.5, 0.0);
-        MatrixStack.Scale(Engine.ClientSize.X, 256.0, 1.0);
+        MatrixStack.Translate(0.5f, 0.5f, 0.0f);
+        MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
         header.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
         bannerEntity.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
         
         MatrixStack.Push();
-        MatrixStack.Translate(0.0, Engine.ClientSize.Y - 64.0, 0.0);
-        MatrixStack.Translate(0.0, menuItemsOffset.FooterYOffset, 0.0);
+        MatrixStack.Translate(0.0f, Engine.ClientSize.Y - 64.0f, 0.0f);
+        MatrixStack.Translate(0.0f, menuItemsOffset.FooterYOffset, 0.0f);
         MatrixStack.Push();
-        MatrixStack.Translate(0.5, 0.5, 0.0);
-        MatrixStack.Scale(Engine.ClientSize.X, 64.0, 1.0);
+        MatrixStack.Translate(0.5f, 0.5f, 0.0f);
+        MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);
         footer.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
-        MatrixStack.Translate(Engine.ClientSize.X - 16.0, 24.0, 0.0);
+        MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
         copyrightText.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
     }
