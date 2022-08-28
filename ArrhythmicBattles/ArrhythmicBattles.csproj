@@ -1,16 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
+        <LangVersion>preview</LangVersion>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AssimpNet" Version="4.1.0" />
       <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.7.4" />
+      <PackageReference Include="System.Runtime.Experimental" Version="6.0.2" />
     </ItemGroup>
 
     <ItemGroup>

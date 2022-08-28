@@ -38,6 +38,9 @@ public class DefaultRenderer : Renderer
         RegisterRenderingStrategy<IndexedVertexDrawData, IndexedVertexRenderStrategy>(unlitShader);
         RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
         RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();
+        
+        GL.CullFace(CullFaceMode.Back);
+        GL.FrontFace(FrontFaceDirection.Ccw);
     }
 
     private void RegisterRenderingStrategy<TDrawData, TStrategy>(params object?[]? args) 
@@ -101,10 +104,12 @@ public class DefaultRenderer : Renderer
         using TemporaryList<IDrawData> guiLayer = renderLayerRegistry[guiLayerId];
         
         GL.Enable(EnableCap.DepthTest);
+        GL.Enable(EnableCap.CullFace);
         GL.DepthMask(true);
         RenderLayer(opaqueLayer);
         
         GL.DepthMask(false);
+        GL.Disable(EnableCap.CullFace);
         GL.Enable(EnableCap.Blend);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         RenderLayer(transparentLayer);

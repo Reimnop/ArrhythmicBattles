@@ -82,8 +82,6 @@ public class KeyboardNavigator : Entity, IRenderable
         currentNode = rootNode;
 
         mesh = new Mesh<Vertex>("mesh");
-        mesh.Attribute(3, 0, VertexAttribType.Float, false);
-        mesh.Attribute(2, 3 * sizeof(float), VertexAttribType.Float, false);
 
         meshEntity = new MeshEntity();
         meshEntity.Mesh = mesh;

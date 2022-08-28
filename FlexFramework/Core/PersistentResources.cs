@@ -21,8 +21,6 @@ public class PersistentResources : IDisposable
         };
         
         QuadMesh = new Mesh<Vertex>("quad", quadVertices);
-        QuadMesh.Attribute(3, 0, VertexAttribType.Float, false);
-        QuadMesh.Attribute(2, 3 * sizeof(float), VertexAttribType.Float, false);
     }
     
     public void Dispose()

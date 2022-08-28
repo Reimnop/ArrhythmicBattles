@@ -5,20 +5,20 @@ using Buffer = FlexFramework.Rendering.Data.Buffer;
 
 namespace FlexFramework.Core.Data;
 
-public class IndexedMesh<T> : IDisposable where T : struct
+public class IndexedMesh<T> : IDisposable where T : struct, IVertex
 {
     public VertexArray VertexArray { get; }
     public Buffer VertexBuffer { get; }
     public Buffer IndexBuffer { get; }
     public int Count { get; private set; }
 
-    private int currentAttribIndex = 0;
-    
     public IndexedMesh(string name)
     {
         VertexBuffer = new Buffer($"{name}-vtx");
         IndexBuffer = new Buffer($"{name}-idx");
         VertexArray = new VertexArray(name);
+        
+        T.SetupAttributes(Attribute, AttributeI);
     }
 
     public IndexedMesh(string name, T[] vertices, int[] indices)
@@ -28,6 +28,8 @@ public class IndexedMesh<T> : IDisposable where T : struct
         
         VertexArray = new VertexArray(name);
         VertexArray.ElementBuffer(IndexBuffer);
+        
+        T.SetupAttributes(Attribute, AttributeI);
         
         LoadData(vertices, indices);
     }
@@ -55,16 +57,14 @@ public class IndexedMesh<T> : IDisposable where T : struct
         }
     }
 
-    public void Attribute(int size, int offset, VertexAttribType vertexAttribType, bool normalized)
+    private void Attribute(int index, int size, int offset, VertexAttribType vertexAttribType, bool normalized)
     {
-        VertexArray.VertexBuffer(VertexBuffer, currentAttribIndex, currentAttribIndex, size, offset, vertexAttribType, normalized, Unsafe.SizeOf<T>());
-        currentAttribIndex++;
+        VertexArray.VertexBuffer(VertexBuffer, index, index, size, offset, vertexAttribType, normalized, Unsafe.SizeOf<T>());
     }
     
-    public void Attribute(int size, int offset, VertexAttribIntegerType vertexAttribIntegerType)
+    private void AttributeI(int index, int size, int offset, VertexAttribIntegerType vertexAttribIntegerType)
     {
-        VertexArray.VertexBuffer(VertexBuffer, currentAttribIndex, currentAttribIndex, size, offset, vertexAttribIntegerType, Unsafe.SizeOf<T>());
-        currentAttribIndex++;
+        VertexArray.VertexBuffer(VertexBuffer, index, index, size, offset, vertexAttribIntegerType, Unsafe.SizeOf<T>());
     }
 
     public void Dispose()

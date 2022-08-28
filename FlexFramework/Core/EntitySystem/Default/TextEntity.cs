@@ -2,8 +2,6 @@
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
 using FlexFramework.Rendering.Data;
-using FlexFramework.Util;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using Textwriter;
 
@@ -72,7 +70,7 @@ public class TextEntity : Entity, IRenderable
     private bool meshValid = false;
 
     private readonly FlexFrameworkMain engine;
-    private readonly Mesh<TextVertex> mesh;
+    private readonly Mesh<TextVertexExtern> mesh;
 
     public TextEntity(FlexFrameworkMain engine, Font font)
     {
@@ -80,11 +78,7 @@ public class TextEntity : Entity, IRenderable
         this.font = font;
         HorizontalAlignment = horizontalAlignment;
         
-        mesh = new Mesh<TextVertex>("text");
-        mesh.Attribute(2, 0, VertexAttribType.Float, false);
-        mesh.Attribute(4, 2 * sizeof(float), VertexAttribType.Float, false);
-        mesh.Attribute(2, 6 * sizeof(float), VertexAttribType.Float, false);
-        mesh.Attribute(1, 8 * sizeof(float), VertexAttribIntegerType.Int);
+        mesh = new Mesh<TextVertexExtern>("text");
     }
 
     public void InvalidateMesh()
@@ -102,7 +96,12 @@ public class TextEntity : Entity, IRenderable
                 .WithColor(System.Drawing.Color.White));
         
         TextVertex[] vertices = TextMeshGenerator.GenerateVertices(builder.Build());
-        mesh.LoadData(vertices);
+        
+        mesh.LoadData(
+            vertices
+                .Select(x => new TextVertexExtern(x))
+                .ToArray()
+        );
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
