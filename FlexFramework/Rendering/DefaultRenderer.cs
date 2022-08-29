@@ -36,6 +36,7 @@ public class DefaultRenderer : Renderer
         // Register render strategies
         RegisterRenderingStrategy<VertexDrawData, VertexRenderStrategy>(unlitShader);
         RegisterRenderingStrategy<IndexedVertexDrawData, IndexedVertexRenderStrategy>(unlitShader);
+        RegisterRenderingStrategy<SkinnedVertexDrawData, SkinnedVertexRenderStrategy>();
         RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
         RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();
         

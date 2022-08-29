@@ -13,7 +13,7 @@ public class GameScene : Scene
     private readonly ABContext context;
 
     private PerspectiveCamera camera;
-    private ModelEntity modelEntity;
+    private SkinnedModelEntity skinnedModelEntity;
     private Model model;
 
     private int opaqueLayer;
@@ -36,9 +36,9 @@ public class GameScene : Scene
 
         model = new Model("testanim.dae");
         
-        modelEntity = new ModelEntity();
-        modelEntity.Model = model;
-        modelEntity.Animation = model.Animations[0];
+        skinnedModelEntity = new SkinnedModelEntity();
+        skinnedModelEntity.Model = model;
+        skinnedModelEntity.Animation = model.Animations[0];
     }
 
     public override void Update(UpdateArgs args)
@@ -48,7 +48,7 @@ public class GameScene : Scene
             Engine.LoadScene<MainMenuScene>(context);
         }
         
-        modelEntity.Update(args);
+        skinnedModelEntity.Update(args);
         
         // never, ever input like this
         Input input = Engine.Input;
@@ -80,13 +80,13 @@ public class GameScene : Scene
         
         MatrixStack.Push();
         // MatrixStack.Scale(0.0125f, 0.0125f, 0.0125f);
-        modelEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        skinnedModelEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }
 
     public override void Dispose()
     {
-        modelEntity.Dispose();
+        skinnedModelEntity.Dispose();
         model.Dispose();
     }
 }
