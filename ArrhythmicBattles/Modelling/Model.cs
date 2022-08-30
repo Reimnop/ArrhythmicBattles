@@ -67,16 +67,23 @@ public class ModelBone
 
 public class Model : IDisposable
 {
+    private readonly ModelImporter modelImporter;
+    
     public ImmutableTree<ModelNode> Tree { get; }
-    public IReadOnlyList<IndexedMesh<Vertex>> Meshes => meshes;
-    public IReadOnlyList<IndexedMesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes;
+
+    // lazily load meshes
+    // yes, Rider converted my if statements and getter to this
+    public IReadOnlyList<IndexedMesh<Vertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
+    public IReadOnlyList<IndexedMesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
+
     public IReadOnlyList<ModelMaterial> Materials => materials;
     public IReadOnlyList<ModelAnimation> Animations => animations;
     public IReadOnlyList<ModelBone> Bones => bones;
     public IReadOnlyDictionary<string, int> BoneIndexMap => boneIndexMap;
     
-    private readonly List<IndexedMesh<Vertex>> meshes;
-    private readonly List<IndexedMesh<SkinnedVertex>> skinnedMeshes;
+    private List<IndexedMesh<Vertex>>? meshes;
+    private List<IndexedMesh<SkinnedVertex>>? skinnedMeshes;
+    
     private readonly List<ModelMaterial> materials;
     private readonly List<ModelAnimation> animations;
     private readonly List<ModelBone> bones;
@@ -84,20 +91,21 @@ public class Model : IDisposable
 
     public Model(string path)
     {
-        using ModelImporter importer = new ModelImporter(path);
+        modelImporter = new ModelImporter(path);
         
-        Tree = importer.LoadModel();
-        meshes = importer.LoadMeshes();
-        skinnedMeshes = importer.LoadSkinnedMeshes();
-        materials = importer.LoadMaterials();
-        animations = importer.LoadAnimations();
-        bones = importer.LoadBones();
+        Tree = modelImporter.LoadModel();
+        meshes = modelImporter.LoadMeshes();
+        skinnedMeshes = modelImporter.LoadSkinnedMeshes();
+        materials = modelImporter.LoadMaterials();
+        animations = modelImporter.LoadAnimations();
+        bones = modelImporter.LoadBones();
 
-        boneIndexMap = importer.GetBoneIndexMap();
+        boneIndexMap = modelImporter.GetBoneIndexMap();
     }
 
     public void Dispose()
     {
         materials.ForEach(x => x.Dispose());
+        modelImporter.Dispose();
     }
 }

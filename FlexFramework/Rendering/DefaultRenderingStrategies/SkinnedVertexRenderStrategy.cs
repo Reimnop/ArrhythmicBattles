@@ -34,14 +34,13 @@ public class SkinnedVertexRenderStrategy : RenderingStrategy
         }
 
         GL.Uniform4(3, vertexDrawData.Color);
-        GL.Uniform1(4, vertexDrawData.Bones == null || vertexDrawData.Bones.Length == 0 ? 0 : 1);
 
         if (vertexDrawData.Bones != null)
         {
             for (int i = 0; i < vertexDrawData.Bones.Length; i++)
             {
                 Matrix4 bone = vertexDrawData.Bones[i];
-                GL.UniformMatrix4(5 + i, true, ref bone);
+                GL.UniformMatrix4(4 + i, true, ref bone);
             }
         }
 

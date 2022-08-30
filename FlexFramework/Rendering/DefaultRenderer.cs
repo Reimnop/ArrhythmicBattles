@@ -9,26 +9,29 @@ namespace FlexFramework.Rendering;
 public class DefaultRenderer : Renderer
 {
     public const string OpaqueLayerName = "opaque";
+    public const string AlphaClipLayerName = "alphaclip";
     public const string TransparentLayerName = "transparent";
     public const string GuiLayerName = "gui";
     
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
     private Dictionary<Type, RenderingStrategy> renderingStrategies = new Dictionary<Type, RenderingStrategy>();
 
-    private GLStateManager glStateManager;
+    private GLStateManager stateManager;
     private ShaderProgram unlitShader;
 
     private int opaqueLayerId;
+    private int alphaClipLayerId;
     private int transparentLayerId;
     private int guiLayerId;
 
     public override void Init()
     {
-        glStateManager = new GLStateManager();
+        stateManager = new GLStateManager();
         unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
         
         // Register render layers
         opaqueLayerId = RegisterLayer(OpaqueLayerName);
+        alphaClipLayerId = RegisterLayer(AlphaClipLayerName);
         transparentLayerId = RegisterLayer(TransparentLayerName);
         guiLayerId = RegisterLayer(GuiLayerName);
         renderLayerRegistry.Freeze();
@@ -98,28 +101,31 @@ public class DefaultRenderer : Renderer
         GL.Viewport(0, 0, Engine.ClientSize.X, Engine.ClientSize.Y);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        GL.Enable(EnableCap.Multisample);
+        stateManager.SetCapability(EnableCap.Multisample, true);
 
         using TemporaryList<IDrawData> opaqueLayer = renderLayerRegistry[opaqueLayerId];
+        using TemporaryList<IDrawData> alphaClipLayer = renderLayerRegistry[alphaClipLayerId];
         using TemporaryList<IDrawData> transparentLayer = renderLayerRegistry[transparentLayerId];
         using TemporaryList<IDrawData> guiLayer = renderLayerRegistry[guiLayerId];
         
-        GL.Enable(EnableCap.DepthTest);
-        GL.Enable(EnableCap.CullFace);
+        stateManager.SetCapability(EnableCap.DepthTest, true);
+        stateManager.SetCapability(EnableCap.CullFace, true);
         GL.DepthMask(true);
         RenderLayer(opaqueLayer);
         
+        stateManager.SetCapability(EnableCap.CullFace, false);
+        RenderLayer(alphaClipLayer);
+        
         GL.DepthMask(false);
-        GL.Disable(EnableCap.CullFace);
-        GL.Enable(EnableCap.Blend);
+        stateManager.SetCapability(EnableCap.Blend, true);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         RenderLayer(transparentLayer);
         
         GL.DepthMask(true);
         
-        GL.Disable(EnableCap.DepthTest);
+        stateManager.SetCapability(EnableCap.DepthTest, false);
         RenderLayer(guiLayer);
-        GL.Disable(EnableCap.Blend);
+        stateManager.SetCapability(EnableCap.Blend, false);
     }
 
     private void RenderLayer(List<IDrawData> layer)
@@ -127,7 +133,7 @@ public class DefaultRenderer : Renderer
         foreach (IDrawData drawData in layer)
         {
             RenderingStrategy strategy = renderingStrategies[drawData.GetType()];
-            strategy.Draw(glStateManager, drawData);
+            strategy.Draw(stateManager, drawData);
         }
     }
 

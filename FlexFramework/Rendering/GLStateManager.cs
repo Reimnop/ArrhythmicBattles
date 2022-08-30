@@ -8,6 +8,38 @@ public class GLStateManager
     private int currentVertexArray = 0;
     private int[] currentTextureUnits = new int[16];
 
+    private readonly Dictionary<EnableCap, bool> glCapabilities = new Dictionary<EnableCap, bool>();
+
+    public void SetCapability(EnableCap cap, bool enabled)
+    {
+        if (!glCapabilities.TryGetValue(cap, out bool currentlyEnabled))
+        {
+            SetCapabilityIgnoreChecks(cap, enabled);
+            glCapabilities.Add(cap, enabled);
+            return;
+        }
+        
+        if (currentlyEnabled == enabled)
+        {
+            return;
+        }
+
+        glCapabilities[cap] = enabled;
+        SetCapabilityIgnoreChecks(cap, enabled);
+    }
+
+    private void SetCapabilityIgnoreChecks(EnableCap cap, bool enabled)
+    {
+        if (enabled)
+        {
+            GL.Enable(cap);
+        }
+        else
+        {
+            GL.Disable(cap);
+        }
+    }
+
     public void UseProgram(int program)
     {
         if (currentProgram == program)

@@ -13,10 +13,10 @@ public class GameScene : Scene
     private readonly ABContext context;
 
     private PerspectiveCamera camera;
-    private SkinnedModelEntity skinnedModelEntity;
+    private SkinnedModelEntity modelEntity;
     private Model model;
 
-    private int opaqueLayer;
+    private int alphaClipLayer;
 
     private float yRotation = 0.0f;
     private float xRotation = 0.0f;
@@ -29,16 +29,16 @@ public class GameScene : Scene
     public override void Init()
     {
         Engine.Renderer.ClearColor = Color4.Black;
-        opaqueLayer = Engine.Renderer.GetLayerId("opaque");
+        alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
         camera.Position = Vector3.UnitZ * 4.0f;
 
-        model = new Model("testanim.dae");
+        model = new Model(@"Assets/Models/WalkAnim.dae");
         
-        skinnedModelEntity = new SkinnedModelEntity();
-        skinnedModelEntity.Model = model;
-        skinnedModelEntity.Animation = model.Animations[0];
+        modelEntity = new SkinnedModelEntity();
+        modelEntity.Model = model;
+        modelEntity.Animation = model.Animations[0];
     }
 
     public override void Update(UpdateArgs args)
@@ -48,7 +48,7 @@ public class GameScene : Scene
             Engine.LoadScene<MainMenuScene>(context);
         }
         
-        skinnedModelEntity.Update(args);
+        modelEntity.Update(args);
         
         // never, ever input like this
         Input input = Engine.Input;
@@ -80,13 +80,13 @@ public class GameScene : Scene
         
         MatrixStack.Push();
         // MatrixStack.Scale(0.0125f, 0.0125f, 0.0125f);
-        skinnedModelEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        modelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }
 
     public override void Dispose()
     {
-        skinnedModelEntity.Dispose();
+        modelEntity.Dispose();
         model.Dispose();
     }
 }

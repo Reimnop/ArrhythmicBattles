@@ -49,10 +49,17 @@
       <None Update="Assets\Audio\Select.wav">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Assets\Models\WalkAnim.dae">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Models\sef.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Assets\Icons" />
+      <Folder Include="Assets\Models" />
     </ItemGroup>
 
 </Project>
