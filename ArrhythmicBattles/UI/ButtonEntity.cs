@@ -26,7 +26,7 @@ public class ButtonEntity : UIElement, IRenderable
     public Color4 TextUnfocusedColor { get; set; } = Color4.White;
     public Color4 TextFocusedColor { get; set; } = Color4.Black;
 
-    public event Action? PressedCallback;
+    public event Action? OnPressed;
 
     public Vector2i TextPosOffset { get; set; }
 
@@ -66,7 +66,7 @@ public class ButtonEntity : UIElement, IRenderable
 
         if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
         {
-            PressedCallback?.Invoke();
+            OnPressed?.Invoke();
         }
     }
 

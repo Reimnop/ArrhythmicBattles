@@ -55,6 +55,7 @@ public static class Extensions
     }
     
     // button extensions
+    // TODO: Remove those for consistency idk why I wrote those 
     public static ButtonEntity WithText(this ButtonEntity button, string text)
     {
         button.Text = text;
@@ -86,7 +87,7 @@ public static class Extensions
 
     public static ButtonEntity AddPressedCallback(this ButtonEntity button, Action callback)
     {
-        button.PressedCallback += callback;
+        button.OnPressed += callback;
         return button;
     }
 }

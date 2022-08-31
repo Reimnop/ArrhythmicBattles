@@ -10,6 +10,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.MainMenu;
 
+// TODO: Extract half of this to an abstract SettingsScreen class
 public class AudioSettingsScreen : Screen
 {
     private static readonly Vector2 ControlSize = new Vector2i(512, 56);
@@ -40,29 +41,13 @@ public class AudioSettingsScreen : Screen
         inputInfo = new InputInfo(scene.Context.InputSystem, capture);
         
         // Controls
+        CreateSlider("SFX VOLUME", scene.Context.Sound.SfxVolumeLevel, value => scene.Context.Sound.SfxVolumeLevel = value);
+        CreateSlider("MUSIC VOLUME", scene.Context.Sound.MusicVolumeLevel, value => scene.Context.Sound.MusicVolumeLevel = value);
+        CreateButton("BACK", ExitColor, () =>
         {
-            SliderEntity sliderEntity = new SliderEntity(engine, inputInfo);
-            sliderEntity.Text = "MUSIC VOLUME";
-            sliderEntity.TextPosOffset = new Vector2i(16, 36);
-            sliderEntity.BarPosOffset = new Vector2i(300, 16);
-            sliderEntity.Size = ControlSize;
-            sliderEntity.UnfocusedColor = DefaultColor;
-            sliderEntity.FocusedColor = new Color4(33, 33, 33, 255);
-            entities.Add(sliderEntity);
-        }
-        
-        {
-            SliderEntity sliderEntity = new SliderEntity(engine, inputInfo);
-            sliderEntity.Text = "EFFECT VOLUME";
-            sliderEntity.TextPosOffset = new Vector2i(16, 36);
-            sliderEntity.BarPosOffset = new Vector2i(300, 16);
-            sliderEntity.Size = ControlSize;
-            sliderEntity.UnfocusedColor = DefaultColor;
-            sliderEntity.FocusedColor = new Color4(33, 33, 33, 255);
-            entities.Add(sliderEntity);
-        }
-        
-        CreateButton("BACK", ExitColor, () => scene.SwitchScreen<SettingsScreen>(engine, scene));
+            scene.Context.SaveSettings();
+            scene.SwitchScreen<SettingsScreen>(engine, scene);
+        });
         
         // Layout stuff we shouldn't touch
         stackLayout = new VerticalStackLayout(engine);
@@ -80,6 +65,21 @@ public class AudioSettingsScreen : Screen
 
         navigator = new KeyboardNavigator(inputInfo, navNodes[0]);
         navigator.OnNodeSelected += node => scene.Context.Sound.SelectSfx.Play();
+    }
+
+    private void CreateSlider(string text, int value, Action<int> valueChangedCallback)
+    {
+        SliderEntity sliderEntity = new SliderEntity(engine, inputInfo);
+        sliderEntity.Value = value;
+        sliderEntity.Text = text;
+        sliderEntity.TextPosOffset = new Vector2i(16, 36);
+        sliderEntity.BarPosOffset = new Vector2i(300, 16);
+        sliderEntity.Size = ControlSize;
+        sliderEntity.UnfocusedColor = DefaultColor;
+        sliderEntity.FocusedColor = new Color4(33, 33, 33, 255);
+        sliderEntity.OnValueChanged += valueChangedCallback;
+        sliderEntity.OnValueChanged += value => scene.Context.Sound.SelectSfx.Play();
+        entities.Add(sliderEntity);
     }
     
     private void CreateButton(string text, Color4 color, Action pressedCallback)

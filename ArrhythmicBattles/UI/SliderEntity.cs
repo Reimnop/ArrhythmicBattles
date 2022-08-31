@@ -22,6 +22,8 @@ public class SliderEntity : UIElement, IRenderable
         get => textEntity.Text;
         set => textEntity.Text = value;
     }
+    
+    public event Action<int>? OnValueChanged;
 
     public Color4 UnfocusedColor { get; set; } = Color4.White;
     public Color4 FocusedColor { get; set; } = Color4.Black;
@@ -98,12 +100,14 @@ public class SliderEntity : UIElement, IRenderable
             {
                 Value--;
                 Value = Math.Clamp(Value, 0, BarsCount);
+                OnValueChanged?.Invoke(Value);
             }
             
             if (input.GetKeyDown(modifyCapture, Keys.Right))
             {
                 Value++;
                 Value = Math.Clamp(Value, 0, BarsCount);
+                OnValueChanged?.Invoke(Value);
             }
             
             if (input.GetKeyDown(modifyCapture, Keys.Enter))
