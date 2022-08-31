@@ -1,4 +1,5 @@
 ﻿using FlexFramework.Core;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Util;
@@ -112,6 +113,16 @@ public class InputSystem
         }
 
         return input.GetKey(key);
+    }
+
+    public Vector2 GetMovement(InputCapture capture)
+    {
+        if (!IsCurrentCapture(capture))
+        {
+            return Vector2.Zero;
+        }
+
+        return input.GetMovement();
     }
 
     public bool GetKeyCombo(InputCapture capture, params Keys[] keys)

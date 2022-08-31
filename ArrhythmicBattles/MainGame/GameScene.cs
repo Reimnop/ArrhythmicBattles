@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.MainMenu;
 using ArrhythmicBattles.Modelling;
+using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
@@ -16,6 +17,9 @@ public class GameScene : Scene
     private SkinnedModelEntity modelEntity;
     private Model model;
 
+    private InputSystem inputSystem;
+    private InputCapture capture;
+
     private int alphaClipLayer;
 
     private float yRotation = 0.0f;
@@ -28,6 +32,9 @@ public class GameScene : Scene
     
     public override void Init()
     {
+        inputSystem = context.InputSystem;
+        capture = inputSystem.AcquireCapture();
+        
         Engine.Renderer.ClearColor = Color4.Black;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
@@ -50,20 +57,17 @@ public class GameScene : Scene
         
         modelEntity.Update(args);
         
-        // never, ever input like this
-        Input input = Engine.Input;
-        
         Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
         Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
 
-        Vector2 movement = input.GetMovement();
+        Vector2 movement = inputSystem.GetMovement(capture);
 
         Vector3 move = forward * movement.Y + right * movement.X;
         camera.Position += move * 6.0f * args.DeltaTime;
 
-        if (input.GetMouse(MouseButton.Right))
+        if (inputSystem.GetMouse(capture, MouseButton.Right))
         {
-            Vector2 delta = input.MouseDelta / 480.0f;
+            Vector2 delta = Engine.Input.MouseDelta / 480.0f;
 
             yRotation -= delta.X;
             xRotation -= delta.Y;
@@ -88,5 +92,6 @@ public class GameScene : Scene
     {
         modelEntity.Dispose();
         model.Dispose();
+        capture.Dispose();
     }
 }
