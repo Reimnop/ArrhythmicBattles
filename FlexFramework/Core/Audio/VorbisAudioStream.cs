@@ -30,20 +30,27 @@ public class VorbisAudioStream : AudioStream
         vorbis.SeekTo(0L);
     }
 
+    private int ReadSamples(Span<float> buffer)
+    {
+        int readLength = vorbis.ReadSamples(buffer);
+        
+        if (readLength == 0 && Looping)
+        {
+            vorbis.SeekTo(0L);
+            return vorbis.ReadSamples(buffer);
+        }
+
+        return readLength;
+    }
+
     public override bool NextBuffer(out Span<byte> data)
     {
-        int readLength = vorbis.ReadSamples(readBuffer);
+        int readLength = ReadSamples(readBuffer);
         
         if (readLength == 0)
         {
-            if (!Looping) 
-            {
-                data = null;
-                return false;
-            }
-            
-            vorbis.SeekTo(0L);
-            readLength = vorbis.ReadSamples(readBuffer);
+            data = null;
+            return false;
         }
 
         GCHandle handle = GCHandle.Alloc(copyBuffer, GCHandleType.Pinned);

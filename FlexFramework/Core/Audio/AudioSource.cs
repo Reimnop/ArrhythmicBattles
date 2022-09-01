@@ -6,10 +6,6 @@ namespace FlexFramework.Core.Audio;
 public class AudioSource : IDisposable
 {
     public int Handle { get; }
-
-    private float gain = 1.0f;
-    private float pitch = 1.0f;
-
     public float Gain
     {
         get => gain;
@@ -19,7 +15,6 @@ public class AudioSource : IDisposable
             AL.Source(Handle, ALSourcef.Gain, gain);
         }
     }
-
     public float Pitch
     {
         get => pitch;
@@ -29,9 +24,7 @@ public class AudioSource : IDisposable
             AL.Source(Handle, ALSourcef.Pitch, pitch);
         }
     }
-
     public bool Playing => AL.GetSourceState(Handle) == ALSourceState.Playing;
-
     public Vector3 Position
     {
         get
@@ -45,6 +38,12 @@ public class AudioSource : IDisposable
             AL.Source(Handle, ALSource3f.Position, ref position);
         }
     }
+    
+    private float gain = 1.0f;
+    private float pitch = 1.0f;
+
+    private readonly Thread audioThread;
+    private bool shouldUpdate = true;
 
     public AudioStream? AudioStream
     {
@@ -64,20 +63,37 @@ public class AudioSource : IDisposable
         AL.Source(Handle, ALSourcef.Gain, gain);
         AL.Source(Handle, ALSourcef.Pitch, pitch);
         AL.Source(Handle, ALSourcei.SourceType, (int) ALSourceType.Streaming);
+
+        audioThread = new Thread(UpdateLoop);
+        audioThread.IsBackground = true;
+        audioThread.Start();
     }
 
-    public void Update()
+    private void UpdateLoop()
     {
-        if (AudioStream == null)
+        while (shouldUpdate)
         {
-            return;
+            Update();
+            Thread.Sleep(4);
         }
-        if (!Playing)
-        {
-            return;
-        }
+    }
 
-        QueueBuffers(AudioStream);
+    private void Update()
+    {
+        if (audioStream == null)
+        {
+            return;
+        }
+        
+        lock (audioStream)
+        {
+            if (!Playing)
+            {
+                return;
+            }
+
+            QueueBuffers(audioStream);
+        }
     }
 
     private void QueueBuffers(AudioStream stream, int numBuffers = 2)
@@ -136,21 +152,24 @@ public class AudioSource : IDisposable
 
     public void Play()
     {
-        if (AudioStream == null)
+        if (audioStream == null)
         {
             return;
         }
         
         AL.SourceStop(Handle);
-        
-        if (AudioStream.SamplePosition > 0)
+
+        lock (audioStream)
         {
-            AudioStream.Restart();
+            if (audioStream.SamplePosition > 0)
+            {
+                audioStream.Restart();
+            }
+        
+            CleanAllBuffers();
+            QueueBuffers(audioStream);
         }
         
-        CleanAllBuffers();
-        QueueBuffers(AudioStream);
-
         AL.SourcePlay(Handle);
     }
 
@@ -171,9 +190,11 @@ public class AudioSource : IDisposable
 
     public void Dispose()
     {
-        CleanAllBuffers();
-        
         AL.SourceStop(Handle);
+        
+        shouldUpdate = false;
+        CleanAllBuffers();
+
         AL.DeleteSource(Handle);
     }
 }

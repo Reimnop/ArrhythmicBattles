@@ -52,12 +52,6 @@ public class ABSound : IDisposable, IConfigurable
         return audioSource;
     }
 
-    public void Update()
-    {
-        MenuBackgroundMusic.Update();
-        SelectSfx.Update();
-    }
-
     public JsonObject ToJson()
     {
         JsonObject jsonObject = new JsonObject();
