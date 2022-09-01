@@ -72,6 +72,10 @@ public class AudioSource : IDisposable
         {
             return;
         }
+        if (!Playing)
+        {
+            return;
+        }
 
         QueueBuffers(AudioStream);
     }
