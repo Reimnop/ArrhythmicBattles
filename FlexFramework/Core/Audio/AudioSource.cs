@@ -46,23 +46,13 @@ public class AudioSource : IDisposable
         }
     }
 
-    public bool Looping { get; set; }
-
     public AudioStream? AudioStream
     {
         get => audioStream;
         set
         {
             audioStream = value;
-            
-            if (value != null)
-            {
-                QueueBuffers(value);
-            }
-            else
-            {
-                CleanAllBuffers();
-            }
+            CleanAllBuffers();
         }
     }
 
@@ -83,15 +73,10 @@ public class AudioSource : IDisposable
             return;
         }
 
-        if (!Playing)
-        {
-            return;
-        }
-        
         QueueBuffers(AudioStream);
     }
 
-    private void QueueBuffers(AudioStream stream, int numBuffers = 4)
+    private void QueueBuffers(AudioStream stream, int numBuffers = 2)
     {
         AL.GetSource(Handle, ALGetSourcei.BuffersProcessed, out int buffersProcessed);
 
@@ -108,18 +93,13 @@ public class AudioSource : IDisposable
         int buffersToQueue = numBuffers - buffersQueued;
         for (int i = 0; i < buffersToQueue; i++)
         {
-            if (!stream.NextBuffer(out byte[]? data))
+            if (!stream.NextBuffer(out Span<byte> data))
             {
-                if (Looping)
-                {
-                    stream.Restart();
-                }
-                
                 break;
             }
 
             int buffer = AL.GenBuffer();
-            AL.BufferData(buffer, DetermineSoundFormat(stream.BytesPerSample, stream.Channels), data, stream.SampleRate);
+            AL.BufferData<byte>(buffer, DetermineSoundFormat(stream.BytesPerSample, stream.Channels), data, stream.SampleRate);
             AL.SourceQueueBuffer(Handle, buffer);
         }
     }
@@ -151,6 +131,26 @@ public class AudioSource : IDisposable
     }
 
     public void Play()
+    {
+        if (AudioStream == null)
+        {
+            return;
+        }
+        
+        AL.SourceStop(Handle);
+        
+        if (AudioStream.SamplePosition > 0)
+        {
+            AudioStream.Restart();
+        }
+        
+        CleanAllBuffers();
+        QueueBuffers(AudioStream);
+
+        AL.SourcePlay(Handle);
+    }
+
+    public void Resume()
     {
         AL.SourcePlay(Handle);
     }

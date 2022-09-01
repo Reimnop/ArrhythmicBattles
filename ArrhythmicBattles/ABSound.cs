@@ -43,9 +43,10 @@ public class ABSound : IDisposable, IConfigurable
     private AudioSource InitAudioSource(string path, bool looping)
     {
         VorbisAudioStream audioStream = new VorbisAudioStream(path);
+        audioStream.Looping = looping;
+        
         AudioSource audioSource = new AudioSource();
         audioSource.AudioStream = audioStream;
-        audioSource.Looping = looping;
         audioStreams.Add(audioStream);
 
         return audioSource;
@@ -54,6 +55,7 @@ public class ABSound : IDisposable, IConfigurable
     public void Update()
     {
         MenuBackgroundMusic.Update();
+        SelectSfx.Update();
     }
 
     public JsonObject ToJson()

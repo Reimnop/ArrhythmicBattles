@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using NVorbis;
 
 namespace FlexFramework.Core.Audio;
@@ -10,9 +9,12 @@ public class VorbisAudioStream : AudioStream
     public override int Channels => vorbis.Channels;
     public override int BytesPerSample => 4;
     public override int SampleRate => vorbis.SampleRate;
-    
+    public override long SamplePosition => vorbis.SamplePosition;
+    public override bool Looping { get; set; }
+
     private readonly VorbisReader vorbis;
     private readonly float[] readBuffer;
+    private readonly byte[] copyBuffer;
 
     public VorbisAudioStream(string path)
     {
@@ -20,6 +22,7 @@ public class VorbisAudioStream : AudioStream
         
         // buffer one second of audio
         readBuffer = new float[vorbis.Channels * vorbis.SampleRate];
+        copyBuffer = new byte[vorbis.Channels * vorbis.SampleRate * sizeof(float)];
     }
 
     public override void Restart()
@@ -27,20 +30,27 @@ public class VorbisAudioStream : AudioStream
         vorbis.SeekTo(0L);
     }
 
-    public override bool NextBuffer([MaybeNullWhen(false)] out byte[] data)
+    public override bool NextBuffer(out Span<byte> data)
     {
-        if (vorbis.ReadSamples(readBuffer) == 0)
+        int readLength = vorbis.ReadSamples(readBuffer);
+        
+        if (readLength == 0)
         {
-            data = null;
-            return false;
+            if (!Looping) 
+            {
+                data = null;
+                return false;
+            }
+            
+            vorbis.SeekTo(0L);
+            readLength = vorbis.ReadSamples(readBuffer);
         }
 
-        data = new byte[readBuffer.Length * sizeof(float)];
-        
-        GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        Marshal.Copy(readBuffer, 0, handle.AddrOfPinnedObject(), readBuffer.Length);
+        GCHandle handle = GCHandle.Alloc(copyBuffer, GCHandleType.Pinned);
+        Marshal.Copy(readBuffer, 0, handle.AddrOfPinnedObject(), readLength);
         handle.Free();
 
+        data = new Span<byte>(copyBuffer, 0, readLength * sizeof(float));
         return true;
     }
 

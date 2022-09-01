@@ -8,8 +8,10 @@ public abstract class AudioStream : IDisposable
     public abstract int Channels { get; }
     public abstract int BytesPerSample { get; }
     public abstract int SampleRate { get; }
+    public abstract long SamplePosition { get; }
+    public abstract bool Looping { get; set; }
 
     public abstract void Restart();
-    public abstract bool NextBuffer([MaybeNullWhen(false)] out byte[] data);
+    public abstract bool NextBuffer(out Span<byte> data);
     public abstract void Dispose();
 }
