@@ -59,6 +59,7 @@ public class ABContext : IDisposable
 
     public void Update()
     {
+        Sound.Update();
         DiscordRpcClient.Invoke();
     }
 

@@ -9,7 +9,6 @@ public class AudioSource : IDisposable
 
     private float gain = 1.0f;
     private float pitch = 1.0f;
-    private bool loop = true;
 
     public float Gain
     {
@@ -31,21 +30,6 @@ public class AudioSource : IDisposable
         }
     }
 
-    public bool Looping
-    {
-        get => loop;
-        set
-        {
-            if (loop == value)
-            {
-                return;
-            }
-
-            loop = value;
-            AL.Source(Handle, ALSourceb.Looping, value);
-        }
-    }
-
     public bool Playing => AL.GetSourceState(Handle) == ALSourceState.Playing;
 
     public Vector3 Position
@@ -62,41 +46,108 @@ public class AudioSource : IDisposable
         }
     }
 
-    private AudioClip? audioClip = null;
+    public bool Looping { get; set; }
 
-    public AudioClip? Clip
+    public AudioStream? AudioStream
     {
-        get => audioClip;
+        get => audioStream;
         set
         {
-            audioClip = value;
-
-            if (audioClip == null)
-            {
-                return;
-            }
+            audioStream = value;
             
-            AL.Source(Handle, ALSourcei.Buffer, audioClip.Handle);
+            if (value != null)
+            {
+                QueueBuffers(value);
+            }
+            else
+            {
+                CleanAllBuffers();
+            }
         }
     }
 
-    public float PlayPosition => SamplePosition / (float) Clip.SampleRate;
-
-    public int SamplePosition
-    {
-        get
-        {
-            AL.GetSource(Handle, ALGetSourcei.SampleOffset, out int bPosition);
-            return bPosition;
-        }
-    }
+    private AudioStream? audioStream;
 
     public AudioSource()
     {
         Handle = AL.GenSource();
         AL.Source(Handle, ALSourcef.Gain, gain);
         AL.Source(Handle, ALSourcef.Pitch, pitch);
-        AL.Source(Handle, ALSourceb.Looping, loop);
+        AL.Source(Handle, ALSourcei.SourceType, (int) ALSourceType.Streaming);
+    }
+
+    public void Update()
+    {
+        if (AudioStream == null)
+        {
+            return;
+        }
+
+        if (!Playing)
+        {
+            return;
+        }
+        
+        QueueBuffers(AudioStream);
+    }
+
+    private void QueueBuffers(AudioStream stream, int numBuffers = 4)
+    {
+        AL.GetSource(Handle, ALGetSourcei.BuffersProcessed, out int buffersProcessed);
+
+        // Delete all used buffers
+        if (buffersProcessed > 0) 
+        {
+            Span<int> buffersToDelete = stackalloc int[buffersProcessed];
+            AL.SourceUnqueueBuffers(Handle, buffersToDelete);
+            AL.DeleteBuffers(buffersToDelete);
+        }
+
+        // Queue new buffers
+        AL.GetSource(Handle, ALGetSourcei.BuffersQueued, out int buffersQueued);
+        int buffersToQueue = numBuffers - buffersQueued;
+        for (int i = 0; i < buffersToQueue; i++)
+        {
+            if (!stream.NextBuffer(out byte[]? data))
+            {
+                if (Looping)
+                {
+                    stream.Restart();
+                }
+                
+                break;
+            }
+
+            int buffer = AL.GenBuffer();
+            AL.BufferData(buffer, DetermineSoundFormat(stream.BytesPerSample, stream.Channels), data, stream.SampleRate);
+            AL.SourceQueueBuffer(Handle, buffer);
+        }
+    }
+
+    private static ALFormat DetermineSoundFormat(int bytesPerSample, int channels)
+    {
+        return (bytesPerSample, channels) switch
+        {
+            (1, 1) => ALFormat.Mono8,
+            (1, 2) => ALFormat.Stereo8,
+            (2, 1) => ALFormat.Mono16,
+            (2, 2) => ALFormat.Stereo16,
+            (4, 1) => ALFormat.MonoFloat32Ext,
+            (4, 2) => ALFormat.StereoFloat32Ext,
+            (_, _) => throw new NotImplementedException()
+        };
+    }
+    
+    private void CleanAllBuffers()
+    {
+        AL.GetSource(Handle, ALGetSourcei.BuffersQueued, out int buffersQueued);
+
+        if (buffersQueued > 0)
+        {
+            Span<int> buffers = stackalloc int[buffersQueued];
+            AL.SourceUnqueueBuffers(buffersQueued, buffers);
+            AL.DeleteBuffers(buffers);
+        }
     }
 
     public void Play()
@@ -116,6 +167,8 @@ public class AudioSource : IDisposable
 
     public void Dispose()
     {
+        CleanAllBuffers();
+        
         AL.SourceStop(Handle);
         AL.DeleteSource(Handle);
     }

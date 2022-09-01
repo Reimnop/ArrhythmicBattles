@@ -29,15 +29,31 @@ public class ABSound : IDisposable, IConfigurable
     private int sfxVolumeLevel = 10;
     private int musicVolumeLevel = 10;
     
-    public StandaloneAudioClip SelectSfx { get; }
-    public StandaloneAudioClip MenuBackgroundMusic { get; }
+    public AudioSource SelectSfx { get; }
+    public AudioSource MenuBackgroundMusic { get; }
+
+    private readonly List<AudioStream> audioStreams = new List<AudioStream>();
 
     public ABSound()
     {
-        SelectSfx = StandaloneAudioClip.FromWave("Assets/Audio/Select.wav");
-        SelectSfx.Looping = false;
-        
-        MenuBackgroundMusic = StandaloneAudioClip.FromWave("Assets/Audio/Arrhythmic.wav");
+        MenuBackgroundMusic = InitAudioSource("Assets/Audio/Arrhythmic.ogg", true);
+        SelectSfx = InitAudioSource("Assets/Audio/Select.ogg", false);
+    }
+
+    private AudioSource InitAudioSource(string path, bool looping)
+    {
+        VorbisAudioStream audioStream = new VorbisAudioStream(path);
+        AudioSource audioSource = new AudioSource();
+        audioSource.AudioStream = audioStream;
+        audioSource.Looping = looping;
+        audioStreams.Add(audioStream);
+
+        return audioSource;
+    }
+
+    public void Update()
+    {
+        MenuBackgroundMusic.Update();
     }
 
     public JsonObject ToJson()
@@ -59,5 +75,10 @@ public class ABSound : IDisposable, IConfigurable
     {
         SelectSfx.Dispose();
         MenuBackgroundMusic.Dispose();
+
+        foreach (AudioStream audioStream in audioStreams)
+        {
+            audioStream.Dispose();
+        }
     }
 }
