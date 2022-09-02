@@ -49,6 +49,12 @@
       <None Update="Assets\Models\sef.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Assets\Models\Environment.dae">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Models\Ground037_1K_Color.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Assets\Audio\Arrhythmic.ogg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

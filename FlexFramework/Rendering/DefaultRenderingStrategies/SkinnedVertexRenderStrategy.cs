@@ -25,22 +25,25 @@ public class SkinnedVertexRenderStrategy : RenderingStrategy
         glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
 
         Matrix4 transformation = vertexDrawData.Transformation;
+        Matrix4 model = vertexDrawData.ModelMatrix;
         GL.UniformMatrix4(0, true, ref transformation);
-        GL.Uniform1(1, vertexDrawData.Texture == null ? 0 : 1);
+        GL.UniformMatrix4(1, true, ref model);
+        GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
 
         if (vertexDrawData.Texture != null)
         {
             glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
         }
 
-        GL.Uniform4(3, vertexDrawData.Color);
+        GL.Uniform4(4, vertexDrawData.Color);
+        GL.Uniform3(5, -Vector3.One);
 
         if (vertexDrawData.Bones != null)
         {
             for (int i = 0; i < vertexDrawData.Bones.Length; i++)
             {
                 Matrix4 bone = vertexDrawData.Bones[i];
-                GL.UniformMatrix4(4 + i, true, ref bone);
+                GL.UniformMatrix4(6 + i, true, ref bone);
             }
         }
 

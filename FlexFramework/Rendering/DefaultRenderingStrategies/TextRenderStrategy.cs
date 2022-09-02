@@ -13,13 +13,13 @@ public class TextRenderStrategy : RenderingStrategy
     {
         this.engine = engine;
 
-        using Shader textVert = new Shader("text-vert", File.ReadAllText("Assets/Shaders/text.vert"),
+        using Shader vertexShader = new Shader("text-vert", File.ReadAllText("Assets/Shaders/text.vert"),
             ShaderType.VertexShader);
-        using Shader textFrag = new Shader("text-frag", File.ReadAllText("Assets/Shaders/text.frag"),
+        using Shader fragmentShader = new Shader("text-frag", File.ReadAllText("Assets/Shaders/text.frag"),
             ShaderType.FragmentShader);
         
         textShader = new ShaderProgram("text");
-        textShader.LinkShaders(textVert, textFrag);
+        textShader.LinkShaders(vertexShader, fragmentShader);
     }
     
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)

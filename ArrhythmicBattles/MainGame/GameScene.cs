@@ -4,6 +4,7 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -15,7 +16,9 @@ public class GameScene : Scene
 
     private PerspectiveCamera camera;
     private SkinnedModelEntity modelEntity;
+    private ModelEntity envModelEntity;
     private Model model;
+    private Model envModel;
 
     private InputSystem inputSystem;
     private InputCapture capture;
@@ -35,17 +38,23 @@ public class GameScene : Scene
         inputSystem = context.InputSystem;
         capture = inputSystem.AcquireCapture();
         
-        Engine.Renderer.ClearColor = Color4.Black;
+        Engine.Renderer.ClearColor = Color4.SkyBlue;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
         camera.Position = Vector3.UnitZ * 4.0f;
 
         model = new Model(@"Assets/Models/WalkAnim.dae");
+        model.TextureMinFilter(TextureMinFilter.Nearest);
+        model.TextureMagFilter(TextureMagFilter.Nearest);
         
         modelEntity = new SkinnedModelEntity();
         modelEntity.Model = model;
         modelEntity.Animation = model.Animations[0];
+
+        envModel = new Model(@"Assets/Models/Environment.dae");
+        envModelEntity = new ModelEntity();
+        envModelEntity.Model = envModel;
     }
 
     public override void Update(UpdateArgs args)
@@ -56,6 +65,7 @@ public class GameScene : Scene
         }
         
         modelEntity.Update(args);
+        envModelEntity.Update(args);
         
         Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
         Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
@@ -83,8 +93,11 @@ public class GameScene : Scene
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         
         MatrixStack.Push();
-        // MatrixStack.Scale(0.0125f, 0.0125f, 0.0125f);
+        MatrixStack.Push();
+        MatrixStack.Translate(0.0f, -0.4f, 8.0f);
         modelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
+        MatrixStack.Pop();
+        envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }
 
@@ -92,6 +105,8 @@ public class GameScene : Scene
     {
         modelEntity.Dispose();
         model.Dispose();
+        envModelEntity.Dispose();
+        envModel.Dispose();
         capture.Dispose();
     }
 }

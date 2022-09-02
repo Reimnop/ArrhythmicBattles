@@ -44,13 +44,13 @@ public class ModelEntity : Entity, IRenderable
     private AnimationHandler? animationHandler;
     private ModelAnimation? animation;
 
-    private readonly IndexedMeshEntity meshEntity;
+    private readonly LitMeshEntity meshEntity;
 
     private float time = 0.0f;
 
     public ModelEntity()
     {
-        meshEntity = new IndexedMeshEntity();
+        meshEntity = new LitMeshEntity();
     }
 
     public override void Update(UpdateArgs args)

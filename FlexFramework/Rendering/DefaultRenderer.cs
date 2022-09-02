@@ -18,6 +18,7 @@ public class DefaultRenderer : Renderer
 
     private GLStateManager stateManager;
     private ShaderProgram unlitShader;
+    private ShaderProgram litShader;
 
     private int opaqueLayerId;
     private int alphaClipLayerId;
@@ -28,6 +29,7 @@ public class DefaultRenderer : Renderer
     {
         stateManager = new GLStateManager();
         unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
+        litShader = LoadProgram("lit", "Assets/Shaders/lit");
         
         // Register render layers
         opaqueLayerId = RegisterLayer(OpaqueLayerName);
@@ -39,6 +41,7 @@ public class DefaultRenderer : Renderer
         // Register render strategies
         RegisterRenderingStrategy<VertexDrawData, VertexRenderStrategy>(unlitShader);
         RegisterRenderingStrategy<IndexedVertexDrawData, IndexedVertexRenderStrategy>(unlitShader);
+        RegisterRenderingStrategy<LitVertexDrawData, LitVertexRenderStrategy>(litShader);
         RegisterRenderingStrategy<SkinnedVertexDrawData, SkinnedVertexRenderStrategy>();
         RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
         RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();

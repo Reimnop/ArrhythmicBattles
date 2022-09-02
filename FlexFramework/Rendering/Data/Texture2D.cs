@@ -55,6 +55,16 @@ public class Texture2D : IGpuObject
         GL.TextureParameter(Handle, TextureParameterName.TextureMagFilter, (int) filter);
     }
 
+    public void AnisotropicFiltering(float value)
+    {
+        GL.TextureParameter(Handle, TextureParameterName.TextureMaxAnisotropy, value);
+    }
+    
+    public void GenerateMipmap()
+    {
+        GL.GenerateTextureMipmap(Handle);
+    }
+
     public void Dispose()
     {
         GL.DeleteTexture(Handle);

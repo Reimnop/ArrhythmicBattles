@@ -23,7 +23,7 @@ public class ModelImporter : IDisposable
         directory = Path.GetDirectoryName(path);
         
         context = new AssimpContext();
-        scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs);
+        scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs);
         
         // Collect all bones
         Dictionary<string, ModelBone> boneNameToBone = new Dictionary<string, ModelBone>();
@@ -73,8 +73,6 @@ public class ModelImporter : IDisposable
                 if (File.Exists(path)) 
                 {
                     texture = Texture2D.FromFile(Path.GetFileName(path), path);
-                    texture.SetMinFilter(TextureMinFilter.Nearest);
-                    texture.SetMagFilter(TextureMagFilter.Nearest);
                 }
             }
 
@@ -91,16 +89,17 @@ public class ModelImporter : IDisposable
         return materials;
     }
     
-    public List<IndexedMesh<Vertex>> LoadMeshes()
+    public List<IndexedMesh<LitVertex>> LoadMeshes()
     {
-        List<IndexedMesh<Vertex>> meshes = new List<IndexedMesh<Vertex>>();
+        List<IndexedMesh<LitVertex>> meshes = new List<IndexedMesh<LitVertex>>();
 
         foreach (Mesh sceneMesh in scene.Meshes)
         {
-            List<Vertex> vertices = new List<Vertex>();
+            List<LitVertex> vertices = new List<LitVertex>();
             for (int i = 0; i < sceneMesh.VertexCount; i++)
             {
                 Vector3D pos = sceneMesh.Vertices[i];
+                Vector3D normal = sceneMesh.Normals[i];
                 Vector3D uv = sceneMesh.TextureCoordinateChannelCount == 0 
                     ? new Vector3D() 
                     : sceneMesh.TextureCoordinateChannels[0][i];
@@ -108,13 +107,14 @@ public class ModelImporter : IDisposable
                     ? new Color4D(1.0f)
                     : sceneMesh.VertexColorChannels[0][i];
                 
-                vertices.Add(new Vertex(
+                vertices.Add(new LitVertex(
                     pos.X, pos.Y, pos.Z, 
+                    normal.X, normal.Y, normal.Z,
                     uv.X, uv.Y, 
                     color.R, color.G, color.B, color.A));
             }
 
-            IndexedMesh<Vertex> mesh = new IndexedMesh<Vertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
+            IndexedMesh<LitVertex> mesh = new IndexedMesh<LitVertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
             meshes.Add(mesh);
         }
 
@@ -131,6 +131,7 @@ public class ModelImporter : IDisposable
             for (int i = 0; i < sceneMesh.VertexCount; i++)
             {
                 Vector3D pos = sceneMesh.Vertices[i];
+                Vector3D normal = sceneMesh.Normals[i];
                 Vector3D uv = sceneMesh.TextureCoordinateChannelCount == 0 
                     ? new Vector3D() 
                     : sceneMesh.TextureCoordinateChannels[0][i];
@@ -140,6 +141,7 @@ public class ModelImporter : IDisposable
                 
                 vertices.Add(new SkinnedVertex(
                     pos.X, pos.Y, pos.Z, 
+                    normal.X, normal.Y, normal.Z,
                     uv.X, uv.Y, 
                     color.R, color.G, color.B, color.A));
             }

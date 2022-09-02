@@ -2,6 +2,7 @@
 using ArrhythmicBattles.Util;
 using FlexFramework.Core.Data;
 using FlexFramework.Rendering.Data;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
@@ -73,7 +74,7 @@ public class Model : IDisposable
 
     // lazily load meshes
     // yes, Rider converted my if statements and getter to this
-    public IReadOnlyList<IndexedMesh<Vertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
+    public IReadOnlyList<IndexedMesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
     public IReadOnlyList<IndexedMesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
 
     public IReadOnlyList<ModelMaterial> Materials => materials;
@@ -81,7 +82,7 @@ public class Model : IDisposable
     public IReadOnlyList<ModelBone> Bones => bones;
     public IReadOnlyDictionary<string, int> BoneIndexMap => boneIndexMap;
     
-    private List<IndexedMesh<Vertex>>? meshes;
+    private List<IndexedMesh<LitVertex>>? meshes;
     private List<IndexedMesh<SkinnedVertex>>? skinnedMeshes;
     
     private readonly List<ModelMaterial> materials;
@@ -101,6 +102,26 @@ public class Model : IDisposable
         bones = modelImporter.LoadBones();
 
         boneIndexMap = modelImporter.GetBoneIndexMap();
+    }
+
+    public void TextureMinFilter(TextureMinFilter filter)
+    {
+        materials.ForEach(mat => mat.Texture?.SetMinFilter(filter));
+    }
+    
+    public void TextureMagFilter(TextureMagFilter filter)
+    {
+        materials.ForEach(mat => mat.Texture?.SetMagFilter(filter));
+    }
+    
+    public void TextureAnisotropicFiltering(float value)
+    {
+        materials.ForEach(mat => mat.Texture?.AnisotropicFiltering(value));
+    }
+
+    public void TextureGenerateMipmap()
+    {
+        materials.ForEach(mat => mat.Texture?.GenerateMipmap());
     }
 
     public void Dispose()

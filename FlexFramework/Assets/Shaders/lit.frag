@@ -18,15 +18,15 @@ void main() {
     vec3 norm = normalize(Normal);
     float light = dot(norm, normalize(-lightDir));
     light = max(min(light, 1.0), 0.4);
-
+    
     vec4 outColor = vec4(1.0);
     if (hasTexture) {
         outColor = texture(_texture, Uv);
     }
     outColor *= Color;
-
+    
     if (outColor.a < 0.01)
         discard;
-
+    
     fragColor = outColor * color * light;
 }
