@@ -1,8 +1,4 @@
-﻿#version 150
-
-#extension GL_ARB_explicit_attrib_location : enable
-#extension GL_ARB_explicit_uniform_location : enable
-
+﻿#version 430
 layout(location = 0) out vec4 fragColor;
 
 layout(location = 2) uniform bool hasTexture;

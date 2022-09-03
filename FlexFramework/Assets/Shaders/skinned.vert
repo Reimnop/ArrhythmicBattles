@@ -1,8 +1,4 @@
-﻿#version 150
-
-#extension GL_ARB_explicit_attrib_location : enable
-#extension GL_ARB_explicit_uniform_location : enable
-
+﻿#version 430
 const int MAX_BONES = 100;
 
 layout(location = 0) in vec3 aPos;

@@ -27,7 +27,7 @@ NativeWindowSettings nws = new NativeWindowSettings()
 {
     Title = "Arrhythmic Battles",
     Size = new Vector2i(1366, 768),
-    APIVersion = new Version(3, 2),
+    APIVersion = new Version(4, 3),
     Profile = ContextProfile.Core,
     Icon = icon
 };
