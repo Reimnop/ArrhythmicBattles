@@ -4,6 +4,7 @@ using FlexFramework.Rendering.Data;
 using FlexFramework.Rendering.DefaultRenderingStrategies;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Rendering;
 
@@ -98,14 +99,14 @@ public class DefaultRenderer : Renderer
         renderLayerRegistry[layerId].Add(drawData);
     }
 
-    private bool ShouldUpdateCapturer()
+    private bool ShouldUpdateCapturer(Vector2i size)
     {
         if (screenCapturer == null)
         {
             return true;
         }
-
-        if (screenCapturer.Width != Engine.ClientSize.X || screenCapturer.Height != Engine.ClientSize.Y)
+        
+        if (screenCapturer.Width != size.X || screenCapturer.Height != size.Y)
         {
             return true;
         }
@@ -115,10 +116,11 @@ public class DefaultRenderer : Renderer
 
     public override void Update(UpdateArgs args)
     {
-        if (ShouldUpdateCapturer())
+        Vector2i size = Engine.ClientSize;
+        if (ShouldUpdateCapturer(size))
         {
             screenCapturer?.Dispose();
-            screenCapturer = new ScreenCapturer("scene", Engine.ClientSize.X, Engine.ClientSize.Y);
+            screenCapturer = new ScreenCapturer("scene", size.X, size.Y);
         }
     }
 
@@ -130,7 +132,7 @@ public class DefaultRenderer : Renderer
         
         stateManager.BindFramebuffer(screenCapturer.FramebufferHandle);
 
-        GL.Viewport(0, 0, Engine.ClientSize.X, Engine.ClientSize.Y);
+        GL.Viewport(0, 0, screenCapturer.Width, screenCapturer.Height);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         // stateManager.SetCapability(EnableCap.Multisample, true);
@@ -164,9 +166,9 @@ public class DefaultRenderer : Renderer
         // Blit to backbuffer
         GL.Clear(ClearBufferMask.ColorBufferBit);
         GL.BlitNamedFramebuffer(screenCapturer.FramebufferHandle, 0, 
-            0, 0, Engine.ClientSize.X, Engine.ClientSize.Y, 
+            0, 0, screenCapturer.Width, screenCapturer.Height, 
             0, 0, Engine.ClientSize.X, Engine.ClientSize.Y,
-            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
     }
 
     private void RenderLayer(List<IDrawData> layer)
