@@ -29,7 +29,6 @@ NativeWindowSettings nws = new NativeWindowSettings()
     Size = new Vector2i(1366, 768),
     APIVersion = new Version(3, 2),
     Profile = ContextProfile.Core,
-    NumberOfSamples = 4,
     Icon = icon
 };
 

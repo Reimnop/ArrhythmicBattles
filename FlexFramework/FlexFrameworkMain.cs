@@ -4,6 +4,7 @@ using FlexFramework.Core.Audio;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
+using FlexFramework.Rendering.Data;
 using FlexFramework.Rendering.Text;
 using FlexFramework.Util.Exceptions;
 using OpenTK.Graphics.OpenGL4;
@@ -108,11 +109,11 @@ public class FlexFrameworkMain : NativeWindow
         float deltaTime = currentTime - time;
         time = currentTime;
 
-        UpdateScene(deltaTime);
+        Tick(deltaTime);
         Render();
     }
 
-    private void UpdateScene(float deltaTime)
+    private void Tick(float deltaTime)
     {
         if (SceneManager.CurrentScene == null)
         {
@@ -123,6 +124,8 @@ public class FlexFrameworkMain : NativeWindow
 
         SceneManager.CurrentScene.Update(args);
         SceneManager.CurrentScene.UpdateInternal(args);
+        
+        Renderer.Update(args);
     }
 
     private unsafe void Render()

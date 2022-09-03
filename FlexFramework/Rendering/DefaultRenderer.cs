@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Util;
+﻿using System.Diagnostics;
+using FlexFramework.Core.Util;
 using FlexFramework.Rendering.Data;
 using FlexFramework.Rendering.DefaultRenderingStrategies;
 using FlexFramework.Util;
@@ -16,6 +17,8 @@ public class DefaultRenderer : Renderer
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
     private Dictionary<Type, RenderingStrategy> renderingStrategies = new Dictionary<Type, RenderingStrategy>();
 
+    private ScreenCapturer? screenCapturer;
+
     private GLStateManager stateManager;
     private ShaderProgram unlitShader;
     private ShaderProgram litShader;
@@ -28,9 +31,11 @@ public class DefaultRenderer : Renderer
     public override void Init()
     {
         stateManager = new GLStateManager();
+        
+        // Init GL objects
         unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
         litShader = LoadProgram("lit", "Assets/Shaders/lit");
-        
+
         // Register render layers
         opaqueLayerId = RegisterLayer(OpaqueLayerName);
         alphaClipLayerId = RegisterLayer(AlphaClipLayerName);
@@ -45,7 +50,7 @@ public class DefaultRenderer : Renderer
         RegisterRenderingStrategy<SkinnedVertexDrawData, SkinnedVertexRenderStrategy>();
         RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
         RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();
-        
+
         GL.CullFace(CullFaceMode.Back);
         GL.FrontFace(FrontFaceDirection.Ccw);
     }
@@ -93,18 +98,42 @@ public class DefaultRenderer : Renderer
         renderLayerRegistry[layerId].Add(drawData);
     }
 
+    private bool ShouldUpdateCapturer()
+    {
+        if (screenCapturer == null)
+        {
+            return true;
+        }
+
+        if (screenCapturer.Width != Engine.ClientSize.X || screenCapturer.Height != Engine.ClientSize.Y)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public override void Update(UpdateArgs args)
     {
+        if (ShouldUpdateCapturer())
+        {
+            screenCapturer?.Dispose();
+            screenCapturer = new ScreenCapturer("scene", Engine.ClientSize.X, Engine.ClientSize.Y);
+        }
     }
 
     public override void Render()
     {
         GL.ClearColor(ClearColor);
         
+        Debug.Assert(screenCapturer != null);
+        
+        stateManager.BindFramebuffer(screenCapturer.FramebufferHandle);
+
         GL.Viewport(0, 0, Engine.ClientSize.X, Engine.ClientSize.Y);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        stateManager.SetCapability(EnableCap.Multisample, true);
+        // stateManager.SetCapability(EnableCap.Multisample, true);
 
         using TemporaryList<IDrawData> opaqueLayer = renderLayerRegistry[opaqueLayerId];
         using TemporaryList<IDrawData> alphaClipLayer = renderLayerRegistry[alphaClipLayerId];
@@ -129,6 +158,15 @@ public class DefaultRenderer : Renderer
         stateManager.SetCapability(EnableCap.DepthTest, false);
         RenderLayer(guiLayer);
         stateManager.SetCapability(EnableCap.Blend, false);
+        
+        stateManager.BindFramebuffer(0);
+        
+        // Blit to backbuffer
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.BlitNamedFramebuffer(screenCapturer.FramebufferHandle, 0, 
+            0, 0, Engine.ClientSize.X, Engine.ClientSize.Y, 
+            0, 0, Engine.ClientSize.X, Engine.ClientSize.Y,
+            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
     }
 
     private void RenderLayer(List<IDrawData> layer)
