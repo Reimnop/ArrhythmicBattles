@@ -34,7 +34,7 @@ public class LitVertexRenderStrategy : RenderingStrategy
         GL.Uniform4(4, vertexDrawData.Color);
         GL.Uniform3(5, -Vector3.One);
 
-        GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Count);
+        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
     }
 
     public override void Dispose()
