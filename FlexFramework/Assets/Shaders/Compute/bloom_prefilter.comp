@@ -8,7 +8,7 @@ layout(location = 2) uniform float softThreshold = 0.75;
 layout(rgba16f, binding = 0) uniform image2D outputImage;
 
 float calcBrightness(vec3 color) {
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+    return max(color.r, max(color.g, color.b));
 }
 
 void main() {

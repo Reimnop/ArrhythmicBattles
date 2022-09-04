@@ -189,9 +189,15 @@ public class DefaultRenderer : Renderer
         Vector2i size = new Vector2i(texture.Width, texture.Height);
         postProcessors.ForEach(processor =>
         {
+            if (processor.CurrentSize == Vector2i.Zero)
+            {
+                processor.Init(size);
+                return;
+            }
+            
             if (processor.CurrentSize != size)
             {
-                processor.Resize(size.X, size.Y);
+                processor.Resize(size);
             }
         });
         postProcessors.ForEach(processor => processor.Process(stateManager, texture));

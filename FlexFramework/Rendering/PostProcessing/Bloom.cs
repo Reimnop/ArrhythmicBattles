@@ -29,25 +29,29 @@ public class Bloom : PostProcessor
         downsampleShader = LoadComputeShader("bloom-downsample", "Assets/Shaders/Compute/bloom_downsample.comp");
         upsampleShader = LoadComputeShader("bloom-upsample", "Assets/Shaders/Compute/bloom_upsample.comp");
         combineShader = LoadComputeShader("bloom-combine", "Assets/Shaders/Compute/bloom_combine.comp");
-        
-        InitSize(1366, 768);
     }
     
-    public override void Resize(int x, int y)
+    public override void Resize(Vector2i size)
     {
-        base.Resize(x, y);
+        base.Resize(size);
         
         DeleteTextures();
-        InitSize(x, y);
+        InitSize(size);
     }
 
-    private void InitSize(int x, int y)
+    public override void Init(Vector2i size)
     {
-        prefilteredTexture = InitNewTexture("bloom-prefiltered", x, y);
-        downsampleMipChain = InitMipChain(new Vector2i(x, y) / 2, 0.5f, 5);
+        base.Init(size);
+        InitSize(size);
+    }
+
+    private void InitSize(Vector2i size)
+    {
+        prefilteredTexture = InitNewTexture("bloom-prefiltered", size.X, size.Y);
+        downsampleMipChain = InitMipChain(size / 2, 0.5f, 5);
         smallestTexture = InitNewTexture("bloom-smallest", downsampleMipChain[^1].Width / 2, downsampleMipChain[^1].Height / 2);
         upsampleMipChain = InitMipChain(new Vector2i(smallestTexture.Width, smallestTexture.Height) * 2, 2.0f, 5);
-        finalTexture = InitNewTexture("bloom-final", x, y);
+        finalTexture = InitNewTexture("bloom-final", size.X, size.Y);
     }
 
     private Texture2D[] InitMipChain(Vector2i initialSize, float factor, int mipCount)

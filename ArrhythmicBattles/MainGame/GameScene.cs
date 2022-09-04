@@ -24,6 +24,7 @@ public class GameScene : Scene
     private Model envModel;
     
     private Bloom bloom;
+    private Exposure tonemapper;
 
     private InputSystem inputSystem;
     private InputCapture capture;
@@ -59,7 +60,7 @@ public class GameScene : Scene
         cubeModel = new Model(@"Assets/Models/Cube.dae");
         cubeModelEntity = new ModelEntity();
         cubeModelEntity.Model = cubeModel;
-        cubeModelEntity.Color = new Color4(4.6f, 4.2f, 1.6f, 1.0f);
+        cubeModelEntity.Color = new Color4(1.2f, 8.2f, 1.8f, 1.0f);
 
         envModel = new Model(@"Assets/Models/Environment.dae");
         envModelEntity = new ModelEntity();
@@ -67,6 +68,8 @@ public class GameScene : Scene
         
         // Init post processing
         bloom = new Bloom();
+        tonemapper = new Exposure();
+        tonemapper.ExposureValue = 0.9f;
     }
 
     public override void Update(UpdateArgs args)
@@ -103,7 +106,8 @@ public class GameScene : Scene
     public override void Render(Renderer renderer)
     {
         renderer.UsePostProcessor(bloom);
-        
+        renderer.UsePostProcessor(tonemapper);
+
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         MatrixStack.Push();
         
@@ -128,6 +132,8 @@ public class GameScene : Scene
         envModelEntity.Dispose();
         envModel.Dispose();
         capture.Dispose();
+        
         bloom.Dispose();
+        tonemapper.Dispose();
     }
 }

@@ -7,9 +7,13 @@ public abstract class PostProcessor : IDisposable
 {
     public Vector2i CurrentSize { get; private set; }
 
-    public virtual void Resize(int x, int y)
+    public virtual void Resize(Vector2i size)
     {
-        CurrentSize = new Vector2i(x, y);
+        CurrentSize = size;
+    }
+    public virtual void Init(Vector2i size)
+    {
+        CurrentSize = size;
     }
     public abstract void Process(GLStateManager stateManager, Texture2D texture);
     public abstract void Dispose();
