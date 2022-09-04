@@ -53,6 +53,18 @@
         <None Update="Assets\Shaders\lit.frag">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Assets\Shaders\Compute\bloom_downsample.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Shaders\Compute\bloom_upsample.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Shaders\Compute\bloom_combine.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Shaders\Compute\bloom_prefilter.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

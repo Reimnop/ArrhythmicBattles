@@ -4,6 +4,7 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
+using FlexFramework.Rendering.PostProcessing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -17,8 +18,12 @@ public class GameScene : Scene
     private PerspectiveCamera camera;
     private SkinnedModelEntity modelEntity;
     private ModelEntity envModelEntity;
+    private ModelEntity cubeModelEntity;
     private Model model;
+    private Model cubeModel;
     private Model envModel;
+    
+    private Bloom bloom;
 
     private InputSystem inputSystem;
     private InputCapture capture;
@@ -38,7 +43,7 @@ public class GameScene : Scene
         inputSystem = context.InputSystem;
         capture = inputSystem.AcquireCapture();
         
-        Engine.Renderer.ClearColor = Color4.SkyBlue;
+        Engine.Renderer.ClearColor = Color4.DeepSkyBlue;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
@@ -47,14 +52,21 @@ public class GameScene : Scene
         model = new Model(@"Assets/Models/WalkAnim.dae");
         model.TextureMinFilter(TextureMinFilter.Nearest);
         model.TextureMagFilter(TextureMagFilter.Nearest);
-        
         modelEntity = new SkinnedModelEntity();
         modelEntity.Model = model;
         modelEntity.Animation = model.Animations[0];
 
+        cubeModel = new Model(@"Assets/Models/Cube.dae");
+        cubeModelEntity = new ModelEntity();
+        cubeModelEntity.Model = cubeModel;
+        cubeModelEntity.Color = new Color4(4.6f, 4.2f, 1.6f, 1.0f);
+
         envModel = new Model(@"Assets/Models/Environment.dae");
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
+        
+        // Init post processing
+        bloom = new Bloom();
     }
 
     public override void Update(UpdateArgs args)
@@ -90,13 +102,21 @@ public class GameScene : Scene
 
     public override void Render(Renderer renderer)
     {
-        CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
+        renderer.UsePostProcessor(bloom);
         
+        CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         MatrixStack.Push();
+        
         MatrixStack.Push();
         MatrixStack.Translate(0.0f, -0.4f, 8.0f);
         modelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
+        
+        MatrixStack.Push();
+        MatrixStack.Translate(0.0f, 4.0f, 0.0f);
+        cubeModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
+        MatrixStack.Pop();
+        
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }
@@ -108,5 +128,6 @@ public class GameScene : Scene
         envModelEntity.Dispose();
         envModel.Dispose();
         capture.Dispose();
+        bloom.Dispose();
     }
 }

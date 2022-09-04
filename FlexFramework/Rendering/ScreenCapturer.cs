@@ -5,33 +5,34 @@ namespace FlexFramework.Rendering;
 
 public class ScreenCapturer : IDisposable
 {
-    public int FramebufferHandle => framebuffer.Handle;
-    public int ColorBufferHandle => colorBuffer.Handle;
-    
     public int Width { get; }
     public int Height { get; }
 
-    private readonly Framebuffer framebuffer;
-    private readonly Renderbuffer depthBuffer;
-    private readonly Texture2D colorBuffer;
+    public Framebuffer Framebuffer { get; }
+    public Renderbuffer DepthBuffer { get; }
+    public Texture2D ColorBuffer { get; }
 
     public ScreenCapturer(string name, int width, int height)
     {
         Width = width;
         Height = height;
         
-        depthBuffer = new Renderbuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f);
-        colorBuffer = new Texture2D($"{name}-color", width, height, SizedInternalFormat.Rgba16f);
-        
-        framebuffer = new Framebuffer(name);
-        framebuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, depthBuffer);
-        framebuffer.Texture(FramebufferAttachment.ColorAttachment0, colorBuffer);
+        DepthBuffer = new Renderbuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f);
+        ColorBuffer = new Texture2D($"{name}-color", width, height, SizedInternalFormat.Rgba16f);
+        ColorBuffer.SetMinFilter(TextureMinFilter.Linear);
+        ColorBuffer.SetMagFilter(TextureMagFilter.Linear);
+        ColorBuffer.SetWrapS(TextureWrapMode.ClampToEdge);
+        ColorBuffer.SetWrapT(TextureWrapMode.ClampToEdge);
+
+        Framebuffer = new Framebuffer(name);
+        Framebuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
+        Framebuffer.Texture(FramebufferAttachment.ColorAttachment0, ColorBuffer);
     }
 
     public void Dispose()
     {
-        framebuffer.Dispose();
-        depthBuffer.Dispose();
-        colorBuffer.Dispose();
+        Framebuffer.Dispose();
+        DepthBuffer.Dispose();
+        ColorBuffer.Dispose();
     }
 }

@@ -59,6 +59,16 @@ public class Texture2D : IGpuObject
     {
         GL.TextureParameter(Handle, TextureParameterName.TextureMaxAnisotropy, value);
     }
+
+    public void SetWrapS(TextureWrapMode wrapMode)
+    {
+        GL.TextureParameter(Handle, TextureParameterName.TextureWrapS, (int) wrapMode);
+    }
+    
+    public void SetWrapT(TextureWrapMode wrapMode)
+    {
+        GL.TextureParameter(Handle, TextureParameterName.TextureWrapT, (int) wrapMode);
+    }
     
     public void GenerateMipmap()
     {

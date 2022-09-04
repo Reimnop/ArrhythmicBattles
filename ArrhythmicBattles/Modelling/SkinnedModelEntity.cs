@@ -46,6 +46,8 @@ public class SkinnedModelEntity : Entity, IRenderable
             }
         }
     }
+    
+    public Color4 Color { get; set; } = Color4.White;
 
     private Model? model;
     private AnimationHandler? animationHandler;
@@ -128,7 +130,7 @@ public class SkinnedModelEntity : Entity, IRenderable
             ModelMaterial material = model.Materials[modelMesh.MaterialIndex];
             
             meshEntity.Mesh = model.SkinnedMeshes[modelMesh.MeshIndex];
-            meshEntity.Color = material.Color;
+            meshEntity.Color = new Color4(material.Color.R * Color.R, material.Color.G * Color.G, material.Color.B * Color.B, material.Color.A * Color.A);
             meshEntity.Texture = material.Texture;
             meshEntity.Render(renderer, layerId, matrixStack, cameraData);
         }

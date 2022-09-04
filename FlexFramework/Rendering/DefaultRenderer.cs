@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering.Data;
 using FlexFramework.Rendering.DefaultRenderingStrategies;
+using FlexFramework.Rendering.PostProcessing;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -17,6 +19,8 @@ public class DefaultRenderer : Renderer
     
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
     private Dictionary<Type, RenderingStrategy> renderingStrategies = new Dictionary<Type, RenderingStrategy>();
+
+    private List<PostProcessor> postProcessors = new List<PostProcessor>();
 
     private ScreenCapturer? screenCapturer;
 
@@ -99,6 +103,11 @@ public class DefaultRenderer : Renderer
         renderLayerRegistry[layerId].Add(drawData);
     }
 
+    public override void UsePostProcessor(PostProcessor postProcessor)
+    {
+        postProcessors.Add(postProcessor);
+    }
+
     private bool ShouldUpdateCapturer(Vector2i size)
     {
         if (screenCapturer == null)
@@ -126,13 +135,13 @@ public class DefaultRenderer : Renderer
 
     public override void Render()
     {
-        GL.ClearColor(ClearColor);
-        
         Debug.Assert(screenCapturer != null);
         
-        stateManager.BindFramebuffer(screenCapturer.FramebufferHandle);
+        stateManager.BindFramebuffer(screenCapturer.Framebuffer.Handle);
 
         GL.Viewport(0, 0, screenCapturer.Width, screenCapturer.Height);
+        
+        GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         // stateManager.SetCapability(EnableCap.Multisample, true);
@@ -162,13 +171,30 @@ public class DefaultRenderer : Renderer
         stateManager.SetCapability(EnableCap.Blend, false);
         
         stateManager.BindFramebuffer(0);
-        
+
+        using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
+        RunPostProcessors(postProcessors, stateManager, screenCapturer.ColorBuffer);
+
         // Blit to backbuffer
+        GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);
-        GL.BlitNamedFramebuffer(screenCapturer.FramebufferHandle, 0, 
+        GL.BlitNamedFramebuffer(screenCapturer.Framebuffer.Handle, 0, 
             0, 0, screenCapturer.Width, screenCapturer.Height, 
             0, 0, Engine.ClientSize.X, Engine.ClientSize.Y,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+    }
+
+    private void RunPostProcessors(List<PostProcessor> postProcessors, GLStateManager stateManager, Texture2D texture)
+    {
+        Vector2i size = new Vector2i(texture.Width, texture.Height);
+        postProcessors.ForEach(processor =>
+        {
+            if (processor.CurrentSize != size)
+            {
+                processor.Resize(size.X, size.Y);
+            }
+        });
+        postProcessors.ForEach(processor => processor.Process(stateManager, texture));
     }
 
     private void RenderLayer(List<IDrawData> layer)

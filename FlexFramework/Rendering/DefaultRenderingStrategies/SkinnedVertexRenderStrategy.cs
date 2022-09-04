@@ -36,7 +36,7 @@ public class SkinnedVertexRenderStrategy : RenderingStrategy
         }
 
         GL.Uniform4(4, vertexDrawData.Color);
-        GL.Uniform3(5, -Vector3.One);
+        GL.Uniform3(5, new Vector3(0.0f, -1.1f, -1.5f));
 
         if (vertexDrawData.Bones != null)
         {
