@@ -10,7 +10,6 @@ public class Bloom : PostProcessor
     public float HardThreshold { get; set; } = 0.85f;
     public float SoftThreshold { get; set; } = 0.75f;
     public float Strength { get; set; } = 0.8f;
-    public float Intensity { get; set; } = 1.0f;
 
     private readonly ShaderProgram prefilterShader;
     private readonly ShaderProgram downsampleShader;
@@ -134,7 +133,6 @@ public class Bloom : PostProcessor
         stateManager.UseProgram(combineShader.Handle);
         GL.Uniform1(0, 0);
         GL.Uniform1(1, 1);
-        GL.Uniform1(2, Intensity);
         stateManager.BindTextureUnit(0, upsampleMipChain[^1].Handle);
         stateManager.BindTextureUnit(1, texture.Handle);
         GL.BindImageTexture(0, finalTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
