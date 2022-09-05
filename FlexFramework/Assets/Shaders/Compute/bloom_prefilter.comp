@@ -22,9 +22,9 @@ void main() {
     float knee = hardThreshold * softThreshold;
     float soft = brightness - hardThreshold + knee;
     soft = max(min(soft, 2.0 * knee), 0.0);
-    soft = soft * soft / (4.0 * knee);
+    soft = soft * soft / (4.0 * knee + 0.00001);
     float contribution = max(soft, brightness - hardThreshold);
-    contribution /= max(brightness, 0.0);
+    contribution /= max(brightness, 0.00001);
     
     imageStore(outputImage, pixelCoord, vec4(color * contribution, 1.0));
 }
