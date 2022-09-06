@@ -4,6 +4,7 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Rendering;
+using FlexFramework.Rendering.Data;
 using FlexFramework.Rendering.PostProcessing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -44,6 +45,8 @@ public class GameScene : Scene
         inputSystem = context.InputSystem;
         capture = inputSystem.AcquireCapture();
         
+        Texture2D texture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
+
         Engine.Renderer.ClearColor = Color4.DeepSkyBlue;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 

@@ -44,8 +44,8 @@ public class Texture2D : IGpuObject
         part.OpenParallel(path);
 
         Texture2D texture2D = new Texture2D(name, part.DataWindow.Width, part.DataWindow.Height,
-            SizedInternalFormat.Rgba16f);
-        texture2D.LoadData(part.GetBytes(ImageDestFormat.RGBA16, GammaEncoding.Linear), PixelFormat.Rgba, PixelType.Float);
+            SizedInternalFormat.Rgb16f);
+        texture2D.LoadData(part.GetBytes(ImageDestFormat.RGB16, GammaEncoding.Linear), PixelFormat.Rgb, PixelType.HalfFloat);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
         
