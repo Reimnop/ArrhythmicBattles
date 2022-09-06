@@ -1,5 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using SharpEXR;
 using StbImageSharp;
+using PixelType = OpenTK.Graphics.OpenGL4.PixelType;
 
 namespace FlexFramework.Rendering.Data;
 
@@ -32,6 +34,23 @@ public class Texture2D : IGpuObject
         texture2D.LoadData(result.Data, PixelFormat.Rgba, PixelType.UnsignedByte);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
+        return texture2D;
+    }
+
+    public static Texture2D FromExr(string name, string path)
+    {
+        EXRFile exrFile = EXRFile.FromFile(path);
+        EXRPart part = exrFile.Parts[0];
+        part.OpenParallel(path);
+
+        Texture2D texture2D = new Texture2D(name, part.DataWindow.Width, part.DataWindow.Height,
+            SizedInternalFormat.Rgba16f);
+        texture2D.LoadData(part.GetBytes(ImageDestFormat.RGBA16, GammaEncoding.Linear), PixelFormat.Rgba, PixelType.Float);
+        texture2D.SetMinFilter(TextureMinFilter.Linear);
+        texture2D.SetMagFilter(TextureMagFilter.Linear);
+        
+        part.Close();
+
         return texture2D;
     }
 
