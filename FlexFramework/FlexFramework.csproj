@@ -78,6 +78,9 @@
         <None Update="Assets\Shaders\Compute\gamma_correct.comp">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Assets\Shaders\Compute\skybox.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

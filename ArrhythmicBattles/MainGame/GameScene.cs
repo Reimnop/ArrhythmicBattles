@@ -23,6 +23,8 @@ public class GameScene : Scene
     private Model model;
     private Model cubeModel;
     private Model envModel;
+
+    private Texture2D skyboxTexture;
     
     private Bloom bloom;
     private Exposure tonemapper;
@@ -45,7 +47,7 @@ public class GameScene : Scene
         inputSystem = context.InputSystem;
         capture = inputSystem.AcquireCapture();
         
-        Texture2D texture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
+        skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
 
         Engine.Renderer.ClearColor = Color4.DeepSkyBlue;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
@@ -108,6 +110,7 @@ public class GameScene : Scene
 
     public override void Render(Renderer renderer)
     {
+        renderer.UseSkybox(skyboxTexture);
         renderer.UsePostProcessor(bloom);
         renderer.UsePostProcessor(tonemapper);
 

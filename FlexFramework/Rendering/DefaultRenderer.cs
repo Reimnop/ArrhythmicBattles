@@ -27,6 +27,9 @@ public class DefaultRenderer : Renderer
     private GLStateManager stateManager;
     private ShaderProgram unlitShader;
     private ShaderProgram litShader;
+    private ShaderProgram skyboxShader;
+
+    private Texture2D? skyboxTexture;
 
     private int opaqueLayerId;
     private int alphaClipLayerId;
@@ -40,6 +43,7 @@ public class DefaultRenderer : Renderer
         // Init GL objects
         unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
         litShader = LoadProgram("lit", "Assets/Shaders/lit");
+        skyboxShader = LoadComputeProgram("skybox", "Assets/Shaders/Compute/skybox");
 
         // Register render layers
         opaqueLayerId = RegisterLayer(OpaqueLayerName);
@@ -87,6 +91,16 @@ public class DefaultRenderer : Renderer
 
         return program;
     }
+    
+    private ShaderProgram LoadComputeProgram(string name, string path)
+    {
+        using Shader shader = new Shader($"{name}-vs", File.ReadAllText($"{path}.comp"), ShaderType.ComputeShader);
+
+        ShaderProgram program = new ShaderProgram(name);
+        program.LinkShaders(shader);
+
+        return program;
+    }
 
     public override int GetLayerId(string name)
     {
@@ -106,6 +120,11 @@ public class DefaultRenderer : Renderer
     public override void UsePostProcessor(PostProcessor postProcessor)
     {
         postProcessors.Add(postProcessor);
+    }
+
+    public override void UseSkybox(Texture2D skyboxTexture)
+    {
+        this.skyboxTexture = skyboxTexture;
     }
 
     private bool ShouldUpdateCapturer(Vector2i size)
@@ -143,8 +162,18 @@ public class DefaultRenderer : Renderer
         
         GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-        // stateManager.SetCapability(EnableCap.Multisample, true);
+        
+        // Render skybox
+        if (skyboxTexture != null)
+        {
+            stateManager.UseProgram(skyboxShader.Handle);
+            stateManager.BindTextureUnit(0, skyboxTexture.Handle);
+            GL.BindImageTexture(0, screenCapturer.ColorBuffer.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
+            GL.DispatchCompute(DivideIntCeil(screenCapturer.ColorBuffer.Width, 8), DivideIntCeil(screenCapturer.ColorBuffer.Height, 8), 1);
+            
+            skyboxTexture = null;
+        }
 
         using TemporaryList<IDrawData> opaqueLayer = renderLayerRegistry[opaqueLayerId];
         using TemporaryList<IDrawData> alphaClipLayer = renderLayerRegistry[alphaClipLayerId];
@@ -220,5 +249,10 @@ public class DefaultRenderer : Renderer
         {
             strategy.Dispose();
         }
+    }
+    
+    private static int DivideIntCeil(int a, int b)
+    {
+        return a / b + (a % b > 0 ? 1 : 0);
     }
 }
