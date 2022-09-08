@@ -20,7 +20,7 @@ public abstract class Renderer : IDisposable
     public abstract int GetLayerId(string name);
     public abstract void EnqueueDrawData(int layerId, IDrawData drawData);
     public abstract void UsePostProcessor(PostProcessor postProcessor);
-    public abstract void UseSkybox(Texture2D skyboxTexture);
+    public abstract void UseSkybox(Texture2D skyboxTexture, CameraData cameraData);
     public abstract void Update(UpdateArgs args);
     public abstract void Render();
     public abstract void Dispose();

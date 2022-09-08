@@ -39,6 +39,8 @@ void main() {
     outputColor += (a + c + g + i) * 0.03125;
     outputColor += (b + d + f + h) * 0.0625;
     outputColor += (j + k + l + m) * 0.125;
+    
+    outputColor = max(outputColor, 0.00001);
 
     imageStore(outputImage, outputPixelCoord, vec4(outputColor, 1.0));
 }

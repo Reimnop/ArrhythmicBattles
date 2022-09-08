@@ -19,9 +19,7 @@ public class GameScene : Scene
     private PerspectiveCamera camera;
     private SkinnedModelEntity modelEntity;
     private ModelEntity envModelEntity;
-    private ModelEntity cubeModelEntity;
     private Model model;
-    private Model cubeModel;
     private Model envModel;
 
     private Texture2D skyboxTexture;
@@ -62,11 +60,6 @@ public class GameScene : Scene
         modelEntity.Model = model;
         modelEntity.Animation = model.Animations[0];
 
-        cubeModel = new Model(@"Assets/Models/Cube.dae");
-        cubeModelEntity = new ModelEntity();
-        cubeModelEntity.Model = cubeModel;
-        cubeModelEntity.Color = new Color4(12.2f, 10.0f, 1.8f, 1.0f);
-
         envModel = new Model(@"Assets/Models/Environment.dae");
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
@@ -74,7 +67,7 @@ public class GameScene : Scene
         // Init post processing
         bloom = new Bloom();
         tonemapper = new Exposure();
-        tonemapper.ExposureValue = 0.8f;
+        tonemapper.ExposureValue = 1.2f;
     }
 
     public override void Update(UpdateArgs args)
@@ -110,23 +103,19 @@ public class GameScene : Scene
 
     public override void Render(Renderer renderer)
     {
-        renderer.UseSkybox(skyboxTexture);
         renderer.UsePostProcessor(bloom);
         renderer.UsePostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
+        renderer.UseSkybox(skyboxTexture, cameraData);
+        
         MatrixStack.Push();
         
         MatrixStack.Push();
         MatrixStack.Translate(0.0f, -0.4f, 8.0f);
         modelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
-        
-        MatrixStack.Push();
-        MatrixStack.Translate(0.0f, 4.0f, 0.0f);
-        cubeModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
-        MatrixStack.Pop();
-        
+
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }

@@ -30,6 +30,7 @@ public class DefaultRenderer : Renderer
     private ShaderProgram skyboxShader;
 
     private Texture2D? skyboxTexture;
+    private CameraData skyboxCameraData;
 
     private int opaqueLayerId;
     private int alphaClipLayerId;
@@ -122,9 +123,10 @@ public class DefaultRenderer : Renderer
         postProcessors.Add(postProcessor);
     }
 
-    public override void UseSkybox(Texture2D skyboxTexture)
+    public override void UseSkybox(Texture2D skyboxTexture, CameraData cameraData)
     {
         this.skyboxTexture = skyboxTexture;
+        skyboxCameraData = cameraData;
     }
 
     private bool ShouldUpdateCapturer(Vector2i size)
@@ -168,6 +170,13 @@ public class DefaultRenderer : Renderer
         {
             stateManager.UseProgram(skyboxShader.Handle);
             stateManager.BindTextureUnit(0, skyboxTexture.Handle);
+            
+            Matrix4 inverseView = Matrix4.Invert(skyboxCameraData.View);
+            Matrix4 inverseProjection = Matrix4.Invert(skyboxCameraData.Projection);
+            
+            GL.UniformMatrix4(1, true, ref inverseProjection);
+            GL.UniformMatrix4(2, true, ref inverseView);
+            
             GL.BindImageTexture(0, screenCapturer.ColorBuffer.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(DivideIntCeil(screenCapturer.ColorBuffer.Width, 8), DivideIntCeil(screenCapturer.ColorBuffer.Height, 8), 1);
