@@ -2,7 +2,7 @@
 
 namespace FlexFramework.Rendering.Data;
 
-public class Framebuffer : IGpuObject
+public class Framebuffer : GpuObject
 {
     public int Handle { get; }
     public string Name { get; }
@@ -37,7 +37,7 @@ public class Framebuffer : IGpuObject
         GL.NamedFramebufferReadBuffer(Handle, readBufferMode);
     }
     
-    public void Dispose()
+    public override void Dispose()
     {
         GL.DeleteFramebuffer(Handle);
     }

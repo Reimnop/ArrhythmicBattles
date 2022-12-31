@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Rendering.Data;
 
-public class Buffer : IGpuObject
+public class Buffer : GpuObject
 {
     public int Handle { get; }
     public string Name { get; }
@@ -36,7 +36,7 @@ public class Buffer : IGpuObject
         GL.NamedBufferSubData(Handle, (IntPtr) offsetInBytes, data.Length * Unsafe.SizeOf<T>(), data);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         GL.DeleteBuffer(Handle);
     }
