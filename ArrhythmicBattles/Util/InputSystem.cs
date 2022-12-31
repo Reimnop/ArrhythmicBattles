@@ -29,6 +29,11 @@ public class InputSystem
         this.input = input;
     }
 
+    public InputInfo GetInputInfo()
+    {
+        return new InputInfo(this, AcquireCapture());
+    }
+
     public InputCapture AcquireCapture()
     {
         InputCapture capture = new InputCapture(this);

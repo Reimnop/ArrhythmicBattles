@@ -57,10 +57,12 @@ public class FlexFrameworkMain : NativeWindow
 
         Console.WriteLine($"{severity} {type} | {messageString}");
 
+#if  DEBUG
         if (type == DebugType.DebugTypeError)
         {
             throw new Exception(messageString);
         }
+#endif
     }
     
     public T? UseRenderer<T>(params object?[]? args) where T : Renderer
@@ -93,6 +95,11 @@ public class FlexFrameworkMain : NativeWindow
 
         TextResources = new TextResources(atlasWidth, fontFiles);
         return TextResources;
+    }
+
+    public Scene LoadScene(Scene scene)
+    {
+        return SceneManager.LoadScene(scene);
     }
 
     public T LoadScene<T>(params object?[]? args) where T : Scene

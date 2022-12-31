@@ -52,6 +52,8 @@ public class MainMenuScene : GuiScene
     private Screen currentScreen;
     private float screenYOffset = 0.0f;
 
+    private InputInfo inputInfo;
+
     public MainMenuScene(ABContext context)
     {
         Context = context;
@@ -66,11 +68,11 @@ public class MainMenuScene : GuiScene
 
         // Init entities
         bannerTexture = Texture2D.FromFile("banner", "Assets/banner.png");
-        bannerEntity = new ImageEntity(Engine)
-            .WithPosition(32, 32)
-            .WithSize(0, 192)
-            .WithTexture(bannerTexture)
-            .WithImageMode(ImageMode.Stretch);
+        bannerEntity = new ImageEntity(Engine);
+        bannerEntity.Position = new Vector2(32.0f, 32.0f);
+        bannerEntity.Size = new Vector2(0.0f, 192.0f);
+        bannerEntity.Texture = bannerTexture;
+        bannerEntity.ImageMode = ImageMode.Stretch;
 
         header = new MeshEntity();
         header.Color = new Color4(24, 24, 24, 255);
@@ -85,8 +87,11 @@ public class MainMenuScene : GuiScene
         // copyrightText.Text = "Copyright Arrhythmic Battles 2022\nThis project is Free Software under the GPLv3";
         copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
+        // Init input
+        inputInfo = Context.InputSystem.GetInputInfo();
+        
         // Init screen
-        currentScreen = new SelectScreen(Engine, this);
+        currentScreen = new SelectScreen(inputInfo, Engine, this);
 
         menuAnimator = new SimpleAnimator<MenuItemsOffset>(
             (left, right, factor) =>
@@ -102,19 +107,21 @@ public class MainMenuScene : GuiScene
         StartCoroutine(ShowMenu());
     }
 
-    public void SwitchScreen<T>(params object?[]? args) where T : Screen
+    public void SwitchScreen(Screen screen)
     {
         currentScreen.Dispose();
-        
+        currentScreen = screen;
+        StartCoroutine(AnimateSwitchScreen(screen));
+    }
+
+    public void SwitchScreen<T>(params object?[]? args) where T : Screen
+    {
         Screen? screen = (Screen?) Activator.CreateInstance(typeof(T), args);
         if (screen == null)
         {
             throw new Exception("Could not load screen!");
         }
-
-        currentScreen = screen;
-
-        StartCoroutine(AnimateSwitchScreen(screen));
+        SwitchScreen(screen);
     }
 
     private IEnumerator AnimateSwitchScreen(Screen screen)
@@ -126,6 +133,11 @@ public class MainMenuScene : GuiScene
         }
 
         screenYOffset = 0.0f;
+    }
+
+    public void LoadScene(Scene scene)
+    {
+        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene(scene)));
     }
 
     public void LoadScene<T>(params object?[]? args) where T : Scene

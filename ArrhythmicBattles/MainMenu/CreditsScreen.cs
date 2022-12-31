@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.UI;
+using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
@@ -15,14 +16,13 @@ public class CreditsScreen : Screen
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;
     private readonly MainMenuScene mainMenuScene;
-    private readonly InputCapture capture;
-
-    public CreditsScreen(FlexFrameworkMain engine, MainMenuScene mainMenuScene)
+    private readonly InputInfo inputInfo;
+    
+    public CreditsScreen(InputInfo inputInfo, FlexFrameworkMain engine, MainMenuScene mainMenuScene)
     {
         this.engine = engine;
         this.mainMenuScene = mainMenuScene;
-
-        capture = mainMenuScene.Context.InputSystem.AcquireCapture();
+        this.inputInfo = inputInfo;
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.BaselineOffset = 24.0f;
@@ -33,7 +33,7 @@ public class CreditsScreen : Screen
     {
         textEntity.Update(args);
 
-        if (mainMenuScene.Context.InputSystem.GetKeyDown(capture, Keys.Escape))
+        if (mainMenuScene.Context.InputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
         {
             mainMenuScene.SwitchScreen<SelectScreen>(engine, mainMenuScene);
         }
@@ -50,6 +50,5 @@ public class CreditsScreen : Screen
     public override void Dispose()
     {
         textEntity.Dispose();
-        capture.Dispose();
     }
 }

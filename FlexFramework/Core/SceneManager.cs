@@ -13,6 +13,20 @@ public class SceneManager
         this.engine = engine;
     }
 
+    public Scene LoadScene(Scene scene)
+    {
+        if (CurrentScene != null)
+        {
+            CurrentScene.Dispose();
+        }
+        
+        scene.SetEngine(engine);
+        scene.Init();
+        CurrentScene = scene;
+
+        return scene;
+    }
+
     public T LoadScene<T>(params object?[]? args) where T : Scene
     {
         T? scene = (T?) Activator.CreateInstance(typeof(T), args);
@@ -22,15 +36,6 @@ public class SceneManager
             throw new LoadSceneException(typeof(T));
         }
 
-        if (CurrentScene != null)
-        {
-            CurrentScene.Dispose();
-        }
-        
-        scene.SetEngine(engine);
-        scene.Init();
-
-        CurrentScene = scene;
-        return scene;
+        return (T) LoadScene(scene);
     }
 }

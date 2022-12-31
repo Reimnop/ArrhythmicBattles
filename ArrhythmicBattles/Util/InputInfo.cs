@@ -1,6 +1,6 @@
 ﻿namespace ArrhythmicBattles.Util;
 
-public struct InputInfo
+public class InputInfo : IDisposable
 {
     public InputSystem InputSystem { get; }
     public InputCapture InputCapture { get; }
@@ -9,5 +9,10 @@ public struct InputInfo
     {
         InputSystem = inputSystem;
         InputCapture = inputCapture;
+    }
+
+    public void Dispose()
+    {
+        InputCapture.Dispose();
     }
 }
