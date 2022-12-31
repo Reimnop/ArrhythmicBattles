@@ -35,7 +35,7 @@ public class CreditsScreen : Screen
 
         if (mainMenuScene.Context.InputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
         {
-            mainMenuScene.SwitchScreen<SelectScreen>(engine, mainMenuScene);
+            mainMenuScene.SwitchScreen(new SelectScreen(inputInfo, engine, mainMenuScene));
         }
     }
     
