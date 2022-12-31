@@ -2,7 +2,7 @@
 using ArrhythmicBattles.Util;
 using Assimp;
 using FlexFramework.Core.Data;
-using FlexFramework.Rendering.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using Quaternion = OpenTK.Mathematics.Quaternion;

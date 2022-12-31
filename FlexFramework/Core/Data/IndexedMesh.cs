@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
-using FlexFramework.Rendering.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
-using Buffer = FlexFramework.Rendering.Data.Buffer;
+using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
 
 namespace FlexFramework.Core.Data;
 

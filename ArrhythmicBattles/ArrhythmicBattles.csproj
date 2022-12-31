@@ -13,6 +13,7 @@
     <ItemGroup>
       <PackageReference Include="AssimpNet" Version="4.1.0" />
       <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+      <PackageReference Include="log4net" Version="2.0.15" />
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.7.4" />
       <PackageReference Include="System.Runtime.Experimental" Version="6.0.2" />
     </ItemGroup>

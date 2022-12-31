@@ -4,7 +4,7 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
+using FlexFramework.Core.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;

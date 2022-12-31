@@ -1,5 +1,5 @@
 ﻿using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
+using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.UI;

@@ -1,5 +1,5 @@
 ﻿using FlexFramework.Core.Data;
-using FlexFramework.Rendering.Text;
+using FlexFramework.Core.Rendering.Text;
 using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Core;

@@ -2,8 +2,8 @@
 using FlexFramework.Core.Data;
 using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
-using FlexFramework.Rendering.Data;
+using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 

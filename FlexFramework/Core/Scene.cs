@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
+using FlexFramework.Core.Rendering;
 
 namespace FlexFramework.Core;
 

@@ -3,9 +3,10 @@ using System.Runtime.InteropServices;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
-using FlexFramework.Rendering.Data;
-using FlexFramework.Rendering.Text;
+using FlexFramework.Logging;
+using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Core.Rendering.Text;
 using FlexFramework.Util.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
@@ -22,8 +23,11 @@ public class FlexFrameworkMain : NativeWindow
     public AudioManager AudioManager { get; }
     public Input Input { get; }
 
+    public event LogEventHandler? Log;
+
     private float time = 0.0f;
 
+    // This causes memory leaks, but the method needs to be pinned to prevent garbage collection
     private GCHandle leakedGcHandle;
 
     public FlexFrameworkMain(NativeWindowSettings nws) : base(nws)
@@ -46,6 +50,16 @@ public class FlexFrameworkMain : NativeWindow
         Input = new Input(this);
     }
 
+    internal void LogMessage(object? sender, Severity severity, string? type, string message)
+    {
+        if (sender == null)
+        {
+            sender = this;
+        }
+        
+        Log?.Invoke(sender, new LogEventArgs(severity, type, message));
+    }
+
     private void LogGlMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
     {
         if (severity == DebugSeverity.DebugSeverityNotification)
@@ -54,9 +68,26 @@ public class FlexFrameworkMain : NativeWindow
         }
         
         string messageString = Marshal.PtrToStringAnsi(message, length);
-
-        Console.WriteLine($"{severity} {type} | {messageString}");
-
+        
+        Severity severityEnum;
+        switch (severity)
+        {
+            case DebugSeverity.DebugSeverityHigh:
+                severityEnum = Severity.Error;
+                break;
+            case DebugSeverity.DebugSeverityMedium:
+                severityEnum = Severity.Warning;
+                break;
+            case DebugSeverity.DebugSeverityLow:
+                severityEnum = Severity.Info;
+                break;
+            default:
+                severityEnum = Severity.Debug;
+                break;
+        }
+        
+        LogMessage(null, severityEnum, "OpenGL", messageString);
+        
 #if  DEBUG
         if (type == DebugType.DebugTypeError)
         {
@@ -64,30 +95,39 @@ public class FlexFrameworkMain : NativeWindow
         }
 #endif
     }
-    
-    public T? UseRenderer<T>(params object?[]? args) where T : Renderer
+
+    public Renderer UseRenderer(Renderer renderer)
     {
-        T? renderer = (T?) Activator.CreateInstance(typeof(T), args);
-
-        if (renderer == null)
-        {
-            return null;
-        }
-
+        LogMessage(null, Severity.Info, null, $"Using renderer [{renderer}]");
+        
         if (Renderer != null)
         {
             Renderer.Dispose();
         }
-
+        
         renderer.SetEngine(this);
         renderer.Init();
 
         Renderer = renderer;
         return renderer;
     }
+    
+    public T UseRenderer<T>(params object?[]? args) where T : Renderer
+    {
+        T? renderer = (T?) Activator.CreateInstance(typeof(T), args);
+
+        if (renderer == null)
+        {
+            throw new LoadRendererException(typeof(T));
+        }
+
+        return (T) UseRenderer(renderer);
+    }
 
     public TextResources LoadFonts(int atlasWidth, params FontFileInfo[] fontFiles)
     {
+        LogMessage(null, Severity.Info, null, $"Loading font atlas(es) with width [{atlasWidth}]");
+        
         if (TextResources != null)
         {
             TextResources.Dispose();
@@ -115,6 +155,11 @@ public class FlexFrameworkMain : NativeWindow
         float currentTime = (float) GLFW.GetTime();
         float deltaTime = currentTime - time;
         time = currentTime;
+
+        if (deltaTime > 1.0f)
+        {
+            LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f}ms]! Is the thread being blocked?");
+        }
 
         Tick(deltaTime);
         Render();

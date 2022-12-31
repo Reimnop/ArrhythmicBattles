@@ -1,4 +1,5 @@
-﻿using FlexFramework.Util.Exceptions;
+﻿using FlexFramework.Logging;
+using FlexFramework.Util.Exceptions;
 
 namespace FlexFramework.Core;
 
@@ -15,6 +16,8 @@ public class SceneManager
 
     public Scene LoadScene(Scene scene)
     {
+        engine.LogMessage(this, Severity.Info, null, $"Switching scene [{CurrentScene}] -> [{scene}]");
+
         if (CurrentScene != null)
         {
             CurrentScene.Dispose();

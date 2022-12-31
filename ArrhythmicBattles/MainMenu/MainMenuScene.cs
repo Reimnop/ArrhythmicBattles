@@ -4,10 +4,10 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 using Textwriter;
-using Renderer = FlexFramework.Rendering.Renderer;
+using Renderer = FlexFramework.Core.Rendering.Renderer;
 
 namespace ArrhythmicBattles.MainMenu;
 

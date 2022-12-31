@@ -4,7 +4,7 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
-using FlexFramework.Rendering;
+using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
