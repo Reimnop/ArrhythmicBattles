@@ -158,7 +158,7 @@ public class DefaultRenderer : Renderer
     {
         Debug.Assert(screenCapturer != null);
         
-        stateManager.BindFramebuffer(screenCapturer.Framebuffer.Handle);
+        stateManager.BindFramebuffer(screenCapturer.FrameBuffer.Handle);
 
         GL.Viewport(0, 0, screenCapturer.Width, screenCapturer.Height);
         
@@ -216,7 +216,7 @@ public class DefaultRenderer : Renderer
         // Blit to backbuffer
         GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);
-        GL.BlitNamedFramebuffer(screenCapturer.Framebuffer.Handle, 0, 
+        GL.BlitNamedFramebuffer(screenCapturer.FrameBuffer.Handle, 0, 
             0, 0, screenCapturer.Width, screenCapturer.Height, 
             0, 0, Engine.ClientSize.X, Engine.ClientSize.Y,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);

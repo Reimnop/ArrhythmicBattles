@@ -8,7 +8,7 @@ public class ScreenCapturer : IDisposable
     public int Width { get; }
     public int Height { get; }
 
-    public Framebuffer Framebuffer { get; }
+    public Framebuffer FrameBuffer { get; }
     public Renderbuffer DepthBuffer { get; }
     public Texture2D ColorBuffer { get; }
 
@@ -24,14 +24,14 @@ public class ScreenCapturer : IDisposable
         ColorBuffer.SetWrapS(TextureWrapMode.ClampToEdge);
         ColorBuffer.SetWrapT(TextureWrapMode.ClampToEdge);
 
-        Framebuffer = new Framebuffer(name);
-        Framebuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
-        Framebuffer.Texture(FramebufferAttachment.ColorAttachment0, ColorBuffer);
+        FrameBuffer = new Framebuffer(name);
+        FrameBuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
+        FrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, ColorBuffer);
     }
 
     public void Dispose()
     {
-        Framebuffer.Dispose();
+        FrameBuffer.Dispose();
         DepthBuffer.Dispose();
         ColorBuffer.Dispose();
     }
