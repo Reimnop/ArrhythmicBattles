@@ -18,5 +18,6 @@ public struct TextVertexExtern : IVertex
         attribConsumer(1,4, 2 * sizeof(float), VertexAttribType.Float, false);
         attribConsumer(2, 2, 6 * sizeof(float), VertexAttribType.Float, false);
         intAttribConsumer(3, 1, 8 * sizeof(float), VertexAttribIntegerType.Int);
+        intAttribConsumer(4, 1, 9 * sizeof(float), VertexAttribIntegerType.Int);
     }
 }

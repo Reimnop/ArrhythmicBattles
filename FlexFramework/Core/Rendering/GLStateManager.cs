@@ -15,7 +15,7 @@ public class GLStateManager
     {
         if (!glCapabilities.TryGetValue(cap, out bool currentlyEnabled))
         {
-            SetCapabilityIgnoreChecks(cap, enabled);
+            SetCapabilityInternal(cap, enabled);
             glCapabilities.Add(cap, enabled);
             return;
         }
@@ -26,10 +26,10 @@ public class GLStateManager
         }
 
         glCapabilities[cap] = enabled;
-        SetCapabilityIgnoreChecks(cap, enabled);
+        SetCapabilityInternal(cap, enabled);
     }
 
-    private void SetCapabilityIgnoreChecks(EnableCap cap, bool enabled)
+    private void SetCapabilityInternal(EnableCap cap, bool enabled)
     {
         if (enabled)
         {

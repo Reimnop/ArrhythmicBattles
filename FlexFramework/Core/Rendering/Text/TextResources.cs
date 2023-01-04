@@ -28,27 +28,12 @@ public class TextResources : IDisposable
         List<Texture2D> textures = new List<Texture2D>();
         foreach (Font font in Fonts)
         {
-            if (font.GrayscaleAtlas != null)
-            {
-                AtlasTexture atlasTexture = font.GrayscaleAtlas;
-                Texture2D texture = new Texture2D($"{font.FamilyName}-gs", atlasTexture.Texture.Width,
-                    atlasTexture.Texture.Height, SizedInternalFormat.R8);
-                texture.LoadData(atlasTexture.Texture.Pixels, PixelFormat.Red, PixelType.UnsignedByte);
-                texture.SetMinFilter(TextureMinFilter.Linear);
-                texture.SetMagFilter(TextureMagFilter.Nearest);
-                textures.Add(texture);
-            }
-            
-            if (font.ColoredAtlas != null)
-            {
-                AtlasTexture atlasTexture = font.ColoredAtlas;
-                Texture2D texture = new Texture2D($"{font.FamilyName}-c", atlasTexture.Texture.Width,
-                    atlasTexture.Texture.Height, SizedInternalFormat.Rgba8);
-                texture.LoadData(atlasTexture.Texture.Pixels, PixelFormat.Bgra, PixelType.UnsignedByte);
-                texture.SetMinFilter(TextureMinFilter.Linear);
-                texture.SetMagFilter(TextureMagFilter.Nearest);
-                textures.Add(texture);
-            }
+            AtlasTexture atlasTexture = font.Atlas;
+            Texture2D texture = new Texture2D($"{font.FamilyName}-atlas", atlasTexture.Texture.Width, atlasTexture.Texture.Height, SizedInternalFormat.Rgba8);
+            texture.LoadData(atlasTexture.Texture.Pixels, PixelFormat.Bgra, PixelType.UnsignedByte);
+            texture.SetMinFilter(TextureMinFilter.Linear);
+            texture.SetMagFilter(TextureMagFilter.Nearest);
+            textures.Add(texture);
         }
 
         FontTextures = textures.ToArray();

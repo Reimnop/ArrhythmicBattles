@@ -40,10 +40,10 @@ public class ClientTexture
 
     public void WritePartial(ClientTexture texture, int offsetX, int offsetY)
     {
-        WritePartial(texture.Pixels, texture.Width, texture.Height, offsetX, offsetY);
+        WritePartial(texture.Pixels, texture.PixelSize, texture.Width, texture.Height, offsetX, offsetY);
     }
 
-    public void WritePartial(byte[] pixels, int width, int height, int offsetX, int offsetY)
+    public void WritePartial(byte[] pixels, int pixelSize, int width, int height, int offsetX, int offsetY)
     {
         if (offsetX + width > Width || offsetY + height > Height ||
             offsetX < 0 || offsetY < 0)
@@ -55,7 +55,17 @@ public class ClientTexture
         {
             for (int x = 0; x < width; x++)
             {
-                SetPixel(x + offsetX, y + offsetY, new ReadOnlySpan<byte>(pixels, (y * width + x) * PixelSize, PixelSize));
+                Span<byte> data = stackalloc byte[PixelSize];
+                for (int i = 0; i < pixelSize; i++)
+                {
+                    data[i] = pixels[(y * width + x) * pixelSize + i];
+                }
+                // Fill the rest of the pixel with 0
+                for (int i = pixelSize; i < PixelSize; i++)
+                {
+                    data[i] = 0;
+                }
+                SetPixel(x + offsetX, y + offsetY, data);
             }
         }
     }

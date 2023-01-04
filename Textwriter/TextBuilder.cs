@@ -12,20 +12,9 @@ public class TextBuilder
 
     public TextBuilder(params Font[] fonts)
     {
-        int texIndex = 0;
         for (int i = 0; i < fonts.Length; i++)
         {
-            if (fonts[i].GrayscaleAtlas != null)
-            {
-                atlases.Add(fonts[i].GrayscaleAtlas, texIndex);
-                texIndex++;
-            }
-
-            if (fonts[i].ColoredAtlas != null)
-            {
-                atlases.Add(fonts[i].ColoredAtlas, texIndex);
-                texIndex++;
-            }
+            atlases.Add(fonts[i].Atlas, i);
         }
     }
 
@@ -96,11 +85,10 @@ public class TextBuilder
         }
 
         List<ShapedText> result = new List<ShapedText>();
-        foreach (List<ShapedText> shapedTexts in shapedTextLines)
+        foreach (List<ShapedText> line in shapedTextLines)
         {
-            result.AddRange(shapedTexts);
+            result.AddRange(line);
         }
-
         return new BuiltText(result);
     }
 
@@ -121,10 +109,9 @@ public class TextBuilder
                     AdvanceY = glyphs[i].AdvanceY,
                     OffsetX = glyphs[i].OffsetX,
                     OffsetY = glyphs[i].OffsetY,
+                    Colored = glyphs[i].Colored,
                     Index = glyphs[i].Index,
-                    TextureIndex = glyphs[i].Colored
-                        ? -(atlases[text.Font.ColoredAtlas] + 1)
-                        : atlases[text.Font.GrayscaleAtlas] + 1
+                    TextureIndex = atlases[text.Font.Atlas]
                 };
             }
 

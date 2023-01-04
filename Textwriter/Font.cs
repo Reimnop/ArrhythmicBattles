@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using HardFuzz.HarfBuzz;
 using SharpFont;
@@ -23,9 +24,7 @@ public class Font : IDisposable
     public int StrikethroughPosition { get; }
     public int StrikethroughThickness { get; }
 
-    public AtlasTexture? GrayscaleAtlas { get; }
-    public AtlasTexture? ColoredAtlas { get; }
-    
+    public AtlasTexture Atlas { get; }
 
     private readonly FtFace ftFace;
     private readonly HbFont hbFont;
@@ -49,9 +48,8 @@ public class Font : IDisposable
         StrikethroughPosition = Ascender / 2;
         StrikethroughThickness = UnderlineThickness;
         
-        List<ClientTexture> grayscaleGlyphTextures = new List<ClientTexture>();
-        List<ClientTexture> coloredGlyphTextures = new List<ClientTexture>();
-        
+        List<ClientTexture> glyphTextures = new List<ClientTexture>();
+
         glyphs = new Glyph[ftFace.GlyphCount];
         for (uint i = 0; i < glyphs.Length; i++)
         {
@@ -59,28 +57,16 @@ public class Font : IDisposable
 
             GlyphSlot gs = ftFace.Glyph;
             GlyphMetrics metrics = gs.Metrics;
-
-            ClientTexture glyphTexture = new ClientTexture(gs.Bitmap.Width, gs.Bitmap.Rows, 
-                gs.Bitmap.PixelMode == PixelMode.Gray ? 1 : 
-                gs.Bitmap.PixelMode == PixelMode.Bgra ? 4 : 
-                throw new NotImplementedException());
+        
+            ClientTexture glyphTexture = new ClientTexture(gs.Bitmap.Width, gs.Bitmap.Rows, 4);
             
             if (gs.Bitmap.Buffer != IntPtr.Zero)
             {
-                glyphTexture.WritePartial(gs.Bitmap.BufferData, gs.Bitmap.Width, gs.Bitmap.Rows, 0, 0);
+                int pixelSize = gs.Bitmap.PixelMode == PixelMode.Gray ? 1 : 4;
+                glyphTexture.WritePartial(gs.Bitmap.BufferData, pixelSize, gs.Bitmap.Width, gs.Bitmap.Rows, 0, 0);
             }
 
-            switch (gs.Bitmap.PixelMode)
-            {
-                case PixelMode.Gray:
-                    grayscaleGlyphTextures.Add(glyphTexture);
-                    break;
-                case PixelMode.Bgra:
-                    coloredGlyphTextures.Add(glyphTexture);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+            glyphTextures.Add(glyphTexture);
 
             glyphs[i].Width = metrics.Width.Value;
             glyphs[i].Height = metrics.Height.Value;
@@ -90,42 +76,15 @@ public class Font : IDisposable
             glyphs[i].HorizontalBearingY = metrics.HorizontalBearingY.Value;
             glyphs[i].VerticalBearingX = metrics.VerticalBearingX.Value;
             glyphs[i].VerticalBearingY = metrics.VerticalBearingY.Value;
-            glyphs[i].Colored =
-                gs.Bitmap.PixelMode != PixelMode.Gray && (gs.Bitmap.PixelMode == PixelMode.Bgra ? true :
-                    throw new NotImplementedException()); // if it's gray, false, it's it's bgra, true, if it's neither, throw
-        }
-
-        GrayscaleAtlas = null;
-        ColoredAtlas = null;
-
-        if (grayscaleGlyphTextures.Count > 0)
-        {
-            int atlasHeight = CalculateAtlasHeight(grayscaleGlyphTextures, atlasWidth);
-            GrayscaleAtlas = new AtlasTexture(atlasWidth, atlasHeight, 1);
+            glyphs[i].Colored = gs.Bitmap.PixelMode != PixelMode.Gray;
         }
         
-        if (coloredGlyphTextures.Count > 0)
-        {
-            int atlasHeight = CalculateAtlasHeight(coloredGlyphTextures, atlasWidth);
-            ColoredAtlas = new AtlasTexture(atlasWidth, atlasHeight, 4);
-        }
-
-        int gIndex = 0;
-        int cIndex = 0;
+        Atlas = new AtlasTexture(atlasWidth, CalculateAtlasHeight(glyphTextures, atlasWidth), 4);
         for (int i = 0; i < glyphs.Length; i++)
         {
-            if (!glyphs[i].Colored)
-            {
-                glyphs[i].Uv = GrayscaleAtlas.AddGlyphTexture(grayscaleGlyphTextures[gIndex]);
-                gIndex++;
-            }
-            else
-            {
-                glyphs[i].Uv = ColoredAtlas.AddGlyphTexture(coloredGlyphTextures[cIndex]);
-                cIndex++;
-            }
+            glyphs[i].Uv = Atlas.AddGlyphTexture(glyphTextures[i]);
         }
-
+        
         hbFont = HbFont.FromFreeType(ftFace.Reference);
     }
 
