@@ -19,10 +19,6 @@ public class Font : IDisposable
     public int Height { get; }
     public int Ascender { get; }
     public int Descender { get; }
-    public int UnderlinePosition { get; }
-    public int UnderlineThickness { get; }
-    public int StrikethroughPosition { get; }
-    public int StrikethroughThickness { get; }
 
     public AtlasTexture Atlas { get; }
 
@@ -42,12 +38,7 @@ public class Font : IDisposable
         Height = ftFace.Size.Metrics.Height.Value;
         Ascender = ftFace.Size.Metrics.Ascender.Value;
         Descender = ftFace.Size.Metrics.Descender.Value;
-        UnderlinePosition = ftFace.UnderlinePosition;
-        UnderlineThickness = ftFace.UnderlineThickness;
 
-        StrikethroughPosition = Ascender / 2;
-        StrikethroughThickness = UnderlineThickness;
-        
         List<ClientTexture> glyphTextures = new List<ClientTexture>();
 
         glyphs = new Glyph[ftFace.GlyphCount];
@@ -109,7 +100,7 @@ public class Font : IDisposable
         return ptrY + maxY;
     }
 
-    public GlyphInfo[] ShapeText(string text)
+    public IEnumerable<GlyphInfo> ShapeText(string text)
     {
         using Buffer buffer = new Buffer();
         buffer.AddUtf(text);
@@ -118,22 +109,14 @@ public class Font : IDisposable
 
         GlyphPosition[] glyphPositions = buffer.GlyphPositions.ToArray();
         HbGlyphInfo[] glyphInfos = buffer.GlyphInfos.ToArray();
-
-        GlyphInfo[] glyphs = new GlyphInfo[buffer.Length];
+        
         for (int i = 0; i < buffer.Length; i++)
         {
-            glyphs[i] = new GlyphInfo
-            {
-                AdvanceX = glyphPositions[i].XAdvance,
-                AdvanceY = glyphPositions[i].YAdvance,
-                OffsetX = glyphPositions[i].XOffset,
-                OffsetY = glyphPositions[i].YOffset,
-                Colored = this.glyphs[glyphInfos[i].Codepoint].Colored,
-                Index = (int)glyphInfos[i].Codepoint
-            };
+            yield return new GlyphInfo(this, 
+                glyphPositions[i].XAdvance, glyphPositions[i].YAdvance, 
+                glyphPositions[i].XOffset, glyphPositions[i].YOffset, 
+                glyphs[glyphInfos[i].Codepoint].Colored, (int) glyphInfos[i].Codepoint);
         }
-
-        return glyphs;
     }
 
     public Glyph GetGlyph(int index)
