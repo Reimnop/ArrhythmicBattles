@@ -76,7 +76,7 @@ public class GameScene : Scene
         Vector2 movement = inputSystem.GetMovement(capture);
 
         Vector3 move = forward * movement.Y + right * movement.X;
-        camera.Position += move * 6.0f * args.DeltaTime;
+        camera.Position += move * 4.0f * args.DeltaTime;
 
         if (inputSystem.GetMouse(capture, MouseButton.Right))
         {
