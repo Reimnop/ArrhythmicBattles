@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using HardFuzz.HarfBuzz;
 
 namespace Textwriter;
 
@@ -10,6 +9,11 @@ public class TextBuilder
         public List<BuiltGlyph> Glyphs { get; } = new List<BuiltGlyph>();
         public int Width { get; private set; }
         public int Height { get; private set; }
+
+        public Line(int height)
+        {
+            Height = height;
+        }
         
         public void AddGlyph(BuiltGlyph glyph, int width, int height)
         {
@@ -21,16 +25,19 @@ public class TextBuilder
     
     private readonly List<StyledText> styledTexts = new List<StyledText>();
     private readonly Dictionary<AtlasTexture, int> atlases = new Dictionary<AtlasTexture, int>();
+    private int minLineHeight = 0;
     private int baselineOffset = 0;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
-
-    public TextBuilder(params Font[] fonts)
+    
+    /// <param name="minLineHeight">Use height of first font if null</param>
+    public TextBuilder(int? minLineHeight, params Font[] fonts)
     {
         for (int i = 0; i < fonts.Length; i++)
         {
             atlases.Add(fonts[i].Atlas, i);
         }
+        this.minLineHeight = minLineHeight ?? fonts[0].Height;
     }
 
     public TextBuilder AddText(StyledText text)
@@ -68,7 +75,7 @@ public class TextBuilder
         List<Line> builtLines = new List<Line>();
         foreach (List<StyledText> line in EnumerateTextLines(styledTexts))
         {
-            Line builtLine = new Line();
+            Line builtLine = new Line(minLineHeight);
             int advance = 0;
             foreach (var (glyphInfo, style) in EnumerateStyledTexts(line))
             {
@@ -102,9 +109,23 @@ public class TextBuilder
         int advanceY = textOffsetY + baselineOffset;
         foreach (Line line in builtLines)
         {
+            int offsetX = 0;
+            switch (horizontalAlignment)
+            {
+                case HorizontalAlignment.Left:
+                    break;
+                case HorizontalAlignment.Center:
+                    offsetX = -line.Width / 2;
+                    break;
+                case HorizontalAlignment.Right:
+                    offsetX = -line.Width;
+                    break;
+            }
+            
             foreach (BuiltGlyph glyph in line.Glyphs)
             {
                 BuiltGlyph currentGlyph = glyph;
+                currentGlyph.OffsetX += offsetX;
                 currentGlyph.OffsetY = advanceY;
                 glyphs.Add(currentGlyph);
             }
@@ -116,7 +137,7 @@ public class TextBuilder
 
     private static IEnumerable<List<StyledText>> EnumerateTextLines(IEnumerable<StyledText> texts)
     {
-        Regex regex = new Regex("\n|\r\n");
+        Regex regex = new Regex(@"\n|\r\n");
         List<StyledText> currentLine = new List<StyledText>();
         foreach (StyledText text in texts)
         {

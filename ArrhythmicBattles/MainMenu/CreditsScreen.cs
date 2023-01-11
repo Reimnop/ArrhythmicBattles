@@ -26,7 +26,7 @@ public class CreditsScreen : Screen
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.BaselineOffset = 24.0f;
-        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nLuce no\nLuce of muck";
+        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nLuce no\nLuce.\n\nPress [Esc] to return";
     }
     
     public override void Update(UpdateArgs args)
