@@ -17,9 +17,7 @@ public class GameScene : Scene
     private readonly ABContext context;
 
     private PerspectiveCamera camera;
-    private SkinnedModelEntity modelEntity;
     private ModelEntity envModelEntity;
-    private Model model;
     private Model envModel;
 
     private Texture2D skyboxTexture;
@@ -53,13 +51,6 @@ public class GameScene : Scene
         camera = new PerspectiveCamera();
         camera.Position = Vector3.UnitZ * 4.0f;
 
-        model = new Model(@"Assets/Models/WalkAnim.dae");
-        model.TextureMinFilter(TextureMinFilter.Nearest);
-        model.TextureMagFilter(TextureMagFilter.Nearest);
-        modelEntity = new SkinnedModelEntity();
-        modelEntity.Model = model;
-        modelEntity.Animation = model.Animations[0];
-
         envModel = new Model(@"Assets/Models/Environment.dae");
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
@@ -77,7 +68,6 @@ public class GameScene : Scene
             Engine.LoadScene<MainMenuScene>(context);
         }
         
-        modelEntity.Update(args);
         envModelEntity.Update(args);
         
         Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
@@ -113,7 +103,6 @@ public class GameScene : Scene
         
         MatrixStack.Push();
         MatrixStack.Translate(0.0f, -0.4f, 8.0f);
-        modelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
 
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
@@ -122,8 +111,6 @@ public class GameScene : Scene
 
     public override void Dispose()
     {
-        modelEntity.Dispose();
-        model.Dispose();
         envModelEntity.Dispose();
         envModel.Dispose();
         capture.Dispose();

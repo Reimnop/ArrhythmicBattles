@@ -44,12 +44,6 @@
       <None Update="Assets\Icons\icon_xl.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Models\WalkAnim.dae">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Assets\Models\sef.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Assets\Models\Environment.dae">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
