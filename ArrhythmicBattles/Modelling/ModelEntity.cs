@@ -98,7 +98,11 @@ public class ModelEntity : Entity, IRenderable
             ModelMaterial material = model.Materials[modelMesh.MaterialIndex];
             
             meshEntity.Mesh = model.Meshes[modelMesh.MeshIndex];
-            meshEntity.Color = new Color4(material.Color.R * Color.R, material.Color.G * Color.G, material.Color.B * Color.B, material.Color.A * Color.A);;
+            meshEntity.Color = new Color4(
+                material.EmissiveStrength * material.Color.R * Color.R, 
+                material.EmissiveStrength * material.Color.G * Color.G, 
+                material.EmissiveStrength * material.Color.B * Color.B, 
+                material.EmissiveStrength * material.Color.A * Color.A);;
             meshEntity.Texture = material.Texture;
             meshEntity.Render(renderer, layerId, matrixStack, cameraData);
         }

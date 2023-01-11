@@ -9,12 +9,16 @@ namespace ArrhythmicBattles.Modelling;
 
 public class ModelMaterial : IDisposable
 {
-    public Color4 Color { get; }
-    public Texture2D? Texture { get; }
+    public string Name { get; }
+    public Color4 Color { get; set; }
+    public float EmissiveStrength { get; set; }
+    public Texture2D? Texture { get; set; }
 
-    public ModelMaterial(Color4 color, Texture2D? texture)
+    public ModelMaterial(string name, Color4 color, float emissiveStrength, Texture2D? texture)
     {
+        Name = name;
         Color = color;
+        EmissiveStrength = emissiveStrength;
         Texture = texture;
     }
 

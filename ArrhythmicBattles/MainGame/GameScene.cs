@@ -44,16 +44,16 @@ public class GameScene : Scene
         capture = inputSystem.AcquireCapture();
         
         skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
-
-        Engine.Renderer.ClearColor = Color4.DeepSkyBlue;
+        Engine.Renderer.ClearColor = Color4.Black;
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
         camera.Position = Vector3.UnitZ * 4.0f;
 
-        envModel = new Model(@"Assets/Models/Environment.dae");
+        envModel = new Model(@"Assets/Models/Map01.dae");
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
+        envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
         
         // Init post processing
         bloom = new Bloom();
@@ -97,14 +97,9 @@ public class GameScene : Scene
         renderer.UsePostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
-        renderer.UseSkybox(skyboxTexture, cameraData);
+        // renderer.UseSkybox(skyboxTexture, cameraData);
         
         MatrixStack.Push();
-        
-        MatrixStack.Push();
-        MatrixStack.Translate(0.0f, -0.4f, 8.0f);
-        MatrixStack.Pop();
-
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
     }

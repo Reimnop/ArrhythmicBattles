@@ -76,14 +76,13 @@ public class ModelImporter : IDisposable
                 }
             }
 
-            ModelMaterial material = new ModelMaterial(
-                new Color4(
-                    sceneMaterial.ColorDiffuse.R,
-                    sceneMaterial.ColorDiffuse.G,
-                    sceneMaterial.ColorDiffuse.B,
-                    sceneMaterial.ColorDiffuse.A),
-                texture);
-            materials.Add(material);
+            Color4 color = new Color4(
+                sceneMaterial.ColorDiffuse.R,
+                sceneMaterial.ColorDiffuse.G,
+                sceneMaterial.ColorDiffuse.B,
+                sceneMaterial.ColorDiffuse.A);
+
+            materials.Add(new ModelMaterial(sceneMaterial.Name, color, 1.0f, texture));
         }
 
         return materials;
@@ -92,7 +91,7 @@ public class ModelImporter : IDisposable
     public List<IndexedMesh<LitVertex>> LoadMeshes()
     {
         List<IndexedMesh<LitVertex>> meshes = new List<IndexedMesh<LitVertex>>();
-
+        
         foreach (Mesh sceneMesh in scene.Meshes)
         {
             List<LitVertex> vertices = new List<LitVertex>();
@@ -106,7 +105,7 @@ public class ModelImporter : IDisposable
                 Color4D color = sceneMesh.VertexColorChannelCount == 0
                     ? new Color4D(1.0f)
                     : sceneMesh.VertexColorChannels[0][i];
-                
+
                 vertices.Add(new LitVertex(
                     pos.X, pos.Y, pos.Z, 
                     normal.X, normal.Y, normal.Z,

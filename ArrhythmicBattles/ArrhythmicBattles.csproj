@@ -44,12 +44,6 @@
       <None Update="Assets\Icons\icon_xl.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Models\Environment.dae">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Assets\Models\Ground037_1K_Color.png">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Assets\Audio\Arrhythmic.ogg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -60,6 +54,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Assets\Skyboxes\skybox.exr">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Models\Map01.dae">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
