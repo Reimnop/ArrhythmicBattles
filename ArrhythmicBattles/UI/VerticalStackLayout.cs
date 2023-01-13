@@ -23,10 +23,20 @@ public class VerticalStackLayout : UIElement
         Children = new List<UIElement>();
     }
 
+    public override void Start()
+    {
+        ComputeLayout();
+    }
+
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
         
+        ComputeLayout();
+    }
+
+    private void ComputeLayout()
+    {
         float offset = 0;
         foreach (UIElement child in Children)
         {

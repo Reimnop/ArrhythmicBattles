@@ -1,32 +1,65 @@
 ﻿using System.Collections;
+using FlexFramework.Core;
+using FlexFramework.Core.EntitySystem;
+using FlexFramework.Core.Util;
 
 namespace ArrhythmicBattles.Util;
 
 public delegate T LerpFunc<T>(T left, T right, float factor);
 public delegate void ValueConsumer<T>(T value);
-public delegate T ValueProvider<T>();
 
-public class SimpleAnimator<T> where T : struct
+public class SimpleAnimator<T> : Entity where T : struct
 {
-    public T CurrentValue { get; private set; }
+    public T CurrentValue => currentValue;
 
     private readonly LerpFunc<T> lerpFunc;
     private readonly ValueConsumer<T>? valueConsumer;
 
-    private readonly float speed = 0.0f;
+    private readonly float speed;
 
     private float t = 1.0f;
-    private ValueProvider<T>? valueProvider;
-    private T oldValue;
+    private T currentValue;
+    private T targetValue;
 
-    public SimpleAnimator(LerpFunc<T> lerpFunc, ValueConsumer<T>? valueConsumer, ValueProvider<T> valueProvider, float speed)
+    public SimpleAnimator(LerpFunc<T> lerpFunc, ValueConsumer<T>? valueConsumer, T initialValue, float speed)
     {
         this.lerpFunc = lerpFunc;
         this.valueConsumer = valueConsumer;
-        this.valueProvider = valueProvider;
         this.speed = speed;
+        
+        currentValue = initialValue;
+        targetValue = initialValue;
+        valueConsumer?.Invoke(initialValue);
+    }
 
-        oldValue = valueProvider();
+    public override void Update(UpdateArgs args)
+    {
+        base.Update(args);
+        
+        t += args.DeltaTime * speed;
+        
+        if (t < 1.0f)
+        {
+            currentValue = lerpFunc(currentValue, targetValue, t);
+            valueConsumer?.Invoke(currentValue);
+        }
+        
+        if (t >= 1.0f && !Equals(currentValue, targetValue))
+        {
+            currentValue = targetValue;
+            valueConsumer?.Invoke(currentValue);
+        }
+    }
+
+    public void LerpTo(T targetValue)
+    {
+        if (Equals(this.targetValue, targetValue))
+        {
+            return;
+        }
+
+        this.targetValue = targetValue;
+        t = 0.0f;
     }
 
     public IEnumerator WaitUntilFinish()
@@ -36,19 +69,8 @@ public class SimpleAnimator<T> where T : struct
             yield return null;
         }
     }
-
-    public void Update(float deltaTime)
+    
+    public override void Dispose()
     {
-        t += deltaTime * speed;
-
-        CurrentValue = lerpFunc(oldValue, valueProvider(), Math.Min(t, 1.0f));
-        valueConsumer?.Invoke(CurrentValue);
-    }
-
-    public void LerpTo(ValueProvider<T> valueProvider)
-    {
-        oldValue = CurrentValue;
-        this.valueProvider = valueProvider;
-        t = 0.0f;
     }
 }

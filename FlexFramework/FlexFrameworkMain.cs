@@ -27,22 +27,26 @@ public class FlexFrameworkMain : NativeWindow
 
     private float time = 0.0f;
 
+#if DEBUG
     // This causes memory leaks, but the method needs to be pinned to prevent garbage collection
     private GCHandle leakedGcHandle;
+#endif
 
     public FlexFrameworkMain(NativeWindowSettings nws) : base(nws)
     {
         Context.MakeCurrent();
-        
+
+#if DEBUG
         // init GL debug callback
         GL.Enable(EnableCap.DebugOutput);
-#if DEBUG
         GL.Enable(EnableCap.DebugOutputSynchronous);
 #endif
 
+#if DEBUG
         DebugProc debugProc = LogGlMessage;
         leakedGcHandle = GCHandle.Alloc(debugProc);
         GL.DebugMessageCallback(debugProc, IntPtr.Zero);
+#endif
 
         SceneManager = new SceneManager(this);
         PersistentResources = new PersistentResources();
@@ -60,6 +64,7 @@ public class FlexFrameworkMain : NativeWindow
         Log?.Invoke(sender, new LogEventArgs(severity, type, message));
     }
 
+#if DEBUG
     private void LogGlMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
     {
         if (severity == DebugSeverity.DebugSeverityNotification)
@@ -88,13 +93,12 @@ public class FlexFrameworkMain : NativeWindow
         
         LogMessage(null, severityEnum, "OpenGL", messageString);
         
-#if  DEBUG
         if (type == DebugType.DebugTypeError)
         {
             throw new Exception(messageString);
         }
-#endif
     }
+#endif
 
     public Renderer UseRenderer(Renderer renderer)
     {
@@ -202,6 +206,8 @@ public class FlexFrameworkMain : NativeWindow
     {
         base.OnClosing(e);
         
+#if DEBUG
         leakedGcHandle.Free();
+#endif
     }
 }

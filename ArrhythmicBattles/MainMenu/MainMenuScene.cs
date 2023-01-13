@@ -11,32 +11,8 @@ using Renderer = FlexFramework.Core.Rendering.Renderer;
 
 namespace ArrhythmicBattles.MainMenu;
 
-public class MainMenuScene : GuiScene
+public class MainMenuScene : ABScene
 {
-    public struct MenuItemsOffset
-    {
-        public float ScreenXOffset { get; set; }
-        public float HeaderYOffset { get; set; }
-        public float FooterYOffset { get; set; }
-
-        public MenuItemsOffset(float screenX, float headerY, float footerY)
-        {
-            ScreenXOffset = screenX;
-            HeaderYOffset = headerY;
-            FooterYOffset = footerY;
-        }
-
-        public static MenuItemsOffset Lerp(MenuItemsOffset left, MenuItemsOffset right, float factor)
-        {
-            return new MenuItemsOffset(
-                MathHelper.Lerp(left.ScreenXOffset, right.ScreenXOffset, factor),
-                MathHelper.Lerp(left.HeaderYOffset, right.HeaderYOffset, factor),
-                MathHelper.Lerp(left.FooterYOffset, right.FooterYOffset, factor));
-        }
-    }
-
-    public ABContext Context { get; }
-
     private Texture2D bannerTexture;
     private ImageEntity bannerEntity;
     
@@ -44,19 +20,16 @@ public class MainMenuScene : GuiScene
     private MeshEntity footer;
     
     private TextEntity copyrightText;
-
-    private MenuItemsOffset menuItemsOffset = new MenuItemsOffset(-656.0f, -256.0f, 64.0f);
+    
     private float deltaTime;
-
-    private SimpleAnimator<MenuItemsOffset> menuAnimator;
+    
     private Screen currentScreen;
     private float screenYOffset = 0.0f;
 
     private InputInfo inputInfo;
 
-    public MainMenuScene(ABContext context)
+    public MainMenuScene(ABContext context) : base(context)
     {
-        Context = context;
     }
 
     public override void Init()
@@ -91,37 +64,20 @@ public class MainMenuScene : GuiScene
         inputInfo = Context.InputSystem.GetInputInfo();
         
         // Init screen
-        currentScreen = new SelectScreen(inputInfo, Engine, this);
-
-        menuAnimator = new SimpleAnimator<MenuItemsOffset>(
-            (left, right, factor) =>
-            {
-                float t = Easing.QuadInOut(factor);
-                return MenuItemsOffset.Lerp(left, right, Easing.CircInOut(t));
-            },
-            value => menuItemsOffset = value, 
-            () => new MenuItemsOffset(-Engine.ClientSize.X, -256.0f, 64.0f),
-            2.5f);
-        
-        // Init startup sequence
-        StartCoroutine(ShowMenu());
+        currentScreen = new SelectScreen(Engine, this, inputInfo);
     }
 
-    public void SwitchScreen(Screen screen)
+    public override void SetScreen(Screen? screen)
     {
+        if (screen == null)
+        {
+            Engine.Close();
+            return;
+        }
+        
         currentScreen.Dispose();
         currentScreen = screen;
         StartCoroutine(AnimateSwitchScreen(screen));
-    }
-
-    public void SwitchScreen<T>(params object?[]? args) where T : Screen
-    {
-        Screen? screen = (Screen?) Activator.CreateInstance(typeof(T), args);
-        if (screen == null)
-        {
-            throw new Exception("Could not load screen!");
-        }
-        SwitchScreen(screen);
     }
 
     private IEnumerator AnimateSwitchScreen(Screen screen)
@@ -134,37 +90,7 @@ public class MainMenuScene : GuiScene
 
         screenYOffset = 0.0f;
     }
-
-    public void LoadScene(Scene scene)
-    {
-        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene(scene)));
-    }
-
-    public void LoadScene<T>(params object?[]? args) where T : Scene
-    {
-        StartCoroutine(HideMenuAndDo(() => Engine.LoadScene<T>(args)));
-    }
-
-    private IEnumerator HideMenuAndDo(Action action)
-    {
-        yield return HideMenu();
-        action();
-    }
-
-    private IEnumerator ShowMenu()
-    {
-        // for some reason it won't work without waiting for a frame
-        yield return null;
-        menuAnimator.LerpTo(() => new MenuItemsOffset());
-        yield return menuAnimator.WaitUntilFinish();
-    }
-
-    private IEnumerator HideMenu()
-    {
-        menuAnimator.LerpTo(() => new MenuItemsOffset(-656.0f, -256.0f, 64.0f));
-        yield return menuAnimator.WaitUntilFinish();
-    }
-
+    
     public override void Update(UpdateArgs args)
     {
         deltaTime = args.DeltaTime;
@@ -174,10 +100,8 @@ public class MainMenuScene : GuiScene
         bannerEntity.Update(args);
         copyrightText.Update(args);
         Context.Update();
-        
-        menuAnimator.Update(args.DeltaTime);
 
-        currentScreen.Position = new Vector2i(48 + (int) menuItemsOffset.ScreenXOffset, 306);
+        currentScreen.Position = new Vector2i(48, 306);
         currentScreen.Update(args);
     }
 
@@ -191,7 +115,6 @@ public class MainMenuScene : GuiScene
         MatrixStack.Pop();
         
         MatrixStack.Push();
-        MatrixStack.Translate(0.0f, menuItemsOffset.HeaderYOffset, 0.0f);
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
@@ -202,7 +125,6 @@ public class MainMenuScene : GuiScene
         
         MatrixStack.Push();
         MatrixStack.Translate(0.0f, Engine.ClientSize.Y - 64.0f, 0.0f);
-        MatrixStack.Translate(0.0f, menuItemsOffset.FooterYOffset, 0.0f);
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);

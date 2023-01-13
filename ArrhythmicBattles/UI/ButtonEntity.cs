@@ -33,7 +33,9 @@ public class ButtonEntity : UIElement, IRenderable
     private readonly InputSystem input;
     private readonly InputCapture capture;
     private readonly TextEntity textEntity;
-    private readonly SimpleAnimator<Color4> colorAnimator;
+    
+    
+    private SimpleAnimator<Color4> colorAnimator = null!;
 
     public ButtonEntity(FlexFrameworkMain engine, InputInfo inputInfo) : base(engine)
     {
@@ -42,7 +44,10 @@ public class ButtonEntity : UIElement, IRenderable
         
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.HorizontalAlignment = HorizontalAlignment.Left;
+    }
 
+    public override void Start()
+    {
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
@@ -54,7 +59,7 @@ public class ButtonEntity : UIElement, IRenderable
                     MathHelper.Lerp(left.A, right.A, t));
             },
             value => textEntity.Color = value,
-            () => TextUnfocusedColor,
+            TextUnfocusedColor,
             10.0f);
     }
 
@@ -62,7 +67,7 @@ public class ButtonEntity : UIElement, IRenderable
     {
         base.Update(args);
         
-        colorAnimator.Update(args.DeltaTime);
+        colorAnimator.Update(args);
 
         if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
         {
@@ -72,12 +77,12 @@ public class ButtonEntity : UIElement, IRenderable
 
     protected override void OnFocused()
     {
-        colorAnimator.LerpTo(() => TextFocusedColor);
+        colorAnimator.LerpTo(TextFocusedColor);
     }
 
     protected override void OnUnfocused()
     {
-        colorAnimator.LerpTo(() => TextUnfocusedColor);
+        colorAnimator.LerpTo(TextUnfocusedColor);
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)

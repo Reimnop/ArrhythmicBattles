@@ -6,16 +6,16 @@ namespace ArrhythmicBattles.MainMenu;
 
 public class SettingsScreen : MenuScreen
 {
-    protected override Screen LastScreen => new SelectScreen(InputInfo, Engine, Scene);
+    protected override Screen LastScreen => new SelectScreen(Engine, Scene, InputInfo);
     
-    public SettingsScreen(InputInfo inputInfo, FlexFrameworkMain engine, MainMenuScene scene) : base(inputInfo, engine, scene)
+    public SettingsScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo) : base(engine, scene, inputInfo)
     {
     }
 
     protected override void InitUI()
     {
         CreateButton("VIDEO", DefaultColor, () => { });
-        CreateButton("AUDIO", DefaultColor, () => Scene.SwitchScreen(new AudioSettingsScreen(InputInfo, Engine, Scene)));
-        CreateButton("BACK", ExitColor, () => Scene.SwitchScreen(LastScreen));
+        CreateButton("AUDIO", DefaultColor, () => Scene.SetScreen(new AudioSettingsScreen(Engine, Scene, InputInfo)));
+        CreateButton("BACK", ExitColor, () => Scene.SetScreen(LastScreen));
     }
 }

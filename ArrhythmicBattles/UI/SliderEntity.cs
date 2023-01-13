@@ -37,7 +37,7 @@ public class SliderEntity : UIElement, IRenderable
     private readonly InputSystem input;
     private readonly InputCapture capture;
     
-    private readonly SimpleAnimator<Color4> colorAnimator;
+    private SimpleAnimator<Color4> colorAnimator = null!;
     
     private readonly TextEntity textEntity;
     private readonly MeshEntity barMeshEntity;
@@ -57,7 +57,10 @@ public class SliderEntity : UIElement, IRenderable
         barMeshEntity.Mesh = engine.PersistentResources.QuadMesh;
         barMeshEntityLowOpacity = new MeshEntity();
         barMeshEntityLowOpacity.Mesh = engine.PersistentResources.QuadMesh;
+    }
 
+    public override void Start()
+    {
         colorAnimator = new SimpleAnimator<Color4>(
             (left, right, factor) =>
             {
@@ -74,7 +77,7 @@ public class SliderEntity : UIElement, IRenderable
                 barMeshEntity.Color = value;
                 barMeshEntityLowOpacity.Color = new Color4(value.R, value.G, value.B, value.A * 0.25f);
             },
-            () => UnfocusedColor,
+            UnfocusedColor,
             10.0f);
     }
 
@@ -88,7 +91,7 @@ public class SliderEntity : UIElement, IRenderable
     {
         base.Update(args);
         
-        colorAnimator.Update(args.DeltaTime);
+        colorAnimator.Update(args);
 
         if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
         {
@@ -120,12 +123,12 @@ public class SliderEntity : UIElement, IRenderable
 
     protected override void OnFocused()
     {
-        colorAnimator.LerpTo(() => FocusedColor);
+        colorAnimator.LerpTo(FocusedColor);
     }
 
     protected override void OnUnfocused()
     {
-        colorAnimator.LerpTo(() => UnfocusedColor);
+        colorAnimator.LerpTo(UnfocusedColor);
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)

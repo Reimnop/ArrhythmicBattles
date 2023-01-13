@@ -65,7 +65,8 @@ public class KeyboardNavigator : Entity, IRenderable
     private readonly InputCapture capture;
     private readonly MeshEntity meshEntity;
     private readonly Mesh<Vertex> mesh;
-    private readonly SimpleAnimator<RectangleF> highlightAnimator;
+    
+    private SimpleAnimator<RectangleF> highlightAnimator = null!;
 
     private NavNode currentNode;
     private RectangleF currentHighlightRect;
@@ -76,16 +77,19 @@ public class KeyboardNavigator : Entity, IRenderable
     {
         input = inputInfo.InputSystem;
         capture = inputInfo.InputCapture;
-        
         RootNode = rootNode;
-        rootNode.Element.IsFocused = true;
-        currentNode = rootNode;
+        
+        RootNode.Element.IsFocused = true;
+        currentNode = RootNode;
 
         mesh = new Mesh<Vertex>("mesh");
 
         meshEntity = new MeshEntity();
         meshEntity.Mesh = mesh;
+    }
 
+    public override void Start()
+    {
         highlightAnimator = new SimpleAnimator<RectangleF>(
             (left, right, factor) =>
             {
@@ -98,7 +102,7 @@ public class KeyboardNavigator : Entity, IRenderable
                     MathHelper.Lerp(left.Height, right.Height, t));
             },
             value => currentHighlightRect = value,
-            () => rootNode.Element.GetBounds(),
+            RootNode.Element.GetBounds(),
             10.0f);
     }
 
@@ -106,7 +110,7 @@ public class KeyboardNavigator : Entity, IRenderable
     {
         base.Update(args);
         
-        highlightAnimator.Update(args.DeltaTime);
+        highlightAnimator.Update(args);
         meshEntity.Update(args);
         
         if (input.GetKeyDown(capture, Keys.Up))
@@ -143,7 +147,7 @@ public class KeyboardNavigator : Entity, IRenderable
         
         OnNodeSelected?.Invoke(node);
         
-        highlightAnimator.LerpTo(() => node.Element.GetBounds());
+        highlightAnimator.LerpTo(node.Element.GetBounds());
     }
 
     private void RegenRectIfNecessary()

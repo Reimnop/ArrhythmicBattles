@@ -15,13 +15,13 @@ public class CreditsScreen : Screen
 
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;
-    private readonly MainMenuScene mainMenuScene;
+    private readonly ABScene scene;
     private readonly InputInfo inputInfo;
     
-    public CreditsScreen(InputInfo inputInfo, FlexFrameworkMain engine, MainMenuScene mainMenuScene)
+    public CreditsScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
     {
         this.engine = engine;
-        this.mainMenuScene = mainMenuScene;
+        this.scene = scene;
         this.inputInfo = inputInfo;
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
@@ -33,9 +33,9 @@ public class CreditsScreen : Screen
     {
         textEntity.Update(args);
 
-        if (mainMenuScene.Context.InputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
+        if (scene.Context.InputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
         {
-            mainMenuScene.SwitchScreen(new SelectScreen(inputInfo, engine, mainMenuScene));
+            scene.SetScreen(new SelectScreen(engine, scene, inputInfo));
         }
     }
     

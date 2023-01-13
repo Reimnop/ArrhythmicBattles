@@ -9,6 +9,7 @@ public abstract class Entity : IDisposable
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
 
     private float deltaTime;
+    private bool started = false;
 
     #region Coroutine Stuff
     
@@ -72,8 +73,18 @@ public abstract class Entity : IDisposable
     
     #endregion
 
+    public virtual void Start()
+    {
+    }
+
     public virtual void Update(UpdateArgs args)
     {
+        if (!started)
+        {
+            started = true;
+            Start();
+        }
+        
         deltaTime = args.DeltaTime;
 
         foreach (Coroutine coroutine in coroutines)

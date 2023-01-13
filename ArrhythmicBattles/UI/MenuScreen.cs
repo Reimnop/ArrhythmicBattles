@@ -26,18 +26,18 @@ public abstract class MenuScreen : Screen
     
     protected InputInfo InputInfo { get; }
     protected FlexFrameworkMain Engine { get; }
-    protected MainMenuScene Scene { get; }
+    protected ABScene Scene { get; }
 
     private readonly VerticalStackLayout stackLayout;
     private readonly KeyboardNavigator navigator;
 
     private readonly List<UIElement> elements = new List<UIElement>();
 
-    public MenuScreen(InputInfo inputInfo, FlexFrameworkMain engine, MainMenuScene scene)
+    public MenuScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
     {
-        this.InputInfo = inputInfo;
-        this.Engine = engine;
-        this.Scene = scene;
+        Engine = engine;
+        Scene = scene;
+        InputInfo = inputInfo;
 
         InitUI();
         
@@ -94,12 +94,11 @@ public abstract class MenuScreen : Screen
     {
         stackLayout.Update(args);
         navigator.Update(args);
-        
         elements.ForEach(element => element.Update(args));
         
         if (LastScreen != null && Scene.Context.InputSystem.GetKeyDown(InputInfo.InputCapture, Keys.Escape))
         {
-            Scene.SwitchScreen(LastScreen);
+            Scene.SetScreen(LastScreen);
         }
     }
     

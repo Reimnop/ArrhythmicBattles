@@ -1,21 +1,18 @@
 ﻿using ArrhythmicBattles.MainMenu;
 using ArrhythmicBattles.Modelling;
+using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
-using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.PostProcessing;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.MainGame;
 
-public class GameScene : Scene
+public class GameScene : ABScene
 {
-    private readonly ABContext context;
-
     private PerspectiveCamera camera;
     private ModelEntity envModelEntity;
     private Model envModel;
@@ -33,14 +30,15 @@ public class GameScene : Scene
     private float yRotation = 0.0f;
     private float xRotation = 0.0f;
 
-    public GameScene(ABContext context)
+    public GameScene(ABContext context) : base(context)
     {
-        this.context = context;
     }
     
     public override void Init()
     {
-        inputSystem = context.InputSystem;
+        base.Init();
+        
+        inputSystem = Context.InputSystem;
         capture = inputSystem.AcquireCapture();
         
         skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
@@ -61,11 +59,16 @@ public class GameScene : Scene
         tonemapper.ExposureValue = 1.2f;
     }
 
+    public override void SetScreen(Screen? screen)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Update(UpdateArgs args)
     {
         if (Engine.Input.GetKey(Keys.Escape))
         {
-            Engine.LoadScene<MainMenuScene>(context);
+            Engine.LoadScene<MainMenuScene>(Context);
         }
         
         envModelEntity.Update(args);
