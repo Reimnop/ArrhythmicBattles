@@ -8,8 +8,19 @@ public class GLStateManager
     private int currentProgram = 0;
     private int currentVertexArray = 0;
     private int[] currentTextureUnits = new int[16];
+    
+    private bool depthMask = true;
 
     private readonly Dictionary<EnableCap, bool> glCapabilities = new Dictionary<EnableCap, bool>();
+    
+    public void SetDepthMask(bool enabled)
+    {
+        if (depthMask != enabled)
+        {
+            GL.DepthMask(enabled);
+            depthMask = enabled;
+        }
+    }
 
     public void SetCapability(EnableCap cap, bool enabled)
     {

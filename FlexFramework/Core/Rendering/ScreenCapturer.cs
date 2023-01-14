@@ -9,15 +9,14 @@ public class ScreenCapturer : IDisposable
     public int Height { get; }
 
     public Framebuffer FrameBuffer { get; }
-    public Renderbuffer DepthBuffer { get; }
     public Texture2D ColorBuffer { get; }
+    public Renderbuffer? DepthBuffer { get; }
 
-    public ScreenCapturer(string name, int width, int height)
+    public ScreenCapturer(string name, int width, int height, bool useDepth = true)
     {
         Width = width;
         Height = height;
-        
-        DepthBuffer = new Renderbuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f);
+
         ColorBuffer = new Texture2D($"{name}-color", width, height, SizedInternalFormat.Rgba16f);
         ColorBuffer.SetMinFilter(TextureMinFilter.Linear);
         ColorBuffer.SetMagFilter(TextureMagFilter.Linear);
@@ -25,14 +24,19 @@ public class ScreenCapturer : IDisposable
         ColorBuffer.SetWrapT(TextureWrapMode.ClampToEdge);
 
         FrameBuffer = new Framebuffer(name);
-        FrameBuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
         FrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, ColorBuffer);
+        
+        if (useDepth)
+        {
+            DepthBuffer = new Renderbuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f);
+            FrameBuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
+        }
     }
 
     public void Dispose()
     {
         FrameBuffer.Dispose();
-        DepthBuffer.Dispose();
         ColorBuffer.Dispose();
+        DepthBuffer?.Dispose();
     }
 }

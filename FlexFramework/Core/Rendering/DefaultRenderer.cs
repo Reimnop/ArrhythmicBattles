@@ -23,7 +23,8 @@ public class DefaultRenderer : Renderer
 
     private List<PostProcessor> postProcessors = new List<PostProcessor>();
 
-    private ScreenCapturer? screenCapturer;
+    private ScreenCapturer? worldScreenCapturer;
+    private ScreenCapturer? guiScreenCapturer;
 
     private GLStateManager stateManager;
     private ShaderProgram unlitShader;
@@ -61,9 +62,11 @@ public class DefaultRenderer : Renderer
         RegisterRenderingStrategy<SkinnedVertexDrawData, SkinnedVertexRenderStrategy>();
         RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
         RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();
-
+        
+        // Set GL modes
         GL.CullFace(CullFaceMode.Back);
         GL.FrontFace(FrontFaceDirection.Ccw);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
     }
 
     private void RegisterRenderingStrategy<TDrawData, TStrategy>(params object?[]? args) 
@@ -134,14 +137,14 @@ public class DefaultRenderer : Renderer
         skyboxCameraData = cameraData;
     }
 
-    private bool ShouldUpdateCapturer(Vector2i size)
+    private bool ShouldUpdateCapturer(Vector2i size, ScreenCapturer? capturer)
     {
-        if (screenCapturer == null)
+        if (capturer == null)
         {
             return true;
         }
         
-        if (screenCapturer.Width != size.X || screenCapturer.Height != size.Y)
+        if (capturer.Width != size.X || capturer.Height != size.Y)
         {
             return true;
         }
@@ -152,20 +155,28 @@ public class DefaultRenderer : Renderer
     public override void Update(UpdateArgs args)
     {
         Vector2i size = Engine.ClientSize;
-        if (ShouldUpdateCapturer(size))
+        
+        if (ShouldUpdateCapturer(size, worldScreenCapturer))
         {
-            screenCapturer?.Dispose();
-            screenCapturer = new ScreenCapturer("scene", size.X, size.Y);
+            worldScreenCapturer?.Dispose();
+            worldScreenCapturer = new ScreenCapturer("world", size.X, size.Y);
+        }
+        
+        if (ShouldUpdateCapturer(size, guiScreenCapturer))
+        {
+            guiScreenCapturer?.Dispose();
+            guiScreenCapturer = new ScreenCapturer("gui", size.X, size.Y, false);
         }
     }
 
     public override void Render()
     {
-        Debug.Assert(screenCapturer != null);
+        Debug.Assert(worldScreenCapturer != null);
+        Debug.Assert(guiScreenCapturer != null);
         
-        stateManager.BindFramebuffer(screenCapturer.FrameBuffer.Handle);
+        stateManager.BindFramebuffer(worldScreenCapturer.FrameBuffer.Handle); // Bind world framebuffer
 
-        GL.Viewport(0, 0, screenCapturer.Width, screenCapturer.Height);
+        GL.Viewport(0, 0, worldScreenCapturer.Width, worldScreenCapturer.Height);
         
         GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -182,9 +193,9 @@ public class DefaultRenderer : Renderer
             GL.UniformMatrix4(1, true, ref inverseProjection);
             GL.UniformMatrix4(2, true, ref inverseView);
             
-            GL.BindImageTexture(0, screenCapturer.ColorBuffer.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
+            GL.BindImageTexture(0, worldScreenCapturer.ColorBuffer.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-            GL.DispatchCompute(DivideIntCeil(screenCapturer.ColorBuffer.Width, 8), DivideIntCeil(screenCapturer.ColorBuffer.Height, 8), 1);
+            GL.DispatchCompute(DivideIntCeil(worldScreenCapturer.ColorBuffer.Width, 8), DivideIntCeil(worldScreenCapturer.ColorBuffer.Height, 8), 1);
             
             skyboxTexture = null;
         }
@@ -196,35 +207,50 @@ public class DefaultRenderer : Renderer
         
         stateManager.SetCapability(EnableCap.DepthTest, true);
         stateManager.SetCapability(EnableCap.CullFace, true);
-        GL.DepthMask(true);
+        stateManager.SetCapability(EnableCap.Blend, false);
+        stateManager.SetDepthMask(true);
         RenderLayer(opaqueLayer);
         
+        stateManager.SetCapability(EnableCap.DepthTest, true);
         stateManager.SetCapability(EnableCap.CullFace, false);
+        stateManager.SetCapability(EnableCap.Blend, false);
+        stateManager.SetDepthMask(true);
         RenderLayer(alphaClipLayer);
         
-        GL.DepthMask(false);
+        stateManager.SetCapability(EnableCap.DepthTest, true);
+        stateManager.SetCapability(EnableCap.CullFace, false);
         stateManager.SetCapability(EnableCap.Blend, true);
-        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        stateManager.SetDepthMask(false);
         RenderLayer(transparentLayer);
         
-        GL.DepthMask(true);
-        
-        stateManager.SetCapability(EnableCap.DepthTest, false);
-        RenderLayer(guiLayer);
-        stateManager.SetCapability(EnableCap.Blend, false);
-        
-        stateManager.BindFramebuffer(0);
-        
-        // Post processing
-        // TODO: Don't post process GUI layer
+        // Post-process world framebuffer
         using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
-        RunPostProcessors(postProcessors, stateManager, screenCapturer.ColorBuffer);
+        RunPostProcessors(postProcessors, stateManager, worldScreenCapturer.ColorBuffer);
+        
+        stateManager.BindFramebuffer(guiScreenCapturer.FrameBuffer.Handle); // Finish rendering world, bind gui framebuffer
+        
+        // Blit world framebuffer to gui framebuffer
+        GL.ClearColor(Color.Black);
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.BlitNamedFramebuffer(worldScreenCapturer.FrameBuffer.Handle, guiScreenCapturer.FrameBuffer.Handle, 
+            0, 0, worldScreenCapturer.Width, worldScreenCapturer.Height, 
+            0, 0, guiScreenCapturer.Width, guiScreenCapturer.Height,
+            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+
+        stateManager.SetCapability(EnableCap.DepthTest, false);
+        stateManager.SetCapability(EnableCap.CullFace, false);
+        stateManager.SetCapability(EnableCap.Blend, true);
+        stateManager.SetDepthMask(true);
+        RenderLayer(guiLayer);
+
+        stateManager.BindFramebuffer(0); // Finally, bind default framebuffer
+
 
         // Blit to backbuffer
         GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);
-        GL.BlitNamedFramebuffer(screenCapturer.FrameBuffer.Handle, 0, 
-            0, 0, screenCapturer.Width, screenCapturer.Height, 
+        GL.BlitNamedFramebuffer(guiScreenCapturer.FrameBuffer.Handle, 0, 
+            0, 0, guiScreenCapturer.Width, guiScreenCapturer.Height, 
             0, 0, Engine.ClientSize.X, Engine.ClientSize.Y,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
     }
@@ -262,6 +288,10 @@ public class DefaultRenderer : Renderer
     public override void Dispose()
     {
         unlitShader.Dispose();
+        litShader.Dispose();
+        skyboxShader.Dispose();
+        worldScreenCapturer?.Dispose();
+        guiScreenCapturer?.Dispose();
 
         foreach (var (_, strategy) in renderingStrategies)
         {
