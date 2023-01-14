@@ -23,6 +23,8 @@ public class GameScene : ABScene
     private InputSystem inputSystem;
     private InputInfo inputInfo;
 
+    private DebugScreen? debugScreen;
+
     private int alphaClipLayer;
 
     private float yRotation = 0.0f;
@@ -60,6 +62,20 @@ public class GameScene : ABScene
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
+
+        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.F3))
+        {
+            if (debugScreen == null)
+            {
+                debugScreen = new DebugScreen(Engine, this);
+                OpenScreen(debugScreen);
+            }
+            else
+            {
+                CloseScreen(debugScreen);
+                debugScreen = null;
+            }
+        }
         
         if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
         {

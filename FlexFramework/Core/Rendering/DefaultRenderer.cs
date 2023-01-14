@@ -214,7 +214,9 @@ public class DefaultRenderer : Renderer
         stateManager.SetCapability(EnableCap.Blend, false);
         
         stateManager.BindFramebuffer(0);
-
+        
+        // Post processing
+        // TODO: Don't post process GUI layer
         using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
         RunPostProcessors(postProcessors, stateManager, screenCapturer.ColorBuffer);
 
