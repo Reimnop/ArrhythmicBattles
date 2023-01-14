@@ -40,9 +40,7 @@ public class FlexFrameworkMain : NativeWindow
         // init GL debug callback
         GL.Enable(EnableCap.DebugOutput);
         GL.Enable(EnableCap.DebugOutputSynchronous);
-#endif
-
-#if DEBUG
+        
         DebugProc debugProc = LogGlMessage;
         leakedGcHandle = GCHandle.Alloc(debugProc);
         GL.DebugMessageCallback(debugProc, IntPtr.Zero);

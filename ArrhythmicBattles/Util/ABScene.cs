@@ -11,8 +11,10 @@ public abstract class ABScene : Scene
 {
     public ABContext Context { get; }
 
-    protected GuiCamera Camera { get; private set; }
+    protected GuiCamera GuiCamera { get; private set; }
     protected int GuiLayerId { get; private set; }
+
+    protected LayeredScreenHandler ScreenHandler { get; } = new LayeredScreenHandler();
 
     public ABScene(ABContext context)
     {
@@ -26,8 +28,32 @@ public abstract class ABScene : Scene
         renderer.ClearColor = new Color4(33, 33, 33, 255);
         GuiLayerId = renderer.GetLayerId("gui");
 
-        Camera = new GuiCamera(Engine);
+        GuiCamera = new GuiCamera(Engine);
     }
-    
-    public abstract void SetScreen(Screen? screen);
+
+    public override void Update(UpdateArgs args)
+    {
+        Context.Update();
+        ScreenHandler.Update(args);
+    }
+
+    public virtual void OpenScreen(Screen screen)
+    {
+        ScreenHandler.OpenScreen(screen);
+    }
+
+    public virtual void CloseScreen(Screen screen)
+    {
+        ScreenHandler.CloseScreen(screen);
+    }
+
+    public virtual void SwitchScreen(Screen before, Screen after)
+    {
+        ScreenHandler.SwitchScreen(before, after);
+    }
+
+    public override void Dispose()
+    {
+        ScreenHandler.Dispose();
+    }
 }

@@ -21,12 +21,19 @@ public class InputCapture : IDisposable
 
 public class InputSystem
 {
-    private readonly Stack<InputCapture> captures = new Stack<InputCapture>();
+    private readonly List<InputCapture> captures = new List<InputCapture>();
     private readonly Input input;
+
+    private InputCapture? currentCapture;
 
     public InputSystem(Input input)
     {
         this.input = input;
+    }
+
+    public void Update()
+    {
+        currentCapture = captures.Count > 0 ? captures.Last() : null;
     }
 
     public InputInfo GetInputInfo()
@@ -37,7 +44,7 @@ public class InputSystem
     public InputCapture AcquireCapture()
     {
         InputCapture capture = new InputCapture(this);
-        captures.Push(capture);
+        captures.Add(capture);
         return capture;
     }
 
@@ -47,17 +54,12 @@ public class InputSystem
         {
             return false;
         }
-        return captures.Peek() == capture;
+        return currentCapture == capture;
     }
 
     public void ReleaseCapture(InputCapture capture)
     {
-        if (!IsCurrentCapture(capture))
-        {
-            throw new Exception("Attempted to release a capture that is not on top");
-        }
-
-        captures.Pop();
+        captures.Remove(capture);
     }
     
     public bool GetMouseDown(InputCapture capture, MouseButton button)

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
-using FlexFramework.Core;
 using FlexFramework.Core.EntitySystem.Default;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering.Data;
@@ -20,11 +19,6 @@ public class MainMenuScene : ABScene
     private MeshEntity footer;
     
     private TextEntity copyrightText;
-    
-    private float deltaTime;
-    
-    private Screen currentScreen;
-    private float screenYOffset = 0.0f;
 
     private InputInfo inputInfo;
 
@@ -63,55 +57,26 @@ public class MainMenuScene : ABScene
         // Init input
         inputInfo = Context.InputSystem.GetInputInfo();
         
-        // Init screen
-        currentScreen = new SelectScreen(Engine, this, inputInfo);
+        OpenScreen(new SelectScreen(Engine, this, inputInfo));
     }
 
-    public override void SetScreen(Screen? screen)
-    {
-        if (screen == null)
-        {
-            Engine.Close();
-            return;
-        }
-        
-        currentScreen.Dispose();
-        currentScreen = screen;
-        StartCoroutine(AnimateSwitchScreen(screen));
-    }
-
-    private IEnumerator AnimateSwitchScreen(Screen screen)
-    {
-        for (float t = 0.0f; t < 1.0f; t += deltaTime * 10.0f)
-        {
-            screenYOffset = MathF.Sin(t * MathF.PI) * 8.0f;
-            yield return null;
-        }
-
-        screenYOffset = 0.0f;
-    }
-    
     public override void Update(UpdateArgs args)
     {
-        deltaTime = args.DeltaTime;
-        
+        base.Update(args);
+
         header.Update(args);
         footer.Update(args);
         bannerEntity.Update(args);
         copyrightText.Update(args);
-        Context.Update();
-
-        currentScreen.Position = new Vector2i(48, 306);
-        currentScreen.Update(args);
     }
 
     public override void Render(Renderer renderer)
     {
-        CameraData cameraData = Camera.GetCameraData(Engine.ClientSize);
+        CameraData cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         
         MatrixStack.Push();
-        MatrixStack.Translate(0.0f, screenYOffset, 0.0f);
-        currentScreen.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        MatrixStack.Translate(48.0f, 306.0f, 0.0f);
+        ScreenHandler.Render(renderer, GuiLayerId, MatrixStack, cameraData);
         MatrixStack.Pop();
         
         MatrixStack.Push();
@@ -137,9 +102,10 @@ public class MainMenuScene : ABScene
 
     public override void Dispose()
     {
+        base.Dispose();
+        
         Context.Sound.MenuBackgroundMusic.Stop();
         
         bannerEntity.Dispose();
-        currentScreen.Dispose();
     }
 }

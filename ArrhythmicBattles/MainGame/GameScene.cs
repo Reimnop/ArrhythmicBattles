@@ -1,6 +1,4 @@
-﻿using ArrhythmicBattles.MainMenu;
-using ArrhythmicBattles.Modelling;
-using ArrhythmicBattles.UI;
+﻿using ArrhythmicBattles.Modelling;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
@@ -23,7 +21,7 @@ public class GameScene : ABScene
     private Exposure tonemapper;
 
     private InputSystem inputSystem;
-    private InputCapture capture;
+    private InputInfo inputInfo;
 
     private int alphaClipLayer;
 
@@ -39,7 +37,7 @@ public class GameScene : ABScene
         base.Init();
         
         inputSystem = Context.InputSystem;
-        capture = inputSystem.AcquireCapture();
+        inputInfo = inputSystem.GetInputInfo();
         
         skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
         Engine.Renderer.ClearColor = Color4.Black;
@@ -59,29 +57,26 @@ public class GameScene : ABScene
         tonemapper.ExposureValue = 1.2f;
     }
 
-    public override void SetScreen(Screen? screen)
-    {
-        throw new NotImplementedException();
-    }
-
     public override void Update(UpdateArgs args)
     {
-        if (Engine.Input.GetKey(Keys.Escape))
-        {
-            Engine.LoadScene<MainMenuScene>(Context);
-        }
+        base.Update(args);
         
+        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
+        {
+            OpenScreen(new PauseScreen(Engine, this));
+        }
+
         envModelEntity.Update(args);
         
         Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
         Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
 
-        Vector2 movement = inputSystem.GetMovement(capture);
+        Vector2 movement = inputSystem.GetMovement(inputInfo.InputCapture);
 
         Vector3 move = forward * movement.Y + right * movement.X;
         camera.Position += move * 4.0f * args.DeltaTime;
 
-        if (inputSystem.GetMouse(capture, MouseButton.Right))
+        if (inputSystem.GetMouse(inputInfo.InputCapture, MouseButton.Right))
         {
             Vector2 delta = Engine.Input.MouseDelta / 480.0f;
 
@@ -105,13 +100,18 @@ public class GameScene : ABScene
         MatrixStack.Push();
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
+        
+        CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
+        ScreenHandler.Render(renderer, GuiLayerId, MatrixStack, guiCameraData);
     }
 
     public override void Dispose()
     {
+        base.Dispose();
+
         envModelEntity.Dispose();
         envModel.Dispose();
-        capture.Dispose();
+        inputInfo.Dispose();
         
         bloom.Dispose();
         tonemapper.Dispose();

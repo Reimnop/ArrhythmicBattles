@@ -60,6 +60,7 @@ public class ABContext : IDisposable
     public void Update()
     {
         DiscordRpcClient.Invoke();
+        InputSystem.Update();
     }
 
     public void Dispose()

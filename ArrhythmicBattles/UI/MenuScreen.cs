@@ -98,7 +98,7 @@ public abstract class MenuScreen : Screen
         
         if (LastScreen != null && Scene.Context.InputSystem.GetKeyDown(InputInfo.InputCapture, Keys.Escape))
         {
-            Scene.SetScreen(LastScreen);
+            Scene.SwitchScreen(this, LastScreen);
         }
     }
     

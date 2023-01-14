@@ -15,7 +15,7 @@ public class SettingsScreen : MenuScreen
     protected override void InitUI()
     {
         CreateButton("VIDEO", DefaultColor, () => { });
-        CreateButton("AUDIO", DefaultColor, () => Scene.SetScreen(new AudioSettingsScreen(Engine, Scene, InputInfo)));
-        CreateButton("BACK", ExitColor, () => Scene.SetScreen(LastScreen));
+        CreateButton("AUDIO", DefaultColor, () => Scene.SwitchScreen(this, new AudioSettingsScreen(Engine, Scene, InputInfo)));
+        CreateButton("BACK", ExitColor, () => Scene.SwitchScreen(this, LastScreen));
     }
 }

@@ -17,8 +17,8 @@ public class SelectScreen : MenuScreen
     {
         CreateButton("SINGLEPLAYER", DefaultColor, () => Engine.LoadScene(new GameScene(Scene.Context)));
         CreateButton("MULTIPLAYER", DefaultColor, () => { });
-        CreateButton("SETTINGS", DefaultColor, () => Scene.SetScreen(new SettingsScreen(Engine, Scene, InputInfo)));
-        CreateButton("CREDITS", DefaultColor, () => Scene.SetScreen(new CreditsScreen(Engine, Scene, InputInfo)));
-        CreateButton("EXIT", ExitColor, () => Scene.SetScreen(null));
+        CreateButton("SETTINGS", DefaultColor, () => Scene.SwitchScreen(this, new SettingsScreen(Engine, Scene, InputInfo)));
+        CreateButton("CREDITS", DefaultColor, () => Scene.SwitchScreen(this, new CreditsScreen(Engine, Scene, InputInfo)));
+        CreateButton("EXIT", ExitColor, () => Scene.CloseScreen(this));
     }
 }

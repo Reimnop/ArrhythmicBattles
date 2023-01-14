@@ -19,7 +19,7 @@ public class AudioSettingsScreen : MenuScreen
         CreateButton("BACK", ExitColor, () =>
         {
             Scene.Context.SaveSettings();
-            Scene.SetScreen(LastScreen);
+            Scene.SwitchScreen(this, LastScreen);
         });
     }
 }
