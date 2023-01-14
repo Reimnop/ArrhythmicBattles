@@ -1,4 +1,5 @@
-﻿using FlexFramework;
+﻿using ArrhythmicBattles.MainGame;
+using FlexFramework;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Text;
 using OpenTK.Mathematics;
@@ -47,7 +48,12 @@ public class Program
         flexFramework.LoadFonts(2048,
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
             new FontFileInfo("inconsolata-small", 18, "Assets/Fonts/Inconsolata-Regular.ttf"));
-        flexFramework.LoadScene<MainMenuScene>(context);
+        
+#if DEBUG
+        flexFramework.LoadScene(new GameScene(context));
+#else
+        flexFramework.LoadScene(new MainMenuScene(context));
+#endif
 
         while (!flexFramework.ShouldClose())
         {
