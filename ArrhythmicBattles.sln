@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFont", "SharpFont\Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles", "ArrhythmicBattles\ArrhythmicBattles.csproj", "{24A57AC7-171D-43FC-992F-20135A758107}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexFramework.Assets", "FlexFramework.Assets\FlexFramework.Assets.csproj", "{0FC893B8-B41E-4092-8360-E5EBB57B3BC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetPacker", "AssetPacker\AssetPacker.csproj", "{17C5AD9D-55B6-4AFA-AE93-9711ECD1F7F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{24A57AC7-171D-43FC-992F-20135A758107}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24A57AC7-171D-43FC-992F-20135A758107}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24A57AC7-171D-43FC-992F-20135A758107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC893B8-B41E-4092-8360-E5EBB57B3BC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC893B8-B41E-4092-8360-E5EBB57B3BC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC893B8-B41E-4092-8360-E5EBB57B3BC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC893B8-B41E-4092-8360-E5EBB57B3BC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17C5AD9D-55B6-4AFA-AE93-9711ECD1F7F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17C5AD9D-55B6-4AFA-AE93-9711ECD1F7F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17C5AD9D-55B6-4AFA-AE93-9711ECD1F7F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17C5AD9D-55B6-4AFA-AE93-9711ECD1F7F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

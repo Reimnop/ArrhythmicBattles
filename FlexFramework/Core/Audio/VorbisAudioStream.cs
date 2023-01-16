@@ -16,9 +16,13 @@ public class VorbisAudioStream : AudioStream
     private readonly float[] readBuffer;
     private readonly byte[] copyBuffer;
 
-    public VorbisAudioStream(string path)
+    public VorbisAudioStream(string path) : this(File.OpenRead(path))
     {
-        vorbis = new VorbisReader(path);
+    }
+
+    public VorbisAudioStream(Stream stream)
+    {
+        vorbis = new VorbisReader(stream);
         
         // buffer one second of audio
         readBuffer = new float[vorbis.Channels * vorbis.SampleRate];

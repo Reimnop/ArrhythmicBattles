@@ -11,17 +11,17 @@ namespace ArrhythmicBattles.MainGame;
 
 public class GameScene : ABScene
 {
-    private PerspectiveCamera camera;
-    private ModelEntity envModelEntity;
-    private Model envModel;
+    private PerspectiveCamera camera = null!;
+    private ModelEntity envModelEntity = null!;
+    private Model envModel = null!;
 
-    private Texture2D skyboxTexture;
+    private Texture2D skyboxTexture = null!;
     
-    private Bloom bloom;
-    private Exposure tonemapper;
+    private Bloom bloom = null!;
+    private Exposure tonemapper = null!;
 
-    private InputSystem inputSystem;
-    private InputInfo inputInfo;
+    private InputSystem inputSystem = null!;
+    private InputInfo inputInfo = null!;
 
     private DebugScreen? debugScreen;
 
@@ -111,7 +111,7 @@ public class GameScene : ABScene
         renderer.UsePostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
-        // renderer.UseSkybox(skyboxTexture, cameraData);
+        renderer.UseSkybox(skyboxTexture, cameraData);
         
         MatrixStack.Push();
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);

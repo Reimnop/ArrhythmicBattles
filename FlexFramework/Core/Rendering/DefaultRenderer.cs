@@ -245,7 +245,6 @@ public class DefaultRenderer : Renderer
 
         stateManager.BindFramebuffer(0); // Finally, bind default framebuffer
 
-
         // Blit to backbuffer
         GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);

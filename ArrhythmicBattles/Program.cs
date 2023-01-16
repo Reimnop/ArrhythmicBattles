@@ -51,6 +51,7 @@ public class Program
         
 #if DEBUG
         flexFramework.LoadScene(new GameScene(context));
+        flexFramework.VSync = VSyncMode.Off;
 #else
         flexFramework.LoadScene(new MainMenuScene(context));
 #endif

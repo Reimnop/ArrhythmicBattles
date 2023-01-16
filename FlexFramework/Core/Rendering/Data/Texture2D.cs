@@ -29,6 +29,11 @@ public class Texture2D : GpuObject
     public static Texture2D FromFile(string name, string path)
     {
         using FileStream stream = File.OpenRead(path);
+        return FromStream(name, stream);
+    }
+    
+    public static Texture2D FromStream(string name, Stream stream)
+    {
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
         Texture2D texture2D = new Texture2D(name, result.Width, result.Height, SizedInternalFormat.Rgba8);
         texture2D.LoadData(result.Data, PixelFormat.Rgba, PixelType.UnsignedByte);

@@ -16,8 +16,8 @@ namespace FlexFramework;
 
 public class FlexFrameworkMain : NativeWindow
 {
-    public Renderer Renderer { get; private set; }
-    public TextResources TextResources { get; private set; }
+    public Renderer Renderer { get; private set; } = null!;
+    public TextResources TextResources { get; private set; } = null!;
     public PersistentResources PersistentResources { get; }
     public SceneManager SceneManager { get; }
     public AudioManager AudioManager { get; }
