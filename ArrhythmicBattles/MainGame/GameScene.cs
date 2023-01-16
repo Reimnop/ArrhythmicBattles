@@ -11,6 +11,8 @@ namespace ArrhythmicBattles.MainGame;
 
 public class GameScene : ABScene
 {
+    private PlayerEntity playerEntity = null!;
+    
     private PerspectiveCamera camera = null!;
     private ModelEntity envModelEntity = null!;
     private Model envModel = null!;
@@ -25,10 +27,8 @@ public class GameScene : ABScene
 
     private DebugScreen? debugScreen;
 
+    private int opaqueLayer;
     private int alphaClipLayer;
-
-    private float yRotation = 0.0f;
-    private float xRotation = 0.0f;
 
     public GameScene(ABContext context) : base(context)
     {
@@ -43,16 +43,21 @@ public class GameScene : ABScene
         
         skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
         Engine.Renderer.ClearColor = Color4.Black;
-        alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
-
-        camera = new PerspectiveCamera();
-        camera.Position = Vector3.UnitZ * 4.0f;
-
+        
         envModel = new Model(@"Assets/Models/Map01.dae");
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
         envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
         
+        opaqueLayer = Engine.Renderer.GetLayerId(DefaultRenderer.OpaqueLayerName);
+        alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
+
+        camera = new PerspectiveCamera();
+        camera.Position = Vector3.UnitZ * 4.0f;
+        
+        playerEntity = new PlayerEntity(inputSystem, inputInfo);
+        playerEntity.Position = Vector3.UnitY * 4.0f;
+
         // Init post processing
         bloom = new Bloom();
         tonemapper = new Exposure();
@@ -81,28 +86,13 @@ public class GameScene : ABScene
         {
             OpenScreen(new PauseScreen(Engine, this));
         }
-
+    
+        playerEntity.Update(args);
         envModelEntity.Update(args);
         
-        Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
-        Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
-
-        Vector2 movement = inputSystem.GetMovement(inputInfo.InputCapture);
-
-        Vector3 move = forward * movement.Y + right * movement.X;
-        camera.Position += move * 4.0f * args.DeltaTime;
-
-        if (inputSystem.GetMouse(inputInfo.InputCapture, MouseButton.Right))
-        {
-            Vector2 delta = Engine.Input.MouseDelta / 480.0f;
-
-            yRotation -= delta.X;
-            xRotation -= delta.Y;
-
-            camera.Rotation =
-                Quaternion.FromAxisAngle(Vector3.UnitY, yRotation) * 
-                Quaternion.FromAxisAngle(Vector3.UnitX, xRotation);
-        }
+        camera.Position = playerEntity.Position + Vector3.UnitY * 0.65f;
+        camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
+                          Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
     }
 
     public override void Render(Renderer renderer)
@@ -113,10 +103,14 @@ public class GameScene : ABScene
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         renderer.UseSkybox(skyboxTexture, cameraData);
         
+        // render player
+        playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        
+        // render environment
         MatrixStack.Push();
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
         MatrixStack.Pop();
-        
+
         CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         ScreenHandler.Render(renderer, GuiLayerId, MatrixStack, guiCameraData);
     }
@@ -125,6 +119,7 @@ public class GameScene : ABScene
     {
         base.Dispose();
 
+        playerEntity.Dispose();
         envModelEntity.Dispose();
         envModel.Dispose();
         inputInfo.Dispose();

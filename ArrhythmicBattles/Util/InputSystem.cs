@@ -21,14 +21,14 @@ public class InputCapture : IDisposable
 
 public class InputSystem
 {
+    public Input Input { get; }
+    
     private readonly List<InputCapture> captures = new List<InputCapture>();
-    private readonly Input input;
-
     private InputCapture? currentCapture;
 
     public InputSystem(Input input)
     {
-        this.input = input;
+        Input = input;
     }
 
     public void Update()
@@ -69,7 +69,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetMouseDown(button);
+        return Input.GetMouseDown(button);
     }
 
     public bool GetMouseUp(InputCapture capture, MouseButton button)
@@ -79,7 +79,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetMouseUp(button);
+        return Input.GetMouseUp(button);
     }
     
     public bool GetMouse(InputCapture capture, MouseButton button)
@@ -89,7 +89,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetMouse(button);
+        return Input.GetMouse(button);
     }
 
     public bool GetKeyDown(InputCapture capture, Keys key)
@@ -99,7 +99,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetKeyDown(key);
+        return Input.GetKeyDown(key);
     }
     
     public bool GetKeyUp(InputCapture capture, Keys key)
@@ -109,7 +109,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetKeyUp(key);
+        return Input.GetKeyUp(key);
     }
 
     public bool GetKey(InputCapture capture, Keys key)
@@ -119,7 +119,7 @@ public class InputSystem
             return false;
         }
 
-        return input.GetKey(key);
+        return Input.GetKey(key);
     }
 
     public Vector2 GetMovement(InputCapture capture)
@@ -129,7 +129,7 @@ public class InputSystem
             return Vector2.Zero;
         }
 
-        return input.GetMovement();
+        return Input.GetMovement();
     }
 
     public bool GetKeyCombo(InputCapture capture, params Keys[] keys)
@@ -139,6 +139,6 @@ public class InputSystem
             return false;
         }
 
-        return input.GetKeyCombo(keys);
+        return Input.GetKeyCombo(keys);
     }
 }

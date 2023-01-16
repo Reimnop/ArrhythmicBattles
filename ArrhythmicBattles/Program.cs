@@ -41,6 +41,7 @@ public class Program
 
         using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
         flexFramework.Log += OnLog;
+        flexFramework.CursorState = CursorState.Grabbed;
 
         using ABContext context = new ABContext(flexFramework);
 

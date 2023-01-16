@@ -22,6 +22,8 @@ public class FlexFrameworkMain : NativeWindow
     public SceneManager SceneManager { get; }
     public AudioManager AudioManager { get; }
     public Input Input { get; }
+    
+    public bool ClampDeltaTime { get; set; } = true;
 
     public event LogEventHandler? Log;
 
@@ -161,6 +163,12 @@ public class FlexFrameworkMain : NativeWindow
         if (deltaTime > 1.0f)
         {
             LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f}ms]! Is the thread being blocked?");
+        }
+        
+        // clamp delta time to 1/10th of a second
+        if (ClampDeltaTime)
+        {
+            deltaTime = Math.Clamp(deltaTime, 0.0f, 0.1f);
         }
 
         Tick(deltaTime);
