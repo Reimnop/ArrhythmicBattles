@@ -23,7 +23,7 @@ public class SceneManager
             CurrentScene.Dispose();
         }
         
-        scene.SetEngine(engine);
+        scene.InitInternal(engine);
         scene.Init();
         CurrentScene = scene;
 

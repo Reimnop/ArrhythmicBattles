@@ -21,7 +21,6 @@ public class FlexFrameworkMain : NativeWindow
     public PersistentResources PersistentResources { get; }
     public SceneManager SceneManager { get; }
     public AudioManager AudioManager { get; }
-    public PhysicsManager PhysicsManager { get; }
     public Input Input { get; }
 
     public event LogEventHandler? Log;
@@ -50,7 +49,6 @@ public class FlexFrameworkMain : NativeWindow
         SceneManager = new SceneManager(this);
         PersistentResources = new PersistentResources();
         AudioManager = new AudioManager();
-        PhysicsManager = new PhysicsManager(this);
         Input = new Input(this);
     }
 
@@ -162,7 +160,7 @@ public class FlexFrameworkMain : NativeWindow
 
         if (deltaTime > 1.0f)
         {
-            LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f}ms]! Is the thread being blocked?");
+            LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f:0.0}ms]! Is the thread being blocked?");
         }
 
         Tick(deltaTime);
@@ -178,7 +176,6 @@ public class FlexFrameworkMain : NativeWindow
 
         UpdateArgs args = new UpdateArgs(time, deltaTime);
         
-        PhysicsManager.Update(args);
         SceneManager.CurrentScene.Update(args);
         SceneManager.CurrentScene.UpdateInternal(args);
         
@@ -216,7 +213,6 @@ public class FlexFrameworkMain : NativeWindow
     {
         base.Dispose(disposing);
         
-        PhysicsManager.Dispose();
         TextResources.Dispose();
         AudioManager.Dispose();
         PersistentResources.Dispose();

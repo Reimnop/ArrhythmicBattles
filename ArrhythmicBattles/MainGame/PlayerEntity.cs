@@ -1,5 +1,8 @@
 ﻿using ArrhythmicBattles.Modelling;
 using ArrhythmicBattles.Util;
+using BepuPhysics;
+using BepuPhysics.Collidables;
+using BepuPhysics.Trees;
 using FlexFramework.Core.EntitySystem;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
@@ -11,11 +14,40 @@ namespace ArrhythmicBattles.MainGame;
 
 public class PlayerEntity : Entity, IRenderable
 {
-    public Vector3 Position { get; set; } = Vector3.Zero;
-    public float Yaw { get; set; } = 0.0f;
-    public float Pitch { get; set; } = 0.0f;
+    private struct RayHitHandler : IRayHitHandler
+    {
+        public bool HitFound { get; private set; } = false;
+
+        private readonly CollidableReference collidable;
+        
+        public RayHitHandler(CollidableReference collidable)
+        {
+            this.collidable = collidable;
+        }
+        
+        public bool AllowTest(CollidableReference collidable)
+        {
+            return collidable != this.collidable;
+        }
+
+        public bool AllowTest(CollidableReference collidable, int childIndex)
+        {
+            return true;
+        }
+
+        public void OnRayHit(in RayData ray, ref float maximumT, float t, in System.Numerics.Vector3 normal, CollidableReference collidable, int childIndex)
+        {
+            HitFound = true;
+        }
+    }
     
-    private Vector3 velocity = Vector3.Zero;
+    public Vector3 Position => position;
+    public float Yaw => yaw;
+    public float Pitch => pitch;
+    
+    private Vector3 position = Vector3.Zero;
+    private float yaw = 0.0f;
+    private float pitch = 0.0f;
 
     private readonly Model model;
     private readonly ModelEntity modelEntity;
@@ -24,88 +56,89 @@ public class PlayerEntity : Entity, IRenderable
     private readonly InputInfo inputInfo;
     private readonly PhysicsManager physicsManager;
 
-    public PlayerEntity(InputSystem inputSystem, InputInfo inputInfo, PhysicsManager physicsManager)
+    private readonly BodyHandle bodyHandle;
+    
+    private bool grounded = false;
+
+    public PlayerEntity(InputSystem inputSystem, InputInfo inputInfo, PhysicsManager physicsManager, Vector3 position, float yaw, float pitch)
     {
         this.inputSystem = inputSystem;
         this.inputInfo = inputInfo;
         this.physicsManager = physicsManager;
+        this.position = position;
+        this.yaw = yaw;
+        this.pitch = pitch;
         
         model = new Model("Assets/Models/Capsule.dae");
         modelEntity = new ModelEntity();
         modelEntity.Model = model;
+        
+        // create shape
+        Capsule capsule = new Capsule(0.5f, 1.0f);
+        TypedIndex capsuleIndex = physicsManager.Simulation.Shapes.Add(capsule);
+        RigidPose rigidPose = new RigidPose(position.ToSystem(), Quaternion.FromAxisAngle(Vector3.UnitY, yaw).ToSystem());
+        BodyDescription bodyDescription = BodyDescription.CreateDynamic(
+            rigidPose, 
+            new BodyInertia { InverseMass = 1.0f / 10.0f },
+            new CollidableDescription(capsuleIndex, 0.1f, float.MaxValue, ContinuousDetection.Passive),
+            0.01f);
+        bodyHandle = physicsManager.Simulation.Bodies.Add(bodyDescription);
 
+        // add to physics manager
         physicsManager.Step += OnStep;
-    }
-
-    private bool IsGrounded()
-    {
-        Vector3 groundMin = new Vector3(-10.0f, -0.1f, -10.0f);
-        Vector3 groundMax = new Vector3(10.0f, 0.1f, 10.0f);
-        Box3 groundBox = new Box3(groundMin, groundMax);
-        
-        Vector3 playerMin = new Vector3(Position.X - 0.5f, Position.Y, Position.Z - 0.5f);
-        Vector3 playerMax = new Vector3(Position.X + 0.5f, Position.Y + 2.0f, Position.Z + 0.5f);
-        Box3 playerBox = new Box3(playerMin, playerMax);
-        
-        return groundBox.Contains(playerBox);
     }
 
     private void OnStep()
     {
-        bool grounded = IsGrounded();
+        // raycast to check if player is grounded
+        BodyReference bodyReference = physicsManager.Simulation.Bodies.GetBodyReference(bodyHandle);
+        RayHitHandler handler = new RayHitHandler(bodyReference.CollidableReference);
+        Vector3 rayStart = new Vector3(position.X, position.Y - 1.0f, position.Z);
+        physicsManager.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 0.5f, ref handler);
+        grounded = handler.HitFound;
+    }
 
-        // apply gravity
-        velocity.Y -= 9.81f * physicsManager.TimeStep;
-        if (grounded)
-        {
-            velocity.Y = 0.0f;
-        }
+    public override void Update(UpdateArgs args)
+    {
+        base.Update(args);
 
+        BodyReference bodyReference = physicsManager.Simulation.Bodies.GetBodyReference(bodyHandle);
+        
         // apply movement
         Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, Yaw);
         Vector3 forward = Vector3.Transform(-Vector3.UnitZ, rotation);
         Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
         Vector2 movement = inputSystem.GetMovement(inputInfo.InputCapture);
         Vector3 move = movement != Vector2.Zero ? Vector3.Normalize(forward * movement.Y + right * movement.X) : Vector3.Zero;
-        velocity += move * 0.65f;
+        Vector2 targetVelocity = new Vector2(move.X, move.Z) * 6.0f;
+        
+        if (targetVelocity != Vector2.Zero)
+        {
+            Vector2 currentVelocity = new Vector2(bodyReference.Velocity.Linear.X, bodyReference.Velocity.Linear.Z);
+            Vector2 velocityDir = targetVelocity - currentVelocity;
+            Vector3 force = new Vector3(velocityDir.X, 0.0f, velocityDir.Y) * 5.0f;
+            bodyReference.ApplyLinearImpulse(force.ToSystem());
+        }
 
         // apply jump
-        if (grounded && inputSystem.GetKey(inputInfo.InputCapture, Keys.Space))
+        if (grounded && inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Space))
         {
-            velocity.Y += 5.0f;
+            bodyReference.ApplyLinearImpulse(new Vector3(0.0f, 50.0f, 0.0f).ToSystem());
         }
         
-        // apply friction
-        velocity.X *= 0.9f;
-        velocity.Z *= 0.9f;
+        // update position
+        position = bodyReference.Pose.Position.ToOpenTK();
 
-        // apply velocity
-        Position += velocity * physicsManager.TimeStep;
-        
-        // if y is below -10, reset position and velocity
-        if (Position.Y < -10.0f)
-        {
-            Position = new Vector3(0.0f, 4.0f, 0.0f);
-            velocity = Vector3.Zero;
-        }
-    }
-
-    public override void Update(UpdateArgs args)
-    {
-        base.Update(args);
-        
         // camera rotation
         Vector2 delta = inputSystem.Input.MouseDelta / 480.0f;
-        Yaw -= delta.X;
-        Pitch -= delta.Y;
-        
-        Pitch = Math.Clamp(Pitch, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
+        yaw -= delta.X;
+        pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y + 1.0f, Position.Z);
+        matrixStack.Translate(position);
         modelEntity.Render(renderer, layerId, matrixStack, cameraData);
         matrixStack.Pop();
     }

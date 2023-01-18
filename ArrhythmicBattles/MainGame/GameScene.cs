@@ -58,16 +58,23 @@ public class GameScene : ABScene
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
+        camera.DepthFar = 1000.0f;
         camera.Position = Vector3.UnitZ * 4.0f;
         
-        playerEntity = new PlayerEntity(inputSystem, inputInfo, Engine.PhysicsManager);
-        playerEntity.Position = Vector3.UnitY * 4.0f;
-        
+        playerEntity = new PlayerEntity(inputSystem, inputInfo, PhysicsManager, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
+
+        // Create floor
+        Box floorBox = new Box(20.0f, 0.1f, 20.0f);
+        TypedIndex floorShapeIndex = PhysicsManager.Simulation.Shapes.Add(floorBox);
+        RigidPose floorPose = RigidPose.Identity;
+        BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
+        PhysicsManager.Simulation.Bodies.Add(floorBodyDescription);
+
         // Spawn a bunch of physicsEntities
         capsuleModel = new Model("Assets/Models/Capsule.dae");
 
         Capsule capsule = new Capsule(0.25f, 0.5f);
-        TypedIndex shape = Engine.PhysicsManager.Simulation.Shapes.Add(capsule);
+        TypedIndex capsuleShape = PhysicsManager.Simulation.Shapes.Add(capsule);
         BodyInertia inertia = capsule.ComputeInertia(1.0f);
 
         Random random = new Random(2);
@@ -80,7 +87,7 @@ public class GameScene : ABScene
             
             Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitX, random.NextSingle() * MathF.PI * 2.0f);
             
-            PhysicsEntity physicsEntity = new PhysicsEntity(Engine.PhysicsManager.Simulation, capsuleModel, shape, inertia, position, rotation);
+            PhysicsEntity physicsEntity = new PhysicsEntity(PhysicsManager.Simulation, capsuleModel, capsuleShape, inertia, position, rotation);
             physicsEntities.Add(physicsEntity);
         }
 
@@ -116,7 +123,7 @@ public class GameScene : ABScene
         playerEntity.Update(args);
         envModelEntity.Update(args);
         
-        camera.Position = playerEntity.Position + Vector3.UnitY * 1.65f;
+        camera.Position = playerEntity.Position + Vector3.UnitY * 0.65f;
         camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
                           Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
 

@@ -54,6 +54,8 @@ public abstract class ABScene : Scene
 
     public override void Dispose()
     {
+        base.Dispose();
+        
         ScreenHandler.Dispose();
     }
 }
