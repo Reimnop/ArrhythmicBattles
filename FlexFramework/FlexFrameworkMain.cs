@@ -5,8 +5,8 @@ using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Logging;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.Text;
+using FlexFramework.Physics;
 using FlexFramework.Util.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
@@ -21,9 +21,8 @@ public class FlexFrameworkMain : NativeWindow
     public PersistentResources PersistentResources { get; }
     public SceneManager SceneManager { get; }
     public AudioManager AudioManager { get; }
+    public PhysicsManager PhysicsManager { get; }
     public Input Input { get; }
-    
-    public bool ClampDeltaTime { get; set; } = true;
 
     public event LogEventHandler? Log;
 
@@ -51,6 +50,7 @@ public class FlexFrameworkMain : NativeWindow
         SceneManager = new SceneManager(this);
         PersistentResources = new PersistentResources();
         AudioManager = new AudioManager();
+        PhysicsManager = new PhysicsManager(this);
         Input = new Input(this);
     }
 
@@ -164,12 +164,6 @@ public class FlexFrameworkMain : NativeWindow
         {
             LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f}ms]! Is the thread being blocked?");
         }
-        
-        // clamp delta time to 1/10th of a second
-        if (ClampDeltaTime)
-        {
-            deltaTime = Math.Clamp(deltaTime, 0.0f, 0.1f);
-        }
 
         Tick(deltaTime);
         Render();
@@ -183,7 +177,8 @@ public class FlexFrameworkMain : NativeWindow
         }
 
         UpdateArgs args = new UpdateArgs(time, deltaTime);
-
+        
+        PhysicsManager.Update(args);
         SceneManager.CurrentScene.Update(args);
         SceneManager.CurrentScene.UpdateInternal(args);
         
@@ -211,9 +206,20 @@ public class FlexFrameworkMain : NativeWindow
     protected override void OnClosing(CancelEventArgs e)
     {
         base.OnClosing(e);
-        
+
 #if DEBUG
         leakedGcHandle.Free();
 #endif
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        
+        PhysicsManager.Dispose();
+        TextResources.Dispose();
+        AudioManager.Dispose();
+        PersistentResources.Dispose();
+        Renderer.Dispose();
     }
 }

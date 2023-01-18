@@ -48,7 +48,7 @@ public class Program
         flexFramework.UseRenderer<DefaultRenderer>();
         flexFramework.LoadFonts(2048,
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
-            new FontFileInfo("inconsolata-small", 18, "Assets/Fonts/Inconsolata-Regular.ttf"));
+            new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
         
 #if DEBUG
         flexFramework.LoadScene(new GameScene(context));

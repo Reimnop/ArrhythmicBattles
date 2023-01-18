@@ -7,6 +7,7 @@ namespace FlexFramework.Core.Rendering;
 
 public abstract class Renderer : IDisposable
 {
+    public abstract GpuInfo GpuInfo { get; }
     public Color4 ClearColor { get; set; } = Color4.Black;
 
     protected FlexFrameworkMain Engine { get; private set; }

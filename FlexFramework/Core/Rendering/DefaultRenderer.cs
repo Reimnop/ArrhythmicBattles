@@ -17,7 +17,10 @@ public class DefaultRenderer : Renderer
     public const string AlphaClipLayerName = "alphaclip";
     public const string TransparentLayerName = "transparent";
     public const string GuiLayerName = "gui";
-    
+
+    public override GpuInfo GpuInfo => gpuInfo;
+    private GpuInfo gpuInfo = null!;
+
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
     private Dictionary<Type, RenderingStrategy> renderingStrategies = new Dictionary<Type, RenderingStrategy>();
 
@@ -42,6 +45,12 @@ public class DefaultRenderer : Renderer
     public override void Init()
     {
         stateManager = new GLStateManager();
+        
+        // Set GpuInfo
+        string name = GL.GetString(StringName.Renderer);
+        string vendor = GL.GetString(StringName.Vendor);
+        string version = GL.GetString(StringName.Version);
+        gpuInfo = new GpuInfo(name, vendor, version);
         
         // Init GL objects
         unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");

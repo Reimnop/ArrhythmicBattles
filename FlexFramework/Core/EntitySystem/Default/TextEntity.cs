@@ -88,7 +88,7 @@ public class TextEntity : Entity, IRenderable
 
     private void GenerateMesh()
     {
-        TextBuilder builder = new TextBuilder(null, engine.TextResources.Fonts)
+        TextBuilder builder = new TextBuilder(font.Height, engine.TextResources.Fonts)
             .WithBaselineOffset((int) (baselineOffset * 64))
             .WithHorizontalAlignment(horizontalAlignment)
             .WithVerticalAlignment(verticalAlignment)

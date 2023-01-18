@@ -1,5 +1,7 @@
 ﻿using ArrhythmicBattles.Modelling;
 using ArrhythmicBattles.Util;
+using BepuPhysics;
+using BepuPhysics.Collidables;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
@@ -16,6 +18,9 @@ public class GameScene : ABScene
     private PerspectiveCamera camera = null!;
     private ModelEntity envModelEntity = null!;
     private Model envModel = null!;
+    private Model capsuleModel = null!;
+
+    private List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
 
     private Texture2D skyboxTexture = null!;
     
@@ -55,8 +60,29 @@ public class GameScene : ABScene
         camera = new PerspectiveCamera();
         camera.Position = Vector3.UnitZ * 4.0f;
         
-        playerEntity = new PlayerEntity(inputSystem, inputInfo);
+        playerEntity = new PlayerEntity(inputSystem, inputInfo, Engine.PhysicsManager);
         playerEntity.Position = Vector3.UnitY * 4.0f;
+        
+        // Spawn a bunch of physicsEntities
+        capsuleModel = new Model("Assets/Models/Capsule.dae");
+
+        Capsule capsule = new Capsule(0.25f, 0.5f);
+        TypedIndex shape = Engine.PhysicsManager.Simulation.Shapes.Add(capsule);
+        BodyInertia inertia = capsule.ComputeInertia(1.0f);
+
+        Random random = new Random(2);
+        for (int i = 0; i < 2400; i++)
+        {
+            Vector3 position = new Vector3(
+                random.NextSingle() * 10.0f - 5.0f,
+                random.NextSingle() * 100.0f + 250.0f,
+                random.NextSingle() * 10.0f - 5.0f);
+            
+            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitX, random.NextSingle() * MathF.PI * 2.0f);
+            
+            PhysicsEntity physicsEntity = new PhysicsEntity(Engine.PhysicsManager.Simulation, capsuleModel, shape, inertia, position, rotation);
+            physicsEntities.Add(physicsEntity);
+        }
 
         // Init post processing
         bloom = new Bloom();
@@ -90,9 +116,14 @@ public class GameScene : ABScene
         playerEntity.Update(args);
         envModelEntity.Update(args);
         
-        camera.Position = playerEntity.Position + Vector3.UnitY * 0.65f;
+        camera.Position = playerEntity.Position + Vector3.UnitY * 1.65f;
         camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
                           Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
+
+        foreach (PhysicsEntity physicsEntity in physicsEntities)
+        {
+            physicsEntity.Update(args);
+        }
     }
 
     public override void Render(Renderer renderer)
@@ -105,6 +136,12 @@ public class GameScene : ABScene
         
         // render player
         playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        
+        // render physicsEntities
+        foreach (PhysicsEntity capsule in physicsEntities)
+        {
+            capsule.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        }
         
         // render environment
         MatrixStack.Push();
@@ -121,6 +158,13 @@ public class GameScene : ABScene
 
         playerEntity.Dispose();
         envModelEntity.Dispose();
+        
+        foreach (PhysicsEntity capsule in physicsEntities)
+        {
+            capsule.Dispose();
+        }
+        
+        capsuleModel.Dispose();
         envModel.Dispose();
         inputInfo.Dispose();
         
