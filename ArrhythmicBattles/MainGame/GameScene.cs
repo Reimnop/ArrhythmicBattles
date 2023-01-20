@@ -6,6 +6,7 @@ using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.PostProcessing;
+using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -19,6 +20,8 @@ public class GameScene : ABScene
     private ModelEntity envModelEntity = null!;
     private Model envModel = null!;
     private Model capsuleModel = null!;
+    
+    private PhysicsWorld physicsWorld = null!;
 
     private List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
 
@@ -46,8 +49,17 @@ public class GameScene : ABScene
         inputSystem = Context.InputSystem;
         inputInfo = inputSystem.GetInputInfo();
         
+        physicsWorld = new PhysicsWorld(Engine);
+        
         skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
-        Engine.Renderer.ClearColor = Color4.Black;
+        
+        Renderer renderer = Engine.Renderer;
+        
+        renderer.ClearColor = Color4.Black;
+        if (renderer is ILighting lighting)
+        {
+            lighting.DirectionalLight = new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
+        }
         
         envModel = new Model(@"Assets/Models/Map01.dae");
         envModelEntity = new ModelEntity();
@@ -61,33 +73,33 @@ public class GameScene : ABScene
         camera.DepthFar = 1000.0f;
         camera.Position = Vector3.UnitZ * 4.0f;
         
-        playerEntity = new PlayerEntity(inputSystem, inputInfo, PhysicsManager, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
+        playerEntity = new PlayerEntity(inputSystem, inputInfo, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
 
         // Create floor
         Box floorBox = new Box(20.0f, 0.1f, 20.0f);
-        TypedIndex floorShapeIndex = PhysicsManager.Simulation.Shapes.Add(floorBox);
+        TypedIndex floorShapeIndex = physicsWorld.Simulation.Shapes.Add(floorBox);
         RigidPose floorPose = RigidPose.Identity;
         BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
-        PhysicsManager.Simulation.Bodies.Add(floorBodyDescription);
+        physicsWorld.Simulation.Bodies.Add(floorBodyDescription);
 
         // Spawn a bunch of physicsEntities
         capsuleModel = new Model("Assets/Models/Capsule.dae");
 
         Capsule capsule = new Capsule(0.25f, 0.5f);
-        TypedIndex capsuleShape = PhysicsManager.Simulation.Shapes.Add(capsule);
+        TypedIndex capsuleShape = physicsWorld.Simulation.Shapes.Add(capsule);
         BodyInertia inertia = capsule.ComputeInertia(1.0f);
 
         Random random = new Random(2);
-        for (int i = 0; i < 2400; i++)
+        for (int i = 0; i < 4096; i++)
         {
             Vector3 position = new Vector3(
                 random.NextSingle() * 10.0f - 5.0f,
-                random.NextSingle() * 100.0f + 250.0f,
+                random.NextSingle() * 500.0f + 400.0f,
                 random.NextSingle() * 10.0f - 5.0f);
             
             Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitX, random.NextSingle() * MathF.PI * 2.0f);
             
-            PhysicsEntity physicsEntity = new PhysicsEntity(PhysicsManager.Simulation, capsuleModel, capsuleShape, inertia, position, rotation);
+            PhysicsEntity physicsEntity = new PhysicsEntity(physicsWorld.Simulation, capsuleModel, capsuleShape, inertia, position, rotation);
             physicsEntities.Add(physicsEntity);
         }
 
@@ -100,6 +112,13 @@ public class GameScene : ABScene
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
+        
+        physicsWorld.Update(args);
+        playerEntity.Update(args);
+        foreach (PhysicsEntity physicsEntity in physicsEntities)
+        {
+            physicsEntity.Update(args);
+        }
 
         if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.F3))
         {
@@ -119,18 +138,17 @@ public class GameScene : ABScene
         {
             OpenScreen(new PauseScreen(Engine, this));
         }
-    
-        playerEntity.Update(args);
+        
         envModelEntity.Update(args);
         
-        camera.Position = playerEntity.Position + Vector3.UnitY * 0.65f;
-        camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
-                          Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
+        // update camera
+        Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
+                              Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
+        
+        Vector3 backward = Vector3.Transform(Vector3.UnitZ, rotation);
 
-        foreach (PhysicsEntity physicsEntity in physicsEntities)
-        {
-            physicsEntity.Update(args);
-        }
+        camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
+        camera.Rotation = rotation;
     }
 
     public override void Render(Renderer renderer)
@@ -139,7 +157,7 @@ public class GameScene : ABScene
         renderer.UsePostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
-        renderer.UseSkybox(skyboxTexture, cameraData);
+        // renderer.UseSkybox(skyboxTexture, cameraData);
         
         // render player
         playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
@@ -170,6 +188,8 @@ public class GameScene : ABScene
         {
             capsule.Dispose();
         }
+        
+        physicsWorld.Dispose();
         
         capsuleModel.Dispose();
         envModel.Dispose();

@@ -10,7 +10,7 @@ layout(location = 5) in vec4 aWeights;
 
 layout(location = 0) uniform mat4 mvp;
 layout(location = 1) uniform mat4 model;
-layout(location = 6) uniform mat4 bones[MAX_BONES];
+layout(location = 9) uniform mat4 bones[MAX_BONES];
 
 out vec2 Uv;
 out vec3 Normal;

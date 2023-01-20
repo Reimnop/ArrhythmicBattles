@@ -62,6 +62,16 @@ public class InputSystem
         captures.Remove(capture);
     }
     
+    public Vector2 GetMouseDelta(InputCapture capture)
+    {
+        if (!IsCurrentCapture(capture))
+        {
+            return Vector2.Zero;
+        }
+        
+        return Input.MouseDelta;
+    }
+    
     public bool GetMouseDown(InputCapture capture, MouseButton button)
     {
         if (!IsCurrentCapture(capture))

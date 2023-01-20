@@ -25,15 +25,22 @@ public class Buffer : GpuObject
         GL.NamedBufferData(Handle, SizeInBytes, IntPtr.Zero, BufferUsageHint.DynamicDraw);
     }
 
-    public void LoadData<T>(T[] data) where T : struct
+    public unsafe void LoadData<T>(ReadOnlySpan<T> data) where T : unmanaged
     {
         SizeInBytes = data.Length * Unsafe.SizeOf<T>();
-        GL.NamedBufferData(Handle, SizeInBytes, data, BufferUsageHint.DynamicDraw);
+
+        fixed (T* ptr = data)
+        {
+            GL.NamedBufferData(Handle, SizeInBytes, (IntPtr) ptr, BufferUsageHint.DynamicDraw);
+        }
     }
     
-    public void LoadDataPartial<T>(T[] data, int offsetInBytes) where T : struct
+    public unsafe void LoadDataPartial<T>(ReadOnlySpan<T> data, int offsetInBytes) where T : unmanaged
     {
-        GL.NamedBufferSubData(Handle, (IntPtr) offsetInBytes, data.Length * Unsafe.SizeOf<T>(), data);
+        fixed (T* ptr = data)
+        {
+            GL.NamedBufferSubData(Handle, (IntPtr) offsetInBytes, data.Length * Unsafe.SizeOf<T>(), (IntPtr) ptr);
+        }
     }
 
     public override void Dispose()

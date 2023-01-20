@@ -10,7 +10,7 @@ public abstract class Renderer : IDisposable
     public abstract GpuInfo GpuInfo { get; }
     public Color4 ClearColor { get; set; } = Color4.Black;
 
-    protected FlexFrameworkMain Engine { get; private set; }
+    protected FlexFrameworkMain Engine { get; private set; } = null!;
 
     internal void SetEngine(FlexFrameworkMain engine)
     {
@@ -21,7 +21,7 @@ public abstract class Renderer : IDisposable
     public abstract int GetLayerId(string name);
     public abstract void EnqueueDrawData(int layerId, IDrawData drawData);
     public abstract void UsePostProcessor(PostProcessor postProcessor);
-    public abstract void UseSkybox(Texture2D skyboxTexture, CameraData cameraData);
+    // TODO: Add UseBackgroundRenderer
     public abstract void Update(UpdateArgs args);
     public abstract void Render();
     public abstract void Dispose();

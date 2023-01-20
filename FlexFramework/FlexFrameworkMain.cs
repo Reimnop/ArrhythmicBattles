@@ -100,7 +100,7 @@ public class FlexFrameworkMain : NativeWindow
 
     public Renderer UseRenderer(Renderer renderer)
     {
-        LogMessage(null, Severity.Info, null, $"Using renderer [{renderer}]");
+        LogMessage(null, Severity.Info, null, $"Using renderer [{renderer.GetType().Name}]");
         
         if (Renderer != null)
         {
@@ -160,7 +160,7 @@ public class FlexFrameworkMain : NativeWindow
 
         if (deltaTime > 1.0f)
         {
-            LogMessage(null, Severity.Warning, null, $"Last frame took [{deltaTime * 1000.0f:0.0}ms]! Is the thread being blocked?");
+            LogMessage(null, Severity.Warning, null, $"Last frame took {deltaTime * 1000.0f:0.0}ms! Is the thread being blocked?");
         }
 
         Tick(deltaTime);

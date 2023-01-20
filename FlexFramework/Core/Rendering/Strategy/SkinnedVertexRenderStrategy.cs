@@ -2,16 +2,19 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+namespace FlexFramework.Core.Rendering.Strategy;
 
-public class SkinnedVertexRenderStrategy : RenderingStrategy
+public class SkinnedVertexRenderStrategy : RenderStrategy
 {
+    private readonly ILighting lighting;
     private readonly ShaderProgram skinnedShader;
     
-    public SkinnedVertexRenderStrategy()
+    public SkinnedVertexRenderStrategy(ILighting lighting)
     {
+        this.lighting = lighting;
+        
         using Shader vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/skinned.frag"), ShaderType.FragmentShader);
+        using Shader fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
 
         skinnedShader = new ShaderProgram("skinned");
         skinnedShader.LinkShaders(vertexShader, fragmentShader);
@@ -36,14 +39,23 @@ public class SkinnedVertexRenderStrategy : RenderingStrategy
         }
 
         GL.Uniform4(4, vertexDrawData.Color);
-        GL.Uniform3(5, new Vector3(0.0f, -1.1f, -1.5f));
+        
+        GL.Uniform3(5, lighting.AmbientLight); 
+
+        if (lighting.DirectionalLight.HasValue)
+        {
+            GL.Uniform3(6, lighting.DirectionalLight.Value.Direction);
+            GL.Uniform3(7, lighting.DirectionalLight.Value.Color);
+        }
+        
+        GL.Uniform1(8, lighting.DirectionalLight?.Intensity ?? 0.0f);
 
         if (vertexDrawData.Bones != null)
         {
             for (int i = 0; i < vertexDrawData.Bones.Length; i++)
             {
                 Matrix4 bone = vertexDrawData.Bones[i];
-                GL.UniformMatrix4(6 + i, true, ref bone);
+                GL.UniformMatrix4(9 + i, true, ref bone);
             }
         }
 

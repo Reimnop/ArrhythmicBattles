@@ -36,7 +36,7 @@ public class Texture2D : GpuObject
     {
         ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
         Texture2D texture2D = new Texture2D(name, result.Width, result.Height, SizedInternalFormat.Rgba8);
-        texture2D.LoadData(result.Data, PixelFormat.Rgba, PixelType.UnsignedByte);
+        texture2D.LoadData<byte>(result.Data, PixelFormat.Rgba, PixelType.UnsignedByte);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
         return texture2D;
@@ -48,9 +48,8 @@ public class Texture2D : GpuObject
         EXRPart part = exrFile.Parts[0];
         part.OpenParallel(path);
 
-        Texture2D texture2D = new Texture2D(name, part.DataWindow.Width, part.DataWindow.Height,
-            SizedInternalFormat.Rgb16f);
-        texture2D.LoadData(part.GetBytes(ImageDestFormat.RGB16, GammaEncoding.Linear), PixelFormat.Rgb, PixelType.HalfFloat);
+        Texture2D texture2D = new Texture2D(name, part.DataWindow.Width, part.DataWindow.Height, SizedInternalFormat.Rgb16f);
+        texture2D.LoadData<byte>(part.GetBytes(ImageDestFormat.RGB16, GammaEncoding.Linear), PixelFormat.Rgb, PixelType.HalfFloat);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
         
@@ -59,14 +58,20 @@ public class Texture2D : GpuObject
         return texture2D;
     }
 
-    public void LoadData<T>(T[] data, PixelFormat pixelFormat, PixelType pixelType) where T : struct
+    public unsafe void LoadData<T>(ReadOnlySpan<T> data, PixelFormat pixelFormat, PixelType pixelType) where T : unmanaged
     {
-        GL.TextureSubImage2D(Handle, 0, 0, 0, Width, Height, pixelFormat, pixelType, data);
+        fixed (T* ptr = data)
+        {
+            GL.TextureSubImage2D(Handle, 0, 0, 0, Width, Height, pixelFormat, pixelType, (IntPtr) ptr);
+        }
     }
     
-    public void LoadDataPartial<T>(T[] data, int x, int y, int width, int height, PixelFormat pixelFormat, PixelType pixelType) where T : struct
+    public unsafe void LoadDataPartial<T>(ReadOnlySpan<T> data, int x, int y, int width, int height, PixelFormat pixelFormat, PixelType pixelType) where T : unmanaged
     {
-        GL.TextureSubImage2D(Handle, 0, x, y, width, height, pixelFormat, pixelType, data);
+        fixed (T* ptr = data)
+        {
+            GL.TextureSubImage2D(Handle, 0, x, y, width, height, pixelFormat, pixelType, (IntPtr) ptr);
+        }
     }
 
     public void SetMinFilter(TextureMinFilter filter)

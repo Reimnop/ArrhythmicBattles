@@ -2,9 +2,9 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+namespace FlexFramework.Core.Rendering.Strategy;
 
-public class TextRenderStrategy : RenderingStrategy
+public class TextRenderStrategy : RenderStrategy
 {
     private readonly ShaderProgram textShader;
     private readonly FlexFrameworkMain engine;

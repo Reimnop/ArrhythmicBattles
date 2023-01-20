@@ -1,10 +1,10 @@
 ﻿using FlexFramework.Core.Rendering.Data;
 
-namespace FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+namespace FlexFramework.Core.Rendering.Strategy;
 
 public delegate void DrawFunc(GLStateManager glStateManager);
 
-public class CustomRenderStrategy : RenderingStrategy
+public class CustomRenderStrategy : RenderStrategy
 {
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {

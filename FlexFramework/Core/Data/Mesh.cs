@@ -6,7 +6,7 @@ using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
 
 namespace FlexFramework.Core.Data;
 
-public class Mesh<T> : IDisposable where T : struct, IVertex
+public class Mesh<T> : IDisposable where T : unmanaged, IVertex
 {
     public VertexArray VertexArray { get; }
     public Buffer VertexBuffer { get; }
@@ -20,7 +20,7 @@ public class Mesh<T> : IDisposable where T : struct, IVertex
         T.SetupAttributes(Attribute, AttributeI);
     }
 
-    public Mesh(string name, T[] vertices)
+    public Mesh(string name, ReadOnlySpan<T> vertices)
     {
         VertexBuffer = new Buffer($"{name}-vtx");
         VertexArray = new VertexArray(name);
@@ -30,7 +30,7 @@ public class Mesh<T> : IDisposable where T : struct, IVertex
         LoadData(vertices);
     }
 
-    public void LoadData(T[] vertices)
+    public void LoadData(ReadOnlySpan<T> vertices)
     {
         Count = vertices.Length;
 

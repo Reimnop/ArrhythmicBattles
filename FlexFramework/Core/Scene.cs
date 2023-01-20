@@ -8,8 +8,6 @@ namespace FlexFramework.Core;
 public abstract class Scene : IDisposable
 {
     protected MatrixStack MatrixStack { get; }
-    protected PhysicsManager PhysicsManager => physicsManager ??= new PhysicsManager(Engine); // Lazy initialization
-    private PhysicsManager? physicsManager;
 
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
@@ -31,10 +29,7 @@ public abstract class Scene : IDisposable
     internal void UpdateInternal(UpdateArgs args)
     {
         deltaTime = args.DeltaTime;
-        
-        // Update physics
-        physicsManager?.Update(args);
-        
+
         // Update coroutines
         foreach (Coroutine coroutine in coroutines)
         {
@@ -118,8 +113,5 @@ public abstract class Scene : IDisposable
     public abstract void Update(UpdateArgs args);
     public abstract void Render(Renderer renderer);
 
-    public virtual void Dispose()
-    {
-        physicsManager?.Dispose();
-    }
+    public abstract void Dispose();
 }

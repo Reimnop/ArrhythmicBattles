@@ -16,7 +16,7 @@ public class PlayerEntity : Entity, IRenderable
 {
     private struct RayHitHandler : IRayHitHandler
     {
-        public bool HitFound { get; private set; } = false;
+        public CollidableReference? Hit { get; private set; } = null;
 
         private readonly CollidableReference collidable;
         
@@ -37,7 +37,7 @@ public class PlayerEntity : Entity, IRenderable
 
         public void OnRayHit(in RayData ray, ref float maximumT, float t, in System.Numerics.Vector3 normal, CollidableReference collidable, int childIndex)
         {
-            HitFound = true;
+            Hit = collidable;
         }
     }
     
@@ -54,17 +54,20 @@ public class PlayerEntity : Entity, IRenderable
 
     private readonly InputSystem inputSystem;
     private readonly InputInfo inputInfo;
-    private readonly PhysicsManager physicsManager;
+    private readonly PhysicsWorld physicsWorld;
 
     private readonly BodyHandle bodyHandle;
     
     private bool grounded = false;
+    
+    private Vector2 movement = Vector2.Zero;
+    private bool jump = false;
 
-    public PlayerEntity(InputSystem inputSystem, InputInfo inputInfo, PhysicsManager physicsManager, Vector3 position, float yaw, float pitch)
+    public PlayerEntity(InputSystem inputSystem, InputInfo inputInfo, PhysicsWorld physicsWorld, Vector3 position, float yaw, float pitch)
     {
         this.inputSystem = inputSystem;
         this.inputInfo = inputInfo;
-        this.physicsManager = physicsManager;
+        this.physicsWorld = physicsWorld;
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
@@ -75,62 +78,71 @@ public class PlayerEntity : Entity, IRenderable
         
         // create shape
         Capsule capsule = new Capsule(0.5f, 1.0f);
-        TypedIndex capsuleIndex = physicsManager.Simulation.Shapes.Add(capsule);
+        TypedIndex capsuleIndex = physicsWorld.Simulation.Shapes.Add(capsule);
         RigidPose rigidPose = new RigidPose(position.ToSystem(), Quaternion.FromAxisAngle(Vector3.UnitY, yaw).ToSystem());
         BodyDescription bodyDescription = BodyDescription.CreateDynamic(
             rigidPose, 
-            new BodyInertia { InverseMass = 1.0f / 10.0f },
+            new BodyInertia { InverseMass = 1.0f / 70.0f },
             new CollidableDescription(capsuleIndex, 0.1f, float.MaxValue, ContinuousDetection.Passive),
             0.01f);
-        bodyHandle = physicsManager.Simulation.Bodies.Add(bodyDescription);
+        bodyHandle = physicsWorld.Simulation.Bodies.Add(bodyDescription);
 
         // add to physics manager
-        physicsManager.Step += OnStep;
+        physicsWorld.Step += OnStep;
     }
 
     private void OnStep()
     {
+        BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
+        
         // raycast to check if player is grounded
-        BodyReference bodyReference = physicsManager.Simulation.Bodies.GetBodyReference(bodyHandle);
         RayHitHandler handler = new RayHitHandler(bodyReference.CollidableReference);
-        Vector3 rayStart = new Vector3(position.X, position.Y - 1.0f, position.Z);
-        physicsManager.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 0.5f, ref handler);
-        grounded = handler.HitFound;
+        Vector3 rayStart = new Vector3(position.X, position.Y - 0.8f, position.Z);
+        physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 0.7f, ref handler);
+        grounded = handler.Hit != null;
+
+        // apply movement
+        if (movement != Vector2.Zero)
+        {
+            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, Yaw);
+            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, rotation);
+            Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
+            Vector3 direction = forward * movement.Y + right * movement.X;
+            Vector2 move = new Vector2(direction.X, direction.Z).Normalized();
+            Vector3 velocity = bodyReference.Velocity.Linear.ToOpenTK();
+            velocity.X = move.X * 6.0f;
+            velocity.Z = move.Y * 6.0f;
+            bodyReference.Velocity.Linear = velocity.ToSystem();
+        }
+
+        // apply jump
+        if (grounded && jump)
+        {
+            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 350.0f, 0.0f));
+        }
+        
+        // reset jump
+        jump = false;
+        
+        // update position
+        position = bodyReference.Pose.Position.ToOpenTK();
     }
 
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
+        
+        // get movement
+        movement = inputSystem.GetMovement(inputInfo.InputCapture);
 
-        BodyReference bodyReference = physicsManager.Simulation.Bodies.GetBodyReference(bodyHandle);
-        
-        // apply movement
-        Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, Yaw);
-        Vector3 forward = Vector3.Transform(-Vector3.UnitZ, rotation);
-        Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
-        Vector2 movement = inputSystem.GetMovement(inputInfo.InputCapture);
-        Vector3 move = movement != Vector2.Zero ? Vector3.Normalize(forward * movement.Y + right * movement.X) : Vector3.Zero;
-        Vector2 targetVelocity = new Vector2(move.X, move.Z) * 6.0f;
-        
-        if (targetVelocity != Vector2.Zero)
+        // jump
+        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Space))
         {
-            Vector2 currentVelocity = new Vector2(bodyReference.Velocity.Linear.X, bodyReference.Velocity.Linear.Z);
-            Vector2 velocityDir = targetVelocity - currentVelocity;
-            Vector3 force = new Vector3(velocityDir.X, 0.0f, velocityDir.Y) * 5.0f;
-            bodyReference.ApplyLinearImpulse(force.ToSystem());
+            jump = true;
         }
-
-        // apply jump
-        if (grounded && inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Space))
-        {
-            bodyReference.ApplyLinearImpulse(new Vector3(0.0f, 50.0f, 0.0f).ToSystem());
-        }
-        
-        // update position
-        position = bodyReference.Pose.Position.ToOpenTK();
 
         // camera rotation
-        Vector2 delta = inputSystem.Input.MouseDelta / 480.0f;
+        Vector2 delta = inputSystem.GetMouseDelta(inputInfo.InputCapture) / 480.0f;
         yaw -= delta.X;
         pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
     }
@@ -146,7 +158,7 @@ public class PlayerEntity : Entity, IRenderable
     public override void Dispose()
     {
         modelEntity.Dispose();
-        
-        physicsManager.Step -= OnStep;
+
+        physicsWorld.Step -= OnStep;
     }
 }

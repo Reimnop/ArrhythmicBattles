@@ -1,8 +1,8 @@
 ﻿using FlexFramework.Core.Rendering.Data;
 
-namespace FlexFramework.Core.Rendering;
+namespace FlexFramework.Core.Rendering.Strategy;
 
-public abstract class RenderingStrategy : IDisposable
+public abstract class RenderStrategy : IDisposable
 {
     protected T EnsureDrawDataType<T>(IDrawData drawData)
     {

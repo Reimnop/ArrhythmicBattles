@@ -30,7 +30,7 @@ public class TextResources : IDisposable
         {
             AtlasTexture atlasTexture = font.Atlas;
             Texture2D texture = new Texture2D($"{font.FamilyName}-atlas", atlasTexture.Texture.Width, atlasTexture.Texture.Height, SizedInternalFormat.Rgba8);
-            texture.LoadData(atlasTexture.Texture.Pixels, PixelFormat.Bgra, PixelType.UnsignedByte);
+            texture.LoadData<byte>(atlasTexture.Texture.Pixels, PixelFormat.Bgra, PixelType.UnsignedByte);
             texture.SetMinFilter(TextureMinFilter.Linear);
             texture.SetMagFilter(TextureMagFilter.Nearest);
             textures.Add(texture);

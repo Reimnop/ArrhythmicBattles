@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+﻿using FlexFramework.Core.Rendering.Strategy;
 
 namespace FlexFramework.Core.Rendering.Data;
 

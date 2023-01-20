@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+using FlexFramework.Core.Rendering.Strategy;
 using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Core.Util;
 using FlexFramework.Logging;
@@ -11,18 +11,21 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering;
 
-public class DefaultRenderer : Renderer
+public class DefaultRenderer : Renderer, ILighting
 {
     public const string OpaqueLayerName = "opaque";
     public const string AlphaClipLayerName = "alphaclip";
     public const string TransparentLayerName = "transparent";
     public const string GuiLayerName = "gui";
 
+    public Vector3 AmbientLight { get; set; } = Vector3.One * 0.4f;
+    public DirectionalLight? DirectionalLight { get; set; }
+
     public override GpuInfo GpuInfo => gpuInfo;
     private GpuInfo gpuInfo = null!;
 
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
-    private Dictionary<Type, RenderingStrategy> renderingStrategies = new Dictionary<Type, RenderingStrategy>();
+    private Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
 
     private List<PostProcessor> postProcessors = new List<PostProcessor>();
 
@@ -33,9 +36,6 @@ public class DefaultRenderer : Renderer
     private ShaderProgram unlitShader;
     private ShaderProgram litShader;
     private ShaderProgram skyboxShader;
-
-    private Texture2D? skyboxTexture;
-    private CameraData skyboxCameraData;
 
     private int opaqueLayerId;
     private int alphaClipLayerId;
@@ -65,12 +65,12 @@ public class DefaultRenderer : Renderer
         renderLayerRegistry.Freeze();
         
         // Register render strategies
-        RegisterRenderingStrategy<VertexDrawData, VertexRenderStrategy>(unlitShader);
-        RegisterRenderingStrategy<IndexedVertexDrawData, IndexedVertexRenderStrategy>(unlitShader);
-        RegisterRenderingStrategy<LitVertexDrawData, LitVertexRenderStrategy>(litShader);
-        RegisterRenderingStrategy<SkinnedVertexDrawData, SkinnedVertexRenderStrategy>();
-        RegisterRenderingStrategy<TextDrawData, TextRenderStrategy>(Engine);
-        RegisterRenderingStrategy<CustomDrawData, CustomRenderStrategy>();
+        RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy(unlitShader));
+        RegisterRenderStrategy<IndexedVertexDrawData>(new IndexedVertexRenderStrategy(unlitShader));
+        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this, litShader));
+        RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
+        RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy(Engine));
+        RegisterRenderStrategy<CustomDrawData>(new CustomRenderStrategy());
         
         // Set GL modes
         GL.CullFace(CullFaceMode.Back);
@@ -78,18 +78,10 @@ public class DefaultRenderer : Renderer
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
     }
 
-    private void RegisterRenderingStrategy<TDrawData, TStrategy>(params object?[]? args) 
-        where TDrawData : IDrawData 
-        where TStrategy : RenderingStrategy
+    private void RegisterRenderStrategy<TDrawData>(RenderStrategy strategy) where TDrawData : IDrawData
     {
-        Engine.LogMessage(this, Severity.Info, null, $"Initializing rendering strategy [{typeof(TStrategy).FullName}]");
-        
-        TStrategy? strategy = Activator.CreateInstance(typeof(TStrategy), args) as TStrategy;
-        if (strategy is null)
-        {
-            throw new ArgumentException();
-        }
-        renderingStrategies.Add(typeof(TDrawData), strategy);
+        Engine.LogMessage(this, Severity.Info, null, $"Initializing render strategy [{strategy.GetType().Name}] for [{typeof(TDrawData).Name}]");
+        renderStrategies.Add(typeof(TDrawData), strategy);
     }
 
     private int RegisterLayer(string name)
@@ -140,12 +132,6 @@ public class DefaultRenderer : Renderer
         postProcessors.Add(postProcessor);
     }
 
-    public override void UseSkybox(Texture2D skyboxTexture, CameraData cameraData)
-    {
-        this.skyboxTexture = skyboxTexture;
-        skyboxCameraData = cameraData;
-    }
-
     private bool ShouldUpdateCapturer(Vector2i size, ScreenCapturer? capturer)
     {
         if (capturer == null)
@@ -189,25 +175,6 @@ public class DefaultRenderer : Renderer
         
         GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        
-        // Render skybox
-        if (skyboxTexture != null)
-        {
-            stateManager.UseProgram(skyboxShader.Handle);
-            stateManager.BindTextureUnit(0, skyboxTexture.Handle);
-            
-            Matrix4 inverseView = Matrix4.Invert(skyboxCameraData.View);
-            Matrix4 inverseProjection = Matrix4.Invert(skyboxCameraData.Projection);
-            
-            GL.UniformMatrix4(1, true, ref inverseProjection);
-            GL.UniformMatrix4(2, true, ref inverseView);
-            
-            GL.BindImageTexture(0, worldScreenCapturer.ColorBuffer.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
-            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-            GL.DispatchCompute(DivideIntCeil(worldScreenCapturer.ColorBuffer.Width, 8), DivideIntCeil(worldScreenCapturer.ColorBuffer.Height, 8), 1);
-            
-            skyboxTexture = null;
-        }
 
         using TemporaryList<IDrawData> opaqueLayer = renderLayerRegistry[opaqueLayerId];
         using TemporaryList<IDrawData> alphaClipLayer = renderLayerRegistry[alphaClipLayerId];
@@ -270,14 +237,14 @@ public class DefaultRenderer : Renderer
         {
             if (processor.CurrentSize == Vector2i.Zero)
             {
-                Engine.LogMessage(this, Severity.Info, null, $"Initializing post processor [{processor}] with size [{size}]");
+                Engine.LogMessage(this, Severity.Info, null, $"Initializing post processor [{processor.GetType().Name}] with size {size}");
                 processor.Init(size);
                 return;
             }
             
             if (processor.CurrentSize != size)
             {
-                Engine.LogMessage(this, Severity.Info, null, $"Resizing post processor [{processor}] from [{processor.CurrentSize}] to [{size}]");
+                Engine.LogMessage(this, Severity.Info, null, $"Resizing post processor [{processor.GetType().Name}] from {processor.CurrentSize} to {size}");
                 processor.Resize(size);
             }
         });
@@ -288,7 +255,7 @@ public class DefaultRenderer : Renderer
     {
         foreach (IDrawData drawData in layer)
         {
-            RenderingStrategy strategy = renderingStrategies[drawData.GetType()];
+            RenderStrategy strategy = renderStrategies[drawData.GetType()];
             strategy.Draw(stateManager, drawData);
         }
     }
@@ -301,7 +268,7 @@ public class DefaultRenderer : Renderer
         worldScreenCapturer?.Dispose();
         guiScreenCapturer?.Dispose();
 
-        foreach (var (_, strategy) in renderingStrategies)
+        foreach (var (_, strategy) in renderStrategies)
         {
             strategy.Dispose();
         }

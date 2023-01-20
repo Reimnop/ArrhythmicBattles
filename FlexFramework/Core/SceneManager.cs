@@ -16,7 +16,7 @@ public class SceneManager
 
     public Scene LoadScene(Scene scene)
     {
-        engine.LogMessage(this, Severity.Info, null, $"Switching scene [{CurrentScene}] -> [{scene}]");
+        engine.LogMessage(this, Severity.Info, null, $"Loading scene [{scene.GetType().Name}]");
 
         if (CurrentScene != null)
         {

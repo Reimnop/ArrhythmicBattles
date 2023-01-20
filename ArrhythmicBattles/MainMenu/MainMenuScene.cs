@@ -2,6 +2,7 @@
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core.EntitySystem.Default;
+using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
@@ -29,6 +30,12 @@ public class MainMenuScene : ABScene
     public override void Init()
     {
         base.Init();
+        
+        // Reset lightings
+        if (Engine.Renderer is ILighting lightings)
+        {
+            lightings.DirectionalLight = null;
+        }
         
         // Init audio
         Context.Sound.MenuBackgroundMusic.Play();

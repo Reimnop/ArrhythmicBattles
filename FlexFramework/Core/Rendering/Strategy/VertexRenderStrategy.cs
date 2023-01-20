@@ -2,9 +2,9 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.Rendering.DefaultRenderingStrategies;
+namespace FlexFramework.Core.Rendering.Strategy;
 
-public class VertexRenderStrategy : RenderingStrategy
+public class VertexRenderStrategy : RenderStrategy
 {
     private readonly ShaderProgram unlitShader;
 

@@ -71,6 +71,8 @@ public class TextEntity : Entity, IRenderable
 
     private readonly FlexFrameworkMain engine;
     private readonly Mesh<TextVertexExtern> mesh;
+    
+    private readonly List<TextVertex> vertices = new List<TextVertex>();
 
     public TextEntity(FlexFrameworkMain engine, Font font)
     {
@@ -95,13 +97,15 @@ public class TextEntity : Entity, IRenderable
             .AddText(new StyledText(text, font)
                 .WithColor(System.Drawing.Color.White));
         
-        TextVertex[] vertices = TextMeshGenerator.GenerateVertices(builder.Build());
+        TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         
-        mesh.LoadData(
-            vertices
-                .Select(x => new TextVertexExtern(x))
-                .ToArray()
-        );
+        Span<TextVertexExtern> vertexSpan = stackalloc TextVertexExtern[vertices.Count];
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            vertexSpan[i] = new TextVertexExtern(vertices[i]);
+        }
+        
+        mesh.LoadData(vertexSpan);
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
