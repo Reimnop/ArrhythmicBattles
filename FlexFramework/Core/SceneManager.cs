@@ -5,7 +5,7 @@ namespace FlexFramework.Core;
 
 public class SceneManager
 {
-    public Scene CurrentScene { get; private set; }
+    public Scene CurrentScene { get; private set; } = null!;
 
     private FlexFrameworkMain engine;
     
@@ -18,10 +18,7 @@ public class SceneManager
     {
         engine.LogMessage(this, Severity.Info, null, $"Loading scene [{scene.GetType().Name}]");
 
-        if (CurrentScene != null)
-        {
-            CurrentScene.Dispose();
-        }
+        CurrentScene?.Dispose();
         
         scene.InitInternal(engine);
         scene.Init();
