@@ -4,6 +4,7 @@ using BepuPhysics;
 using BepuPhysics.Collidables;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Physics;
@@ -24,8 +25,8 @@ public class GameScene : ABScene
     private PhysicsWorld physicsWorld = null!;
 
     private List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
-
-    private Texture2D skyboxTexture = null!;
+    
+    private ProceduralSkyboxRenderer skyboxRenderer = null!;
     
     private Bloom bloom = null!;
     private Exposure tonemapper = null!;
@@ -51,8 +52,8 @@ public class GameScene : ABScene
         
         physicsWorld = new PhysicsWorld(Engine);
         
-        skyboxTexture = Texture2D.FromExr("skybox", "Assets/Skyboxes/skybox.exr");
-        
+        skyboxRenderer = new ProceduralSkyboxRenderer();
+
         Renderer renderer = Engine.Renderer;
         
         renderer.ClearColor = Color4.Black;
@@ -157,7 +158,7 @@ public class GameScene : ABScene
         renderer.UsePostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
-        // renderer.UseSkybox(skyboxTexture, cameraData);
+        renderer.UseBackgroundRenderer(skyboxRenderer, cameraData);
         
         // render player
         playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
@@ -197,5 +198,7 @@ public class GameScene : ABScene
         
         bloom.Dispose();
         tonemapper.Dispose();
+        
+        skyboxRenderer.Dispose();
     }
 }

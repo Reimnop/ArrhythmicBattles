@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Rendering.Strategy;
+using FlexFramework.Core.Rendering.RenderStrategies;
 using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Core.Util;
 using FlexFramework.Logging;
@@ -27,6 +28,8 @@ public class DefaultRenderer : Renderer, ILighting
     private Registry<string, List<IDrawData>> renderLayerRegistry = new Registry<string, List<IDrawData>>();
     private Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
 
+    private BackgroundRenderer? backgroundRenderer;
+    private CameraData backgroundCameraData;
     private List<PostProcessor> postProcessors = new List<PostProcessor>();
 
     private ScreenCapturer? worldScreenCapturer;
@@ -127,6 +130,12 @@ public class DefaultRenderer : Renderer, ILighting
         renderLayerRegistry[layerId].Add(drawData);
     }
 
+    public override void UseBackgroundRenderer(BackgroundRenderer backgroundRenderer, CameraData cameraData)
+    {
+        this.backgroundRenderer = backgroundRenderer;
+        backgroundCameraData = cameraData;
+    }
+
     public override void UsePostProcessor(PostProcessor postProcessor)
     {
         postProcessors.Add(postProcessor);
@@ -175,7 +184,12 @@ public class DefaultRenderer : Renderer, ILighting
         
         GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        
+        // Render background
+        backgroundRenderer?.Render(this, stateManager, worldScreenCapturer.ColorBuffer, backgroundCameraData);
+        backgroundRenderer = null;
 
+        // Render scene
         using TemporaryList<IDrawData> opaqueLayer = renderLayerRegistry[opaqueLayerId];
         using TemporaryList<IDrawData> alphaClipLayer = renderLayerRegistry[alphaClipLayerId];
         using TemporaryList<IDrawData> transparentLayer = renderLayerRegistry[transparentLayerId];
@@ -268,14 +282,9 @@ public class DefaultRenderer : Renderer, ILighting
         worldScreenCapturer?.Dispose();
         guiScreenCapturer?.Dispose();
 
-        foreach (var (_, strategy) in renderStrategies)
+        foreach (IDisposable strategy in renderStrategies.Values.OfType<IDisposable>())
         {
             strategy.Dispose();
         }
-    }
-    
-    private static int DivideIntCeil(int a, int b)
-    {
-        return a / b + (a % b > 0 ? 1 : 0);
     }
 }

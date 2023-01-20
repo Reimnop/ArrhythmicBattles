@@ -79,6 +79,9 @@
         <None Update="Assets\Shaders\Compute\skybox.comp">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Assets\Shaders\Compute\procedural_skybox.comp">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

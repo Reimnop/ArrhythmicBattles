@@ -53,9 +53,6 @@
       <None Update="Assets\Models\Cube.dae">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Skyboxes\skybox.exr">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="Assets\Models\Map01.dae">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
