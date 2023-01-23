@@ -119,9 +119,4 @@ public class ModelEntity : Entity, IRenderable
     {
         return animationHandler?.GetNodeTransform(node) ?? node.Transform;
     }
-    
-    public override void Dispose()
-    {
-        meshEntity.Dispose();
-    }
 }

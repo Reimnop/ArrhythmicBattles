@@ -10,7 +10,7 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.MainGame;
 
-public class PhysicsEntity : Entity, IRenderable
+public class PhysicsEntity : Entity, IRenderable, IDisposable
 {
     public Vector3 Position { get; private set; }
     public Quaternion Rotation { get; private set; }
@@ -62,9 +62,8 @@ public class PhysicsEntity : Entity, IRenderable
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        modelEntity.Dispose();
         model.Dispose();
         simulation.Bodies.Remove(bodyHandle);
     }

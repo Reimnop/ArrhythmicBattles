@@ -145,9 +145,4 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         return animationHandler?.GetNodeTransform(node) ?? node.Transform;
     }
-    
-    public override void Dispose()
-    {
-        meshEntity.Dispose();
-    }
 }

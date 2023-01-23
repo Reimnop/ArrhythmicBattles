@@ -25,8 +25,4 @@ public class IndexedMeshEntity : Entity, IRenderable
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }
-    
-    public override void Dispose()
-    {
-    }
 }

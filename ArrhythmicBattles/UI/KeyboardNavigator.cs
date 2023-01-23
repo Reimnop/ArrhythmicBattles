@@ -56,7 +56,7 @@ public class NavNode
 
 public delegate void NodeSelectedEventHandler(NavNode node);
 
-public class KeyboardNavigator : Entity, IRenderable
+public class KeyboardNavigator : Entity, IRenderable, IDisposable
 {
     public NavNode RootNode { get; }
     public event NodeSelectedEventHandler? OnNodeSelected;
@@ -176,9 +176,8 @@ public class KeyboardNavigator : Entity, IRenderable
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        meshEntity.Dispose();
         mesh.Dispose();
     }
 }

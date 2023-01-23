@@ -69,8 +69,4 @@ public class SimpleAnimator<T> : Entity where T : struct
             yield return null;
         }
     }
-    
-    public override void Dispose()
-    {
-    }
 }

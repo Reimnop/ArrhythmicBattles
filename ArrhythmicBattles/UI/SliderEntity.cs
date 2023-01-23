@@ -10,7 +10,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.UI;
 
-public class SliderEntity : UIElement, IRenderable
+public class SliderEntity : UIElement, IRenderable, IDisposable
 {
     public override Vector2 Position { get; set; }
     public override Vector2 Size { get; set; }
@@ -176,7 +176,7 @@ public class SliderEntity : UIElement, IRenderable
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         modifyCapture?.Dispose();
         textEntity.Dispose();

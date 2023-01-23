@@ -7,7 +7,7 @@ using Textwriter;
 
 namespace FlexFramework.Core.EntitySystem.Default;
 
-public class TextEntity : Entity, IRenderable
+public class TextEntity : Entity, IRenderable, IDisposable
 {
     public Font Font
     {
@@ -127,7 +127,7 @@ public class TextEntity : Entity, IRenderable
         renderer.EnqueueDrawData(layerId, textDrawData);
     }
     
-    public override void Dispose()
+    public void Dispose()
     {
         mesh.Dispose();
     }

@@ -12,7 +12,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.MainGame;
 
-public class PlayerEntity : Entity, IRenderable
+public class PlayerEntity : Entity, IRenderable, IDisposable
 {
     private struct RayHitHandler : IRayHitHandler
     {
@@ -155,10 +155,8 @@ public class PlayerEntity : Entity, IRenderable
         matrixStack.Pop();
     }
     
-    public override void Dispose()
+    public void Dispose()
     {
-        modelEntity.Dispose();
-
         physicsWorld.Step -= OnStep;
     }
 }

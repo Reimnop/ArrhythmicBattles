@@ -112,7 +112,5 @@ public class MainMenuScene : ABScene
         base.Dispose();
         
         Context.Sound.MenuBackgroundMusic.Stop();
-        
-        bannerEntity.Dispose();
     }
 }

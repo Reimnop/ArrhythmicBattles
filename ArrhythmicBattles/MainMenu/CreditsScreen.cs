@@ -9,7 +9,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.MainMenu;
 
-public class CreditsScreen : Screen
+public class CreditsScreen : Screen, IDisposable
 {
     public override Vector2 Position { get; set; }
 
@@ -47,7 +47,7 @@ public class CreditsScreen : Screen
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         textEntity.Dispose();
     }

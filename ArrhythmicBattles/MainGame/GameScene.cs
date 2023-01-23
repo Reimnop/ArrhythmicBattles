@@ -5,7 +5,6 @@ using BepuPhysics.Collidables;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
-using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
@@ -183,8 +182,7 @@ public class GameScene : ABScene
         base.Dispose();
 
         playerEntity.Dispose();
-        envModelEntity.Dispose();
-        
+
         foreach (PhysicsEntity capsule in physicsEntities)
         {
             capsule.Dispose();

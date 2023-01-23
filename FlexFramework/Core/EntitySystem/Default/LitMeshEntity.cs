@@ -24,8 +24,4 @@ public class LitMeshEntity : Entity, IRenderable
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }
-
-    public override void Dispose()
-    {
-    }
 }

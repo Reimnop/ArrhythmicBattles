@@ -26,8 +26,4 @@ public class SkinnedMeshEntity : Entity, IRenderable
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }
-    
-    public override void Dispose()
-    {
-    }
 }

@@ -9,7 +9,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.MainGame;
 
-public class PauseScreen : Screen
+public class PauseScreen : Screen, IDisposable
 {
     public override Vector2 Position { get; set; }
     
@@ -63,7 +63,7 @@ public class PauseScreen : Screen
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         textEntity.Dispose();
         inputInfo.Dispose();

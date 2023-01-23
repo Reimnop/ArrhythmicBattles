@@ -10,7 +10,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.UI;
 
-public abstract class MenuScreen : Screen
+public abstract class MenuScreen : Screen, IDisposable
 {
     protected static Vector2 ControlSize => new Vector2i(512, 56);
     protected static Color4 DefaultColor => Color4.White;
@@ -108,8 +108,11 @@ public abstract class MenuScreen : Screen
         elements.ForEach(element => (element as IRenderable)?.Render(renderer, layerId, matrixStack, cameraData));
     }
 
-    public override void Dispose()
+    public virtual void Dispose()
     {
-        elements.ForEach(button => button.Dispose());
+        foreach (IDisposable disposable in elements.OfType<IDisposable>())
+        {
+            disposable.Dispose();
+        }
     }
 }

@@ -77,8 +77,4 @@ public class ImageEntity : UIElement, IRenderable
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
     }
-
-    public override void Dispose()
-    {
-    }
 }

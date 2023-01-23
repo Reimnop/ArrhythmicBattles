@@ -9,7 +9,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.MainGame;
 
-public class DebugScreen : Screen
+public class DebugScreen : Screen, IDisposable
 {
     public override Vector2 Position { get; set; }
 
@@ -82,7 +82,7 @@ public class DebugScreen : Screen
         matrixStack.Pop();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         leftTextEntity.Dispose();
     }

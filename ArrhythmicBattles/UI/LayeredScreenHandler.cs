@@ -4,7 +4,7 @@ using FlexFramework.Core.Util;
 
 namespace ArrhythmicBattles.UI;
 
-public class LayeredScreenHandler : Entity, IRenderable
+public class LayeredScreenHandler : Entity, IRenderable, IDisposable
 {
     public IEnumerable<Screen> Screens => screens;
     
@@ -31,7 +31,10 @@ public class LayeredScreenHandler : Entity, IRenderable
     
     public void CloseScreen(Screen screen)
     {
-        screen.Dispose();
+        if (screen is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
         screens.Remove(screen);
     }
     
@@ -43,7 +46,10 @@ public class LayeredScreenHandler : Entity, IRenderable
             throw new ArgumentException("Screen not found", nameof(before));
         }
         
-        before.Dispose();
+        if (before is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
         screens[index] = after;
     }
 
@@ -55,11 +61,11 @@ public class LayeredScreenHandler : Entity, IRenderable
         }
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        foreach (Screen screen in screens)
+        foreach (IDisposable disposable in screens.OfType<IDisposable>())
         {
-            screen.Dispose();
+            disposable.Dispose();
         }
     }
 }

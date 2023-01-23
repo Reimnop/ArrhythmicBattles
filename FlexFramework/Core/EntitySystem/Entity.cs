@@ -3,7 +3,7 @@ using FlexFramework.Core.Util;
 
 namespace FlexFramework.Core.EntitySystem;
 
-public abstract class Entity : IDisposable
+public abstract class Entity
 {
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
@@ -102,6 +102,4 @@ public abstract class Entity : IDisposable
         
         finishedCoroutines.Clear();
     }
-    
-    public abstract void Dispose();
 }

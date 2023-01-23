@@ -50,8 +50,4 @@ public class VerticalStackLayout : UIElement
     {
         Children.Add(element);
     }
-
-    public override void Dispose()
-    {
-    }
 }
