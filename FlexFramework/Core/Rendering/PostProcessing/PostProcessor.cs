@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.PostProcessing;
 
-public abstract class PostProcessor : IDisposable
+public abstract class PostProcessor
 {
     public Vector2i CurrentSize { get; private set; }
 
@@ -16,5 +16,4 @@ public abstract class PostProcessor : IDisposable
         CurrentSize = size;
     }
     public abstract void Process(GLStateManager stateManager, Texture2D texture);
-    public abstract void Dispose();
 }

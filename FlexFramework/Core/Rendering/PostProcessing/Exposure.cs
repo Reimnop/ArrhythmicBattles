@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.PostProcessing;
 
-public class Exposure : PostProcessor
+public class Exposure : PostProcessor, IDisposable
 {
     public float ExposureValue { get; set; } = 1.0f;
 
@@ -49,7 +49,7 @@ public class Exposure : PostProcessor
             CurrentSize.X, CurrentSize.Y, 1);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         tonemappedTexture.Dispose();
         program.Dispose();

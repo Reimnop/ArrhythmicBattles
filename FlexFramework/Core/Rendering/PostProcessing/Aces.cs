@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.PostProcessing;
 
-public class Aces : PostProcessor
+public class Aces : PostProcessor, IDisposable
 {
     private ShaderProgram program;
     private Texture2D tonemappedTexture;
@@ -46,7 +46,7 @@ public class Aces : PostProcessor
             CurrentSize.X, CurrentSize.Y, 1);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         tonemappedTexture.Dispose();
         program.Dispose();

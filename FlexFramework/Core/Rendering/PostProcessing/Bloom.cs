@@ -5,7 +5,7 @@ using OpenTK.Mathematics;
 namespace FlexFramework.Core.Rendering.PostProcessing;
 
 // TODO: Make mip count a const
-public class Bloom : PostProcessor
+public class Bloom : PostProcessor, IDisposable
 {
     public float HardThreshold { get; set; } = 0.85f;
     public float SoftThreshold { get; set; } = 0.75f;
@@ -146,7 +146,7 @@ public class Bloom : PostProcessor
             CurrentSize.X, CurrentSize.Y, 1);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         prefilterShader.Dispose();
         downsampleShader.Dispose();
