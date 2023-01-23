@@ -18,7 +18,10 @@ public class SceneManager
     {
         engine.LogMessage(this, Severity.Info, null, $"Loading scene [{scene.GetType().Name}]");
 
-        CurrentScene?.Dispose();
+        if (CurrentScene is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
         
         scene.InitInternal(engine);
         scene.Init();

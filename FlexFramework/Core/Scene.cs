@@ -5,7 +5,7 @@ using FlexFramework.Physics;
 
 namespace FlexFramework.Core;
 
-public abstract class Scene : IDisposable
+public abstract class Scene
 {
     protected MatrixStack MatrixStack { get; }
 
@@ -112,6 +112,4 @@ public abstract class Scene : IDisposable
     public abstract void Init();
     public abstract void Update(UpdateArgs args);
     public abstract void Render(Renderer renderer);
-
-    public abstract void Dispose();
 }

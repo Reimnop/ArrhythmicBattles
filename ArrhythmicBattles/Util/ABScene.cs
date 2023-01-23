@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Util;
 
-public abstract class ABScene : Scene
+public abstract class ABScene : Scene, IDisposable
 {
     public ABContext Context { get; }
 
@@ -52,7 +52,7 @@ public abstract class ABScene : Scene
         ScreenHandler.SwitchScreen(before, after);
     }
 
-    public override void Dispose()
+    public virtual void Dispose()
     {
         ScreenHandler.Dispose();
     }
