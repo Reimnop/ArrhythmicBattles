@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering;
 
-public abstract class Renderer : IDisposable
+public abstract class Renderer
 {
     public abstract GpuInfo GpuInfo { get; }
     public Color4 ClearColor { get; set; } = Color4.Black;
@@ -25,5 +25,4 @@ public abstract class Renderer : IDisposable
     public abstract void UsePostProcessor(PostProcessor postProcessor);
     public abstract void Update(UpdateArgs args);
     public abstract void Render();
-    public abstract void Dispose();
 }

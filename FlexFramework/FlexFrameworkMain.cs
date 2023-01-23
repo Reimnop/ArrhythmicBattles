@@ -102,9 +102,9 @@ public class FlexFrameworkMain : NativeWindow
     {
         LogMessage(null, Severity.Info, null, $"Using renderer [{renderer.GetType().Name}]");
         
-        if (Renderer != null)
+        if (Renderer is IDisposable disposable)
         {
-            Renderer.Dispose();
+            disposable.Dispose();
         }
         
         renderer.SetEngine(this);
@@ -216,6 +216,9 @@ public class FlexFrameworkMain : NativeWindow
         TextResources.Dispose();
         AudioManager.Dispose();
         PersistentResources.Dispose();
-        Renderer.Dispose();
+        if (Renderer is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 }

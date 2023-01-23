@@ -12,7 +12,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering;
 
-public class DefaultRenderer : Renderer, ILighting
+public class DefaultRenderer : Renderer, ILighting, IDisposable
 {
     public const string OpaqueLayerName = "opaque";
     public const string AlphaClipLayerName = "alphaclip";
@@ -274,7 +274,7 @@ public class DefaultRenderer : Renderer, ILighting
         }
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         unlitShader.Dispose();
         litShader.Dispose();
