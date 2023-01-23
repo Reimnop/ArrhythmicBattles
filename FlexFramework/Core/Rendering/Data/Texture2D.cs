@@ -5,7 +5,7 @@ using PixelType = OpenTK.Graphics.OpenGL4.PixelType;
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Texture2D : GpuObject
+public class Texture2D : GpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
@@ -104,7 +104,7 @@ public class Texture2D : GpuObject
         GL.GenerateTextureMipmap(Handle);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         GL.DeleteTexture(Handle);
     }

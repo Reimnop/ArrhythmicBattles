@@ -2,7 +2,7 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Renderbuffer : GpuObject
+public class Renderbuffer : GpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
@@ -19,7 +19,7 @@ public class Renderbuffer : GpuObject
         Handle = handle;
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         GL.DeleteRenderbuffer(Handle);
     }

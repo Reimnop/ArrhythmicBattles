@@ -1,9 +1,7 @@
 ﻿namespace FlexFramework.Core.Rendering.Data;
 
-public abstract class GpuObject : IDisposable
+public abstract class GpuObject
 {
     public int Handle { get; }
     public string Name { get; }
-
-    public abstract void Dispose();
 }

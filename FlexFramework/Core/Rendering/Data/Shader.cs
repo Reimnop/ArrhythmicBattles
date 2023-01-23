@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Shader : GpuObject
+public class Shader : GpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
@@ -29,7 +29,7 @@ public class Shader : GpuObject
         }
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         GL.DeleteShader(Handle);
     }

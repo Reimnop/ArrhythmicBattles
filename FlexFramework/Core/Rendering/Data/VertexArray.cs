@@ -2,7 +2,7 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class VertexArray : GpuObject
+public class VertexArray : GpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
@@ -38,7 +38,7 @@ public class VertexArray : GpuObject
         GL.VertexArrayElementBuffer(Handle, buffer.Handle);
     }
     
-    public override void Dispose()
+    public void Dispose()
     {
         GL.DeleteVertexArray(Handle);
     }
