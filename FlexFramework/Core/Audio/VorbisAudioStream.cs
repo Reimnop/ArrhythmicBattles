@@ -3,7 +3,7 @@ using NVorbis;
 
 namespace FlexFramework.Core.Audio;
 
-public class VorbisAudioStream : AudioStream
+public class VorbisAudioStream : AudioStream, IDisposable
 {
     public override float Length => vorbis.TotalTime.Seconds;
     public override int Channels => vorbis.Channels;
@@ -65,7 +65,7 @@ public class VorbisAudioStream : AudioStream
         return true;
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         vorbis.Dispose();
     }

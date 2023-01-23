@@ -72,9 +72,9 @@ public class ABSound : IDisposable, IConfigurable
         SelectSfx.Dispose();
         MenuBackgroundMusic.Dispose();
 
-        foreach (AudioStream audioStream in audioStreams)
+        foreach (IDisposable disposable in audioStreams.OfType<IDisposable>())
         {
-            audioStream.Dispose();
+            disposable.Dispose();
         }
     }
 }

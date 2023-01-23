@@ -2,7 +2,7 @@
 
 namespace FlexFramework.Core.Audio;
 
-public abstract class AudioStream : IDisposable
+public abstract class AudioStream
 {
     public abstract float Length { get; }
     public abstract int Channels { get; }
@@ -13,5 +13,4 @@ public abstract class AudioStream : IDisposable
 
     public abstract void Restart();
     public abstract bool NextBuffer(out Span<byte> data);
-    public abstract void Dispose();
 }
