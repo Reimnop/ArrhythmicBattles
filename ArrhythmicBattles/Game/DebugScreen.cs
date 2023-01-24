@@ -7,7 +7,7 @@ using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 using Textwriter;
 
-namespace ArrhythmicBattles.MainGame;
+namespace ArrhythmicBattles.Game;
 
 public class DebugScreen : Screen, IDisposable
 {

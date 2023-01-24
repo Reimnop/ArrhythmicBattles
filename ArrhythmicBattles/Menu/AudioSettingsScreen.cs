@@ -2,7 +2,7 @@
 using ArrhythmicBattles.Util;
 using FlexFramework;
 
-namespace ArrhythmicBattles.MainMenu;
+namespace ArrhythmicBattles.Menu;
 
 public class AudioSettingsScreen : MenuScreen
 {

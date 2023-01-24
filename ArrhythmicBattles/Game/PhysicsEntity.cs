@@ -8,7 +8,7 @@ using FlexFramework.Core.Util;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.MainGame;
+namespace ArrhythmicBattles.Game;
 
 public class PhysicsEntity : Entity, IRenderable, IDisposable
 {

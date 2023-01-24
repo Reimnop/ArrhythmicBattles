@@ -1,4 +1,4 @@
-﻿using ArrhythmicBattles.MainMenu;
+﻿using ArrhythmicBattles.Menu;
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.EntitySystem;

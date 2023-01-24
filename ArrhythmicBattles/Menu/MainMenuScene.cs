@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 using Textwriter;
 using Renderer = FlexFramework.Core.Rendering.Renderer;
 
-namespace ArrhythmicBattles.MainMenu;
+namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {

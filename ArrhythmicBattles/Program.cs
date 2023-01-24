@@ -1,11 +1,11 @@
-﻿using ArrhythmicBattles.MainGame;
+﻿using ArrhythmicBattles.Game;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using ArrhythmicBattles.MainMenu;
+using ArrhythmicBattles.Menu;
 using DiscordRPC.Logging;
 using FlexFramework.Logging;
 using log4net;

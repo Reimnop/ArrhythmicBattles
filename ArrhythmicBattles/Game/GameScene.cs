@@ -10,7 +10,7 @@ using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.MainGame;
+namespace ArrhythmicBattles.Game;
 
 public class GameScene : ABScene
 {

@@ -1,9 +1,9 @@
-﻿using ArrhythmicBattles.MainGame;
+﻿using ArrhythmicBattles.Game;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
 
-namespace ArrhythmicBattles.MainMenu;
+namespace ArrhythmicBattles.Menu;
 
 public class SelectScreen : MenuScreen
 {

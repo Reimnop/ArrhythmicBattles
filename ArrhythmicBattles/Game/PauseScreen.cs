@@ -7,7 +7,7 @@ using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.MainGame;
+namespace ArrhythmicBattles.Game;
 
 public class PauseScreen : Screen, IDisposable
 {

@@ -7,7 +7,7 @@ using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.MainMenu;
+namespace ArrhythmicBattles.Menu;
 
 public class CreditsScreen : Screen, IDisposable
 {
