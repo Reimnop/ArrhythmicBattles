@@ -1,15 +1,17 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 
-namespace ArrhythmicBattles.Networking.Server.Tcp;
+namespace ArrhythmicBattles.Networking.Client;
 
-public class ClientTcpSocket : ClientSocket, IDisposable
+public class TcpGameClient : GameClient, IDisposable
 {
     private readonly TcpClient client;
     private readonly NetworkStream stream;
     
-    public ClientTcpSocket(TcpClient client)
+    public TcpGameClient(IPAddress address, int port)
     {
-        this.client = client;
+        client = new TcpClient();
+        client.Connect(address, port);
         stream = client.GetStream();
     }
     
@@ -35,9 +37,9 @@ public class ClientTcpSocket : ClientSocket, IDisposable
     {
         Dispose();
     }
-    
+
     public void Dispose()
     {
-        client.Close();
+        client.Dispose();
     }
 }
