@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using ArrhythmicBattles.Common;
 
 namespace ArrhythmicBattles.Networking.Server.Local;
 
@@ -7,6 +8,8 @@ public class ClientLocalSocket : ClientSocket, IDisposable
     private readonly ConcurrentQueue<ReadOnlyMemory<byte>> queuedPackets = new ConcurrentQueue<ReadOnlyMemory<byte>>(); 
     private readonly ServerLocalSocket server;
     
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
     public ClientLocalSocket(ServerLocalSocket server)
     {
         this.server = server;
@@ -23,17 +26,15 @@ public class ClientLocalSocket : ClientSocket, IDisposable
         return server.WriteAsync(this, buffer);
     }
 
-    public override ValueTask<Memory<byte>> ReceiveAsync()
+    public override async ValueTask<Memory<byte>> ReceiveAsync()
     {
-        if (queuedPackets.TryDequeue(out ReadOnlyMemory<byte> packet))
-        {
-            // Copy the packet to a new buffer
-            Memory<byte> buffer = new byte[packet.Length];
-            packet.CopyTo(buffer);
-            return ValueTask.FromResult(buffer);
-        }
+        ReadOnlyMemory<byte> packet = default;
+        await TaskHelper.WaitUntil(() => queuedPackets.TryDequeue(out packet), cancellationToken: cancellationTokenSource.Token);
 
-        return ValueTask.FromResult(Memory<byte>.Empty);
+        // Copy the packet to a new buffer
+        Memory<byte> buffer = new byte[packet.Length];
+        packet.CopyTo(buffer);
+        return buffer;
     }
 
     public override void Close()
@@ -43,6 +44,8 @@ public class ClientLocalSocket : ClientSocket, IDisposable
     
     public void Dispose()
     {
+        // Cancel the receive loop
+        cancellationTokenSource.Cancel();
         server.RemoveClient(this);
     }
 }

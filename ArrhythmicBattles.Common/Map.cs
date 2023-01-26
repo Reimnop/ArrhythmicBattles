@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ArrhythmicBattles.Networking.Util;
+namespace ArrhythmicBattles.Common;
 
 // From https://stackoverflow.com/a/41907561
 public class Map<T1, T2> : IEnumerable<KeyValuePair<T1, T2>> where T1 : notnull where T2 : notnull

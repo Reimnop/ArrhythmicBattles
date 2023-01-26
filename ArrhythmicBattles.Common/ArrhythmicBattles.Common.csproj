@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\ArrhythmicBattles.Networking\ArrhythmicBattles.Networking.csproj" />
-    </ItemGroup>
-
 </Project>

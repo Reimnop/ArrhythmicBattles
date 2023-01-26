@@ -13,10 +13,17 @@ public class ServerTcpSocket : ServerSocket, IDisposable
         listener.Start();
     }
 
-    public override async Task<ClientSocket> AcceptAsync()
+    public override async Task<ClientSocket?> AcceptAsync()
     {
-        TcpClient client = await listener.AcceptTcpClientAsync();
-        return new ClientTcpSocket(client);
+        try
+        {
+            TcpClient client = await listener.AcceptTcpClientAsync();
+            return new ClientTcpSocket(client);
+        }
+        catch (SocketException)
+        {
+            return null;
+        }
     }
 
     public override Task DisconnectClientAsync(ClientSocket clientSocket)

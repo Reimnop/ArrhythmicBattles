@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using ArrhythmicBattles.Common;
 using ArrhythmicBattles.Networking.Client;
-using ArrhythmicBattles.Networking.Util;
 
 namespace ArrhythmicBattles.Networking.Server.Local;
 
@@ -9,6 +9,8 @@ public class ServerLocalSocket : ServerSocket, IDisposable
 {
     private readonly Map<ClientLocalSocket, LocalGameClient> clients = new Map<ClientLocalSocket, LocalGameClient>();
     private readonly ConcurrentQueue<ClientLocalSocket> newClients = new ConcurrentQueue<ClientLocalSocket>();
+    
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     
     internal void RemoveClient(ClientLocalSocket client)
     {
@@ -41,14 +43,10 @@ public class ServerLocalSocket : ServerSocket, IDisposable
         return Task.FromResult<GameClient>(gameClient);
     }
     
-    public override async Task<ClientSocket> AcceptAsync()
+    public override async Task<ClientSocket?> AcceptAsync()
     {
         ClientLocalSocket? client = null;
-        while (!newClients.TryDequeue(out client))
-        {
-            await Task.Delay(1);
-        }
-        
+        await TaskHelper.WaitUntil(() => newClients.TryDequeue(out client), cancellationToken: cancellationTokenSource.Token);
         return client;
     }
 

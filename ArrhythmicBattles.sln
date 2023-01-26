@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles.Server", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles.Networking", "ArrhythmicBattles.Networking\ArrhythmicBattles.Networking.csproj", "{9C69C965-15E4-4F81-8EA3-5F0E9DCE4F35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles.Common", "ArrhythmicBattles.Common\ArrhythmicBattles.Common.csproj", "{2960E67B-4618-4E60-A8F9-36070D4EAE3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{9C69C965-15E4-4F81-8EA3-5F0E9DCE4F35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C69C965-15E4-4F81-8EA3-5F0E9DCE4F35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C69C965-15E4-4F81-8EA3-5F0E9DCE4F35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2960E67B-4618-4E60-A8F9-36070D4EAE3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2960E67B-4618-4E60-A8F9-36070D4EAE3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2960E67B-4618-4E60-A8F9-36070D4EAE3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2960E67B-4618-4E60-A8F9-36070D4EAE3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
