@@ -24,17 +24,14 @@ public class LocalGameClient : GameClient, IDisposable
         return server.WriteAsync(this, buffer);
     }
 
-    public override ValueTask<Memory<byte>> ReceiveAsync()
+    public override ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
     {
         if (queuedPackets.TryDequeue(out ReadOnlyMemory<byte> packet))
         {
-            // Copy the packet to a new buffer
-            Memory<byte> buffer = new byte[packet.Length];
-            packet.CopyTo(buffer);
-            return ValueTask.FromResult(buffer);
+            return ValueTask.FromResult(packet);
         }
         
-        return ValueTask.FromResult(Memory<byte>.Empty);
+        return ValueTask.FromResult(ReadOnlyMemory<byte>.Empty);
     }
 
     public override void Close()

@@ -20,11 +20,11 @@ public class TcpGameClient : GameClient, IDisposable
         return stream.WriteAsync(buffer);
     }
 
-    public override async ValueTask<Memory<byte>> ReceiveAsync()
+    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
     {
         if (client.Available == 0)
         {
-            return Memory<byte>.Empty;
+            return ReadOnlyMemory<byte>.Empty;
         }
         
         // I hope the garbage collector doesn't get mad at me for this
