@@ -19,12 +19,9 @@ public class GameScene : ABScene
     private PerspectiveCamera camera = null!;
     private ModelEntity envModelEntity = null!;
     private Model envModel = null!;
-    private Model capsuleModel = null!;
-    
+
     private PhysicsWorld physicsWorld = null!;
 
-    private List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
-    
     private ProceduralSkyboxRenderer skyboxRenderer = null!;
     
     private Bloom bloom = null!;
@@ -82,27 +79,6 @@ public class GameScene : ABScene
         BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
         physicsWorld.Simulation.Bodies.Add(floorBodyDescription);
 
-        // Spawn a bunch of physicsEntities
-        capsuleModel = new Model("Assets/Models/Capsule.dae");
-
-        Capsule capsule = new Capsule(0.25f, 0.5f);
-        TypedIndex capsuleShape = physicsWorld.Simulation.Shapes.Add(capsule);
-        BodyInertia inertia = capsule.ComputeInertia(1.0f);
-
-        Random random = new Random(2);
-        for (int i = 0; i < 4096; i++)
-        {
-            Vector3 position = new Vector3(
-                random.NextSingle() * 10.0f - 5.0f,
-                random.NextSingle() * 500.0f + 400.0f,
-                random.NextSingle() * 10.0f - 5.0f);
-            
-            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitX, random.NextSingle() * MathF.PI * 2.0f);
-            
-            PhysicsEntity physicsEntity = new PhysicsEntity(physicsWorld.Simulation, capsuleModel, capsuleShape, inertia, position, rotation);
-            physicsEntities.Add(physicsEntity);
-        }
-
         // Init post processing
         bloom = new Bloom();
         tonemapper = new Exposure();
@@ -115,10 +91,6 @@ public class GameScene : ABScene
         
         physicsWorld.Update(args);
         playerEntity.Update(args);
-        foreach (PhysicsEntity physicsEntity in physicsEntities)
-        {
-            physicsEntity.Update(args);
-        }
 
         if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.F3))
         {
@@ -161,13 +133,7 @@ public class GameScene : ABScene
         
         // render player
         playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
-        
-        // render physicsEntities
-        foreach (PhysicsEntity capsule in physicsEntities)
-        {
-            capsule.Render(renderer, opaqueLayer, MatrixStack, cameraData);
-        }
-        
+
         // render environment
         MatrixStack.Push();
         envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
@@ -182,15 +148,8 @@ public class GameScene : ABScene
         base.Dispose();
 
         playerEntity.Dispose();
-
-        foreach (PhysicsEntity capsule in physicsEntities)
-        {
-            capsule.Dispose();
-        }
-        
         physicsWorld.Dispose();
         
-        capsuleModel.Dispose();
         envModel.Dispose();
         inputInfo.Dispose();
         
