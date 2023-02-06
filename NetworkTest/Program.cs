@@ -11,11 +11,11 @@ namespace NetworkTest;
 
 class Program
 {
-    private static ServerLocalSocket serverSocket;
+    private static ServerTcpSocket serverSocket;
     
     public static void Main(string[] args)
     {
-        serverSocket = new ServerLocalSocket();
+        serverSocket = new ServerTcpSocket(12345);
         
         GameServer server = new GameServer(serverSocket);
         Task.Run(() => server.Start());
@@ -27,8 +27,8 @@ class Program
     private static async Task Client()
     {
         Console.WriteLine("Starting client");
-        
-        GameClient client = await serverSocket.ConnectLocalClientAsync();
+
+        GameClient client = new TcpGameClient(IPAddress.Loopback, 12345);
         Console.WriteLine("Client connected to server");
         
         ReadOnlyMemory<byte> buffer = await client.ReceiveAsync();
