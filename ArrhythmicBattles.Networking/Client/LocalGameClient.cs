@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using ArrhythmicBattles.Common;
 using ArrhythmicBattles.Networking.Server.Local;
 
 namespace ArrhythmicBattles.Networking.Client;
@@ -7,6 +8,8 @@ public class LocalGameClient : GameClient, IDisposable
 {
     private readonly ConcurrentQueue<ReadOnlyMemory<byte>> queuedPackets = new ConcurrentQueue<ReadOnlyMemory<byte>>(); 
     private readonly ServerLocalSocket server;
+    
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     
     public LocalGameClient(ServerLocalSocket server)
     {
@@ -24,14 +27,11 @@ public class LocalGameClient : GameClient, IDisposable
         return server.WriteAsync(this, buffer);
     }
 
-    public override ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
+    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
     {
-        if (queuedPackets.TryDequeue(out ReadOnlyMemory<byte> packet))
-        {
-            return ValueTask.FromResult(packet);
-        }
-        
-        return ValueTask.FromResult(ReadOnlyMemory<byte>.Empty);
+        ReadOnlyMemory<byte> packet = default;
+        await TaskHelper.WaitUntil(() => queuedPackets.TryDequeue(out packet), cancellationToken: cancellationTokenSource.Token);
+        return packet;
     }
 
     public override void Close()
@@ -41,6 +41,7 @@ public class LocalGameClient : GameClient, IDisposable
 
     public void Dispose()
     {
+        cancellationTokenSource.Cancel();
         server.RemoveClient(this);
     }
 }

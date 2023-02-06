@@ -26,15 +26,11 @@ public class ClientLocalSocket : ClientSocket, IDisposable
         return server.WriteAsync(this, buffer);
     }
 
-    public override async ValueTask<Memory<byte>> ReceiveAsync()
+    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
     {
         ReadOnlyMemory<byte> packet = default;
         await TaskHelper.WaitUntil(() => queuedPackets.TryDequeue(out packet), cancellationToken: cancellationTokenSource.Token);
-
-        // Copy the packet to a new buffer
-        Memory<byte> buffer = new byte[packet.Length];
-        packet.CopyTo(buffer);
-        return buffer;
+        return packet;
     }
 
     public override void Close()
