@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ArrhythmicBattles.Networking\ArrhythmicBattles.Networking.csproj" />
+      <ProjectReference Include="..\ArrhythmicBattles.Server\ArrhythmicBattles.Server.csproj" />
     </ItemGroup>
 
 </Project>

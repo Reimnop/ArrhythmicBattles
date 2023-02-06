@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
+using ArrhythmicBattles.Common;
 
 namespace ArrhythmicBattles.Networking.Client;
 
@@ -7,6 +9,8 @@ public class TcpGameClient : GameClient, IDisposable
 {
     private readonly TcpClient client;
     private readonly NetworkStream stream;
+    
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     
     public TcpGameClient(IPAddress address, int port)
     {
@@ -22,14 +26,12 @@ public class TcpGameClient : GameClient, IDisposable
 
     public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
     {
-        if (client.Available == 0)
-        {
-            return ReadOnlyMemory<byte>.Empty;
-        }
-        
+        await TaskHelper.WaitUntil(() => client.Available > 0, cancellationToken: cancellationTokenSource.Token);
+
         // I hope the garbage collector doesn't get mad at me for this
-        Memory<byte> buffer = new byte[client.Available];
-        await stream.ReadAsync(buffer);
+        byte[] buffer = new byte[client.Available];
+        int bytesRead = await stream.ReadAsync(buffer);
+        Debug.Assert(bytesRead == buffer.Length); // Better safe than sorry
         return buffer;
     }
 
@@ -40,6 +42,7 @@ public class TcpGameClient : GameClient, IDisposable
 
     public void Dispose()
     {
+        cancellationTokenSource.Cancel();
         client.Dispose();
     }
 }

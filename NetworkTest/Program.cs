@@ -1,48 +1,42 @@
-﻿using ArrhythmicBattles.Networking.Client;
+﻿using System.Globalization;
+using System.Net;
+using System.Text;
+using ArrhythmicBattles.Networking.Client;
 using ArrhythmicBattles.Networking.Server;
 using ArrhythmicBattles.Networking.Server.Local;
+using ArrhythmicBattles.Networking.Server.Tcp;
+using ArrhythmicBattles.Server;
 
 namespace NetworkTest;
 
 class Program
 {
+    private static ServerLocalSocket serverSocket;
+    
     public static void Main(string[] args)
     {
-        ServerLocalSocket server = new ServerLocalSocket();
-        Task.Run(() => Server(server));
-        Client(server).GetAwaiter().GetResult();
+        serverSocket = new ServerLocalSocket();
         
-        Thread.Sleep(1000);
+        GameServer server = new GameServer(serverSocket);
+        Task.Run(() => server.Start());
+        Task.Run(Client);
+        
+        Thread.Sleep(Timeout.Infinite);
     }
 
-    public static async Task Client(ServerLocalSocket server)
+    private static async Task Client()
     {
-        GameClient gameClient = await server.ConnectLocalClientAsync();
-        Console.WriteLine("[CLIENT] Connected to server");
+        Console.WriteLine("Starting client");
         
-        Console.WriteLine("[CLIENT] Sending data");
-        byte[] data = new byte[2048];
-        await gameClient.SendAsync(data);
-
-        Console.WriteLine("[CLIENT] Receiving data");
-        ReadOnlyMemory<byte> buffer = await gameClient.ReceiveAsync();
-        Console.WriteLine($"[CLIENT] Received {buffer.Length} bytes");
-    }
-
-    public static async Task Server(ServerSocket serverSocket)
-    {
-        ClientSocket? socket = await serverSocket.AcceptAsync();
-
-        if (socket != null)
-        {
-            Console.WriteLine("[SERVER] Client connected");
-            
-            ReadOnlyMemory<byte> buffer = await socket.ReceiveAsync();
-            Console.WriteLine($"[SERVER] Received {buffer.Length} bytes");
-            
-            Console.WriteLine("[SERVER] Sending data");
-            byte[] data = new byte[1024];
-            await socket.SendAsync(data);
-        }
+        GameClient client = await serverSocket.ConnectLocalClientAsync();
+        Console.WriteLine("Client connected to server");
+        
+        ReadOnlyMemory<byte> buffer = await client.ReceiveAsync();
+        Console.WriteLine($"Client received data from server ({buffer.Length} bytes)");
+        
+        int length = BitConverter.ToInt32(buffer.Span);
+        string message = Encoding.UTF8.GetString(buffer.Span.Slice(4, length));
+        
+        Console.WriteLine($"Client received '{message}'");
     }
 }
