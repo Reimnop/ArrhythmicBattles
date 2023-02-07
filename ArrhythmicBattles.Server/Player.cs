@@ -1,36 +1,22 @@
-﻿using ArrhythmicBattles.Networking;
-using ArrhythmicBattles.Networking.Packets;
-using ArrhythmicBattles.Networking.Server;
-
-namespace ArrhythmicBattles.Server;
+﻿namespace ArrhythmicBattles.Server;
 
 public class Player : IDisposable
 {
-    private readonly ClientSocket client;
-    private readonly TypedPacketTunnel tunnel;
+    public PlayerNetworkHandler NetworkHandler { get; }
+    public string Username { get; }
 
     private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-    internal Player(ClientSocket client)
+    internal Player(PlayerNetworkHandler networkHandler, string username)
     {
-        this.client = client;
-        tunnel = new TypedPacketTunnel(client);
-    }
-
-    public async Task SendPacketAsync(Packet packet)
-    {
-        await tunnel.SendAsync(packet);
-    }
-    
-    public async Task<Packet> ReceivePacketAsync()
-    {
-        return await tunnel.ReceiveAsync();
+        NetworkHandler = networkHandler;
+        Username = username;
     }
 
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
-        client.Close();
+        NetworkHandler.Dispose();
     }
 }

@@ -1,11 +1,7 @@
-﻿using System.Globalization;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using ArrhythmicBattles.Networking;
 using ArrhythmicBattles.Networking.Client;
 using ArrhythmicBattles.Networking.Packets;
-using ArrhythmicBattles.Networking.Server;
-using ArrhythmicBattles.Networking.Server.Local;
 using ArrhythmicBattles.Networking.Server.Tcp;
 using ArrhythmicBattles.Server;
 
@@ -17,7 +13,7 @@ class Program
     
     public static void Main(string[] args)
     {
-        serverSocket = new ServerTcpSocket(19738);
+        serverSocket = new ServerTcpSocket(42069); // Funni number 
         
         GameServer server = new GameServer(serverSocket);
         Task.Run(() => server.Start());
@@ -28,13 +24,8 @@ class Program
 
     private static async Task Client()
     {
-        Console.WriteLine("Starting client");
-
-        GameClient client = new TcpGameClient(IPAddress.Loopback, 19738);
+        GameClient client = new TcpGameClient(IPAddress.Loopback, 42069);
         TypedPacketTunnel tunnel = new TypedPacketTunnel(client);
-        Console.WriteLine("Client connected to server");
-        
         await tunnel.SendAsync(new AuthPacket("TestUser"));
-        Console.WriteLine("Sent auth packet");
     }
 }

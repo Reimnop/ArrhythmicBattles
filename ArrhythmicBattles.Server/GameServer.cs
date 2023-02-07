@@ -30,17 +30,24 @@ public class GameServer : IDisposable
             ClientSocket? client = await socket.AcceptAsync();
             if (client != null)
             {
-                Player player = new Player(client);
-                players.Add(player);
-                
-                Console.WriteLine($"Accepted client {client.GetName()}");
-
-                Packet packet = await player.ReceivePacketAsync();
-                if (packet is AuthPacket authPacket)
-                {
-                    Console.WriteLine($"Received auth packet from {authPacket.Username}");
-                }
+                Console.WriteLine($"Client '{client.GetName()}' is trying to connect");
+                Task.Run(() => HandleClientAsync(client));
             }
+        }
+    }
+
+    private async Task HandleClientAsync(ClientSocket clientSocket)
+    {
+        PlayerNetworkHandler networkHandler = new PlayerNetworkHandler(clientSocket);
+        Packet packet = await networkHandler.ReceivePacketAsync();
+
+        if (packet is AuthPacket authPacket)
+        {
+            string username = authPacket.Username;
+            Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}'");
+            
+            Player player = new Player(networkHandler, username);
+            players.Add(player);
         }
     }
     
