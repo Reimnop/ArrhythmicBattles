@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using ArrhythmicBattles.Common;
 using ArrhythmicBattles.Networking.Packets;
 using ArrhythmicBattles.Networking.Server;
 
@@ -20,12 +21,12 @@ public class GameServer : IDisposable
     public async Task Start()
     {
         Task acceptTask = AcceptClientsAsync();
-        Task tickTask = TickAsync();
+        Task tickTask = TickLoopAsync();
         
         await Task.WhenAll(acceptTask, tickTask);
     }
     
-    private async Task TickAsync()
+    private async Task TickLoopAsync()
     {
         const int tickRate = 20;
         
@@ -34,11 +35,7 @@ public class GameServer : IDisposable
         
         while (!cancellationTokenSource.IsCancellationRequested)
         {
-            foreach (Player player in players)
-            {
-                TextPacket textPacket = new TextPacket("Hello World!");
-                await player.NetworkHandler.SendPacketAsync(textPacket);
-            }
+            await TickAsync();
 
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             long targetMilliseconds = 1000 / tickRate;
@@ -55,6 +52,11 @@ public class GameServer : IDisposable
         stopwatch.Stop();
     }
 
+    private async Task TickAsync()
+    {
+        
+    }
+
     private async Task AcceptClientsAsync()
     {
         while (!cancellationTokenSource.IsCancellationRequested)
@@ -63,7 +65,7 @@ public class GameServer : IDisposable
             if (client != null)
             {
                 Console.WriteLine($"Client '{client.GetName()}' is trying to connect");
-                Task.Run(() => HandleClientAsync(client));
+                _ = HandleClientAsync(client);
             }
         }
     }
@@ -76,9 +78,27 @@ public class GameServer : IDisposable
         if (packet is AuthPacket authPacket)
         {
             string username = authPacket.Username;
-            Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}'");
+            long id = authPacket.Id;
+            Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}' ({id})");
+
+            // Get player list
+            List<PlayerProfile> playerList = players.Select(player => new PlayerProfile(player.Username, player.Id)).ToList();
+            playerList.Add(new PlayerProfile(username, id));
+
+            PlayerListPacket playerListPacket = new PlayerListPacket(playerList);
             
-            Player player = new Player(networkHandler, username);
+            // Send the player list
+            await networkHandler.SendPacketAsync(playerListPacket);
+            
+            // Send other clients player list and join packet
+            PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(id);
+            foreach (Player player1 in players)
+            {
+                await player1.NetworkHandler.SendPacketAsync(playerListPacket);
+                await player1.NetworkHandler.SendPacketAsync(playerJoinPacket);
+            }
+
+            Player player = new Player(networkHandler, username, id);
             players.Add(player);
         }
     }

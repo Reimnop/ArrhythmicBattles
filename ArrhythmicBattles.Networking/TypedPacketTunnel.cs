@@ -8,7 +8,9 @@ public class TypedPacketTunnel
     private readonly Map<Identifier, Type> packetTypes = new Map<Identifier, Type>()
     {
         { new Identifier("arrhythmicbattles", "auth"), typeof(AuthPacket) },
-        { new Identifier("arrhythmicbattles", "text"), typeof(TextPacket) }
+        { new Identifier("arrhythmicbattles", "player_list"), typeof(PlayerListPacket) },
+        { new Identifier("arrhythmicbattles", "player_join"), typeof(PlayerJoinPacket) },
+        { new Identifier("arrhythmicbattles", "player_leave"), typeof(PlayerLeavePacket) }
     };
 
     private readonly ISenderReceiver senderReceiver;
