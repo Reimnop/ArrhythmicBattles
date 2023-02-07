@@ -18,7 +18,7 @@ public class LocalGameClient : GameClient, IDisposable
     
     internal ValueTask WriteAsync(ReadOnlyMemory<byte> buffer)
     {
-        byteQueue.Enqueue(buffer.ToArray(), 0, buffer.Length);
+        byteQueue.Enqueue(buffer.Span);
         return ValueTask.CompletedTask;
     }
     
@@ -31,7 +31,7 @@ public class LocalGameClient : GameClient, IDisposable
     {
         byte[] buffer = new byte[length == -1 ? byteQueue.Length : length];
         await TaskHelper.WaitUntil(() => byteQueue.Length >= length, cancellationToken: cancellationTokenSource.Token);
-        byteQueue.Dequeue(buffer, 0, buffer.Length);
+        byteQueue.Dequeue(buffer);
         return buffer;
     }
 

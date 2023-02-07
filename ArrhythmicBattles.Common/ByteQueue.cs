@@ -124,10 +124,10 @@ public sealed class ByteQueue
     /// Enqueues a buffer to the queue and inserts it to a correct position
     /// </summary>
     /// <param name="buffer">Buffer to enqueue</param>
-    /// <param name="offset">The zero-based byte offset in the buffer</param>
-    /// <param name="size">The number of bytes to enqueue</param>
-    public void Enqueue(byte[] buffer, int offset, int size)
+    public void Enqueue(ReadOnlySpan<byte> buffer)
     {
+        int size = buffer.Length;
+
         if (size == 0)
             return;
 
@@ -142,17 +142,17 @@ public sealed class ByteQueue
 
                 if (rightLength >= size)
                 {
-                    Buffer.BlockCopy(buffer, offset, fInternalBuffer, fTail, size);
+                    buffer.CopyTo(fInternalBuffer.AsSpan(fTail));
                 }
                 else
                 {
-                    Buffer.BlockCopy(buffer, offset, fInternalBuffer, fTail, rightLength);
-                    Buffer.BlockCopy(buffer, offset + rightLength, fInternalBuffer, 0, size - rightLength);
+                    buffer.Slice(0, rightLength).CopyTo(fInternalBuffer.AsSpan(fTail));
+                    buffer.Slice(rightLength).CopyTo(fInternalBuffer);
                 }
             }
             else
             {
-                Buffer.BlockCopy(buffer, offset, fInternalBuffer, fTail, size);
+                buffer.CopyTo(fInternalBuffer.AsSpan(fTail));
             }
 
             fTail = (fTail + size) % fInternalBuffer.Length;
@@ -165,11 +165,11 @@ public sealed class ByteQueue
     /// Dequeues a buffer from the queue
     /// </summary>
     /// <param name="buffer">Buffer to enqueue</param>
-    /// <param name="offset">The zero-based byte offset in the buffer</param>
-    /// <param name="size">The number of bytes to dequeue</param>
     /// <returns>Number of bytes dequeued</returns>
-    public int Dequeue(byte[] buffer, int offset, int size)
+    public int Dequeue(Span<byte> buffer)
     {
+        int size = buffer.Length;
+        
         lock (this)
         {
             if (size > fSize)
@@ -180,7 +180,7 @@ public sealed class ByteQueue
 
             if (fHead < fTail)
             {
-                Buffer.BlockCopy(fInternalBuffer, fHead, buffer, offset, size);
+                fInternalBuffer.AsSpan(fHead, size).CopyTo(buffer);
             }
             else
             {
@@ -188,12 +188,12 @@ public sealed class ByteQueue
 
                 if (rightLength >= size)
                 {
-                    Buffer.BlockCopy(fInternalBuffer, fHead, buffer, offset, size);
+                    fInternalBuffer.AsSpan(fHead, size).CopyTo(buffer);
                 }
                 else
                 {
-                    Buffer.BlockCopy(fInternalBuffer, fHead, buffer, offset, rightLength);
-                    Buffer.BlockCopy(fInternalBuffer, 0, buffer, offset + rightLength, size - rightLength);
+                    fInternalBuffer.AsSpan(fHead, rightLength).CopyTo(buffer);
+                    fInternalBuffer.AsSpan(0, size - rightLength).CopyTo(buffer.Slice(rightLength));
                 }
             }
 
