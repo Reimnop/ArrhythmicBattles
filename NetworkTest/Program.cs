@@ -15,7 +15,7 @@ class Program
     
     public static void Main(string[] args)
     {
-        serverSocket = new ServerTcpSocket(12345);
+        serverSocket = new ServerTcpSocket(19738);
         
         GameServer server = new GameServer(serverSocket);
         Task.Run(() => server.Start());
@@ -28,7 +28,7 @@ class Program
     {
         Console.WriteLine("Starting client");
 
-        GameClient client = new TcpGameClient(IPAddress.Loopback, 12345);
+        GameClient client = new TcpGameClient(IPAddress.Loopback, 19738);
         Console.WriteLine("Client connected to server");
         
         ReadOnlyMemory<byte> buffer = await client.ReceiveAsync();

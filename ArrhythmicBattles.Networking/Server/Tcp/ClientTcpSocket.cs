@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
 
 namespace ArrhythmicBattles.Networking.Server.Tcp;
 
@@ -27,7 +28,8 @@ public class ClientTcpSocket : ClientSocket, IDisposable
         
         // I hope the garbage collector doesn't get mad at me for this
         byte[] buffer = new byte[client.Available];
-        await stream.ReadAsync(buffer);
+        int bytesRead = await stream.ReadAsync(buffer);
+        Debug.Assert(bytesRead == buffer.Length); // This should never happen (hopefully)
         return buffer;
     }
 

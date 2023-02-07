@@ -42,6 +42,7 @@ public class LocalGameClient : GameClient, IDisposable
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
         server.RemoveClient(this);
     }
 }

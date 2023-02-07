@@ -5,7 +5,7 @@ using ArrhythmicBattles.Networking.Client;
 namespace ArrhythmicBattles.Networking.Server.Local;
 
 // Emulates network connections between clients and the server
-public class ServerLocalSocket : ServerSocket, IDisposable
+public class ServerLocalSocket : ServerSocket
 {
     private readonly Map<ClientLocalSocket, LocalGameClient> clients = new Map<ClientLocalSocket, LocalGameClient>();
     private readonly ConcurrentQueue<ClientLocalSocket> newClients = new ConcurrentQueue<ClientLocalSocket>();
@@ -57,11 +57,6 @@ public class ServerLocalSocket : ServerSocket, IDisposable
     }
 
     public override void Close()
-    {
-        Dispose();
-    }
-    
-    public void Dispose()
     {
     }
 }

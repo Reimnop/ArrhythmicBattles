@@ -30,12 +30,6 @@ public class GameServer : IDisposable
             if (client != null)
             {
                 Player player = new Player(client);
-                
-                // Send handshake packet
-                string handshake = "Hello, client! If you see this handshake, you are connected to the server! :)";
-                byte[] handshakeBytes = Encoding.UTF8.GetBytes(handshake);
-                await player.SendPacketAsync(handshakeBytes);
-
                 players.Add(player);
             }
         }
@@ -44,5 +38,6 @@ public class GameServer : IDisposable
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
     }
 }

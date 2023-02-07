@@ -55,6 +55,7 @@ public class Player : IDisposable
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
         client.Close();
     }
 }

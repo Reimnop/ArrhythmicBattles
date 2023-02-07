@@ -42,6 +42,7 @@ public class ClientLocalSocket : ClientSocket, IDisposable
     {
         // Cancel the receive loop
         cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
         server.RemoveClient(this);
     }
 }
