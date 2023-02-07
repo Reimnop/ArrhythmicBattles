@@ -27,5 +27,11 @@ class Program
         GameClient client = new TcpGameClient(IPAddress.Loopback, 42069);
         TypedPacketTunnel tunnel = new TypedPacketTunnel(client);
         await tunnel.SendAsync(new AuthPacket("TestUser"));
+
+        while (true)
+        {
+            Packet packet = await tunnel.ReceiveAsync();
+            Console.WriteLine(((TextPacket) packet).Text);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using ArrhythmicBattles.Networking.Packets;
 using ArrhythmicBattles.Networking.Server;
 
@@ -19,8 +20,39 @@ public class GameServer : IDisposable
     public async Task Start()
     {
         Task acceptTask = AcceptClientsAsync();
+        Task tickTask = TickAsync();
         
-        await Task.WhenAll(acceptTask);
+        await Task.WhenAll(acceptTask, tickTask);
+    }
+    
+    private async Task TickAsync()
+    {
+        const int tickRate = 20;
+        
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        while (!cancellationTokenSource.IsCancellationRequested)
+        {
+            foreach (Player player in players)
+            {
+                TextPacket textPacket = new TextPacket("Hello World!");
+                await player.NetworkHandler.SendPacketAsync(textPacket);
+            }
+
+            long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            long targetMilliseconds = 1000 / tickRate;
+            long sleepMilliseconds = targetMilliseconds - elapsedMilliseconds;
+            
+            if (sleepMilliseconds > 0)
+            {
+                await Task.Delay((int) sleepMilliseconds);
+            }
+            
+            stopwatch.Restart();
+        }
+        
+        stopwatch.Stop();
     }
 
     private async Task AcceptClientsAsync()
@@ -55,5 +87,6 @@ public class GameServer : IDisposable
     {
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
+        socket.Close();
     }
 }
