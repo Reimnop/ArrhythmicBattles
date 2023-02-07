@@ -5,7 +5,7 @@ namespace ArrhythmicBattles.Networking.Server.Local;
 
 public class ClientLocalSocket : ClientSocket, IDisposable
 {
-    private readonly ConcurrentQueue<ReadOnlyMemory<byte>> queuedPackets = new ConcurrentQueue<ReadOnlyMemory<byte>>(); 
+    private readonly ByteQueue byteQueue = new ByteQueue();
     private readonly ServerLocalSocket server;
     
     private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -17,7 +17,7 @@ public class ClientLocalSocket : ClientSocket, IDisposable
 
     internal ValueTask WriteAsync(ReadOnlyMemory<byte> buffer)
     {
-        queuedPackets.Enqueue(buffer);
+        byteQueue.Enqueue(buffer.ToArray(), 0, buffer.Length);
         return ValueTask.CompletedTask;
     }
 
@@ -26,11 +26,17 @@ public class ClientLocalSocket : ClientSocket, IDisposable
         return server.WriteAsync(this, buffer);
     }
 
-    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
+    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(int length)
     {
-        ReadOnlyMemory<byte> packet = default;
-        await TaskHelper.WaitUntil(() => queuedPackets.TryDequeue(out packet), cancellationToken: cancellationTokenSource.Token);
-        return packet;
+        byte[] buffer = new byte[length == -1 ? byteQueue.Length : length];
+        await TaskHelper.WaitUntil(() => byteQueue.Length >= length, cancellationToken: cancellationTokenSource.Token);
+        byteQueue.Dequeue(buffer, 0, buffer.Length);
+        return buffer;
+    }
+
+    public override string GetName()
+    {
+        return "Local";
     }
 
     public override void Close()

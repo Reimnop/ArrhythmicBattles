@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using ArrhythmicBattles.Networking.Packets;
 using ArrhythmicBattles.Networking.Server;
 
 namespace ArrhythmicBattles.Server;
@@ -31,6 +32,14 @@ public class GameServer : IDisposable
             {
                 Player player = new Player(client);
                 players.Add(player);
+                
+                Console.WriteLine($"Accepted client {client.GetName()}");
+
+                Packet packet = await player.ReceivePacketAsync();
+                if (packet is AuthPacket authPacket)
+                {
+                    Console.WriteLine($"Received auth packet from {authPacket.Username}");
+                }
             }
         }
     }

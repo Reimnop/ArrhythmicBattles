@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net.Sockets;
+using ArrhythmicBattles.Common;
 
 namespace ArrhythmicBattles.Networking.Server.Tcp;
 
@@ -7,6 +8,8 @@ public class ClientTcpSocket : ClientSocket, IDisposable
 {
     private readonly TcpClient client;
     private readonly NetworkStream stream;
+    
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     
     public ClientTcpSocket(TcpClient client)
     {
@@ -19,18 +22,18 @@ public class ClientTcpSocket : ClientSocket, IDisposable
         return stream.WriteAsync(buffer);
     }
 
-    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync()
+    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(int length)
     {
-        if (client.Available == 0)
-        {
-            return ReadOnlyMemory<byte>.Empty;
-        }
-        
-        // I hope the garbage collector doesn't get mad at me for this
-        byte[] buffer = new byte[client.Available];
+        byte[] buffer = new byte[length == -1 ? client.Available : length];
+        await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationTokenSource.Token);
         int bytesRead = await stream.ReadAsync(buffer);
-        Debug.Assert(bytesRead == buffer.Length); // This should never happen (hopefully)
+        Debug.Assert(bytesRead == buffer.Length); // This should never happen
         return buffer;
+    }
+
+    public override string GetName()
+    {
+        return client.Client.RemoteEndPoint!.ToString()!;
     }
 
     public override void Close()
@@ -40,6 +43,8 @@ public class ClientTcpSocket : ClientSocket, IDisposable
     
     public void Dispose()
     {
+        cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
         client.Close();
     }
 }

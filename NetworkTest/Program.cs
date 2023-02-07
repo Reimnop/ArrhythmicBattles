@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text;
+using ArrhythmicBattles.Networking;
 using ArrhythmicBattles.Networking.Client;
+using ArrhythmicBattles.Networking.Packets;
 using ArrhythmicBattles.Networking.Server;
 using ArrhythmicBattles.Networking.Server.Local;
 using ArrhythmicBattles.Networking.Server.Tcp;
@@ -29,14 +31,10 @@ class Program
         Console.WriteLine("Starting client");
 
         GameClient client = new TcpGameClient(IPAddress.Loopback, 19738);
+        TypedPacketTunnel tunnel = new TypedPacketTunnel(client);
         Console.WriteLine("Client connected to server");
         
-        ReadOnlyMemory<byte> buffer = await client.ReceiveAsync();
-        Console.WriteLine($"Client received data from server ({buffer.Length} bytes)");
-        
-        int length = BitConverter.ToInt32(buffer.Span);
-        string message = Encoding.UTF8.GetString(buffer.Span.Slice(4, length));
-        
-        Console.WriteLine($"Client received '{message}'");
+        await tunnel.SendAsync(new AuthPacket("TestUser"));
+        Console.WriteLine("Sent auth packet");
     }
 }

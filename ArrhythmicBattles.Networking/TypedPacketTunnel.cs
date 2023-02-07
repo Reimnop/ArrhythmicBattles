@@ -3,7 +3,7 @@ using ArrhythmicBattles.Networking.Packets;
 
 namespace ArrhythmicBattles.Networking;
 
-public class TypedPacketTunnel : IDisposable
+public class TypedPacketTunnel
 {
     private readonly Map<Identifier, Type> packetTypes = new Map<Identifier, Type>()
     {
@@ -11,12 +11,10 @@ public class TypedPacketTunnel : IDisposable
     };
 
     private readonly ISenderReceiver senderReceiver;
-    private readonly ByteReceiver byteReceiver;
-    
+
     public TypedPacketTunnel(ISenderReceiver senderReceiver)
     {
         this.senderReceiver = senderReceiver;
-        byteReceiver = new ByteReceiver(senderReceiver);
     }
 
     public async Task SendAsync(Packet packet)
@@ -49,10 +47,10 @@ public class TypedPacketTunnel : IDisposable
     
     public async Task<Packet> ReceiveAsync()
     {
-        ReadOnlyMemory<byte> lengthBuffer = await byteReceiver.NextBytesAsync(4);
+        ReadOnlyMemory<byte> lengthBuffer = await senderReceiver.ReceiveAsync(4);
         int packetLength = BitConverter.ToInt32(lengthBuffer.Span);
         
-        ReadOnlyMemory<byte> packetBuffer = await byteReceiver.NextBytesAsync(packetLength);
+        ReadOnlyMemory<byte> packetBuffer = await senderReceiver.ReceiveAsync(packetLength);
         using MemoryStream stream = new MemoryStream(packetBuffer.ToArray());
         BinaryReader reader = new BinaryReader(stream);
         Identifier packetIdentifier = reader.ReadString();
@@ -74,10 +72,5 @@ public class TypedPacketTunnel : IDisposable
         ReadOnlyMemory<byte> packetData = packetBuffer.Slice((int) stream.Position);
         await packet.DeserializeAsync(packetData);
         return packet;
-    }
-
-    public void Dispose()
-    {
-        byteReceiver.Dispose();
     }
 }
