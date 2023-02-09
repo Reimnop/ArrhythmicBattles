@@ -8,6 +8,7 @@ public class TypedPacketTunnel
     private readonly Map<Identifier, Type> packetTypes = new Map<Identifier, Type>()
     {
         { new Identifier("arrhythmicbattles", "auth"), typeof(AuthPacket) },
+        { new Identifier("arrhythmicbattles", "heartbeat"), typeof(HeartbeatPacket) },
         { new Identifier("arrhythmicbattles", "player_list"), typeof(PlayerListPacket) },
         { new Identifier("arrhythmicbattles", "player_join"), typeof(PlayerJoinPacket) },
         { new Identifier("arrhythmicbattles", "player_leave"), typeof(PlayerLeavePacket) }
@@ -48,12 +49,22 @@ public class TypedPacketTunnel
         await senderReceiver.SendAsync(sendBuffer);
     }
     
-    public async Task<Packet> ReceiveAsync()
+    public async Task<Packet?> ReceiveAsync()
     {
         ReadOnlyMemory<byte> lengthBuffer = await senderReceiver.ReceiveAsync(4);
+        if (lengthBuffer.Length == 0)
+        {
+            return null;
+        } 
+        
         int packetLength = BitConverter.ToInt32(lengthBuffer.Span);
         
         ReadOnlyMemory<byte> packetBuffer = await senderReceiver.ReceiveAsync(packetLength);
+        if (packetBuffer.Length == 0)
+        {
+            return null;
+        }
+        
         using MemoryStream stream = new MemoryStream(packetBuffer.ToArray());
         BinaryReader reader = new BinaryReader(stream);
         Identifier packetIdentifier = reader.ReadString();

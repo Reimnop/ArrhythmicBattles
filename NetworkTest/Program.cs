@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using ArrhythmicBattles.Common;
 using ArrhythmicBattles.Networking;
 using ArrhythmicBattles.Networking.Client;
@@ -15,7 +16,7 @@ class Program
 
     private static async Task Client()
     {
-        long id = DateTime.Now.ToBinary();
+        long id = 0;
         
         GameClient client = new TcpGameClient(IPAddress.Loopback, 42069);
         TypedPacketTunnel tunnel = new TypedPacketTunnel(client);
@@ -23,7 +24,17 @@ class Program
 
         while (true)
         {
-            Packet packet = await tunnel.ReceiveAsync();
+            Packet? packet = await tunnel.ReceiveAsync();
+
+            if (packet is null)
+            {
+                break;
+            }
+
+            if (packet is HeartbeatPacket)
+            {
+                Console.WriteLine("Received heartbeat");
+            }
             
             if (packet is PlayerListPacket playerListPacket)
             {

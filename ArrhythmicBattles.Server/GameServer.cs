@@ -35,7 +35,10 @@ public class GameServer : IDisposable
         
         while (!cancellationTokenSource.IsCancellationRequested)
         {
-            await TickAsync();
+            foreach (Player player in players)
+            {
+                await player.TickAsync(1.0f / tickRate);
+            }
 
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             long targetMilliseconds = 1000 / tickRate;
@@ -50,11 +53,6 @@ public class GameServer : IDisposable
         }
         
         stopwatch.Stop();
-    }
-
-    private async Task TickAsync()
-    {
-        
     }
 
     private async Task AcceptClientsAsync()
@@ -73,7 +71,13 @@ public class GameServer : IDisposable
     private async Task HandleClientAsync(ClientSocket clientSocket)
     {
         PlayerNetworkHandler networkHandler = new PlayerNetworkHandler(clientSocket);
-        Packet packet = await networkHandler.ReceivePacketAsync();
+        Packet? packet = await networkHandler.ReceivePacketAsync();
+
+        if (packet is null)
+        {
+            Console.WriteLine($"Client '{clientSocket.GetName()}' disconnected");
+            return;
+        }
 
         if (packet is AuthPacket authPacket)
         {

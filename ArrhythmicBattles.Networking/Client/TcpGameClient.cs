@@ -28,6 +28,12 @@ public class TcpGameClient : GameClient, IDisposable
     {
         byte[] buffer = new byte[length == -1 ? client.Available : length];
         await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationTokenSource.Token);
+
+        if (cancellationTokenSource.IsCancellationRequested)
+        {
+            return ReadOnlyMemory<byte>.Empty; // Return empty memory if the client is disconnected
+        }
+
         int bytesRead = await stream.ReadAsync(buffer);
         Debug.Assert(bytesRead == buffer.Length); // Better safe than sorry
         return buffer;

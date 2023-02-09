@@ -6,13 +6,15 @@ namespace ArrhythmicBattles.Server;
 
 public class PlayerNetworkHandler : IDisposable
 {
-    private readonly TypedPacketTunnel tunnel;
     private readonly ClientSocket client;
+    private readonly TypedPacketTunnel tunnel;
+    private readonly PacketCollector collector;
     
     public PlayerNetworkHandler(ClientSocket client)
     {
         this.client = client;
         tunnel = new TypedPacketTunnel(client);
+        collector = new PacketCollector(tunnel);
     }
     
     public async Task SendPacketAsync(Packet packet)
@@ -20,13 +22,24 @@ public class PlayerNetworkHandler : IDisposable
         await tunnel.SendAsync(packet);
     }
     
-    public async Task<Packet> ReceivePacketAsync()
+    public Task<Packet?> ReceivePacketAsync()
     {
-        return await tunnel.ReceiveAsync();
+        return tunnel.ReceiveAsync();
+    }
+    
+    public Task<T?> ReceivePacketAsync<T>() where T : Packet
+    {
+        return collector.ReceivePacketAsync<T>();
+    }
+    
+    public Task<T?> GetPacketAsync<T>() where T : Packet
+    {
+        return collector.GetPacketAsync<T>();
     }
 
     public void Dispose()
     {
         client.Close();
+        collector.Dispose();
     }
 }

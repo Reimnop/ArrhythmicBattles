@@ -1,4 +1,6 @@
-﻿namespace ArrhythmicBattles.Server;
+﻿using ArrhythmicBattles.Networking.Packets;
+
+namespace ArrhythmicBattles.Server;
 
 public class Player : IDisposable
 {
@@ -6,19 +8,30 @@ public class Player : IDisposable
     public string Username { get; }
     public long Id { get; }
 
-    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+    private float time = 0.0f;
+    private float heartbeatTime = 0.0f;
 
-    internal Player(PlayerNetworkHandler networkHandler, string username, long id)
+    public Player(PlayerNetworkHandler networkHandler, string username, long id)
     {
         NetworkHandler = networkHandler;
         Username = username;
         Id = id;
     }
 
+    public async Task TickAsync(float deltaTime)
+    {
+        time += deltaTime;
+        heartbeatTime += deltaTime;
+
+        if (heartbeatTime >= 5.0f)
+        {
+            heartbeatTime = 0.0f;
+            await NetworkHandler.SendPacketAsync(new HeartbeatPacket());
+        }
+    }
+
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
-        cancellationTokenSource.Dispose();
         NetworkHandler.Dispose();
     }
 }
