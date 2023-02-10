@@ -18,6 +18,9 @@ public class ServerTcpSocket : ServerSocket, IDisposable
         try
         {
             TcpClient client = await listener.AcceptTcpClientAsync();
+            client.ReceiveTimeout = 20000;
+            client.SendTimeout = 20000;
+            client.NoDelay = true;
             return new ClientTcpSocket(client);
         }
         catch (SocketException)

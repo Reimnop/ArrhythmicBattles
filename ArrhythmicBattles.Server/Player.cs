@@ -26,6 +26,8 @@ public class Player : IDisposable
         if (heartbeatTime >= 5.0f)
         {
             heartbeatTime = 0.0f;
+            
+            Console.WriteLine($"Sending heartbeat to {Username} ({Id})");
             await NetworkHandler.SendPacketAsync(new HeartbeatPacket());
         }
     }

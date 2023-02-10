@@ -71,7 +71,7 @@ public class GameServer : IDisposable
     private async Task HandleClientAsync(ClientSocket clientSocket)
     {
         PlayerNetworkHandler networkHandler = new PlayerNetworkHandler(clientSocket);
-        Packet? packet = await networkHandler.ReceivePacketAsync();
+        AuthPacket? packet = await networkHandler.ReceivePacketAsync<AuthPacket>();
 
         if (packet is null)
         {
@@ -79,34 +79,32 @@ public class GameServer : IDisposable
             return;
         }
 
-        if (packet is AuthPacket authPacket)
+        string username = packet.Username;
+        long id = packet.Id;
+        Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}' ({id})");
+
+        // Get player list
+        List<PlayerProfile> playerList =
+            players.Select(player => new PlayerProfile(player.Username, player.Id)).ToList();
+        playerList.Add(new PlayerProfile(username, id));
+
+        PlayerListPacket playerListPacket = new PlayerListPacket(playerList);
+
+        // Send the player list
+        await networkHandler.SendPacketAsync(playerListPacket);
+
+        // Send other clients player list and join packet
+        PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(id);
+        foreach (Player player1 in players)
         {
-            string username = authPacket.Username;
-            long id = authPacket.Id;
-            Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}' ({id})");
-
-            // Get player list
-            List<PlayerProfile> playerList = players.Select(player => new PlayerProfile(player.Username, player.Id)).ToList();
-            playerList.Add(new PlayerProfile(username, id));
-
-            PlayerListPacket playerListPacket = new PlayerListPacket(playerList);
-            
-            // Send the player list
-            await networkHandler.SendPacketAsync(playerListPacket);
-            
-            // Send other clients player list and join packet
-            PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(id);
-            foreach (Player player1 in players)
-            {
-                await player1.NetworkHandler.SendPacketAsync(playerListPacket);
-                await player1.NetworkHandler.SendPacketAsync(playerJoinPacket);
-            }
-
-            Player player = new Player(networkHandler, username, id);
-            players.Add(player);
+            await player1.NetworkHandler.SendPacketAsync(playerListPacket);
+            await player1.NetworkHandler.SendPacketAsync(playerJoinPacket);
         }
+
+        Player player = new Player(networkHandler, username, id);
+        players.Add(player);
     }
-    
+
     public void Dispose()
     {
         cancellationTokenSource.Cancel();

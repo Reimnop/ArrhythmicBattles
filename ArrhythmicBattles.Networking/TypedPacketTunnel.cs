@@ -58,13 +58,12 @@ public class TypedPacketTunnel
         } 
         
         int packetLength = BitConverter.ToInt32(lengthBuffer.Span);
-        
         ReadOnlyMemory<byte> packetBuffer = await senderReceiver.ReceiveAsync(packetLength);
         if (packetBuffer.Length == 0)
         {
             return null;
         }
-        
+
         using MemoryStream stream = new MemoryStream(packetBuffer.ToArray());
         BinaryReader reader = new BinaryReader(stream);
         Identifier packetIdentifier = reader.ReadString();

@@ -15,6 +15,9 @@ public class TcpGameClient : GameClient, IDisposable
     public TcpGameClient(IPAddress address, int port)
     {
         client = new TcpClient();
+        client.ReceiveTimeout = 20000;
+        client.SendTimeout = 20000;
+        client.NoDelay = true;
         client.Connect(address, port);
         stream = client.GetStream();
     }

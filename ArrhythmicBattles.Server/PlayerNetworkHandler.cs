@@ -21,12 +21,7 @@ public class PlayerNetworkHandler : IDisposable
     {
         await tunnel.SendAsync(packet);
     }
-    
-    public Task<Packet?> ReceivePacketAsync()
-    {
-        return tunnel.ReceiveAsync();
-    }
-    
+
     public Task<T?> ReceivePacketAsync<T>() where T : Packet
     {
         return collector.ReceivePacketAsync<T>();
