@@ -11,6 +11,8 @@ public class GameServer : IDisposable
     private readonly List<Player> players = new List<Player>();
     private readonly ServerSocket socket;
     
+    private readonly List<Player> playersToRemove = new List<Player>();
+
     private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public GameServer(ServerSocket socket)
@@ -35,6 +37,12 @@ public class GameServer : IDisposable
         
         while (!cancellationTokenSource.IsCancellationRequested)
         {
+            foreach (Player player in playersToRemove)
+            {
+                players.Remove(player);
+            }
+            playersToRemove.Clear();
+            
             foreach (Player player in players)
             {
                 await player.TickAsync(1.0f / tickRate);
@@ -66,6 +74,13 @@ public class GameServer : IDisposable
                 _ = HandleClientAsync(client);
             }
         }
+    }
+    
+    public Task DisconnectPlayerAsync(Player player)
+    {
+        player.Dispose();
+        playersToRemove.Add(player);
+        return Task.CompletedTask;
     }
 
     private async Task HandleClientAsync(ClientSocket clientSocket)
@@ -101,7 +116,7 @@ public class GameServer : IDisposable
             await player1.NetworkHandler.SendPacketAsync(playerJoinPacket);
         }
 
-        Player player = new Player(networkHandler, username, id);
+        Player player = new Player(this, networkHandler, username, id);
         players.Add(player);
     }
 

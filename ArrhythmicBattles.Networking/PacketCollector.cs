@@ -4,12 +4,10 @@ using ArrhythmicBattles.Networking.Packets;
 
 namespace ArrhythmicBattles.Networking;
 
-public class PacketCollector : IDisposable
+public class PacketCollector
 {
     private readonly TypedPacketTunnel tunnel;
     private readonly Dictionary<Type, ConcurrentQueue<Packet>> packetQueues = new Dictionary<Type, ConcurrentQueue<Packet>>();
-    
-    private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public PacketCollector(TypedPacketTunnel tunnel)
     {
@@ -34,15 +32,13 @@ public class PacketCollector : IDisposable
             }
         }
         while (packet != null);
-        
-        cancellationTokenSource.Cancel();
     }
     
     // This waits for a packet of the given type to be received
-    public async Task<T?> ReceivePacketAsync<T>() where T : Packet
+    public async Task<T?> ReceivePacketAsync<T>(CancellationToken cancellationToken = default) where T : Packet
     {
         Packet? packet = null;
-        await TaskHelper.WaitUntil(() => packetQueues.TryGetValue(typeof(T), out ConcurrentQueue<Packet>? queue) && queue.TryDequeue(out packet), cancellationToken: cancellationTokenSource.Token);
+        await TaskHelper.WaitUntil(() => packetQueues.TryGetValue(typeof(T), out ConcurrentQueue<Packet>? queue) && queue.TryDequeue(out packet), cancellationToken: cancellationToken);
         return (T?) packet;
     }
     
@@ -55,11 +51,5 @@ public class PacketCollector : IDisposable
         }
         
         return Task.FromResult((T?) null);
-    }
-    
-    public void Dispose()
-    {
-        cancellationTokenSource.Cancel();
-        cancellationTokenSource.Dispose();
     }
 }

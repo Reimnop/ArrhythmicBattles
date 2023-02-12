@@ -2,4 +2,11 @@
 using ArrhythmicBattles.Server;
 
 using GameServer gameServer = new GameServer(new ServerTcpSocket(42069));
-gameServer.Start().GetAwaiter().GetResult();
+Task task = gameServer.Start();
+task.Wait();
+
+// Throw exception if task is faulted
+if (task.IsFaulted)
+{
+    throw task.Exception!;
+}

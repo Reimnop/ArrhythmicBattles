@@ -8,9 +8,7 @@ public class LocalGameClient : GameClient, IDisposable
 {
     private readonly ByteQueue byteQueue = new ByteQueue();
     private readonly ServerLocalSocket server;
-    
-    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-    
+
     public LocalGameClient(ServerLocalSocket server)
     {
         this.server = server;
@@ -22,15 +20,15 @@ public class LocalGameClient : GameClient, IDisposable
         return ValueTask.CompletedTask;
     }
     
-    public override ValueTask SendAsync(ReadOnlyMemory<byte> buffer)
+    public override async Task SendAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        return server.WriteAsync(this, buffer);
+        await server.WriteAsync(this, buffer);
     }
 
-    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(int length)
+    public override async Task<ReadOnlyMemory<byte>> ReceiveAsync(int length, CancellationToken cancellationToken = default)
     {
         byte[] buffer = new byte[length == -1 ? byteQueue.Length : length];
-        await TaskHelper.WaitUntil(() => byteQueue.Length >= length, cancellationToken: cancellationTokenSource.Token);
+        await TaskHelper.WaitUntil(() => byteQueue.Length >= length, cancellationToken: cancellationToken);
         byteQueue.Dequeue(buffer);
         return buffer;
     }
@@ -42,8 +40,6 @@ public class LocalGameClient : GameClient, IDisposable
 
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
-        cancellationTokenSource.Dispose();
         server.RemoveClient(this);
     }
 }

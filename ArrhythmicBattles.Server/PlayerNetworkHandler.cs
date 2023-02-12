@@ -19,7 +19,8 @@ public class PlayerNetworkHandler : IDisposable
     
     public async Task SendPacketAsync(Packet packet)
     {
-        await tunnel.SendAsync(packet);
+        using CancellationTokenSource cts = new CancellationTokenSource(20000);
+        await tunnel.SendAsync(packet, cts.Token);
     }
 
     public Task<T?> ReceivePacketAsync<T>() where T : Packet
@@ -35,6 +36,5 @@ public class PlayerNetworkHandler : IDisposable
     public void Dispose()
     {
         client.Close();
-        collector.Dispose();
     }
 }

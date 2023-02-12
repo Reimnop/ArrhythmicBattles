@@ -21,7 +21,7 @@ public class TypedPacketTunnel
         this.senderReceiver = senderReceiver;
     }
 
-    public async Task SendAsync(Packet packet)
+    public async Task SendAsync(Packet packet, CancellationToken cancellationToken = default)
     {
         // Serialize the packet
         byte[] packetBytes;
@@ -46,7 +46,7 @@ public class TypedPacketTunnel
             sendBuffer = stream.ToArray();
         }
 
-        await senderReceiver.SendAsync(sendBuffer);
+        await senderReceiver.SendAsync(sendBuffer, cancellationToken);
     }
     
     public async Task<Packet?> ReceiveAsync()

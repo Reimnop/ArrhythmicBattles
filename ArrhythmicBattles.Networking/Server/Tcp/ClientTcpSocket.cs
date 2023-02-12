@@ -8,25 +8,23 @@ public class ClientTcpSocket : ClientSocket, IDisposable
 {
     private readonly TcpClient client;
     private readonly NetworkStream stream;
-    
-    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-    
+
     public ClientTcpSocket(TcpClient client)
     {
         this.client = client;
         stream = client.GetStream();
     }
     
-    public override ValueTask SendAsync(ReadOnlyMemory<byte> buffer)
+    public override async Task SendAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        return stream.WriteAsync(buffer);
+        await stream.WriteAsync(buffer, cancellationToken);
     }
 
-    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(int length)
+    public override async Task<ReadOnlyMemory<byte>> ReceiveAsync(int length, CancellationToken cancellationToken = default)
     {
         byte[] buffer = new byte[length == -1 ? client.Available : length];
-        await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationTokenSource.Token);
-        int bytesRead = await stream.ReadAsync(buffer);
+        await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationToken);
+        int bytesRead = await stream.ReadAsync(buffer, cancellationToken);
         Debug.Assert(bytesRead == buffer.Length); // This should never happen
         return buffer;
     }
@@ -43,8 +41,6 @@ public class ClientTcpSocket : ClientSocket, IDisposable
     
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
-        cancellationTokenSource.Dispose();
         client.Close();
     }
 }

@@ -9,9 +9,7 @@ public class TcpGameClient : GameClient, IDisposable
 {
     private readonly TcpClient client;
     private readonly NetworkStream stream;
-    
-    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-    
+
     public TcpGameClient(IPAddress address, int port)
     {
         client = new TcpClient();
@@ -22,22 +20,16 @@ public class TcpGameClient : GameClient, IDisposable
         stream = client.GetStream();
     }
     
-    public override ValueTask SendAsync(ReadOnlyMemory<byte> buffer)
+    public override async Task SendAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
     {
-        return stream.WriteAsync(buffer);
+        await stream.WriteAsync(buffer, cancellationToken);
     }
 
-    public override async ValueTask<ReadOnlyMemory<byte>> ReceiveAsync(int length)
+    public override async Task<ReadOnlyMemory<byte>> ReceiveAsync(int length, CancellationToken cancellationToken = default)
     {
         byte[] buffer = new byte[length == -1 ? client.Available : length];
-        await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationTokenSource.Token);
-
-        if (cancellationTokenSource.IsCancellationRequested)
-        {
-            return ReadOnlyMemory<byte>.Empty; // Return empty memory if the client is disconnected
-        }
-
-        int bytesRead = await stream.ReadAsync(buffer);
+        await TaskHelper.WaitUntil(() => client.Available >= buffer.Length, cancellationToken: cancellationToken);
+        int bytesRead = await stream.ReadAsync(buffer, cancellationToken);
         Debug.Assert(bytesRead == buffer.Length); // Better safe than sorry
         return buffer;
     }
@@ -49,7 +41,6 @@ public class TcpGameClient : GameClient, IDisposable
 
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
         client.Dispose();
     }
 }
