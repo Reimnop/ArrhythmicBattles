@@ -92,6 +92,13 @@ public class NetworkHandler : IDisposable
         }
     }
 
+    public async Task<Packet?> ReceivePacketAsync()
+    {
+        EventListener<Packet> listener = new EventListener<Packet>(PacketReceived);
+        await TaskHelper.WaitUntil(() => listener.IsCompleted, cancellationToken: cancellationTokenSource.Token);
+        return listener.Result;
+    }
+    
     public async Task<T?> ReceivePacketAsync<T>() where T : Packet
     {
         Packet? packet = null;

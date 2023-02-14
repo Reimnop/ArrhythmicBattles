@@ -41,12 +41,19 @@ class Program
 
         while (true)
         {
-            HeartbeatPacket? heartbeatPacket = await networkHandler.GetPacketAsync<HeartbeatPacket>();
-            PlayerLeavePacket? playerLeavePacket = await networkHandler.GetPacketAsync<PlayerLeavePacket>();
-            PlayerListPacket? playerListPacket = await networkHandler.GetPacketAsync<PlayerListPacket>();
-            PlayerJoinPacket? playerJoinPacket = await networkHandler.GetPacketAsync<PlayerJoinPacket>();
+            Packet? packet = await networkHandler.ReceivePacketAsync();
+            
+            if (packet is null)
+            {
+                Console.WriteLine("Received null packet, disconnecting");
+                break;
+            }
 
-            if (heartbeatPacket != null)
+            PlayerLeavePacket? playerLeavePacket = packet as PlayerLeavePacket;
+            PlayerListPacket? playerListPacket = packet as PlayerListPacket;
+            PlayerJoinPacket? playerJoinPacket = packet as PlayerJoinPacket;
+
+            if (packet is HeartbeatPacket)
             {
                 Console.WriteLine("Received heartbeat");
             }
