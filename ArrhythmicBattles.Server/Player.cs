@@ -52,7 +52,7 @@ public class Player : IDisposable
             heartbeatTime = 0.0f;
 
             Console.WriteLine($"Sending heartbeat to {Username} ({Id})");
-            NetworkHandler.SendPacket(new HeartbeatPacket());
+            await NetworkHandler.SendPacketAsync(new HeartbeatPacket());
             
             Exception? exception = NetworkHandler.GetException();
             if (exception != null)

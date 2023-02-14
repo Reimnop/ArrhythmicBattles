@@ -98,8 +98,8 @@ public class GameServer : IDisposable
         PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(player.Id!.Value);
         foreach (Player serverPlayer in players)
         {
-            serverPlayer.NetworkHandler.SendPacket(playerListPacket);
-            serverPlayer.NetworkHandler.SendPacket(playerJoinPacket);
+            await serverPlayer.NetworkHandler.SendPacketAsync(playerListPacket);
+            await serverPlayer.NetworkHandler.SendPacketAsync(playerJoinPacket);
         }
     }
 

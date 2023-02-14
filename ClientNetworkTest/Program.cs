@@ -23,7 +23,7 @@ class Program
         NetworkHandler networkHandler = new NetworkHandler(client);
 
         Console.WriteLine("Sending auth packet");
-        networkHandler.SendPacket(new AuthPacket($"TestUser-{id}", id));
+        await networkHandler.SendPacketAsync(new AuthPacket($"TestUser-{id}", id));
         Console.WriteLine("Auth packet sent, waiting for packets");
 
         Stopwatch stopwatch = new Stopwatch();

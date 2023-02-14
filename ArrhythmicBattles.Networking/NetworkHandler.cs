@@ -7,22 +7,47 @@ namespace ArrhythmicBattles.Networking;
 
 public class NetworkHandler : IDisposable
 {
+    private struct EventListener<T>
+    {
+        public bool IsCompleted => result != null;
+        public T? Result => result;
+        
+        private T? result = default;
+        private readonly AsyncEvent<T> asyncEvent;
+        
+        public EventListener(AsyncEvent<T> asyncEvent)
+        {
+            this.asyncEvent = asyncEvent;
+            
+            result = default;
+            asyncEvent.AddCallback(OnEvent);
+        }
+
+        private Task OnEvent(object sender, T args)
+        {
+            result = args;
+            asyncEvent.RemoveCallback(OnEvent);
+            return Task.CompletedTask;
+        }
+    }
+    
     public AsyncEvent<Packet> PacketReceived { get; } = new AsyncEvent<Packet>();
 
     private readonly TypedPacketTunnel tunnel;
-    private readonly PacketCollector collector;
     private readonly ConcurrentQueue<Packet> queuedOutgoingPackets = new ConcurrentQueue<Packet>();
-    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     
+    private readonly Dictionary<Type, AsyncCallback<Packet>> packetHandlers = new Dictionary<Type, AsyncCallback<Packet>>();
+
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+    private readonly Task receivePacketLoopTask;
     private readonly Task sendPacketLoopTask;
 
     public NetworkHandler(ISenderReceiver senderReceiver)
     {
         tunnel = new TypedPacketTunnel(senderReceiver);
-        collector = new PacketCollector(tunnel);
-        
+
+        receivePacketLoopTask = Task.Run(ReceivePacketLoopAsync);
         sendPacketLoopTask = Task.Run(SendPacketLoopAsync);
-        collector.PacketReceived.AddCallback(OnPacketReceived);
     }
     
     public Exception? GetException()
@@ -32,20 +57,26 @@ public class NetworkHandler : IDisposable
             return sendPacketLoopTask.Exception;
         }
         
-        Exception? collectorException = collector.GetException();
-        if (collectorException != null)
+        if (receivePacketLoopTask.IsFaulted)
         {
-            return collectorException;
+            return receivePacketLoopTask.Exception;
         }
-
+        
         return null;
     }
     
-    private async Task OnPacketReceived(object sender, Packet packet)
+    private async Task ReceivePacketLoopAsync()
     {
-        await PacketReceived.InvokeAsync(this, packet);
+        while (!cancellationTokenSource.IsCancellationRequested)
+        {
+            Packet? packet = await tunnel.ReceiveAsync();
+            if (packet != null)
+            {
+                await PacketReceived.InvokeAsync(this, packet);
+            }
+        }
     }
-    
+
     private async Task SendPacketLoopAsync()
     {
         while (!cancellationTokenSource.IsCancellationRequested)
@@ -60,26 +91,37 @@ public class NetworkHandler : IDisposable
             }
         }
     }
-    
-    public void SendPacket(Packet packet)
+
+    public async Task<T?> ReceivePacketAsync<T>() where T : Packet
     {
-        queuedOutgoingPackets.Enqueue(packet);
+        Packet? packet = null;
+        do
+        {
+            EventListener<Packet> listener = new EventListener<Packet>(PacketReceived);
+            await TaskHelper.WaitUntil(() => listener.IsCompleted, cancellationToken: cancellationTokenSource.Token);
+            packet = listener.Result;
+        }
+        while (packet != null && packet.GetType() != typeof(T) && !cancellationTokenSource.IsCancellationRequested);
+        
+        return (T?) packet;
     }
 
-    public Task<T?> ReceivePacketAsync<T>() where T : Packet
+    /// <param name="shouldBlock">If true, the packet will be sent immediately. If false, the packet will be queued and sent in the background.</param>
+    public async Task SendPacketAsync(Packet packet, bool shouldBlock = false)
     {
-        return collector.ReceivePacketAsync<T>();
-    }
-    
-    public Task<T?> GetPacketAsync<T>() where T : Packet
-    {
-        return collector.GetPacketAsync<T>();
+        if (!shouldBlock)
+        {
+            using CancellationTokenSource cts = new CancellationTokenSource(20000);
+            await tunnel.SendAsync(packet, cts.Token);
+            return;
+        }
+        
+        queuedOutgoingPackets.Enqueue(packet);
     }
 
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
-        collector.Dispose();
     }
 }
