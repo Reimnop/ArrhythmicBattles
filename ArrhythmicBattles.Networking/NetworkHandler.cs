@@ -7,7 +7,7 @@ namespace ArrhythmicBattles.Networking;
 
 public class NetworkHandler : IDisposable
 {
-    private struct EventListener<T>
+    private class EventListener<T>
     {
         public bool IsCompleted => result != null;
         public T? Result => result;
@@ -52,16 +52,16 @@ public class NetworkHandler : IDisposable
     
     public Exception? GetException()
     {
-        if (sendPacketLoopTask.IsFaulted)
-        {
-            return sendPacketLoopTask.Exception;
-        }
-        
         if (receivePacketLoopTask.IsFaulted)
         {
             return receivePacketLoopTask.Exception;
         }
         
+        if (sendPacketLoopTask.IsFaulted)
+        {
+            return sendPacketLoopTask.Exception;
+        }
+
         return null;
     }
     
