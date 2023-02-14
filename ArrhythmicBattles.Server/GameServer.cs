@@ -85,39 +85,22 @@ public class GameServer : IDisposable
 
     private async Task HandleClientAsync(ClientSocket clientSocket)
     {
-        PlayerNetworkHandler networkHandler = new PlayerNetworkHandler(clientSocket);
-        AuthPacket? packet = await networkHandler.ReceivePacketAsync<AuthPacket>();
-
-        if (packet is null)
-        {
-            Console.WriteLine($"Client '{clientSocket.GetName()}' disconnected");
-            return;
-        }
-
-        string username = packet.Username;
-        long id = packet.Id;
-        Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{username}' ({id})");
-
+        Player player = new Player(this, clientSocket);
+        players.Add(player);
+        await player.AuthenticateAsync();
+        Debug.Assert(player.Authenticated);
+        
         // Get player list
-        List<PlayerProfile> playerList =
-            players.Select(player => new PlayerProfile(player.Username, player.Id)).ToList();
-        playerList.Add(new PlayerProfile(username, id));
-
+        List<PlayerProfile> playerList = players.Select(x => new PlayerProfile(x.Username!, x.Id!.Value)).ToList();
         PlayerListPacket playerListPacket = new PlayerListPacket(playerList);
 
-        // Send the player list
-        await networkHandler.SendPacketAsync(playerListPacket);
-
-        // Send other clients player list and join packet
-        PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(id);
-        foreach (Player player1 in players)
+        // Send all clients player list and join packet
+        PlayerJoinPacket playerJoinPacket = new PlayerJoinPacket(player.Id!.Value);
+        foreach (Player serverPlayer in players)
         {
-            await player1.NetworkHandler.SendPacketAsync(playerListPacket);
-            await player1.NetworkHandler.SendPacketAsync(playerJoinPacket);
+            serverPlayer.NetworkHandler.SendPacket(playerListPacket);
+            serverPlayer.NetworkHandler.SendPacket(playerJoinPacket);
         }
-
-        Player player = new Player(this, networkHandler, username, id);
-        players.Add(player);
     }
 
     public void Dispose()

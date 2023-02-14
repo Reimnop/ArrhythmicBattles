@@ -1,24 +1,45 @@
-﻿using ArrhythmicBattles.Networking.Packets;
+﻿using ArrhythmicBattles.Networking;
+using ArrhythmicBattles.Networking.Packets;
+using ArrhythmicBattles.Networking.Server;
 
 namespace ArrhythmicBattles.Server;
 
 public class Player : IDisposable
 {
-    public PlayerNetworkHandler NetworkHandler { get; }
-    public string Username { get; }
-    public long Id { get; }
+    public NetworkHandler NetworkHandler { get; }
+    public string? Username { get; private set; }
+    public long? Id { get; private set; }
+    public bool Authenticated { get; private set; } = false;
     
     private readonly GameServer server;
+    private readonly ClientSocket clientSocket;
 
     private float time = 0.0f;
     private float heartbeatTime = 0.0f;
 
-    public Player(GameServer server, PlayerNetworkHandler networkHandler, string username, long id)
+    public Player(GameServer server, ClientSocket clientSocket)
     {
         this.server = server;
-        NetworkHandler = networkHandler;
-        Username = username;
-        Id = id;
+        this.clientSocket = clientSocket;
+        NetworkHandler = new NetworkHandler(clientSocket);
+    }
+
+    public async Task AuthenticateAsync()
+    {
+        Console.WriteLine("Waiting for authentication packet...");
+        AuthPacket? packet = await NetworkHandler.ReceivePacketAsync<AuthPacket>();
+
+        if (packet is null)
+        {
+            Console.WriteLine($"Client '{clientSocket.GetName()}' sent invalid packet, disconnecting");
+            await server.DisconnectPlayerAsync(this);
+            return;
+        }
+
+        Username = packet.Username;
+        Id = packet.Id;
+        Authenticated = true;
+        Console.WriteLine($"Client '{clientSocket.GetName()}' authenticated as '{Username}' (ID: {Id})");
     }
 
     public async Task TickAsync(float deltaTime)
@@ -30,14 +51,13 @@ public class Player : IDisposable
         {
             heartbeatTime = 0.0f;
 
-            try
+            Console.WriteLine($"Sending heartbeat to {Username} ({Id})");
+            NetworkHandler.SendPacket(new HeartbeatPacket());
+            
+            Exception? exception = NetworkHandler.GetException();
+            if (exception != null)
             {
-                Console.WriteLine($"Sending heartbeat to {Username} ({Id})");
-                await NetworkHandler.SendPacketAsync(new HeartbeatPacket());
-            }
-            catch (Exception)
-            {
-                Console.WriteLine($"Failed to send heartbeat to {Username} ({Id}), disconnecting client");
+                Console.WriteLine($"Exception in {Username} ({Id}): {exception}");
                 await server.DisconnectPlayerAsync(this);
             }
         }
@@ -46,5 +66,6 @@ public class Player : IDisposable
     public void Dispose()
     {
         NetworkHandler.Dispose();
+        clientSocket.Close();
     }
 }

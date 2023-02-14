@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles.Networkin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrhythmicBattles.Common", "ArrhythmicBattles.Common\ArrhythmicBattles.Common.csproj", "{2960E67B-4618-4E60-A8F9-36070D4EAE3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkTest", "NetworkTest\NetworkTest.csproj", "{0564B712-8A53-4F79-910B-E92CA04FEE5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetworkTest", "ClientNetworkTest\ClientNetworkTest.csproj", "{0564B712-8A53-4F79-910B-E92CA04FEE5D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABDedicatedServer", "ABDedicatedServer\ABDedicatedServer.csproj", "{12FFE98D-EDA4-4269-9311-23CAB63FCE52}"
 EndProject
