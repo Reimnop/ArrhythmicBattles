@@ -6,6 +6,9 @@ public static class Utils
 {
     public static void LinkNodesWrapAroundVertical(params NavNode[] nodes)
     {
+        if (nodes.Length == 0)
+            return;
+
         nodes[0].Top = nodes[^1];
         nodes[0].Bottom = nodes[1];
         

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
-using FlexFramework.Core.EntitySystem.Default;
+using FlexFramework.Core.System.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering.Data;
@@ -58,8 +58,8 @@ public class MainMenuScene : ABScene
 
         copyrightText = new TextEntity(Engine, Engine.TextResources.GetFont("inconsolata-small"));
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
-        // copyrightText.Text = "Copyright Arrhythmic Battles 2022\nThis project is Free Software under the GPLv3";
-        copyrightText.Text = "Luce, do not.\nLuce, your status.";
+        copyrightText.Text = "Version 0.0.1 BETA\n© 2021 Arrhythmic Battles"; // TODO: It's not 2021 anymore
+        // copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
         // Init input
         inputInfo = Context.InputSystem.GetInputInfo();

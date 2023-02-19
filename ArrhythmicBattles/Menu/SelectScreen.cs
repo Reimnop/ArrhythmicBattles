@@ -16,7 +16,7 @@ public class SelectScreen : MenuScreen
     protected override void InitUI()
     {
         CreateButton("SINGLEPLAYER", DefaultColor, () => Engine.LoadScene(new GameScene(Scene.Context)));
-        CreateButton("MULTIPLAYER", DefaultColor, () => { });
+        CreateButton("MULTIPLAYER", DefaultColor, () => Scene.SwitchScreen(this, new MultiplayerScreen(Engine, Scene, InputInfo)));
         CreateButton("SETTINGS", DefaultColor, () => Scene.SwitchScreen(this, new SettingsScreen(Engine, Scene, InputInfo)));
         CreateButton("CREDITS", DefaultColor, () => Scene.SwitchScreen(this, new CreditsScreen(Engine, Scene, InputInfo)));
         CreateButton("EXIT", ExitColor, () => Scene.CloseScreen(this));

@@ -1,10 +1,10 @@
 ﻿using System.Drawing;
 using FlexFramework;
-using FlexFramework.Core.EntitySystem;
+using FlexFramework.Core.System;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.EntitySystem.Default;
+namespace FlexFramework.Core.System.Entities;
 
 public abstract class UIElement : Entity
 {

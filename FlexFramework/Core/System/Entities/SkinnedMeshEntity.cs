@@ -2,14 +2,16 @@
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.EntitySystem.Default;
+namespace FlexFramework.Core.System.Entities;
 
-public class LitMeshEntity : Entity, IRenderable
+public class SkinnedMeshEntity : Entity, IRenderable
 {
-    public IndexedMesh<LitVertex>? Mesh { get; set; }
+    public IndexedMesh<SkinnedVertex>? Mesh { get; set; }
     public Texture2D? Texture { get; set; }
+    public Matrix4[]? Bones { get; set; }
     public Color4 Color { get; set; } = Color4.White;
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
@@ -20,8 +22,8 @@ public class LitMeshEntity : Entity, IRenderable
         }
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh.VertexArray, Mesh.Count, matrixStack.GlobalTransformation, transformation, Texture, Color);
-
+        SkinnedVertexDrawData vertexDrawData = new SkinnedVertexDrawData(Mesh.VertexArray, Mesh.Count, matrixStack.GlobalTransformation, transformation, Texture, Bones, Color);
+        
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }
 }

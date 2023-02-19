@@ -22,8 +22,8 @@ public class GameServer : IDisposable
 
     public async Task Start()
     {
-        Task acceptTask = AcceptClientsAsync();
-        Task tickTask = TickLoopAsync();
+        Task acceptTask = Task.Run(AcceptClientsAsync);
+        Task tickTask = Task.Run(TickLoopAsync);
         
         await Task.WhenAll(acceptTask, tickTask);
     }

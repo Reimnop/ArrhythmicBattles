@@ -67,7 +67,7 @@ public class Bundle : IDisposable
     public object GetAsset(string name)
     {
         // if the asset is not loaded, load it
-        if (stream != null && assetLocations.TryGetValue(name, out AssetLocation? location))
+        if (stream != null && assetLocations.TryGetValue(name, out AssetLocation location))
         {
             SubStream subStream = new SubStream(stream, location.Offset, location.Size);
             object asset = assetFactory.ReadAsset(location.Type, subStream);

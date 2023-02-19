@@ -1,13 +1,13 @@
 ﻿using FlexFramework;
 using FlexFramework.Core.Data;
-using FlexFramework.Core.EntitySystem;
+using FlexFramework.Core.System;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.EntitySystem.Default;
+namespace FlexFramework.Core.System.Entities;
 
 public enum ImageMode
 {

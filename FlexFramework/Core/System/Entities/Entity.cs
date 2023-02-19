@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using FlexFramework.Core.Util;
 
-namespace FlexFramework.Core.EntitySystem;
+namespace FlexFramework.Core.System.Entities;
 
 public abstract class Entity
 {

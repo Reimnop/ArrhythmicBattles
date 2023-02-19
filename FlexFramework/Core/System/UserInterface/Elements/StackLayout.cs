@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.UserInterface.Elements;
+﻿namespace FlexFramework.Core.System.UserInterface.Elements;
 
 public class StackLayout : Element
 {
@@ -28,6 +28,9 @@ public class StackLayout : Element
             
             // Calculate the actual child bounds
             Bounds childBounds = child.CalculateBounds(childParentBounds);
+            
+            // Expand child bounds to fill the parent bounds
+            childBounds.Width = childParentBounds.Width;
             
             // Add the child drawables
             child.BuildDrawables(drawables, childBounds);

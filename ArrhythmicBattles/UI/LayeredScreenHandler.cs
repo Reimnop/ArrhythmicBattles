@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.EntitySystem;
+﻿using FlexFramework.Core.System;
+using FlexFramework.Core.System.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
 

@@ -5,7 +5,7 @@ using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 using Textwriter;
 
-namespace FlexFramework.Core.EntitySystem.Default;
+namespace FlexFramework.Core.System.Entities;
 
 public class TextEntity : Entity, IRenderable, IDisposable
 {
@@ -95,7 +95,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
             .WithHorizontalAlignment(horizontalAlignment)
             .WithVerticalAlignment(verticalAlignment)
             .AddText(new StyledText(text, font)
-                .WithColor(System.Drawing.Color.White));
+                .WithColor(global::System.Drawing.Color.White));
         
         TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         

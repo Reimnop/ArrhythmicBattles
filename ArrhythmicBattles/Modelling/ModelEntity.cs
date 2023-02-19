@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using ArrhythmicBattles.Modelling.Animate;
 using ArrhythmicBattles.Util;
-using FlexFramework.Core.EntitySystem;
-using FlexFramework.Core.EntitySystem.Default;
+using FlexFramework.Core.System;
+using FlexFramework.Core.System.Entities;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;

@@ -3,7 +3,7 @@
 /// <summary>
 /// Stores the location of an asset in an asset bundle
 /// </summary>
-public class AssetLocation
+public struct AssetLocation
 {
     public string Type { get; set; }
     public long Offset { get; set; }

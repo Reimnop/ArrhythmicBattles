@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.UserInterface;
+﻿namespace FlexFramework.Core.System.UserInterface;
 
 public enum Unit
 {

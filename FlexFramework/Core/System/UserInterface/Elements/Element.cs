@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.UserInterface.Elements;
+﻿namespace FlexFramework.Core.System.UserInterface.Elements;
 
 public abstract class Element
 {

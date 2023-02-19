@@ -1,4 +1,8 @@
-﻿using ArrhythmicBattles.Game;
+﻿// Skip the menu and go straight to the game
+// #define DEBUG_SKIP_MENU
+
+// TODO: Move half of this project to the engine
+
 using FlexFramework;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Text;
@@ -6,7 +10,6 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using ArrhythmicBattles.Menu;
-using DiscordRPC.Logging;
 using FlexFramework.Logging;
 using log4net;
 using log4net.Config;
@@ -50,9 +53,8 @@ public class Program
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
             new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
         
-#if DEBUG
+#if DEBUG && DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
-        flexFramework.VSync = VSyncMode.Off;
 #else
         flexFramework.LoadScene(new MainMenuScene(context));
 #endif
