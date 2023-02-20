@@ -7,12 +7,12 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Drawables;
 
-public class BoundingBoxDrawable : IRenderable
+public class BoundingBoxRenderable : IRenderable
 {
     private readonly Mesh<Vertex> mesh;
     private readonly Bounds bounds;
     
-    public BoundingBoxDrawable(FlexFrameworkMain engine, Bounds bounds)
+    public BoundingBoxRenderable(FlexFrameworkMain engine, Bounds bounds)
     {
         this.bounds = bounds;
         

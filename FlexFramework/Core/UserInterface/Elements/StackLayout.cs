@@ -14,7 +14,7 @@ public class StackLayout : Element
     public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds elementBounds)
     {
 #if DEBUG && DEBUG_SHOW_BOUNDING_BOXES // Add bounding box drawable if in debug mode
-        renderables.Add(new BoundingBoxDrawable(engine, elementBounds));
+        renderables.Add(new BoundingBoxRenderable(engine, elementBounds));
 #endif
         
         // Get the bounds of this element content area
