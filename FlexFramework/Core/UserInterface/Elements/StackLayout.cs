@@ -1,4 +1,5 @@
 ﻿using FlexFramework.Core.UserInterface.Renderables;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -15,13 +16,14 @@ public class StackLayout : Element
     {
         Bounds boundingBox = CalculateBoundingBox(constraintBounds);
         Bounds elementBounds = CalculateElementBounds(boundingBox);
+        Bounds contentBounds = CalculateContentBounds(elementBounds);
         
 #if DEBUG && DEBUG_SHOW_BOUNDING_BOXES // Add bounding box drawable if in debug mode
-        renderables.Add(new BoundingBoxRenderable(engine, boundingBox));
+        renderables.Add(new BoundingBoxRenderable(engine, boundingBox, Color4.White));
+        renderables.Add(new BoundingBoxRenderable(engine, elementBounds, Color4.Red));
+        renderables.Add(new BoundingBoxRenderable(engine, contentBounds, Color4.Lime));
 #endif
-        
-        // Get the bounds of this element content area
-        Bounds contentBounds = CalculateContentBounds(elementBounds);
+
         float spacing = Spacing.Calculate(contentBounds.Height);
 
         // Create child drawables

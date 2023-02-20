@@ -30,22 +30,38 @@ public class MultiplayerScreen : Screen
             new EmptyElement()
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel)
+                Height = new Length(64.0f, Unit.Pixel),
+                PaddingTop = new Length(12.0f, Unit.Pixel),
+                PaddingBottom = new Length(12.0f, Unit.Pixel),
+                PaddingLeft = new Length(12.0f, Unit.Pixel),
+                PaddingRight = new Length(12.0f, Unit.Pixel)
             },
             new EmptyElement()
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel)
+                Height = new Length(64.0f, Unit.Pixel),
+                PaddingTop = new Length(12.0f, Unit.Pixel),
+                PaddingBottom = new Length(12.0f, Unit.Pixel),
+                PaddingLeft = new Length(12.0f, Unit.Pixel),
+                PaddingRight = new Length(12.0f, Unit.Pixel)
             },
             new EmptyElement()
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel)
+                Height = new Length(64.0f, Unit.Pixel),
+                PaddingTop = new Length(12.0f, Unit.Pixel),
+                PaddingBottom = new Length(12.0f, Unit.Pixel),
+                PaddingLeft = new Length(12.0f, Unit.Pixel),
+                PaddingRight = new Length(12.0f, Unit.Pixel)
             })
         {
             Width = new Length(512.0f, Unit.Pixel), 
             Height = Length.Full,
-            Spacing = new Length(12.0f, Unit.Pixel)
+            Spacing = new Length(12.0f, Unit.Pixel),
+            PaddingTop = new Length(12.0f, Unit.Pixel),
+            PaddingBottom = new Length(12.0f, Unit.Pixel),
+            PaddingLeft = new Length(12.0f, Unit.Pixel),
+            PaddingRight = new Length(12.0f, Unit.Pixel)
         };
 
         return root.BuildRenderables(engine, bounds);
