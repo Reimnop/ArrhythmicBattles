@@ -14,7 +14,7 @@
         <DefineConstants>$(DefineConstants)</DefineConstants>
         
         <!-- Skip the menu and go straight to the game -->
-        <DefineConstants>DEBUG_SKIP_MENU</DefineConstants>
+        <!-- <DefineConstants>DEBUG_SKIP_MENU</DefineConstants> -->
     </PropertyGroup>
 
     <ItemGroup>

@@ -5,7 +5,7 @@ using FlexFramework.Core.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.UserInterface.Drawables;
+namespace FlexFramework.Core.UserInterface.Renderables;
 
 public class BoundingBoxRenderable : IRenderable
 {
@@ -23,13 +23,11 @@ public class BoundingBoxRenderable : IRenderable
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
-        matrixStack.Translate(bounds.X0, bounds.Y0, 0.0f);
-        matrixStack.Scale(bounds.Width, bounds.Height, 1.0f);
-        matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);
+        matrixStack.Scale(bounds.Width, bounds.Height, 1.0f);
+        matrixStack.Translate(bounds.X0, bounds.Y0, 0.0f);
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color4.White, PrimitiveType.LineLoop);
         renderer.EnqueueDrawData(layerId, vertexDrawData);
-        matrixStack.Pop();
         matrixStack.Pop();
     }
 }

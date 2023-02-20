@@ -80,13 +80,13 @@ public class AudioSource : IDisposable
             {
                 if (!Playing)
                 {
-                    return;
+                    continue;
                 }
 
                 QueueBuffers(audioStream);
             }
             
-            await Task.Delay(5, cancellationTokenSource.Token);
+            await Task.Delay(2, cancellationTokenSource.Token);
         }
     }
 
@@ -188,7 +188,6 @@ public class AudioSource : IDisposable
         
         cancellationTokenSource.Cancel();
         cancellationTokenSource.Dispose();
-        audioUpdateTask.Wait(); // Don't clean up until the update loop is done
         CleanAllBuffers();
 
         AL.DeleteSource(Handle);

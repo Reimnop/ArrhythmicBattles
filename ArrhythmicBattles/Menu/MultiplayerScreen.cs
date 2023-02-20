@@ -1,6 +1,7 @@
 ﻿using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
@@ -12,22 +13,42 @@ namespace ArrhythmicBattles.Menu;
 public class MultiplayerScreen : Screen
 {
     public override Vector2 Position { get; set; }
-    
-    private Element rootElement;
-    
+
+    private readonly FlexFrameworkMain engine;
+    private List<IRenderable> renderables;
+
     public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
     {
+        this.engine = engine;
+        Bounds bounds = new Bounds(0, 0, engine.Size.X, engine.Size.Y);
+        renderables = RenderLayout(bounds);
     }
 
-    private Element CreateLayout(Bounds bounds)
+    private List<IRenderable> RenderLayout(Bounds bounds)
     {
-        Element root = new StackLayout()
+        Element root = new StackLayout(
+            new EmptyElement()
+            {
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel)
+            },
+            new EmptyElement()
+            {
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel)
+            },
+            new EmptyElement()
+            {
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel)
+            })
         {
-            Width = Length.Full, 
-            Height = Length.Full
+            Width = new Length(512.0f, Unit.Pixel), 
+            Height = Length.Full,
+            Spacing = new Length(12.0f, Unit.Pixel)
         };
 
-        return root;
+        return root.BuildRenderables(engine, bounds);
     }
 
     public override void Update(UpdateArgs args)
@@ -37,6 +58,9 @@ public class MultiplayerScreen : Screen
 
     public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
-        
+        foreach (IRenderable renderable in renderables)
+        {
+            renderable.Render(renderer, layerId, matrixStack, cameraData);
+        }
     }
 }

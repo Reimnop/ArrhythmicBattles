@@ -106,6 +106,10 @@ public class GameServer : IDisposable
     public void Dispose()
     {
         cancellationTokenSource.Cancel();
+        foreach (Player player in players)
+        {
+            player.Dispose();
+        }
         cancellationTokenSource.Dispose();
         socket.Close();
     }

@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.UserInterface.Drawables;
+﻿using FlexFramework.Core.UserInterface.Renderables;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -17,31 +17,42 @@ public abstract class Element
     public Length PaddingTop { get; set; } = Length.Zero;
     public Length PaddingBottom { get; set; } = Length.Zero;
 
-    public Bounds CalculateBounds(Bounds parentBounds)
+    // Bounding box is the area that the element occupies
+    public Bounds CalculateBoundingBox(Bounds constraintBounds)
     {
-        Bounds marginBounds = new Bounds(
-            parentBounds.X0 + MarginLeft.Calculate(parentBounds.Width),
-            parentBounds.Y0 + MarginTop.Calculate(parentBounds.Height),
-            parentBounds.X1 - MarginRight.Calculate(parentBounds.Width),
-            parentBounds.Y1 - MarginBottom.Calculate(parentBounds.Height)
-        );
-
         return new Bounds(
-                marginBounds.X0,
-                marginBounds.Y0,
-                marginBounds.X0 + Width.Calculate(parentBounds.Width),
-                marginBounds.Y0 + Height.Calculate(parentBounds.Height)
-            );
+            constraintBounds.X0, 
+            constraintBounds.Y0, 
+            constraintBounds.X0 + Width.Calculate(constraintBounds.Width), 
+            constraintBounds.Y0 + Height.Calculate(constraintBounds.Height));
+    }
+
+    // Element bounds is the area that the element can draw to
+    public Bounds CalculateElementBounds(Bounds boundingBox)
+    {
+        return new Bounds(
+            boundingBox.X0 + MarginLeft.Calculate(boundingBox.Width),
+            boundingBox.Y0 + MarginTop.Calculate(boundingBox.Height),
+            boundingBox.X1 - MarginRight.Calculate(boundingBox.Width),
+            boundingBox.Y1 - MarginBottom.Calculate(boundingBox.Height));
     }
     
-    public abstract void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds elementBounds);
-    
-    protected Bounds CalculatePaddingBounds(Bounds bounds)
+    // Content bounds is the area where the element's children can draw to
+    public Bounds CalculateContentBounds(Bounds elementBounds)
     {
         return new Bounds(
-            bounds.X0 + PaddingLeft.Calculate(bounds.Width),
-            bounds.Y0 + PaddingTop.Calculate(bounds.Height),
-            bounds.X1 - PaddingRight.Calculate(bounds.Width),
-            bounds.Y1 - PaddingBottom.Calculate(bounds.Height));
+            elementBounds.X0 + PaddingLeft.Calculate(elementBounds.Width),
+            elementBounds.Y0 + PaddingTop.Calculate(elementBounds.Height),
+            elementBounds.X1 - PaddingRight.Calculate(elementBounds.Width),
+            elementBounds.Y1 - PaddingBottom.Calculate(elementBounds.Height));
+    }
+
+    public abstract void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds);
+    
+    public List<IRenderable> BuildRenderables(FlexFrameworkMain engine, Bounds constraintBounds)
+    {
+        List<IRenderable> renderables = new List<IRenderable>();
+        BuildRenderables(renderables, engine, constraintBounds);
+        return renderables;
     }
 }

@@ -14,6 +14,7 @@ public class EngineResources
     {
         this.resourceManager = resourceManager;
         QuadMesh = CreateQuadMesh();
+        QuadWireframeMesh = CreateQuadWireframeMesh();
     }
     
     private ResourceLocation CreateQuadMesh()
@@ -41,6 +42,6 @@ public class EngineResources
             new Vertex(0.5f, -0.5f, 0.0f, 1.0f, 0.0f)
         };
         
-        return resourceManager.AddResource(new Mesh<Vertex>("quad", vertices));
+        return resourceManager.AddResource(new Mesh<Vertex>("quad-wireframe", vertices));
     }
 }
