@@ -27,7 +27,7 @@ public class BoundingBoxRenderable : IRenderable
         matrixStack.Scale(bounds.Width, bounds.Height, 1.0f);
         matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color4.White, PrimitiveType.Lines);
+        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color4.White, PrimitiveType.LineLoop);
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
         matrixStack.Pop();
