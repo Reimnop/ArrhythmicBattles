@@ -18,7 +18,8 @@ public class FlexFrameworkMain : NativeWindow
 {
     public Renderer Renderer { get; private set; } = null!;
     public TextResources TextResources { get; private set; } = null!;
-    public PersistentResources PersistentResources { get; }
+    public EngineResources Resources { get; }
+    public ResourceManager ResourceManager { get; }
     public SceneManager SceneManager { get; }
     public AudioManager AudioManager { get; }
     public Input Input { get; }
@@ -47,7 +48,8 @@ public class FlexFrameworkMain : NativeWindow
 #endif
 
         SceneManager = new SceneManager(this);
-        PersistentResources = new PersistentResources();
+        ResourceManager = new ResourceManager();
+        Resources = new EngineResources(ResourceManager);
         AudioManager = new AudioManager();
         Input = new Input(this);
     }
@@ -205,6 +207,7 @@ public class FlexFrameworkMain : NativeWindow
         base.OnClosing(e);
 
 #if DEBUG
+        // Unleak the debug callback
         leakedGcHandle.Free();
 #endif
     }
@@ -215,7 +218,7 @@ public class FlexFrameworkMain : NativeWindow
         
         TextResources.Dispose();
         AudioManager.Dispose();
-        PersistentResources.Dispose();
+        ResourceManager.Dispose();
         if (Renderer is IDisposable disposable)
         {
             disposable.Dispose();

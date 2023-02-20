@@ -1,7 +1,9 @@
 ﻿using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
-using FlexFramework.Core.System.Entities;
+using FlexFramework.Core;
+using FlexFramework.Core.Data;
+using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
@@ -28,9 +30,11 @@ public class PauseScreen : Screen, IDisposable
         
         inputSystem = scene.Context.InputSystem;
         inputInfo = inputSystem.GetInputInfo();
+        
+        EngineResources resources = engine.Resources;
 
         background = new MeshEntity();
-        background.Mesh = engine.PersistentResources.QuadMesh;
+        background.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));

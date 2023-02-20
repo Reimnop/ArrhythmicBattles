@@ -1,5 +1,5 @@
 ﻿using FlexFramework;
-using FlexFramework.Core.System.Entities;
+using FlexFramework.Core.Entities;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 

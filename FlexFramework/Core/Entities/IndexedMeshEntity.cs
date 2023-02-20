@@ -5,11 +5,11 @@ using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.System.Entities;
+namespace FlexFramework.Core.Entities;
 
-public class MeshEntity : Entity, IRenderable
+public class IndexedMeshEntity : Entity, IRenderable
 {
-    public Mesh<Vertex>? Mesh { get; set; }
+    public IndexedMesh<Vertex>? Mesh { get; set; }
     public Texture2D? Texture { get; set; }
     public Color4 Color { get; set; } = Color4.White;
 
@@ -21,7 +21,7 @@ public class MeshEntity : Entity, IRenderable
         }
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color);
+        IndexedVertexDrawData vertexDrawData = new IndexedVertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color);
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

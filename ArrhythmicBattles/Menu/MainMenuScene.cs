@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
-using FlexFramework.Core.System.Entities;
+using FlexFramework.Core;
+using FlexFramework.Core.Data;
+using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering.Data;
@@ -47,14 +49,16 @@ public class MainMenuScene : ABScene
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
+        
+        EngineResources resources = Engine.Resources;
 
         header = new MeshEntity();
         header.Color = new Color4(24, 24, 24, 255);
-        header.Mesh = Engine.PersistentResources.QuadMesh;
+        header.Mesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
         
         footer = new MeshEntity();
         footer.Color = new Color4(24, 24, 24, 255);
-        footer.Mesh = Engine.PersistentResources.QuadMesh;
+        footer.Mesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
 
         copyrightText = new TextEntity(Engine, Engine.TextResources.GetFont("inconsolata-small"));
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;

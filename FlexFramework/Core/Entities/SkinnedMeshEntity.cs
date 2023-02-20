@@ -5,7 +5,7 @@ using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.System.Entities;
+namespace FlexFramework.Core.Entities;
 
 public class SkinnedMeshEntity : Entity, IRenderable
 {

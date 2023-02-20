@@ -5,7 +5,7 @@ using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 using Textwriter;
 
-namespace FlexFramework.Core.System.Entities;
+namespace FlexFramework.Core.Entities;
 
 public class TextEntity : Entity, IRenderable, IDisposable
 {

@@ -1,13 +1,13 @@
 ﻿using FlexFramework;
 using FlexFramework.Core.Data;
-using FlexFramework.Core.System;
+using FlexFramework.Core;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.System.Entities;
+namespace FlexFramework.Core.Entities;
 
 public enum ImageMode
 {
@@ -31,7 +31,9 @@ public class ImageEntity : UIElement, IRenderable
 
     public ImageEntity(FlexFrameworkMain engine) : base(engine)
     {
-        quadMesh = engine.PersistentResources.QuadMesh;
+        EngineResources resources = engine.Resources;
+        quadMesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        
     }
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)

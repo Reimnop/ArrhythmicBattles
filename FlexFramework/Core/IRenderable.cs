@@ -1,7 +1,7 @@
 ﻿using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 
-namespace FlexFramework.Core.System;
+namespace FlexFramework.Core;
 
 public interface IRenderable
 {

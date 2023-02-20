@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.Core.System.UserInterface.Elements;
+﻿namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class Element
 {
@@ -33,6 +33,4 @@ public abstract class Element
     }
     
     public abstract void BuildDrawables(List<Drawable> drawables, Bounds parentBounds);
-        
-    public abstract Drawable? CreateDrawable(Bounds bounds);
 }

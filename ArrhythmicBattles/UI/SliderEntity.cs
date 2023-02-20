@@ -1,7 +1,8 @@
 ﻿using ArrhythmicBattles.Util;
 using FlexFramework;
-using FlexFramework.Core.System;
-using FlexFramework.Core.System.Entities;
+using FlexFramework.Core;
+using FlexFramework.Core.Data;
+using FlexFramework.Core.Entities;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
@@ -52,11 +53,13 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
 
         Font font = engine.TextResources.GetFont("inconsolata-regular");
         
+        EngineResources resources = engine.Resources;
+
         textEntity = new TextEntity(engine, font);
         barMeshEntity = new MeshEntity();
-        barMeshEntity.Mesh = engine.PersistentResources.QuadMesh;
+        barMeshEntity.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
         barMeshEntityLowOpacity = new MeshEntity();
-        barMeshEntityLowOpacity.Mesh = engine.PersistentResources.QuadMesh;
+        barMeshEntityLowOpacity.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
     }
 
     public override void Start()
