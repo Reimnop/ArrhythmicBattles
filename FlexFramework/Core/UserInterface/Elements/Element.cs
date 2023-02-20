@@ -1,4 +1,5 @@
 ﻿using FlexFramework.Core.UserInterface.Renderables;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -45,6 +46,21 @@ public abstract class Element
             elementBounds.Y0 + PaddingTop.Calculate(elementBounds.Height),
             elementBounds.X1 - PaddingRight.Calculate(elementBounds.Width),
             elementBounds.Y1 - PaddingBottom.Calculate(elementBounds.Height));
+    }
+    
+    /// <param name="renderables">This parameter is for debug purposes only</param>
+    /// <param name="engine">This parameter is for debug purposes only</param>
+    protected void CalculateBounds(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds, out Bounds boundingBox, out Bounds elementBounds, out Bounds contentBounds)
+    {
+        boundingBox = CalculateBoundingBox(constraintBounds);
+        elementBounds = CalculateElementBounds(boundingBox);
+        contentBounds = CalculateContentBounds(elementBounds);
+        
+#if DEBUG && DEBUG_SHOW_BOUNDING_BOXES // Add bounding box drawable if in debug mode
+        renderables.Add(new BoundingBoxRenderable(engine, boundingBox, Color4.White));
+        renderables.Add(new BoundingBoxRenderable(engine, elementBounds, Color4.Red));
+        renderables.Add(new BoundingBoxRenderable(engine, contentBounds, Color4.Lime));
+#endif
     }
 
     public abstract void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds);

@@ -7,16 +7,8 @@ public class EmptyElement : Element
 {
     public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
-        Bounds boundingBox = CalculateBoundingBox(constraintBounds);
-        Bounds elementBounds = CalculateElementBounds(boundingBox);
-        Bounds contentBounds = CalculateContentBounds(elementBounds);
-        
-#if DEBUG && DEBUG_SHOW_BOUNDING_BOXES // Add bounding box drawable if in debug mode
-        renderables.Add(new BoundingBoxRenderable(engine, boundingBox, Color4.White));
-        renderables.Add(new BoundingBoxRenderable(engine, elementBounds, Color4.Red));
-        renderables.Add(new BoundingBoxRenderable(engine, contentBounds, Color4.Lime));
-#endif
-        
+        CalculateBounds(renderables, engine, constraintBounds, out _, out _, out Bounds contentBounds);
+
         float y = contentBounds.Y0;
         
         // Render children
