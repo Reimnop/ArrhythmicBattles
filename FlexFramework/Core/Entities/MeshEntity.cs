@@ -3,6 +3,7 @@ using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Entities;
@@ -12,6 +13,7 @@ public class MeshEntity : Entity, IRenderable
     public Mesh<Vertex>? Mesh { get; set; }
     public Texture2D? Texture { get; set; }
     public Color4 Color { get; set; } = Color4.White;
+    public PrimitiveType PrimitiveType { get; set; } = PrimitiveType.Triangles;
 
     public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
@@ -21,7 +23,7 @@ public class MeshEntity : Entity, IRenderable
         }
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color);
+        VertexDrawData vertexDrawData = new VertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color, PrimitiveType);
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

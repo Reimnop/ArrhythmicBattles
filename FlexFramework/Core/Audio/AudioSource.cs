@@ -42,8 +42,8 @@ public class AudioSource : IDisposable
     private float gain = 1.0f;
     private float pitch = 1.0f;
 
-    private readonly Thread audioThread;
-    private bool shouldUpdate = true;
+    private readonly Task audioUpdateTask;
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public AudioStream? AudioStream
     {
@@ -64,35 +64,29 @@ public class AudioSource : IDisposable
         AL.Source(Handle, ALSourcef.Pitch, pitch);
         AL.Source(Handle, ALSourcei.SourceType, (int) ALSourceType.Streaming);
 
-        audioThread = new Thread(UpdateLoop);
-        audioThread.IsBackground = true;
-        audioThread.Start();
+        audioUpdateTask = Task.Run(UpdateLoopAsync);
     }
 
-    private void UpdateLoop()
+    private async Task UpdateLoopAsync()
     {
-        while (shouldUpdate)
+        while (!cancellationTokenSource.IsCancellationRequested)
         {
-            Update();
-            Thread.Sleep(4);
-        }
-    }
-
-    private void Update()
-    {
-        if (audioStream == null)
-        {
-            return;
-        }
-        
-        lock (audioStream)
-        {
-            if (!Playing)
+            if (audioStream == null)
             {
-                return;
+                continue;
             }
+        
+            lock (audioStream)
+            {
+                if (!Playing)
+                {
+                    return;
+                }
 
-            QueueBuffers(audioStream);
+                QueueBuffers(audioStream);
+            }
+            
+            await Task.Delay(5, cancellationTokenSource.Token);
         }
     }
 
@@ -134,7 +128,7 @@ public class AudioSource : IDisposable
             (2, 2) => ALFormat.Stereo16,
             (4, 1) => ALFormat.MonoFloat32Ext,
             (4, 2) => ALFormat.StereoFloat32Ext,
-            (_, _) => throw new NotImplementedException()
+            (_, _) => throw new NotSupportedException()
         };
     }
     
@@ -192,7 +186,9 @@ public class AudioSource : IDisposable
     {
         AL.SourceStop(Handle);
         
-        shouldUpdate = false;
+        cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
+        audioUpdateTask.Wait(); // Don't clean up until the update loop is done
         CleanAllBuffers();
 
         AL.DeleteSource(Handle);

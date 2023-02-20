@@ -31,6 +31,6 @@ public class VertexRenderStrategy : RenderStrategy
 
         GL.Uniform4(3, vertexDrawData.Color);
 
-        GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Count);
+        GL.DrawArrays(vertexDrawData.PrimitiveType, 0, vertexDrawData.Count);
     }
 }

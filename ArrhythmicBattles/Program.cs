@@ -1,15 +1,11 @@
-﻿// Skip the menu and go straight to the game
-// #define DEBUG_SKIP_MENU
-
-// TODO: Move half of this project to the engine
-
+﻿using ArrhythmicBattles.Game;
+using ArrhythmicBattles.Menu;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using ArrhythmicBattles.Menu;
 using FlexFramework.Logging;
 using log4net;
 using log4net.Config;

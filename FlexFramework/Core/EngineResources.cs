@@ -6,6 +6,7 @@ namespace FlexFramework.Core;
 public class EngineResources
 {
     public ResourceLocation QuadMesh { get; }
+    public ResourceLocation QuadWireframeMesh { get; }
 
     private readonly ResourceManager resourceManager;
     
@@ -17,7 +18,7 @@ public class EngineResources
     
     private ResourceLocation CreateQuadMesh()
     {
-        Vertex[] quadVertices =
+        Vertex[] vertices =
         {
             new Vertex(0.5f, 0.5f, 0.0f, 1.0f, 1.0f),
             new Vertex(-0.5f, 0.5f, 0.0f, 0.0f, 1.0f),
@@ -27,6 +28,19 @@ public class EngineResources
             new Vertex(0.5f, -0.5f, 0.0f, 1.0f, 0.0f)
         };
         
-        return resourceManager.AddResource(new Mesh<Vertex>("quad", quadVertices));
+        return resourceManager.AddResource(new Mesh<Vertex>("quad", vertices));
+    }
+
+    private ResourceLocation CreateQuadWireframeMesh()
+    {
+        Vertex[] vertices =
+        {
+            new Vertex(0.5f, 0.5f, 0.0f, 1.0f, 1.0f),
+            new Vertex(-0.5f, 0.5f, 0.0f, 0.0f, 1.0f),
+            new Vertex(-0.5f, -0.5f, 0.0f, 0.0f, 0.0f),
+            new Vertex(0.5f, -0.5f, 0.0f, 1.0f, 0.0f)
+        };
+        
+        return resourceManager.AddResource(new Mesh<Vertex>("quad", vertices));
     }
 }

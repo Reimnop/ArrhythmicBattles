@@ -9,6 +9,13 @@
         <LangVersion>preview</LangVersion>
         <EnablePreviewFeatures>True</EnablePreviewFeatures>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants)</DefineConstants>
+        
+        <!-- Skip the menu and go straight to the game -->
+        <DefineConstants>DEBUG_SKIP_MENU</DefineConstants>
+    </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="AssimpNet" Version="4.1.0" />

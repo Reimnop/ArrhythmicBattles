@@ -9,6 +9,13 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants)</DefineConstants>
+
+        <!-- Show UI bounding boxes -->
+        <DefineConstants>DEBUG_SHOW_BOUNDING_BOXES</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="BepuPhysics" Version="2.4.0" />
         <PackageReference Include="NVorbis" Version="0.10.4" />

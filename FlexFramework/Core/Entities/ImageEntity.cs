@@ -5,6 +5,7 @@ using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Entities;
@@ -74,7 +75,7 @@ public class ImageEntity : UIElement, IRenderable
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
         
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color);
+        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color, PrimitiveType.Triangles);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();

@@ -1,4 +1,6 @@
-﻿namespace FlexFramework.Core.UserInterface.Elements;
+﻿using FlexFramework.Core.UserInterface.Drawables;
+
+namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class Element
 {
@@ -32,5 +34,14 @@ public abstract class Element
             );
     }
     
-    public abstract void BuildDrawables(List<Drawable> drawables, Bounds parentBounds);
+    public abstract void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds elementBounds);
+    
+    protected Bounds CalculatePaddingBounds(Bounds bounds)
+    {
+        return new Bounds(
+            bounds.X0 + PaddingLeft.Calculate(bounds.Width),
+            bounds.Y0 + PaddingTop.Calculate(bounds.Height),
+            bounds.X1 - PaddingRight.Calculate(bounds.Width),
+            bounds.Y1 - PaddingBottom.Calculate(bounds.Height));
+    }
 }
