@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Util;
+namespace FlexFramework.Util;
 
 public static class MeshGenerator
 {

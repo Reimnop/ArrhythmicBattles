@@ -5,6 +5,7 @@ using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;

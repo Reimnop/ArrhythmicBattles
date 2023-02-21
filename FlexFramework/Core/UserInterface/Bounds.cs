@@ -1,4 +1,6 @@
-﻿namespace FlexFramework.Core.UserInterface;
+﻿using OpenTK.Mathematics;
+
+namespace FlexFramework.Core.UserInterface;
 
 public struct Bounds
 {
@@ -12,6 +14,26 @@ public struct Bounds
     {
         get => Y1 - Y0;
         set => Y1 = Y0 + value;
+    }
+
+    public Vector2 Min
+    {
+        get => new Vector2(X0, Y0);
+        set
+        {
+            X0 = value.X;
+            Y0 = value.Y;
+        }
+    }
+    
+    public Vector2 Max
+    {
+        get => new Vector2(X1, Y1);
+        set
+        {
+            X1 = value.X;
+            Y1 = value.Y;
+        }
     }
     
     public float X0 { get; set; }

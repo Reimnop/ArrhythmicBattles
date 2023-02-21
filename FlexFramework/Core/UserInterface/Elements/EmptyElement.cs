@@ -5,6 +5,11 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class EmptyElement : Element
 {
+    public EmptyElement(params Element[] children)
+    {
+        Children.AddRange(children);
+    }
+    
     public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         CalculateBounds(renderables, engine, constraintBounds, out _, out _, out Bounds contentBounds);

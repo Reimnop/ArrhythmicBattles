@@ -27,8 +27,9 @@ public class MultiplayerScreen : Screen
     private List<IRenderable> RenderLayout(Bounds bounds)
     {
         Element root = new StackLayout(
-            new EmptyElement()
+            new RectElement()
             {
+                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 PaddingTop = new Length(12.0f, Unit.Pixel),
@@ -36,8 +37,9 @@ public class MultiplayerScreen : Screen
                 PaddingLeft = new Length(12.0f, Unit.Pixel),
                 PaddingRight = new Length(12.0f, Unit.Pixel)
             },
-            new EmptyElement()
+            new RectElement()
             {
+                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 PaddingTop = new Length(12.0f, Unit.Pixel),
@@ -45,8 +47,9 @@ public class MultiplayerScreen : Screen
                 PaddingLeft = new Length(12.0f, Unit.Pixel),
                 PaddingRight = new Length(12.0f, Unit.Pixel)
             },
-            new EmptyElement()
+            new RectElement()
             {
+                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 PaddingTop = new Length(12.0f, Unit.Pixel),
