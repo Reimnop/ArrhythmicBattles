@@ -37,8 +37,7 @@ public class RectRenderable : IRenderable, IDisposable
                     return new Vertex(new Vector3(pos), uv);
                 })
                 .ToArray();
-            mesh = new Mesh<Vertex>($"quad-rounded-{this.radius}");
-            mesh.LoadData(vertices);
+            mesh = new Mesh<Vertex>($"quad-rounded-{this.radius}", vertices);
         }
     }
     

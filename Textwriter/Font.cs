@@ -19,6 +19,7 @@ public class Font : IDisposable
     public int Height { get; }
     public int Ascender { get; }
     public int Descender { get; }
+    public int TotalHeight => Ascender - Descender;
 
     public AtlasTexture Atlas { get; }
 

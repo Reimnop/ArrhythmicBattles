@@ -7,6 +7,7 @@ using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
+using Textwriter;
 
 namespace ArrhythmicBattles.Menu;
 
@@ -26,8 +27,15 @@ public class MultiplayerScreen : Screen
 
     private List<IRenderable> RenderLayout(Bounds bounds)
     {
+        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        
         Element root = new StackLayout(
-            new RectElement()
+            new RectElement(
+                new TextElement("Lorem ipsum dolor sit amet,", Color4.Black, font)
+                {
+                    Width = Length.Full,
+                    Height = Length.Full
+                })
             {
                 Radius = 8.0f,
                 Width = Length.Full,
@@ -37,7 +45,12 @@ public class MultiplayerScreen : Screen
                 PaddingLeft = new Length(12.0f, Unit.Pixel),
                 PaddingRight = new Length(12.0f, Unit.Pixel)
             },
-            new RectElement()
+            new RectElement(
+                new TextElement("consectetur adipiscing elit.", Color4.Black, font)
+                {
+                    Width = Length.Full,
+                    Height = Length.Full
+                })
             {
                 Radius = 8.0f,
                 Width = Length.Full,
@@ -47,7 +60,12 @@ public class MultiplayerScreen : Screen
                 PaddingLeft = new Length(12.0f, Unit.Pixel),
                 PaddingRight = new Length(12.0f, Unit.Pixel)
             },
-            new RectElement()
+            new RectElement(
+                new TextElement("Nulla ut tincidunt quam.", Color4.Black, font)
+                {
+                    Width = Length.Full,
+                    Height = Length.Full
+                })
             {
                 Radius = 8.0f,
                 Width = Length.Full,
@@ -59,7 +77,7 @@ public class MultiplayerScreen : Screen
             })
         {
             Width = new Length(512.0f, Unit.Pixel), 
-            Height = Length.Full,
+            Height = new Length(240.0f, Unit.Pixel),
             Spacing = new Length(12.0f, Unit.Pixel),
             PaddingTop = new Length(12.0f, Unit.Pixel),
             PaddingBottom = new Length(12.0f, Unit.Pixel),

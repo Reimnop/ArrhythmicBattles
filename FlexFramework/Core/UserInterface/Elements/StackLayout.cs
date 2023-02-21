@@ -14,7 +14,8 @@ public class StackLayout : Element
 
     public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
-        CalculateBounds(renderables, engine, constraintBounds, out _, out _, out Bounds contentBounds);
+        DrawDebugBounds(renderables, engine, constraintBounds);
+        CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
 
         float spacing = Spacing.Calculate(contentBounds.Height);
 

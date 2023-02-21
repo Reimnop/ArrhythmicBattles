@@ -95,7 +95,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
             .WithHorizontalAlignment(horizontalAlignment)
             .WithVerticalAlignment(verticalAlignment)
             .AddText(new StyledText(text, font)
-                .WithColor(global::System.Drawing.Color.White));
+                .WithColor(System.Drawing.Color.White));
         
         TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         
