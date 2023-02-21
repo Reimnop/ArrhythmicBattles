@@ -40,10 +40,7 @@ public class MultiplayerScreen : Screen
                 Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
-                PaddingTop = new Length(12.0f, Unit.Pixel),
-                PaddingBottom = new Length(12.0f, Unit.Pixel),
-                PaddingLeft = new Length(12.0f, Unit.Pixel),
-                PaddingRight = new Length(12.0f, Unit.Pixel)
+                Padding = new Length(12.0f, Unit.Pixel)
             },
             new RectElement(
                 new TextElement("consectetur adipiscing elit.", Color4.Black, font)
@@ -55,10 +52,7 @@ public class MultiplayerScreen : Screen
                 Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
-                PaddingTop = new Length(12.0f, Unit.Pixel),
-                PaddingBottom = new Length(12.0f, Unit.Pixel),
-                PaddingLeft = new Length(12.0f, Unit.Pixel),
-                PaddingRight = new Length(12.0f, Unit.Pixel)
+                Padding = new Length(12.0f, Unit.Pixel)
             },
             new RectElement(
                 new TextElement("Nulla ut tincidunt quam.", Color4.Black, font)
@@ -70,22 +64,16 @@ public class MultiplayerScreen : Screen
                 Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
-                PaddingTop = new Length(12.0f, Unit.Pixel),
-                PaddingBottom = new Length(12.0f, Unit.Pixel),
-                PaddingLeft = new Length(12.0f, Unit.Pixel),
-                PaddingRight = new Length(12.0f, Unit.Pixel)
+                Padding = new Length(12.0f, Unit.Pixel)
             })
         {
             Width = new Length(512.0f, Unit.Pixel), 
             Height = new Length(240.0f, Unit.Pixel),
             Spacing = new Length(12.0f, Unit.Pixel),
-            PaddingTop = new Length(12.0f, Unit.Pixel),
-            PaddingBottom = new Length(12.0f, Unit.Pixel),
-            PaddingLeft = new Length(12.0f, Unit.Pixel),
-            PaddingRight = new Length(12.0f, Unit.Pixel)
+            Padding = new Length(12.0f, Unit.Pixel)
         };
 
-        return root.BuildRenderables(engine, bounds);
+        return root.BuildDrawables(engine, bounds);
     }
 
     public override void Update(UpdateArgs args)

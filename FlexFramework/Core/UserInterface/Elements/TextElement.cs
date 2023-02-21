@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.UserInterface.Renderables;
+﻿using FlexFramework.Core.UserInterface.Drawables;
 using OpenTK.Mathematics;
 using Textwriter;
 
@@ -17,12 +17,12 @@ public class TextElement : EmptyElement
         this.font = font;
     }
     
-    public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         DrawDebugBounds(renderables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
-        renderables.Add(new TextRenderable(engine, elementBounds, text, color, font));
+        renderables.Add(new TextDrawable(engine, elementBounds, text, color, font));
         
-        base.BuildRenderables(renderables, engine, constraintBounds);
+        base.BuildDrawables(renderables, engine, constraintBounds);
     }
 }

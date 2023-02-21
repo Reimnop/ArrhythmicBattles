@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using FlexFramework.Core.UserInterface.Renderables;
+using FlexFramework.Core.UserInterface.Drawables;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
@@ -10,10 +10,20 @@ public abstract class Element
 
     public Length Width { get; set; } = Length.Zero;
     public Length Height { get; set; } = Length.Zero;
+
+    public Length Margin
+    {
+        set => MarginLeft = MarginRight = MarginTop = MarginBottom = value;
+    }
     public Length MarginLeft { get; set; } = Length.Zero;
     public Length MarginRight { get; set; } = Length.Zero;
     public Length MarginTop { get; set; } = Length.Zero;
     public Length MarginBottom { get; set; } = Length.Zero;
+    
+    public Length Padding
+    {
+        set => PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = value;
+    }
     public Length PaddingLeft { get; set; } = Length.Zero;
     public Length PaddingRight { get; set; } = Length.Zero;
     public Length PaddingTop { get; set; } = Length.Zero;
@@ -56,24 +66,22 @@ public abstract class Element
         contentBounds = CalculateContentBounds(elementBounds);
     }
     
-    [Conditional("DEBUG")]
+    [Conditional("DEBUG_SHOW_BOUNDING_BOXES")]
     protected void DrawDebugBounds(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         CalculateBounds(constraintBounds, out Bounds boundingBox, out Bounds elementBounds, out Bounds contentBounds);
         
-#if DEBUG && DEBUG_SHOW_BOUNDING_BOXES
-        renderables.Add(new BoundingBoxRenderable(engine, boundingBox, Color4.White));
-        renderables.Add(new BoundingBoxRenderable(engine, elementBounds, Color4.Red));
-        renderables.Add(new BoundingBoxRenderable(engine, contentBounds, Color4.Lime));
-#endif
+        renderables.Add(new BoundingBoxDrawable(engine, boundingBox, Color4.White));
+        renderables.Add(new BoundingBoxDrawable(engine, elementBounds, Color4.Red));
+        renderables.Add(new BoundingBoxDrawable(engine, contentBounds, Color4.Lime));
     }
 
-    public abstract void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds);
+    public abstract void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds);
     
-    public List<IRenderable> BuildRenderables(FlexFrameworkMain engine, Bounds constraintBounds)
+    public List<IRenderable> BuildDrawables(FlexFrameworkMain engine, Bounds constraintBounds)
     {
         List<IRenderable> renderables = new List<IRenderable>();
-        BuildRenderables(renderables, engine, constraintBounds);
+        BuildDrawables(renderables, engine, constraintBounds);
         return renderables;
     }
 }

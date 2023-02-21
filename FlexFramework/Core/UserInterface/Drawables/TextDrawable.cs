@@ -5,15 +5,15 @@ using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 using Textwriter;
 
-namespace FlexFramework.Core.UserInterface.Renderables;
+namespace FlexFramework.Core.UserInterface.Drawables;
 
-public class TextRenderable : IRenderable
+public class TextDrawable : Drawable
 {
     private readonly Bounds bounds;
     
     private Mesh<TextVertexExtern> mesh;
     
-    public TextRenderable(FlexFrameworkMain engine, Bounds bounds, string text, Color4 color, Font font)
+    public TextDrawable(FlexFrameworkMain engine, Bounds bounds, string text, Color4 color, Font font) : base(bounds, null)
     {
         this.bounds = bounds;
         
@@ -36,13 +36,16 @@ public class TextRenderable : IRenderable
         mesh = new Mesh<TextVertexExtern>("text", vertexSpan);
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
+        matrixStack.Push();
+        Transform.ApplyToMatrixStack(matrixStack);
         matrixStack.Push();
         matrixStack.Translate(bounds.X0, bounds.Y0, 0.0f);
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color4.White);
         renderer.EnqueueDrawData(layerId, textDrawData);
+        matrixStack.Pop();
         matrixStack.Pop();
     }
 }

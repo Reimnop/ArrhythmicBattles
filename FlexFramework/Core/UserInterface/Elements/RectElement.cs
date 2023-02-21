@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.UserInterface.Renderables;
+﻿using FlexFramework.Core.UserInterface.Drawables;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
@@ -12,12 +12,12 @@ public class RectElement : EmptyElement
     {
     }
 
-    public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         DrawDebugBounds(renderables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
-        renderables.Add(new RectRenderable(engine, elementBounds, Color, Radius));
+        renderables.Add(new RectDrawable(engine, elementBounds, Color, Radius));
         
-        base.BuildRenderables(renderables, engine, constraintBounds);
+        base.BuildDrawables(renderables, engine, constraintBounds);
     }
 }

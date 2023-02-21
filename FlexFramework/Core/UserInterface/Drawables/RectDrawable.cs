@@ -6,16 +6,16 @@ using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.UserInterface.Renderables;
+namespace FlexFramework.Core.UserInterface.Drawables;
 
-public class RectRenderable : IRenderable, IDisposable
+public class RectDrawable : Drawable, IDisposable
 {
     private readonly Mesh<Vertex> mesh;
     private readonly Bounds bounds;
     private readonly Color4 color;
     private readonly float radius;
 
-    public RectRenderable(FlexFrameworkMain engine, Bounds bounds, Color4 color, float radius = 0.0f)
+    public RectDrawable(FlexFrameworkMain engine, Bounds bounds, Color4 color, float radius = 0.0f) : base(bounds, null)
     {
         this.bounds = bounds;
         this.color = color;
@@ -41,8 +41,11 @@ public class RectRenderable : IRenderable, IDisposable
         }
     }
     
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
+        matrixStack.Push();
+        Transform.ApplyToMatrixStack(matrixStack);
+        
         matrixStack.Push();
 
         if (radius == 0.0f)
@@ -54,6 +57,7 @@ public class RectRenderable : IRenderable, IDisposable
         
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, color, PrimitiveType.Triangles);
         renderer.EnqueueDrawData(layerId, vertexDrawData);
+        matrixStack.Pop();
         matrixStack.Pop();
     }
 

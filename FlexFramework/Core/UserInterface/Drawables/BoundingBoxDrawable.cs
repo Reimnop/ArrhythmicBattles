@@ -5,15 +5,15 @@ using FlexFramework.Core.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.UserInterface.Renderables;
+namespace FlexFramework.Core.UserInterface.Drawables;
 
-public class BoundingBoxRenderable : IRenderable
+public class BoundingBoxDrawable : Drawable
 {
     private readonly Mesh<Vertex> mesh;
     private readonly Bounds bounds;
     private readonly Color4 color;
     
-    public BoundingBoxRenderable(FlexFrameworkMain engine, Bounds bounds, Color4 color)
+    public BoundingBoxDrawable(FlexFrameworkMain engine, Bounds bounds, Color4 color) : base(bounds, null)
     {
         this.bounds = bounds;
         this.color = color;
@@ -21,8 +21,8 @@ public class BoundingBoxRenderable : IRenderable
         EngineResources resources = engine.Resources;
         mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadWireframeMesh);
     }
-    
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+
+    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
         matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);

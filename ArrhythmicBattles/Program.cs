@@ -49,7 +49,7 @@ public class Program
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
             new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
         
-#if DEBUG && DEBUG_SKIP_MENU
+#if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
 #else
         flexFramework.LoadScene(new MainMenuScene(context));

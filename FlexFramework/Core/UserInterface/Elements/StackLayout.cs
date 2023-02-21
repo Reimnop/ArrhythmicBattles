@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.UserInterface.Renderables;
+﻿using FlexFramework.Core.UserInterface.Drawables;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
@@ -12,7 +12,7 @@ public class StackLayout : Element
         Children.AddRange(children);
     }
 
-    public override void BuildRenderables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         DrawDebugBounds(renderables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
@@ -31,7 +31,7 @@ public class StackLayout : Element
             y += childBounds.Height + spacing; // Add the spacing to the y position
 
             // Add the child drawables
-            child.BuildRenderables(renderables, engine, childConstraintBounds);
+            child.BuildDrawables(renderables, engine, childConstraintBounds);
         }
     }
 }
