@@ -5,6 +5,7 @@ namespace FlexFramework.Core.UserInterface;
 
 public interface IInputProvider
 {
+    bool InputAvailable { get; }
     Vector2 MousePosition { get; }
     Vector2 MouseDelta { get; }
     Vector2 MouseScroll { get; }

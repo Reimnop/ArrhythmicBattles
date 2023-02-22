@@ -10,9 +10,9 @@ public class EmptyElement : Element
         Children.AddRange(children);
     }
     
-    public override void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
-        DrawDebugBounds(renderables, engine, constraintBounds);
+        DrawDebugBounds(drawables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
 
         float y = contentBounds.Y0;
@@ -24,7 +24,7 @@ public class EmptyElement : Element
             Bounds childBounds = child.CalculateBoundingBox(childConstraintBounds);
             y += childBounds.Height;
 
-            child.BuildDrawables(renderables, engine, childConstraintBounds);
+            child.BuildDrawables(drawables, engine, childConstraintBounds);
         }
     }
 }

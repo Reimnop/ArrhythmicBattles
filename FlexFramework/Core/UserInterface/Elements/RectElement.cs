@@ -12,12 +12,12 @@ public class RectElement : EmptyElement
     {
     }
 
-    public override void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
-        DrawDebugBounds(renderables, engine, constraintBounds);
+        DrawDebugBounds(drawables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
-        renderables.Add(new RectDrawable(engine, elementBounds, Color, Radius));
+        drawables.Add(new RectDrawable(engine, elementBounds, Color, Radius));
         
-        base.BuildDrawables(renderables, engine, constraintBounds);
+        base.BuildDrawables(drawables, engine, constraintBounds);
     }
 }

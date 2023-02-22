@@ -67,20 +67,20 @@ public abstract class Element
     }
     
     [Conditional("DEBUG_SHOW_BOUNDING_BOXES")]
-    protected void DrawDebugBounds(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds)
+    protected void DrawDebugBounds(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
     {
         CalculateBounds(constraintBounds, out Bounds boundingBox, out Bounds elementBounds, out Bounds contentBounds);
         
-        renderables.Add(new BoundingBoxDrawable(engine, boundingBox, Color4.White));
-        renderables.Add(new BoundingBoxDrawable(engine, elementBounds, Color4.Red));
-        renderables.Add(new BoundingBoxDrawable(engine, contentBounds, Color4.Lime));
+        drawables.Add(new BoundingBoxDrawable(engine, boundingBox, Color4.White));
+        drawables.Add(new BoundingBoxDrawable(engine, elementBounds, Color4.Red));
+        drawables.Add(new BoundingBoxDrawable(engine, contentBounds, Color4.Lime));
     }
 
-    public abstract void BuildDrawables(List<IRenderable> renderables, FlexFrameworkMain engine, Bounds constraintBounds);
+    public abstract void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds);
     
-    public List<IRenderable> BuildDrawables(FlexFrameworkMain engine, Bounds constraintBounds)
+    public List<Drawable> BuildDrawables(FlexFrameworkMain engine, Bounds constraintBounds)
     {
-        List<IRenderable> renderables = new List<IRenderable>();
+        List<Drawable> renderables = new List<Drawable>();
         BuildDrawables(renderables, engine, constraintBounds);
         return renderables;
     }

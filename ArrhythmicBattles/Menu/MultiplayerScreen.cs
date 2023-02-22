@@ -4,6 +4,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
+using FlexFramework.Core.UserInterface.Drawables;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
@@ -16,16 +17,16 @@ public class MultiplayerScreen : Screen
     public override Vector2 Position { get; set; }
 
     private readonly FlexFrameworkMain engine;
-    private List<IRenderable> renderables;
+    private List<Drawable> drawables;
 
     public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
     {
         this.engine = engine;
         Bounds bounds = new Bounds(0, 0, engine.Size.X, engine.Size.Y);
-        renderables = RenderLayout(bounds);
+        drawables = RenderLayout(bounds);
     }
 
-    private List<IRenderable> RenderLayout(Bounds bounds)
+    private List<Drawable> RenderLayout(Bounds bounds)
     {
         Font font = engine.TextResources.GetFont("inconsolata-regular");
         
@@ -83,9 +84,9 @@ public class MultiplayerScreen : Screen
 
     public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
     {
-        foreach (IRenderable renderable in renderables)
+        foreach (Drawable drawable in drawables)
         {
-            renderable.Render(renderer, layerId, matrixStack, cameraData);
+            drawable.Render(renderer, layerId, matrixStack, cameraData);
         }
     }
 }
