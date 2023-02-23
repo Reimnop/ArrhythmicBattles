@@ -2,16 +2,14 @@
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core;
-using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
-using FlexFramework.Core.UserInterface.Drawables;
 using FlexFramework.Core.UserInterface.Elements;
 using OpenTK.Mathematics;
 using Textwriter;
 
 namespace ArrhythmicBattles.Menu;
 
-public class MultiplayerScreen : Screen
+public class MultiplayerScreen : Screen, IDisposable
 {
     public override Vector2 Position { get; set; }
 
@@ -21,7 +19,10 @@ public class MultiplayerScreen : Screen
     public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
     {
         this.engine = engine;
+        Bounds bounds = new Bounds(0, 0, engine.Size.X, engine.Size.Y);
+        
         root = InitUI();
+        root.UpdateLayout(bounds);
     }
 
     private Element InitUI()
@@ -30,8 +31,10 @@ public class MultiplayerScreen : Screen
 
         return new StackLayout(
             new RectElement(
-                new TextElement("Lorem ipsum dolor sit amet,", Color4.Black, font)
+                new TextElement(engine, font)
                 {
+                    Text = "Lorem ipsum dolor sit amet,",
+                    Color = Color4.Black,
                     Width = Length.Full,
                     Height = Length.Full
                 })
@@ -42,8 +45,10 @@ public class MultiplayerScreen : Screen
                 Padding = new Length(12.0f, Unit.Pixel)
             },
             new RectElement(
-                new TextElement("consectetur adipiscing elit.", Color4.Black, font)
+                new TextElement(engine, font)
                 {
+                    Text = "consectetur adipiscing elit.",
+                    Color = Color4.Black,
                     Width = Length.Full,
                     Height = Length.Full
                 })
@@ -54,8 +59,10 @@ public class MultiplayerScreen : Screen
                 Padding = new Length(12.0f, Unit.Pixel)
             },
             new RectElement(
-                new TextElement("Nulla ut tincidunt quam.", Color4.Black, font)
+                new TextElement(engine, font)
                 {
+                    Text = "Nulla ut tincidunt quam.",
+                    Color = Color4.Black,
                     Width = Length.Full,
                     Height = Length.Full
                 })
@@ -81,5 +88,13 @@ public class MultiplayerScreen : Screen
     public override void Render(RenderArgs args)
     {
         root.RenderRecursive(args);
+    }
+
+    public void Dispose()
+    {
+        foreach (IDisposable disposable in root.OfType<IDisposable>())
+        {
+            disposable.Dispose();
+        }
     }
 }

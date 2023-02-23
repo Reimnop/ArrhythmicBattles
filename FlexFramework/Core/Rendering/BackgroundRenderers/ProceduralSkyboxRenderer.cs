@@ -1,5 +1,5 @@
 ﻿using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Util;
+using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 

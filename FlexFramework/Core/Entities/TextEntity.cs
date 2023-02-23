@@ -19,7 +19,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
         }
     }
 
-    public float BaselineOffset
+    public int BaselineOffset
     {
         get => baselineOffset;
         set
@@ -63,7 +63,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
 
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
-    private float baselineOffset = 0.0f;
+    private int baselineOffset = 0;
     private Font font = null;
     private string text = "";
 
@@ -91,7 +91,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
     private void GenerateMesh()
     {
         TextBuilder builder = new TextBuilder(font.Height, engine.TextResources.Fonts)
-            .WithBaselineOffset((int) (baselineOffset * 64))
+            .WithBaselineOffset(baselineOffset)
             .WithHorizontalAlignment(horizontalAlignment)
             .WithVerticalAlignment(verticalAlignment)
             .AddText(new StyledText(text, font)

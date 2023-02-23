@@ -37,7 +37,7 @@ public class PauseScreen : Screen, IDisposable
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24.0f;
+        textEntity.BaselineOffset = 24;
         textEntity.Text = "Game paused!\n\nPress [Esc] to return";
     }
     

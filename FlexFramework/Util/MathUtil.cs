@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.Core.Util;
+﻿namespace FlexFramework.Util;
 
 public static class MathUtil
 {

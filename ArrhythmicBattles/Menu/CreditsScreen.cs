@@ -25,7 +25,7 @@ public class CreditsScreen : Screen, IDisposable
         this.inputInfo = inputInfo;
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24.0f;
+        textEntity.BaselineOffset = 24;
         textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nLuce no\nLuce.\n\nPress [Esc] to return";
     }
     

@@ -32,10 +32,10 @@ public class DebugScreen : Screen, IDisposable
         GpuInfo gpuInfo = engine.Renderer.GpuInfo;
 
         leftTextEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-small"));
-        leftTextEntity.BaselineOffset = 16.0f;
+        leftTextEntity.BaselineOffset = 16;
         
         rightTextEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-small"));
-        rightTextEntity.BaselineOffset = 16.0f;
+        rightTextEntity.BaselineOffset = 16;
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +
