@@ -1,7 +1,7 @@
 ﻿using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using OpenTK.Mathematics;
 using Textwriter;
 
@@ -9,14 +9,10 @@ namespace FlexFramework.Core.UserInterface.Drawables;
 
 public class TextDrawable : Drawable
 {
-    private readonly Bounds bounds;
-    
     private Mesh<TextVertexExtern> mesh;
     
-    public TextDrawable(FlexFrameworkMain engine, Bounds bounds, string text, Color4 color, Font font) : base(bounds, null)
+    public TextDrawable(FlexFrameworkMain engine, string text, Color4 color, Font font)
     {
-        this.bounds = bounds;
-        
         TextBuilder textBuilder = new TextBuilder(font.Height, engine.TextResources.Fonts)
             .WithBaselineOffset(font.TotalHeight)
             .AddText(new StyledText(text, font)
@@ -36,12 +32,17 @@ public class TextDrawable : Drawable
         mesh = new Mesh<TextVertexExtern>("text", vertexSpan);
     }
 
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
+        Renderer renderer = args.Renderer;
+        int layerId = args.LayerId;
+        MatrixStack matrixStack = args.MatrixStack;
+        CameraData cameraData = args.CameraData;
+        
         matrixStack.Push();
         Transform.ApplyToMatrixStack(matrixStack);
         matrixStack.Push();
-        matrixStack.Translate(bounds.X0, bounds.Y0, 0.0f);
+        matrixStack.Translate(Bounds.X0, Bounds.Y0, 0.0f);
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color4.White);
         renderer.EnqueueDrawData(layerId, textDrawData);

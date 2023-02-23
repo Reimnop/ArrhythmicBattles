@@ -4,7 +4,7 @@ using BepuPhysics.Collidables;
 using BepuPhysics.Constraints;
 using BepuUtilities;
 using BepuUtilities.Memory;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Logging;
 
 namespace FlexFramework.Physics;

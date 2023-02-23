@@ -3,7 +3,6 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core.Data;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
@@ -167,13 +166,15 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         mesh.LoadData(vertices);
     }
     
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         RegenRectIfNecessary();
         
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(currentHighlightRect.X, currentHighlightRect.Y, 0.0f);
-        meshEntity.Render(renderer, layerId, matrixStack, cameraData);
+        meshEntity.Render(args);
         matrixStack.Pop();
     }
 

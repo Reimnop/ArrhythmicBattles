@@ -1,7 +1,6 @@
 ﻿using FlexFramework;
 using FlexFramework.Core.Data;
 using FlexFramework.Core;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
@@ -37,12 +36,17 @@ public class ImageEntity : UIElement, IRenderable
         
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         if (Texture == null)
         {
             return;
         }
+        
+        Renderer renderer = args.Renderer;
+        int layerId = args.LayerId;
+        MatrixStack matrixStack = args.MatrixStack;
+        CameraData cameraData = args.CameraData;
 
         matrixStack.Push();
         matrixStack.Translate(0.5f - Origin.X, 0.5f - Origin.Y, 0.0f);

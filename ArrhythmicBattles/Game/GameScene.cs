@@ -2,7 +2,7 @@
 using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
@@ -131,16 +131,22 @@ public class GameScene : ABScene
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         renderer.UseBackgroundRenderer(skyboxRenderer, cameraData);
         
+        RenderArgs alphaClipArgs = new RenderArgs(renderer, alphaClipLayer, MatrixStack, cameraData);
+        RenderArgs opaqueArgs = new RenderArgs(renderer, opaqueLayer, MatrixStack, cameraData);
+        
         // render player
-        playerEntity.Render(renderer, opaqueLayer, MatrixStack, cameraData);
+        playerEntity.Render(opaqueArgs);
 
         // render environment
         MatrixStack.Push();
-        envModelEntity.Render(renderer, alphaClipLayer, MatrixStack, cameraData);
+        envModelEntity.Render(alphaClipArgs);
         MatrixStack.Pop();
 
+        // render gui
         CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        ScreenHandler.Render(renderer, GuiLayerId, MatrixStack, guiCameraData);
+        RenderArgs guiArgs = new RenderArgs(renderer, GuiLayerId, MatrixStack, guiCameraData);
+        
+        ScreenHandler.Render(guiArgs);
     }
 
     public override void Dispose()

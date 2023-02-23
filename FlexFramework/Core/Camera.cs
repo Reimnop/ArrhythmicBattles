@@ -1,4 +1,4 @@
-﻿using FlexFramework.Core.Util;
+﻿using FlexFramework.Core;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core;

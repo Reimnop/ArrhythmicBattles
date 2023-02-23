@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.Util;
+namespace FlexFramework.Core;
 
 public class PerspectiveCamera : Camera
 {

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 
 namespace FlexFramework.Core.Entities;
 
-public abstract class Entity
+public abstract class Entity : IUpdateable
 {
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();

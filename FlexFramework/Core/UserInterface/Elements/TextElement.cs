@@ -17,12 +17,11 @@ public class TextElement : EmptyElement
         this.font = font;
     }
     
-    public override void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
+    public override void UpdateLayout(Bounds constraintBounds)
     {
-        DrawDebugBounds(drawables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
-        drawables.Add(new TextDrawable(engine, elementBounds, text, color, font));
+        // drawables.Add(new TextDrawable(engine, elementBounds, text, color, font));
         
-        base.BuildDrawables(drawables, engine, constraintBounds);
+        base.UpdateLayout(constraintBounds);
     }
 }

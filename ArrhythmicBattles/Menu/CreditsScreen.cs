@@ -2,7 +2,7 @@
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -39,11 +39,13 @@ public class CreditsScreen : Screen, IDisposable
         }
     }
     
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
-        textEntity.Render(renderer, layerId, matrixStack, cameraData);
+        textEntity.Render(args);
         matrixStack.Pop();
     }
 

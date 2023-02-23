@@ -3,7 +3,6 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -134,8 +133,10 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
         colorAnimator.LerpTo(UnfocusedColor);
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
 
@@ -144,7 +145,7 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
         matrixStack.Translate(TextPosOffset.X, TextPosOffset.Y, 0.0f);
         matrixStack.Push();
         matrixStack.Translate(-Origin.X * Size.X, -Origin.Y * Size.Y, 0.0f);
-        textEntity.Render(renderer, layerId, matrixStack, cameraData);
+        textEntity.Render(args);
         matrixStack.Pop();
         matrixStack.Pop();
 
@@ -157,7 +158,7 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
             matrixStack.Translate(0.5f, 0.5f, 0.0f);
             matrixStack.Scale(16.0f, 24.0f, 0.0f);
             matrixStack.Translate(i * 20.0f, 0.0f, 0.0f);
-            barMeshEntity.Render(renderer, layerId, matrixStack, cameraData);
+            barMeshEntity.Render(args);
             matrixStack.Pop();
         }
         matrixStack.Pop();
@@ -171,7 +172,7 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
             matrixStack.Translate(0.5f, 0.5f, 0.0f);
             matrixStack.Scale(16.0f, 24.0f, 0.0f);
             matrixStack.Translate(i * 20.0f, 0.0f, 0.0f);
-            barMeshEntityLowOpacity.Render(renderer, layerId, matrixStack, cameraData);
+            barMeshEntityLowOpacity.Render(args);
             matrixStack.Pop();
         }
         matrixStack.Pop();

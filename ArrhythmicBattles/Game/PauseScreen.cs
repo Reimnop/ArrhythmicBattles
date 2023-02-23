@@ -5,7 +5,6 @@ using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -53,17 +52,19 @@ public class PauseScreen : Screen, IDisposable
         }
     }
     
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);
         matrixStack.Scale(engine.ClientSize.X, engine.ClientSize.Y, 1.0f);
-        background.Render(renderer, layerId, matrixStack, cameraData);
+        background.Render(args);
         matrixStack.Pop();
         
         matrixStack.Push();
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
-        textEntity.Render(renderer, layerId, matrixStack, cameraData);
+        textEntity.Render(args);
         matrixStack.Pop();
     }
 

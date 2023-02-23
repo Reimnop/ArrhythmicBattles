@@ -5,7 +5,6 @@ using BepuPhysics.Collidables;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 
@@ -53,13 +52,15 @@ public class PhysicsEntity : Entity, IRenderable, IDisposable
         Rotation = pose.Orientation.ToOpenTK();
     }
     
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Scale(0.5f, 0.5f, 0.5f);
         matrixStack.Rotate(Rotation);
         matrixStack.Translate(Position);
-        modelEntity.Render(renderer, layerId, matrixStack, cameraData);
+        modelEntity.Render(args);
         matrixStack.Pop();
     }
 

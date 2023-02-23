@@ -3,7 +3,6 @@ using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -102,10 +101,10 @@ public abstract class MenuScreen : Screen, IDisposable
         }
     }
     
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
-        navigator.Render(renderer, layerId, matrixStack, cameraData);
-        elements.ForEach(element => (element as IRenderable)?.Render(renderer, layerId, matrixStack, cameraData));
+        navigator.Render(args);
+        elements.ForEach(element => (element as IRenderable)?.Render(args));
     }
 
     public virtual void Dispose()

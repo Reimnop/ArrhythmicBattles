@@ -1,7 +1,6 @@
 ﻿using ArrhythmicBattles.UI;
 using FlexFramework;
 using FlexFramework.Core;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
@@ -10,7 +9,8 @@ namespace ArrhythmicBattles.Util;
 public abstract class ABScene : Scene, IDisposable
 {
     public ABContext Context { get; }
-
+    
+    protected MatrixStack MatrixStack { get; } = new MatrixStack();
     protected GuiCamera GuiCamera { get; private set; }
     protected int GuiLayerId { get; private set; }
 

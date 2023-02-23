@@ -1,7 +1,6 @@
 ﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
 
 namespace ArrhythmicBattles.UI;
 
@@ -54,11 +53,11 @@ public class LayeredScreenHandler : Entity, IRenderable, IDisposable
         screens[index] = after;
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         foreach (Screen screen in screens)
         {
-            screen.Render(renderer, layerId, matrixStack, cameraData);
+            screen.Render(args);
         }
     }
 

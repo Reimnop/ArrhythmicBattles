@@ -4,7 +4,7 @@ using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.RenderStrategies;
 using FlexFramework.Core.Rendering.PostProcessing;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Logging;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;

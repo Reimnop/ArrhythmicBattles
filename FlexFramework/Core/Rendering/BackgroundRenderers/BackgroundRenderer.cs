@@ -1,5 +1,5 @@
 ﻿using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 
 namespace FlexFramework.Core.Rendering.BackgroundRenderers;
 

@@ -1,5 +1,5 @@
 ﻿using FlexFramework.Core.Data;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
@@ -108,7 +108,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
         mesh.LoadData(vertexSpan);
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         if (!meshValid)
         {
@@ -120,6 +120,11 @@ public class TextEntity : Entity, IRenderable, IDisposable
         {
             return;
         }
+        
+        Renderer renderer = args.Renderer;
+        int layerId = args.LayerId;
+        MatrixStack matrixStack = args.MatrixStack;
+        CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color);

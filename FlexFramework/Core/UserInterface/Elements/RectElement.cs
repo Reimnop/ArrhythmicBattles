@@ -11,13 +11,4 @@ public class RectElement : EmptyElement
     public RectElement(params Element[] children) : base(children)
     {
     }
-
-    public override void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
-    {
-        DrawDebugBounds(drawables, engine, constraintBounds);
-        CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
-        drawables.Add(new RectDrawable(engine, elementBounds, Color, Radius));
-        
-        base.BuildDrawables(drawables, engine, constraintBounds);
-    }
 }

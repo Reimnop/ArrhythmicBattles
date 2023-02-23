@@ -1,7 +1,4 @@
-﻿using FlexFramework.Core.UserInterface.Drawables;
-using OpenTK.Mathematics;
-
-namespace FlexFramework.Core.UserInterface.Elements;
+﻿namespace FlexFramework.Core.UserInterface.Elements;
 
 public class EmptyElement : Element
 {
@@ -9,10 +6,9 @@ public class EmptyElement : Element
     {
         Children.AddRange(children);
     }
-    
-    public override void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
+
+    public override void UpdateLayout(Bounds constraintBounds)
     {
-        DrawDebugBounds(drawables, engine, constraintBounds);
         CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
 
         float y = contentBounds.Y0;
@@ -24,7 +20,7 @@ public class EmptyElement : Element
             Bounds childBounds = child.CalculateBoundingBox(childConstraintBounds);
             y += childBounds.Height;
 
-            child.BuildDrawables(drawables, engine, childConstraintBounds);
+            child.UpdateLayout(childConstraintBounds);
         }
     }
 }

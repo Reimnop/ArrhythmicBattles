@@ -1,7 +1,7 @@
 ﻿using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.PostProcessing;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering;

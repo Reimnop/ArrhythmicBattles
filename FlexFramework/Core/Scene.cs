@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Physics;
 
@@ -7,19 +7,12 @@ namespace FlexFramework.Core;
 
 public abstract class Scene
 {
-    protected MatrixStack MatrixStack { get; }
-
     private HashSet<Coroutine> coroutines = new HashSet<Coroutine>();
     private List<Coroutine> finishedCoroutines = new List<Coroutine>();
 
     private float deltaTime = 0.0f;
 
     protected FlexFrameworkMain Engine { get; private set; }
-
-    public Scene()
-    {
-        MatrixStack = new MatrixStack();
-    }
 
     internal void InitInternal(FlexFrameworkMain engine)
     {

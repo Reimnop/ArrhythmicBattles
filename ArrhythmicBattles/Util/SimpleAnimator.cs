@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 
 namespace ArrhythmicBattles.Util;
 

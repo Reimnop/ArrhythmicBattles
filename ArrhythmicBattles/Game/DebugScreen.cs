@@ -3,7 +3,7 @@ using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using OpenTK.Mathematics;
 using Textwriter;
 
@@ -68,15 +68,17 @@ public class DebugScreen : Screen, IDisposable
         rightTextEntity.Update(args);
     }
     
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
-        leftTextEntity.Render(renderer, layerId, matrixStack, cameraData);
+        leftTextEntity.Render(args);
         
         matrixStack.Push();
         matrixStack.Translate(engine.ClientSize.X, 0.0f, 0.0f);
-        rightTextEntity.Render(renderer, layerId, matrixStack, cameraData);
+        rightTextEntity.Render(args);
         matrixStack.Pop();
         
         matrixStack.Pop();

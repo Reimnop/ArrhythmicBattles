@@ -6,7 +6,6 @@ using BepuPhysics.Trees;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -148,11 +147,13 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
         matrixStack.Push();
         matrixStack.Translate(position);
-        modelEntity.Render(renderer, layerId, matrixStack, cameraData);
+        modelEntity.Render(args);
         matrixStack.Pop();
     }
     

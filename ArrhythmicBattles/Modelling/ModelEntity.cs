@@ -3,7 +3,6 @@ using ArrhythmicBattles.Modelling.Animate;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
@@ -73,23 +72,24 @@ public class ModelEntity : Entity, IRenderable
         }
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         if (Model == null)
         {
             return;
         }
         
-        RenderModelRecursively(Model.Tree.RootNode, renderer, layerId, matrixStack, cameraData);
+        RenderModelRecursively(Model.Tree.RootNode, args);
     }
     
     // more recursion bullshit
-    private void RenderModelRecursively(ImmutableNode<ModelNode> node, Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
         Debug.Assert(model != null);
 
+        MatrixStack matrixStack = args.MatrixStack;
         ModelNode modelNode = node.Value;
-        
+
         matrixStack.Push();
         matrixStack.Transform(GetNodeTransform(modelNode));
 
@@ -104,12 +104,12 @@ public class ModelEntity : Entity, IRenderable
                 material.EmissiveStrength * material.Color.B * Color.B, 
                 material.EmissiveStrength * material.Color.A * Color.A);;
             meshEntity.Texture = material.Texture;
-            meshEntity.Render(renderer, layerId, matrixStack, cameraData);
+            meshEntity.Render(args);
         }
 
         foreach (ImmutableNode<ModelNode> child in node.Children)
         {
-            RenderModelRecursively(child, renderer, layerId, matrixStack, cameraData);
+            RenderModelRecursively(child, args);
         }
         
         matrixStack.Pop();

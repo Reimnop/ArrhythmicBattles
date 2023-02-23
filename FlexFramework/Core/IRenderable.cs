@@ -1,9 +1,9 @@
-﻿using FlexFramework.Core.Util;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 
 namespace FlexFramework.Core;
 
 public interface IRenderable
 {
-    void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData);
+    void Render(RenderArgs args);
 }

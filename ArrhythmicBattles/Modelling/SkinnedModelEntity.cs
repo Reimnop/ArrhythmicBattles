@@ -3,7 +3,6 @@ using ArrhythmicBattles.Modelling.Animate;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
@@ -108,21 +107,22 @@ public class SkinnedModelEntity : Entity, IRenderable
         matrixStack.Pop();
     }
 
-    public void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public void Render(RenderArgs args)
     {
         if (Model == null)
         {
             return;
         }
         
-        RenderModelRecursively(Model.Tree.RootNode, renderer, layerId, matrixStack, cameraData);
+        RenderModelRecursively(Model.Tree.RootNode, args);
     }
     
     // more recursion bullshit
-    private void RenderModelRecursively(ImmutableNode<ModelNode> node, Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
         Debug.Assert(model != null);
 
+        MatrixStack matrixStack = args.MatrixStack;
         ModelNode modelNode = node.Value;
 
         foreach (ModelMesh modelMesh in modelNode.Meshes)
@@ -132,12 +132,12 @@ public class SkinnedModelEntity : Entity, IRenderable
             meshEntity.Mesh = model.SkinnedMeshes[modelMesh.MeshIndex];
             meshEntity.Color = new Color4(material.Color.R * Color.R, material.Color.G * Color.G, material.Color.B * Color.B, material.Color.A * Color.A);
             meshEntity.Texture = material.Texture;
-            meshEntity.Render(renderer, layerId, matrixStack, cameraData);
+            meshEntity.Render(args);
         }
 
         foreach (ImmutableNode<ModelNode> child in node.Children)
         {
-            RenderModelRecursively(child, renderer, layerId, matrixStack, cameraData);
+            RenderModelRecursively(child, args);
         }
     }
 

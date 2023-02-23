@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-using FlexFramework.Core.UserInterface.Drawables;
-using OpenTK.Mathematics;
+﻿using System.Collections;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public abstract class Element
+public abstract class Element : IEnumerable<Element>
 {
     public List<Element> Children { get; } = new List<Element>();
 
@@ -65,23 +63,50 @@ public abstract class Element
         elementBounds = CalculateElementBounds(boundingBox);
         contentBounds = CalculateContentBounds(elementBounds);
     }
-    
-    [Conditional("DEBUG_SHOW_BOUNDING_BOXES")]
-    protected void DrawDebugBounds(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds)
+
+    public abstract void UpdateLayout(Bounds constraintBounds);
+
+    /// <summary>
+    /// Enumerates all elements of the tree, including this element.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator<Element> GetEnumerator()
     {
-        CalculateBounds(constraintBounds, out Bounds boundingBox, out Bounds elementBounds, out Bounds contentBounds);
+        Stack<Element> stack = new Stack<Element>();
+        stack.Push(this);
         
-        drawables.Add(new BoundingBoxDrawable(engine, boundingBox, Color4.White));
-        drawables.Add(new BoundingBoxDrawable(engine, elementBounds, Color4.Red));
-        drawables.Add(new BoundingBoxDrawable(engine, contentBounds, Color4.Lime));
+        while (stack.Count > 0)
+        {
+            Element element = stack.Pop();
+            yield return element;
+            
+            int childCount = element.Children.Count;
+            for (int i = childCount - 1; i >= 0; i--)
+            {
+                stack.Push(element.Children[i]);
+            }
+        }
     }
 
-    public abstract void BuildDrawables(List<Drawable> drawables, FlexFrameworkMain engine, Bounds constraintBounds);
-    
-    public List<Drawable> BuildDrawables(FlexFrameworkMain engine, Bounds constraintBounds)
+    IEnumerator IEnumerable.GetEnumerator()
     {
-        List<Drawable> renderables = new List<Drawable>();
-        BuildDrawables(renderables, engine, constraintBounds);
-        return renderables;
+        return GetEnumerator();
+    }
+    
+    // Helper methods
+    public void UpdateRecursive(UpdateArgs args)
+    {
+        foreach (IUpdateable updateable in this.OfType<IUpdateable>())
+        {
+            updateable.Update(args);
+        }
+    }
+
+    public void RenderRecursive(RenderArgs args)
+    {
+        foreach (IRenderable renderable in this.OfType<IRenderable>())
+        {
+            renderable.Render(args);
+        }
     }
 }

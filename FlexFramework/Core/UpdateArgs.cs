@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.Core.Util;
+﻿namespace FlexFramework.Core;
 
 public struct UpdateArgs
 {

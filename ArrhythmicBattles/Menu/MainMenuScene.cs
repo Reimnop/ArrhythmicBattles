@@ -5,7 +5,6 @@ using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Util;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 using Textwriter;
@@ -84,19 +83,20 @@ public class MainMenuScene : ABScene
     public override void Render(Renderer renderer)
     {
         CameraData cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
+        RenderArgs args = new RenderArgs(renderer, GuiLayerId, MatrixStack, cameraData);
         
         MatrixStack.Push();
         MatrixStack.Translate(48.0f, 306.0f, 0.0f);
-        ScreenHandler.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        ScreenHandler.Render(args);
         MatrixStack.Pop();
         
         MatrixStack.Push();
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
-        header.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        header.Render(args);
         MatrixStack.Pop();
-        bannerEntity.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        bannerEntity.Render(args);
         MatrixStack.Pop();
         
         MatrixStack.Push();
@@ -104,10 +104,10 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);
-        footer.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        footer.Render(args);
         MatrixStack.Pop();
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
-        copyrightText.Render(renderer, GuiLayerId, MatrixStack, cameraData);
+        copyrightText.Render(args);
         MatrixStack.Pop();
     }
 

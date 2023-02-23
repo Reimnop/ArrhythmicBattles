@@ -1,7 +1,7 @@
 ﻿using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.Util;
+using FlexFramework.Core;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -15,7 +15,7 @@ public class RectDrawable : Drawable, IDisposable
     private readonly Color4 color;
     private readonly float radius;
 
-    public RectDrawable(FlexFrameworkMain engine, Bounds bounds, Color4 color, float radius = 0.0f) : base(bounds, null)
+    public RectDrawable(FlexFrameworkMain engine, Color4 color, float radius = 0.0f)
     {
         this.bounds = bounds;
         this.color = color;
@@ -41,8 +41,13 @@ public class RectDrawable : Drawable, IDisposable
         }
     }
     
-    public override void Render(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public override void Render(RenderArgs args)
     {
+        Renderer renderer = args.Renderer;
+        int layerId = args.LayerId;
+        MatrixStack matrixStack = args.MatrixStack;
+        CameraData cameraData = args.CameraData;
+
         matrixStack.Push();
         Transform.ApplyToMatrixStack(matrixStack);
         
