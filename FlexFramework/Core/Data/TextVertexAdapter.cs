@@ -3,11 +3,11 @@ using Textwriter;
 
 namespace FlexFramework.Core.Data;
 
-public struct TextVertexExtern : IVertex
+public struct TextVertexAdapter : IVertex
 {
     public TextVertex TextVertex { get; set; }
 
-    public TextVertexExtern(TextVertex textVertex)
+    public TextVertexAdapter(TextVertex textVertex)
     {
         TextVertex = textVertex;
     }

@@ -70,7 +70,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
     private bool meshValid = false;
 
     private readonly FlexFrameworkMain engine;
-    private readonly Mesh<TextVertexExtern> mesh;
+    private readonly Mesh<TextVertexAdapter> mesh;
     
     private readonly List<TextVertex> vertices = new List<TextVertex>();
 
@@ -80,7 +80,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
         this.font = font;
         HorizontalAlignment = horizontalAlignment;
         
-        mesh = new Mesh<TextVertexExtern>("text");
+        mesh = new Mesh<TextVertexAdapter>("text");
     }
 
     public void InvalidateMesh()
@@ -99,10 +99,10 @@ public class TextEntity : Entity, IRenderable, IDisposable
         
         TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         
-        Span<TextVertexExtern> vertexSpan = stackalloc TextVertexExtern[vertices.Count];
+        Span<TextVertexAdapter> vertexSpan = stackalloc TextVertexAdapter[vertices.Count];
         for (int i = 0; i < vertices.Count; i++)
         {
-            vertexSpan[i] = new TextVertexExtern(vertices[i]);
+            vertexSpan[i] = new TextVertexAdapter(vertices[i]);
         }
         
         mesh.LoadData(vertexSpan);
