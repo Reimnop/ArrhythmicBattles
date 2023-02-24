@@ -6,6 +6,7 @@ using BepuPhysics.Trees;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -32,7 +33,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
 
         public bool AllowTest(CollidableReference collidable, int childIndex)
         {
-            return true;
+            return collidable != this.collidable;
         }
 
         public void OnRayHit(in RayData ray, ref float maximumT, float t, in System.Numerics.Vector3 normal, CollidableReference collidable, int childIndex)
@@ -52,8 +53,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
     private readonly Model model;
     private readonly ModelEntity modelEntity;
 
-    private readonly InputSystem inputSystem;
-    private readonly InputInfo inputInfo;
+    private readonly IInputProvider inputProvider;
     private readonly PhysicsWorld physicsWorld;
 
     private readonly BodyHandle bodyHandle;
@@ -63,10 +63,9 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
     private Vector2 movement = Vector2.Zero;
     private bool jump = false;
 
-    public PlayerEntity(InputSystem inputSystem, InputInfo inputInfo, PhysicsWorld physicsWorld, Vector3 position, float yaw, float pitch)
+    public PlayerEntity(IInputProvider inputProvider, PhysicsWorld physicsWorld, Vector3 position, float yaw, float pitch)
     {
-        this.inputSystem = inputSystem;
-        this.inputInfo = inputInfo;
+        this.inputProvider = inputProvider;
         this.physicsWorld = physicsWorld;
         this.position = position;
         this.yaw = yaw;
@@ -97,8 +96,8 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         
         // raycast to check if player is grounded
         RayHitHandler handler = new RayHitHandler(bodyReference.CollidableReference);
-        Vector3 rayStart = new Vector3(position.X, position.Y - 0.8f, position.Z);
-        physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 0.7f, ref handler);
+        Vector3 rayStart = new Vector3(position.X, position.Y, position.Z);
+        physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 1.0f, ref handler);
         grounded = handler.Hit != null;
 
         // apply movement
@@ -133,16 +132,16 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         base.Update(args);
         
         // get movement
-        movement = inputSystem.GetMovement(inputInfo.InputCapture);
+        movement = inputProvider.GetMovement();
 
         // jump
-        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Space))
+        if (inputProvider.GetKeyDown(Keys.Space))
         {
             jump = true;
         }
 
         // camera rotation
-        Vector2 delta = inputSystem.GetMouseDelta(inputInfo.InputCapture) / 480.0f;
+        Vector2 delta = inputProvider.MouseDelta / 480.0f;
         yaw -= delta.X;
         pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
     }

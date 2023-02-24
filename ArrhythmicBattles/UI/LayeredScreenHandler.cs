@@ -14,7 +14,7 @@ public class LayeredScreenHandler : Entity, IRenderable, IDisposable
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
-        
+
         currentScreens.Clear();
         currentScreens.AddRange(screens);
 

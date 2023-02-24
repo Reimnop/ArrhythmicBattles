@@ -57,6 +57,7 @@ public class Program
 
         while (!flexFramework.ShouldClose())
         {
+            context.Update();
             flexFramework.Update();
         }
     }

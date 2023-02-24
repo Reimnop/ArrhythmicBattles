@@ -4,6 +4,7 @@ using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
@@ -34,21 +35,19 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
     public int BarsCount { get; set; } = 10;
     public int Value { get; set; } = 10;
 
-    private readonly InputSystem input;
-    private readonly InputCapture capture;
-    
+    private readonly IInputProvider inputProvider;
+
     private SimpleAnimator<Color4> colorAnimator = null!;
     
     private readonly TextEntity textEntity;
     private readonly MeshEntity barMeshEntity;
     private readonly MeshEntity barMeshEntityLowOpacity;
+    
+    private bool focused = false;
 
-    private InputCapture? modifyCapture;
-
-    public SliderEntity(FlexFrameworkMain engine, InputInfo inputInfo) : base(engine)
+    public SliderEntity(FlexFrameworkMain engine, IInputProvider inputProvider) : base(engine)
     {
-        input = inputInfo.InputSystem;
-        capture = inputInfo.InputCapture;
+        this.inputProvider = inputProvider;
 
         Font font = engine.TextResources.GetFont("inconsolata-regular");
         
@@ -95,30 +94,20 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
         
         colorAnimator.Update(args);
 
-        if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
+        if (focused)
         {
-            modifyCapture = input.AcquireCapture();
-        } 
-        else if (modifyCapture != null)
-        {
-            if (input.GetKeyDown(modifyCapture, Keys.Left))
+            if (inputProvider.GetKeyDown(Keys.Left))
             {
                 Value--;
                 Value = Math.Clamp(Value, 0, BarsCount);
                 OnValueChanged?.Invoke(Value);
             }
             
-            if (input.GetKeyDown(modifyCapture, Keys.Right))
+            if (inputProvider.GetKeyDown(Keys.Right))
             {
                 Value++;
                 Value = Math.Clamp(Value, 0, BarsCount);
                 OnValueChanged?.Invoke(Value);
-            }
-            
-            if (input.GetKeyDown(modifyCapture, Keys.Enter))
-            {
-                modifyCapture.Dispose();
-                modifyCapture = null;
             }
         }
     }
@@ -126,11 +115,13 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
     protected override void OnFocused()
     {
         colorAnimator.LerpTo(FocusedColor);
+        focused = true;
     }
 
     protected override void OnUnfocused()
     {
         colorAnimator.LerpTo(UnfocusedColor);
+        focused = false;
     }
 
     public void Render(RenderArgs args)
@@ -182,7 +173,6 @@ public class SliderEntity : UIElement, IRenderable, IDisposable
 
     public void Dispose()
     {
-        modifyCapture?.Dispose();
         textEntity.Dispose();
     }
 }

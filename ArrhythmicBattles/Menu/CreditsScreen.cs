@@ -4,6 +4,7 @@ using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -16,13 +17,13 @@ public class CreditsScreen : Screen, IDisposable
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;
     private readonly ABScene scene;
-    private readonly InputInfo inputInfo;
+    private readonly IInputProvider inputProvider;
     
-    public CreditsScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
+    public CreditsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
     {
         this.engine = engine;
         this.scene = scene;
-        this.inputInfo = inputInfo;
+        this.inputProvider = inputProvider;
 
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.BaselineOffset = 24;
@@ -33,9 +34,9 @@ public class CreditsScreen : Screen, IDisposable
     {
         textEntity.Update(args);
 
-        if (scene.Context.InputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
+        if (inputProvider.GetKeyDown(Keys.Escape))
         {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputInfo));
+            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
         }
     }
     

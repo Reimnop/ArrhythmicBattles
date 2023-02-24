@@ -4,6 +4,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -22,21 +23,21 @@ public abstract class MenuScreen : Screen, IDisposable
         get => stackLayout.Position;
         set => stackLayout.Position = value;
     }
-    
-    protected InputInfo InputInfo { get; }
+
     protected FlexFrameworkMain Engine { get; }
     protected ABScene Scene { get; }
+    protected IInputProvider InputProvider { get; }
 
     private readonly VerticalStackLayout stackLayout;
     private readonly KeyboardNavigator navigator;
 
     private readonly List<UIElement> elements = new List<UIElement>();
 
-    public MenuScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
+    public MenuScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
     {
         Engine = engine;
         Scene = scene;
-        InputInfo = inputInfo;
+        InputProvider = inputProvider;
 
         InitUI();
         
@@ -55,7 +56,7 @@ public abstract class MenuScreen : Screen, IDisposable
 
         Utils.LinkNodesWrapAroundVertical(navNodes.ToArray());
 
-        navigator = new KeyboardNavigator(inputInfo, navNodes[0]);
+        navigator = new KeyboardNavigator(inputProvider, navNodes[0]);
         navigator.OnNodeSelected += node => scene.Context.Sound.SelectSfx.Play();
     }
 
@@ -63,7 +64,7 @@ public abstract class MenuScreen : Screen, IDisposable
     
     protected void CreateButton(string text, Color4 color, Action pressedCallback)
     {
-        ButtonEntity buttonEntity = new ButtonEntity(Engine, InputInfo);
+        ButtonEntity buttonEntity = new ButtonEntity(Engine, InputProvider);
         buttonEntity.Text = text;
         buttonEntity.Origin = new Vector2(0.0f, 1.0f);
         buttonEntity.TextPosOffset = new Vector2i(16, 36);
@@ -76,7 +77,7 @@ public abstract class MenuScreen : Screen, IDisposable
     }
     protected void CreateSlider(string text, int value, Action<int> valueChangedCallback)
     {
-        SliderEntity sliderEntity = new SliderEntity(Engine, InputInfo);
+        SliderEntity sliderEntity = new SliderEntity(Engine, InputProvider);
         sliderEntity.Value = value;
         sliderEntity.Text = text;
         sliderEntity.TextPosOffset = new Vector2i(16, 36);
@@ -95,7 +96,7 @@ public abstract class MenuScreen : Screen, IDisposable
         navigator.Update(args);
         elements.ForEach(element => element.Update(args));
         
-        if (LastScreen != null && Scene.Context.InputSystem.GetKeyDown(InputInfo.InputCapture, Keys.Escape))
+        if (LastScreen != null && InputProvider.GetKeyDown(Keys.Escape))
         {
             Scene.SwitchScreen(this, LastScreen);
         }

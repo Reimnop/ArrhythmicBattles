@@ -3,6 +3,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
@@ -28,18 +29,15 @@ public class ButtonEntity : UIElement, IRenderable, IDisposable
     public event Action? Pressed;
 
     public Vector2i TextPosOffset { get; set; }
-
-    private readonly InputSystem input;
-    private readonly InputCapture capture;
+    
+    private readonly IInputProvider inputProvider;
     private readonly TextEntity textEntity;
-    
-    
+
     private SimpleAnimator<Color4> colorAnimator = null!;
 
-    public ButtonEntity(FlexFrameworkMain engine, InputInfo inputInfo) : base(engine)
+    public ButtonEntity(FlexFrameworkMain engine, IInputProvider inputProvider) : base(engine)
     {
-        input = inputInfo.InputSystem;
-        capture = inputInfo.InputCapture;
+        this.inputProvider = inputProvider;
         
         textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
         textEntity.HorizontalAlignment = HorizontalAlignment.Left;
@@ -68,7 +66,7 @@ public class ButtonEntity : UIElement, IRenderable, IDisposable
         
         colorAnimator.Update(args);
 
-        if (IsFocused && input.GetKeyDown(capture, Keys.Enter))
+        if (IsFocused && inputProvider.GetKeyDown(Keys.Enter))
         {
             Pressed?.Invoke();
         }

@@ -16,7 +16,7 @@ public class MultiplayerScreen : Screen, IDisposable
     private readonly FlexFrameworkMain engine;
     private readonly Element root;
 
-    public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo)
+    public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
     {
         this.engine = engine;
         Bounds bounds = new Bounds(0, 0, engine.Size.X, engine.Size.Y);

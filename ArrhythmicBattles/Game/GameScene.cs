@@ -6,6 +6,7 @@ using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
+using FlexFramework.Core.UserInterface;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -26,9 +27,8 @@ public class GameScene : ABScene
     
     private Bloom bloom = null!;
     private Exposure tonemapper = null!;
-
-    private InputSystem inputSystem = null!;
-    private InputInfo inputInfo = null!;
+    
+    private ScopedInputProvider inputProvider = null!;
 
     private DebugScreen? debugScreen;
 
@@ -43,11 +43,8 @@ public class GameScene : ABScene
     {
         base.Init();
         
-        inputSystem = Context.InputSystem;
-        inputInfo = inputSystem.GetInputInfo();
-        
+        inputProvider = Context.InputSystem.AcquireInputProvider();
         physicsWorld = new PhysicsWorld(Engine);
-        
         skyboxRenderer = new ProceduralSkyboxRenderer();
 
         Renderer renderer = Engine.Renderer;
@@ -70,7 +67,7 @@ public class GameScene : ABScene
         camera.DepthFar = 1000.0f;
         camera.Position = Vector3.UnitZ * 4.0f;
         
-        playerEntity = new PlayerEntity(inputSystem, inputInfo, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
+        playerEntity = new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
 
         // Create floor
         Box floorBox = new Box(20.0f, 0.1f, 20.0f);
@@ -92,7 +89,7 @@ public class GameScene : ABScene
         physicsWorld.Update(args);
         playerEntity.Update(args);
 
-        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.F3))
+        if (inputProvider.GetKeyDown(Keys.F3))
         {
             if (debugScreen == null)
             {
@@ -106,7 +103,7 @@ public class GameScene : ABScene
             }
         }
         
-        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
+        if (inputProvider.GetKeyDown(Keys.Escape))
         {
             OpenScreen(new PauseScreen(Engine, this));
         }
@@ -157,7 +154,7 @@ public class GameScene : ABScene
         physicsWorld.Dispose();
         
         envModel.Dispose();
-        inputInfo.Dispose();
+        inputProvider.Dispose();
         
         bloom.Dispose();
         tonemapper.Dispose();

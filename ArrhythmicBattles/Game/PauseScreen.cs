@@ -5,8 +5,10 @@ using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using Textwriter;
 
 namespace ArrhythmicBattles.Game;
 
@@ -19,16 +21,14 @@ public class PauseScreen : Screen, IDisposable
 
     private readonly FlexFrameworkMain engine;
     private readonly ABScene scene;
-    private readonly InputSystem inputSystem;
-    private readonly InputInfo inputInfo;
+    private readonly ScopedInputProvider inputProvider;
 
     public PauseScreen(FlexFrameworkMain engine, ABScene scene)
     {
         this.engine = engine;
         this.scene = scene;
         
-        inputSystem = scene.Context.InputSystem;
-        inputInfo = inputSystem.GetInputInfo();
+        inputProvider = scene.Context.InputSystem.AcquireInputProvider();
         
         EngineResources resources = engine.Resources;
 
@@ -36,8 +36,10 @@ public class PauseScreen : Screen, IDisposable
         background.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
-        textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24;
+        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        
+        textEntity = new TextEntity(engine, font);
+        textEntity.BaselineOffset = font.Height;
         textEntity.Text = "Game paused!\n\nPress [Esc] to return";
     }
     
@@ -46,7 +48,7 @@ public class PauseScreen : Screen, IDisposable
         background.Update(args);
         textEntity.Update(args);
 
-        if (inputSystem.GetKeyDown(inputInfo.InputCapture, Keys.Escape))
+        if (inputProvider.GetKeyDown(Keys.Escape))
         {
             scene.CloseScreen(this);
         }
@@ -71,6 +73,6 @@ public class PauseScreen : Screen, IDisposable
     public void Dispose()
     {
         textEntity.Dispose();
-        inputInfo.Dispose();
+        inputProvider.Dispose();
     }
 }

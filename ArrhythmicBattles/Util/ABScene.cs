@@ -33,7 +33,6 @@ public abstract class ABScene : Scene, IDisposable
 
     public override void Update(UpdateArgs args)
     {
-        Context.Update();
         ScreenHandler.Update(args);
     }
 

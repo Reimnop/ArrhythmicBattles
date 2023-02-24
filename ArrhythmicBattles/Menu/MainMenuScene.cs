@@ -6,6 +6,7 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using Textwriter;
 using Renderer = FlexFramework.Core.Rendering.Renderer;
@@ -22,7 +23,7 @@ public class MainMenuScene : ABScene
     
     private TextEntity copyrightText;
 
-    private InputInfo inputInfo;
+    private ScopedInputProvider inputProvider;
 
     public MainMenuScene(ABContext context) : base(context)
     {
@@ -65,9 +66,9 @@ public class MainMenuScene : ABScene
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
         // Init input
-        inputInfo = Context.InputSystem.GetInputInfo();
+        inputProvider = Context.InputSystem.AcquireInputProvider();
         
-        OpenScreen(new SelectScreen(Engine, this, inputInfo));
+        OpenScreen(new SelectScreen(Engine, this, inputProvider));
     }
 
     public override void Update(UpdateArgs args)
@@ -115,6 +116,7 @@ public class MainMenuScene : ABScene
     {
         base.Dispose();
         
+        inputProvider.Dispose();
         Context.Sound.MenuBackgroundMusic.Stop();
     }
 }

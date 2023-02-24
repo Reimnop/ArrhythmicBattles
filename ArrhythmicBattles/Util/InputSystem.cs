@@ -4,18 +4,13 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Util;
 
-public class InputCapture : IDisposable
+public struct InputCapture
 {
-    private readonly InputSystem system;
-    
-    public InputCapture(InputSystem system)
-    {
-        this.system = system;
-    }
+    public int Id { get; }
 
-    public void Dispose()
+    public InputCapture(int id)
     {
-        system.ReleaseCapture(this);
+        Id = id;
     }
 }
 
@@ -24,7 +19,8 @@ public class InputSystem
     public Input Input { get; }
     
     private readonly List<InputCapture> captures = new List<InputCapture>();
-    private InputCapture? currentCapture;
+    private InputCapture? currentCapture = null;
+    private int captureId = 0;
 
     public InputSystem(Input input)
     {
@@ -33,17 +29,17 @@ public class InputSystem
 
     public void Update()
     {
-        currentCapture = captures.Count > 0 ? captures.Last() : null;
+        currentCapture = captures.Count > 0 ? captures[^1] : null;
     }
 
-    public InputInfo GetInputInfo()
+    public ScopedInputProvider AcquireInputProvider()
     {
-        return new InputInfo(this, AcquireCapture());
+        return new ScopedInputProvider(AcquireCapture(), this);
     }
 
     public InputCapture AcquireCapture()
     {
-        InputCapture capture = new InputCapture(this);
+        InputCapture capture = new InputCapture(captureId++);
         captures.Add(capture);
         return capture;
     }
@@ -54,12 +50,28 @@ public class InputSystem
         {
             return false;
         }
-        return currentCapture == capture;
+        
+        if (currentCapture == null)
+        {
+            return false;
+        }
+        
+        return currentCapture.Value.Id == capture.Id;
     }
 
     public void ReleaseCapture(InputCapture capture)
     {
         captures.Remove(capture);
+    }
+    
+    public Vector2 GetMousePosition(InputCapture capture)
+    {
+        if (!IsCurrentCapture(capture))
+        {
+            return Vector2.Zero;
+        }
+        
+        return Input.MousePosition;
     }
     
     public Vector2 GetMouseDelta(InputCapture capture)
@@ -70,6 +82,26 @@ public class InputSystem
         }
         
         return Input.MouseDelta;
+    }
+    
+    public Vector2 GetMouseScroll(InputCapture capture)
+    {
+        if (!IsCurrentCapture(capture))
+        {
+            return Vector2.Zero;
+        }
+        
+        return Input.MouseScroll;
+    }
+    
+    public Vector2 GetMouseScrollDelta(InputCapture capture)
+    {
+        if (!IsCurrentCapture(capture))
+        {
+            return Vector2.Zero;
+        }
+        
+        return Input.MouseScrollDelta;
     }
     
     public bool GetMouseDown(InputCapture capture, MouseButton button)

@@ -4,6 +4,7 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -60,9 +61,8 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
 {
     public NavNode RootNode { get; }
     public event NodeSelectedEventHandler? OnNodeSelected;
-    
-    private readonly InputSystem input;
-    private readonly InputCapture capture;
+
+    private readonly IInputProvider inputProvider;
     private readonly MeshEntity meshEntity;
     private readonly Mesh<Vertex> mesh;
     private readonly List<Vector2> vertexPositions = new List<Vector2>();
@@ -74,10 +74,9 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
 
     private Vector2 currentRectSize;
 
-    public KeyboardNavigator(InputInfo inputInfo, NavNode rootNode)
+    public KeyboardNavigator(IInputProvider inputProvider, NavNode rootNode)
     {
-        input = inputInfo.InputSystem;
-        capture = inputInfo.InputCapture;
+        this.inputProvider = inputProvider;
         RootNode = rootNode;
         
         RootNode.Element.IsFocused = true;
@@ -114,22 +113,22 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         highlightAnimator.Update(args);
         meshEntity.Update(args);
         
-        if (input.GetKeyDown(capture, Keys.Up))
+        if (inputProvider.GetKeyDown(Keys.Up))
         {
             AdvanceTo(currentNode.Top);
         }
         
-        if (input.GetKeyDown(capture, Keys.Down))
+        if (inputProvider.GetKeyDown(Keys.Down))
         {
             AdvanceTo(currentNode.Bottom);
         }
         
-        if (input.GetKeyDown(capture, Keys.Left))
+        if (inputProvider.GetKeyDown(Keys.Left))
         {
             AdvanceTo(currentNode.Left);
         }
         
-        if (input.GetKeyDown(capture, Keys.Right))
+        if (inputProvider.GetKeyDown(Keys.Right))
         {
             AdvanceTo(currentNode.Right);
         }

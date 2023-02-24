@@ -1,14 +1,15 @@
 ﻿using ArrhythmicBattles.UI;
 using ArrhythmicBattles.Util;
 using FlexFramework;
+using FlexFramework.Core.UserInterface;
 
 namespace ArrhythmicBattles.Menu;
 
 public class AudioSettingsScreen : MenuScreen
 {
-    protected override Screen LastScreen => new SettingsScreen(Engine, Scene, InputInfo);
+    protected override Screen LastScreen => new SettingsScreen(Engine, Scene, InputProvider);
     
-    public AudioSettingsScreen(FlexFrameworkMain engine, ABScene scene, InputInfo inputInfo) : base(engine, scene, inputInfo)
+    public AudioSettingsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider) : base(engine, scene, inputProvider)
     {
     }
 
