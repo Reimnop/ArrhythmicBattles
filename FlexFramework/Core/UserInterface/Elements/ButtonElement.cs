@@ -14,7 +14,11 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
     public event Action? Click;
     
     private readonly Interactivity interactivity;
-    private readonly RectEntity rectEntity = new RectEntity();
+
+    private readonly RectEntity rectEntity = new RectEntity()
+    {
+        Radius = 4.0f
+    };
 
     public ButtonElement(IInputProvider inputProvider, params Element[] children) : base(children)
     {
