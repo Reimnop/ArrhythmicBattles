@@ -40,8 +40,6 @@ public class TextElement : VisualElement, IRenderable, IDisposable
         matrixStack.Translate(ElementBounds.X0, ElementBounds.Y0, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
-        
-        DrawDebugBoxes(args);
     }
 
     public void Dispose()

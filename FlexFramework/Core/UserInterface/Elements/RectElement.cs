@@ -49,8 +49,6 @@ public class RectElement : VisualElement, IRenderable, IDisposable
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
-        
-        DrawDebugBoxes(args);
     }
 
     public void Dispose()

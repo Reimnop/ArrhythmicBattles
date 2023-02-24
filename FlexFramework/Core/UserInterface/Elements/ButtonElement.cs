@@ -17,26 +17,14 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
     private readonly Mesh<Vertex> mesh;
     private readonly List<Vector2> vertexPositions = new List<Vector2>();
     
-    private bool hovered;
+    private Color4 color = new Color4(0.9f, 0.9f, 0.9f, 1.0f);
 
     public ButtonElement(IInputProvider inputProvider, params Element[] children) : base(children)
     {
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonDown += OnMouseButtonDown;
-        interactivity.MouseEnter += OnMouseEnter;
-        interactivity.MouseLeave += OnMouseLeave;
-        
+
         mesh = new Mesh<Vertex>("button-mesh");
-    }
-
-    private void OnMouseLeave()
-    {
-        hovered = false;
-    }
-
-    private void OnMouseEnter()
-    {
-        hovered = true;
     }
 
     private void OnMouseButtonDown(MouseButton button)
@@ -50,6 +38,16 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
     public void Update(UpdateArgs args)
     {
         interactivity.Update();
+
+        color = new Color4(0.9f, 0.9f, 0.9f, 1.0f);
+        if (interactivity.MouseOver)
+        {
+            color = new Color4(0.8f, 0.8f, 0.8f, 1.0f);
+        }
+        if (interactivity.MouseButtons[(int) MouseButton.Left])
+        {
+            color = new Color4(0.6f, 0.6f, 0.6f, 1.0f);
+        }
     }
 
     public override void UpdateLayout(Bounds constraintBounds)
@@ -81,11 +79,9 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
         int layerId = args.LayerId;
         
         matrixStack.Push();
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, hovered ? new Color4(0.7f, 0.7f, 0.7f, 1.0f) : new Color4(0.9f, 0.9f, 0.9f, 1.0f), PrimitiveType.Triangles);
+        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
-        
-        DrawDebugBoxes(args);
     }
 
     public void Dispose()

@@ -12,6 +12,8 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
     public event MouseEventHandler? MouseButtonUp;
     
     public Bounds Bounds { get; set; }
+    public bool MouseOver { get; private set; }
+    public bool[] MouseButtons { get; } = new bool[(int) MouseButton.Last + 1];
     
     private readonly IInputProvider inputProvider;
 
@@ -25,33 +27,40 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
 
     public void Update()
     {
-        bool mouseOver = IsMouseOver();
+        // Get input
+        MouseOver = IsMouseOver();
+        for (int i = 0; i < MouseButtons.Length; i++)
+        {
+            MouseButtons[i] = IsMouseButton((MouseButton) i);
+        }
         
-        if (mouseOver && !lastMouseOver)
+        // Check for mouse enter/leave
+        if (MouseOver && !lastMouseOver)
         {
             MouseEnter?.Invoke();
         }
-        else if (!mouseOver && lastMouseOver)
+        else if (!MouseOver && lastMouseOver)
         {
             MouseLeave?.Invoke();
         }
-        
-        lastMouseOver = mouseOver;
-        
-        for (int i = 0; i < lastMouseButtons.Length; i++)
+
+        for (int i = 0; i < MouseButtons.Length; i++)
         {
-            bool mouseButton = IsMouseButton((MouseButton) i);
-            
-            if (mouseButton && !lastMouseButtons[i])
+            if (MouseButtons[i] && !lastMouseButtons[i])
             {
                 MouseButtonDown?.Invoke((MouseButton) i);
             }
-            else if (!mouseButton && lastMouseButtons[i])
+            else if (!MouseButtons[i] && lastMouseButtons[i])
             {
                 MouseButtonUp?.Invoke((MouseButton) i);
             }
-            
-            lastMouseButtons[i] = mouseButton;
+        }
+        
+        // Update last values
+        lastMouseOver = MouseOver;
+        for (int i = 0; i < MouseButtons.Length; i++)
+        {
+            lastMouseButtons[i] = MouseButtons[i];
         }
     }
     

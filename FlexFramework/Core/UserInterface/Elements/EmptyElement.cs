@@ -9,7 +9,7 @@ public class EmptyElement : Element
 
     public override void UpdateLayout(Bounds constraintBounds)
     {
-        CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
-        UpdateChildrenLayout(contentBounds);
+        base.UpdateLayout(constraintBounds);
+        UpdateChildrenLayout(ContentBounds);
     }
 }
