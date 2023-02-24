@@ -156,20 +156,15 @@ public abstract class Element : IEnumerable<Element>
 
     public void RenderRecursive(RenderArgs args)
     {
-#if DEBUG_SHOW_BOUNDING_BOXES
-        foreach (Element element in this)
-        {
-            if (element is IRenderable renderable)
-            {
-                renderable.Render(args);
-            }
-            
-            DrawDebugBoxes(element, args);
-        }
-#else
         foreach (IRenderable renderable in this.OfType<IRenderable>())
         {
             renderable.Render(args);
+        }
+        
+#if DEBUG_SHOW_BOUNDING_BOXES
+        foreach (Element element in this)
+        {
+            DrawDebugBoxes(element, args);
         }
 #endif
     }
