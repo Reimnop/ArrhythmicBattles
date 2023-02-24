@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class RectElement : EmptyElement, IRenderable, IDisposable
+public class RectElement : VisualElement, IRenderable, IDisposable
 {
     public float Radius { get; set; } = 0.0f;
     public Color4 Color { get; set; } = Color4.White;
@@ -20,21 +20,22 @@ public class RectElement : EmptyElement, IRenderable, IDisposable
     public override void UpdateLayout(Bounds constraintBounds)
     {
         base.UpdateLayout(constraintBounds);
-        CalculateBounds(constraintBounds, out _, out Bounds elementBounds, out _);
+        UpdateChildrenLayout(ContentBounds);
         
-        Vector2[] vertexPositions = MeshGenerator.GenerateRoundedRectangle(elementBounds.Min, elementBounds.Max, Radius);
+        // Render self
+        Vector2[] vertexPositions = MeshGenerator.GenerateRoundedRectangle(ElementBounds.Min, ElementBounds.Max, Radius);
         Vertex[] vertices = vertexPositions
             .Select(pos =>
             {
-                Vector2 relativePos = pos - elementBounds.Min;
-                Vector2 uv = new Vector2(relativePos.X / elementBounds.Width, relativePos.Y / elementBounds.Height);
+                Vector2 relativePos = pos - ElementBounds.Min;
+                Vector2 uv = new Vector2(relativePos.X / ElementBounds.Width, relativePos.Y / ElementBounds.Height);
                 return new Vertex(new Vector3(pos), uv);
             })
             .ToArray();
         mesh.LoadData(vertices);
     }
 
-    public void Render(RenderArgs args)
+    public override void Render(RenderArgs args)
     {
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
@@ -44,6 +45,8 @@ public class RectElement : EmptyElement, IRenderable, IDisposable
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
+        
+        DrawDebugBoxes(args);
     }
 
     public void Dispose()

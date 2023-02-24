@@ -10,17 +10,6 @@ public class EmptyElement : Element
     public override void UpdateLayout(Bounds constraintBounds)
     {
         CalculateBounds(constraintBounds, out _, out _, out Bounds contentBounds);
-
-        float y = contentBounds.Y0;
-        
-        // Render children
-        foreach (Element child in Children)
-        {
-            Bounds childConstraintBounds = new Bounds(contentBounds.X0, y, contentBounds.X1, contentBounds.Y1);
-            Bounds childBounds = child.CalculateBoundingBox(childConstraintBounds);
-            y += childBounds.Height;
-
-            child.UpdateLayout(childConstraintBounds);
-        }
+        UpdateChildrenLayout(contentBounds);
     }
 }

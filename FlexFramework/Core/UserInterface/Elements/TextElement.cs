@@ -4,7 +4,7 @@ using Textwriter;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class TextElement : EmptyElement, IRenderable, IDisposable
+public class TextElement : VisualElement, IRenderable, IDisposable
 {
     public string Text
     {
@@ -19,7 +19,6 @@ public class TextElement : EmptyElement, IRenderable, IDisposable
     }
 
     private readonly TextEntity textEntity;
-    private Bounds elementBounds;
 
     public TextElement(FlexFrameworkMain engine, Font font, params Element[] children) : base(children)
     {
@@ -30,17 +29,19 @@ public class TextElement : EmptyElement, IRenderable, IDisposable
     public override void UpdateLayout(Bounds constraintBounds)
     {
         base.UpdateLayout(constraintBounds);
-        CalculateBounds(constraintBounds, out _, out elementBounds, out _);
+        UpdateChildrenLayout(ContentBounds);
     }
 
-    public void Render(RenderArgs args)
+    public override void Render(RenderArgs args)
     {
         MatrixStack matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(elementBounds.X0, elementBounds.Y0, 0.0f);
+        matrixStack.Translate(ElementBounds.X0, ElementBounds.Y0, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
+        
+        DrawDebugBoxes(args);
     }
 
     public void Dispose()

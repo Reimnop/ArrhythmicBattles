@@ -5,17 +5,10 @@ namespace FlexFramework.Core.UserInterface;
 
 public struct Transform
 {
-    public Vector2 Position { get; set; }
-    public Vector2 Scale { get; set; }
-    public float Rotation { get; set; }
-    
-    public Transform()
-    {
-        Position = Vector2.Zero;
-        Scale = Vector2.One;
-        Rotation = 0.0f;
-    }
-    
+    public Vector2 Position { get; set; } = Vector2.Zero;
+    public Vector2 Scale { get; set; } = Vector2.One;
+    public float Rotation { get; set; } = 0.0f;
+
     public Transform(Vector2 position, Vector2 scale, float rotation)
     {
         Position = position;

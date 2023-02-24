@@ -26,6 +26,11 @@ public abstract class Element : IEnumerable<Element>
     public Length PaddingRight { get; set; } = Length.Zero;
     public Length PaddingTop { get; set; } = Length.Zero;
     public Length PaddingBottom { get; set; } = Length.Zero;
+    
+    protected Element(params Element[] children)
+    {
+        Children.AddRange(children);
+    }
 
     // Bounding box is the area that the element occupies
     public Bounds CalculateBoundingBox(Bounds constraintBounds)
@@ -65,6 +70,21 @@ public abstract class Element : IEnumerable<Element>
     }
 
     public abstract void UpdateLayout(Bounds constraintBounds);
+    
+    protected void UpdateChildrenLayout(Bounds contentBounds)
+    {
+        float y = contentBounds.Y0;
+        
+        // Render children
+        foreach (Element child in Children)
+        {
+            Bounds childConstraintBounds = new Bounds(contentBounds.X0, y, contentBounds.X1, contentBounds.Y1);
+            Bounds childBounds = child.CalculateBoundingBox(childConstraintBounds);
+            y += childBounds.Height;
+
+            child.UpdateLayout(childConstraintBounds);
+        }
+    }
 
     /// <summary>
     /// Enumerates all elements of the tree, including this element.
