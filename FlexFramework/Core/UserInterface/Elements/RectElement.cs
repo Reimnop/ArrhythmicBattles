@@ -3,6 +3,7 @@ using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using SharpFont;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -11,7 +12,8 @@ public class RectElement : VisualElement, IRenderable, IDisposable
     public float Radius { get; set; } = 0.0f;
     public Color4 Color { get; set; } = Color4.White;
 
-    private Mesh<Vertex> mesh = new Mesh<Vertex>("rect");
+    private readonly Mesh<Vertex> mesh = new Mesh<Vertex>("rect");
+    private readonly List<Vector2> vertexPositions = new List<Vector2>();
 
     public RectElement(params Element[] children) : base(children)
     {
@@ -22,16 +24,18 @@ public class RectElement : VisualElement, IRenderable, IDisposable
         base.UpdateLayout(constraintBounds);
         UpdateChildrenLayout(ContentBounds);
         
-        // Render self
-        Vector2[] vertexPositions = MeshGenerator.GenerateRoundedRectangle(ElementBounds.Min, ElementBounds.Max, Radius);
-        Vertex[] vertices = vertexPositions
-            .Select(pos =>
-            {
-                Vector2 relativePos = pos - ElementBounds.Min;
-                Vector2 uv = new Vector2(relativePos.X / ElementBounds.Width, relativePos.Y / ElementBounds.Height);
-                return new Vertex(new Vector3(pos), uv);
-            })
-            .ToArray();
+        vertexPositions.Clear();
+        MeshGenerator.GenerateRoundedRectangle(vertexPositions, ElementBounds.Min, ElementBounds.Max, Radius);
+        
+        Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
+        for (int i = 0; i < vertexPositions.Count; i++)
+        {
+            Vector2 pos = vertexPositions[i];
+            Vector2 relativePos = pos - ElementBounds.Min;
+            Vector2 uv = new Vector2(relativePos.X / ElementBounds.Width, relativePos.Y / ElementBounds.Height);
+            vertices[i] = new Vertex(new Vector3(pos), uv);
+        }
+        
         mesh.LoadData(vertices);
     }
 

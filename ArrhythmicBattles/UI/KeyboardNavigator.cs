@@ -65,6 +65,7 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
     private readonly InputCapture capture;
     private readonly MeshEntity meshEntity;
     private readonly Mesh<Vertex> mesh;
+    private readonly List<Vector2> vertexPositions = new List<Vector2>();
     
     private SimpleAnimator<RectangleF> highlightAnimator = null!;
 
@@ -160,9 +161,16 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
 
         currentRectSize = actualRectSize;
         
-        Vertex[] vertices = MeshGenerator.GenerateRoundedRectangle(Vector2.Zero, new Vector2(actualRectSize.X, actualRectSize.Y), 8)
-            .Select(pos => new Vertex(pos.X, pos.Y, 0.0f, actualRectSize.X / pos.X, actualRectSize.Y / pos.Y))
-            .ToArray();
+        vertexPositions.Clear();
+        MeshGenerator.GenerateRoundedRectangle(vertexPositions, Vector2.Zero, new Vector2(actualRectSize.X, actualRectSize.Y), 8.0f);
+        
+        Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
+        for (int i = 0; i < vertexPositions.Count; i++)
+        {
+            Vector2 pos = vertexPositions[i];
+            vertices[i] = new Vertex(pos.X, pos.Y, 0.0f, actualRectSize.X / pos.X, actualRectSize.Y / pos.Y);
+        }
+        
         mesh.LoadData(vertices);
     }
     
