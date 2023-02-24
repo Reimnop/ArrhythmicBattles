@@ -6,7 +6,6 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using Textwriter;
@@ -46,7 +45,8 @@ public class MainMenuScene : ABScene
         Context.Sound.MenuBackgroundMusic.Play();
 
         // Init entities
-        bannerTexture = Texture2D.FromFile("banner", "Assets/banner.png");
+        string bannerPath = Utils.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
+        bannerTexture = Texture2D.FromFile("banner", bannerPath);
         bannerEntity = new ImageEntity(Engine);
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);

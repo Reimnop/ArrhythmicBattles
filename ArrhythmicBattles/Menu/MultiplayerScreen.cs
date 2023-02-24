@@ -48,8 +48,8 @@ public class MultiplayerScreen : Screen, IDisposable
                 })
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(12.0f, Unit.Pixel)
+                Height = new Length(56.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel)
             },
             new ButtonElement(
                 inputProvider,
@@ -62,8 +62,8 @@ public class MultiplayerScreen : Screen, IDisposable
                 })
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(12.0f, Unit.Pixel)
+                Height = new Length(56.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel)
             },
             new ButtonElement(
                 inputProvider,
@@ -76,14 +76,13 @@ public class MultiplayerScreen : Screen, IDisposable
                 })
             {
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(12.0f, Unit.Pixel)
+                Height = new Length(56.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel)
             })
         {
             Width = new Length(512.0f, Unit.Pixel), 
             Height = new Length(240.0f, Unit.Pixel),
-            Spacing = new Length(12.0f, Unit.Pixel),
-            Padding = new Length(12.0f, Unit.Pixel)
+            Spacing = new Length(16.0f, Unit.Pixel)
         };
     }
 
@@ -104,9 +103,6 @@ public class MultiplayerScreen : Screen, IDisposable
 
     public void Dispose()
     {
-        foreach (IDisposable disposable in root.OfType<IDisposable>())
-        {
-            disposable.Dispose();
-        }
+        root.DisposeRecursive();
     }
 }

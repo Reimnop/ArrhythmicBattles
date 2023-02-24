@@ -174,6 +174,14 @@ public abstract class Element : IEnumerable<Element>
 #endif
     }
     
+    public void DisposeRecursive()
+    {
+        foreach (IDisposable disposable in this.OfType<IDisposable>())
+        {
+            disposable.Dispose();
+        }
+    }
+    
 #if DEBUG_SHOW_BOUNDING_BOXES
     protected static void DrawDebugBoxes(Element element, RenderArgs args)
     {

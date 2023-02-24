@@ -21,4 +21,9 @@ public static class Utils
             nodes[i].Bottom = nodes[i + 1];
         }
     }
+    
+    public static float RandomFromTime()
+    {
+        return (float) (DateTime.Now.Millisecond / 1000.0);
+    }
 }

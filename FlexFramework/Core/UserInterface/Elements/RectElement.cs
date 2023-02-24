@@ -1,19 +1,23 @@
-﻿using FlexFramework.Core.Data;
-using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Util;
-using OpenTK.Graphics.OpenGL4;
+﻿using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
-using SharpFont;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
 public class RectElement : VisualElement, IRenderable, IDisposable
 {
-    public float Radius { get; set; } = 0.0f;
-    public Color4 Color { get; set; } = Color4.White;
+    public float Radius
+    {
+        get => rectEntity.Radius;
+        set => rectEntity.Radius = value;
+    }
 
-    private readonly Mesh<Vertex> mesh = new Mesh<Vertex>("rect");
-    private readonly List<Vector2> vertexPositions = new List<Vector2>();
+    public Color4 Color
+    {
+        get => rectEntity.Color;
+        set => rectEntity.Color = value;
+    }
+
+    private readonly RectEntity rectEntity = new RectEntity();
 
     public RectElement(params Element[] children) : base(children)
     {
@@ -24,35 +28,17 @@ public class RectElement : VisualElement, IRenderable, IDisposable
         base.UpdateLayout(constraintBounds);
         UpdateChildrenLayout(ContentBounds);
         
-        vertexPositions.Clear();
-        MeshGenerator.GenerateRoundedRectangle(vertexPositions, ElementBounds.Min, ElementBounds.Max, Radius);
-        
-        Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
-        for (int i = 0; i < vertexPositions.Count; i++)
-        {
-            Vector2 pos = vertexPositions[i];
-            Vector2 relativePos = pos - ElementBounds.Min;
-            Vector2 uv = new Vector2(relativePos.X / ElementBounds.Width, relativePos.Y / ElementBounds.Height);
-            vertices[i] = new Vertex(new Vector3(pos), uv);
-        }
-        
-        mesh.LoadData(vertices);
+        rectEntity.Min = ElementBounds.Min;
+        rectEntity.Max = ElementBounds.Max;
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
-        CameraData cameraData = args.CameraData;
-        int layerId = args.LayerId;
-        
-        matrixStack.Push();
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
-        args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
-        matrixStack.Pop();
+        rectEntity.Render(args);
     }
 
     public void Dispose()
     {
-        mesh.Dispose();
+        rectEntity.Dispose();
     }
 }
