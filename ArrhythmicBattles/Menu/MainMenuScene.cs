@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using ArrhythmicBattles.UI;
+using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;

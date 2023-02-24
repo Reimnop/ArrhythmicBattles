@@ -2,7 +2,7 @@
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public class LayeredScreenHandler : Entity, IRenderable, IDisposable
 {

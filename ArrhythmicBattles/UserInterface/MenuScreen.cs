@@ -8,8 +8,9 @@ using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
+[Obsolete("Use the new UI system instead.")]
 public abstract class MenuScreen : Screen, IDisposable
 {
     protected static Vector2 ControlSize => new Vector2i(512, 56);

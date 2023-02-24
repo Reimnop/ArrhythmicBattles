@@ -8,7 +8,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public class ButtonEntity : UIElement, IRenderable, IDisposable
 {

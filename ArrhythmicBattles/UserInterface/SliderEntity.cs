@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public class SliderEntity : UIElement, IRenderable, IDisposable
 {

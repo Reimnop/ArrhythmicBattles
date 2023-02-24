@@ -1,9 +1,4 @@
-﻿using System.Drawing;
-using FlexFramework.Core.Data;
-using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering.Data;
-using FlexFramework.Util;
-using OpenTK.Graphics.OpenGL4;
+﻿using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 

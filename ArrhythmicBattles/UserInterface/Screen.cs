@@ -2,7 +2,7 @@
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public abstract class Screen : IRenderable
 {

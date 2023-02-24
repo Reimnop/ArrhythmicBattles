@@ -3,7 +3,7 @@ using FlexFramework.Core.Entities;
 using FlexFramework.Core;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public class VerticalStackLayout : UIElement
 {

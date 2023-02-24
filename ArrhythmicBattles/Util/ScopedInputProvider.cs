@@ -6,7 +6,7 @@ namespace ArrhythmicBattles.Util;
 
 public class ScopedInputProvider : IInputProvider, IDisposable
 {
-    public bool InputAvailable => InputSystem.IsCurrentCapture(Capture);
+    public bool InputAvailable => InputSystem.Input.WindowFocused && InputSystem.IsCurrentCapture(Capture);
     public Vector2 MousePosition => InputSystem.GetMousePosition(Capture);
     public Vector2 MouseDelta => InputSystem.GetMouseDelta(Capture);
     public Vector2 MouseScroll => InputSystem.GetMouseScroll(Capture);

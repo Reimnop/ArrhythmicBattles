@@ -8,7 +8,7 @@ using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.UI;
+namespace ArrhythmicBattles.UserInterface;
 
 public class NavNode
 {
@@ -62,7 +62,7 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
 
     private readonly IInputProvider inputProvider;
     
-    private readonly RectEntity rectEntity= new RectEntity()
+    private readonly RectEntity rectEntity = new RectEntity()
     {
         Radius = 8.0f
     };

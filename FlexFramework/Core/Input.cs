@@ -10,6 +10,7 @@ public class Input
     private readonly KeyboardState keyboard;
     private readonly MouseState mouse;
 
+    public bool WindowFocused => window.IsFocused;
     public Vector2 MousePosition => mouse.Position;
     public Vector2 MouseDelta => mouse.Delta;
     public Vector2 MouseScroll => mouse.Scroll;

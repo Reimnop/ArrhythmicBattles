@@ -1,4 +1,4 @@
-﻿using ArrhythmicBattles.UI;
+﻿using ArrhythmicBattles.UserInterface;
 
 namespace ArrhythmicBattles.Util;
 

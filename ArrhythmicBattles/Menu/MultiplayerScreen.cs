@@ -1,4 +1,4 @@
-﻿using ArrhythmicBattles.UI;
+﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core;
@@ -34,46 +34,20 @@ public class MultiplayerScreen : Screen, IDisposable
 
     private Element InitUI()
     {
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
-
         return new StackLayout(
-            new ButtonElement(
-                inputProvider,
-                new TextElement(engine, font)
-                {
-                    Text = "Lorem ipsum dolor sit amet,",
-                    Color = Color4.Black,
-                    Width = Length.Full,
-                    Height = Length.Full
-                })
+            new ABButtonElement(engine, inputProvider, "Lorem ipsum dolor sit amet,")  
             {
                 Width = Length.Full,
                 Height = new Length(56.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
-            new ButtonElement(
-                inputProvider,
-                new TextElement(engine, font)
-                {
-                    Text = "consectetur adipiscing elit.",
-                    Color = Color4.Black,
-                    Width = Length.Full,
-                    Height = Length.Full
-                })
+            new ABButtonElement(engine, inputProvider, "consectetur adipiscing elit.")
             {
                 Width = Length.Full,
                 Height = new Length(56.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
-            new ButtonElement(
-                inputProvider,
-                new TextElement(engine, font)
-                {
-                    Text = "Nulla ut tincidunt quam.",
-                    Color = Color4.Black,
-                    Width = Length.Full,
-                    Height = Length.Full
-                })
+            new ABButtonElement(engine, inputProvider, "Nulla ut tincidunt quam.")
             {
                 Width = Length.Full,
                 Height = new Length(56.0f, Unit.Pixel),
@@ -81,7 +55,7 @@ public class MultiplayerScreen : Screen, IDisposable
             })
         {
             Width = new Length(512.0f, Unit.Pixel), 
-            Height = new Length(240.0f, Unit.Pixel),
+            Height = new Length(200.0f, Unit.Pixel),
             Spacing = new Length(16.0f, Unit.Pixel)
         };
     }
