@@ -8,7 +8,7 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class VisualElement : Element, IRenderable
 {
-#if DEBUG_SHOW_BOUNDING_BOXES
+#if DEBUG_SHOW_BOUNDING_BOXES // This will blow up if you have multiple OpenGL contexts, but it's only for debugging anyway
     private static readonly Mesh<Vertex> DebugMesh = new Mesh<Vertex>("debug");
 
     static VisualElement()
