@@ -45,6 +45,7 @@ public class CreditsScreen : Screen, IDisposable
         MatrixStack matrixStack = args.MatrixStack;
         
         matrixStack.Push();
+        matrixStack.Translate(48.0f, 306.0f, 0.0f);
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();

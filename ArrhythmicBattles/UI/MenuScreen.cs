@@ -104,8 +104,13 @@ public abstract class MenuScreen : Screen, IDisposable
     
     public override void Render(RenderArgs args)
     {
+        MatrixStack matrixStack = args.MatrixStack;
+        
+        matrixStack.Push();
+        matrixStack.Translate(48.0f, 306.0f, 0.0f);
         navigator.Render(args);
         elements.ForEach(element => (element as IRenderable)?.Render(args));
+        matrixStack.Pop();
     }
 
     public virtual void Dispose()

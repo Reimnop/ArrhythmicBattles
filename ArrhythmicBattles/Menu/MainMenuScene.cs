@@ -8,6 +8,7 @@ using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using Textwriter;
 using Renderer = FlexFramework.Core.Rendering.Renderer;
 
@@ -32,6 +33,8 @@ public class MainMenuScene : ABScene
     public override void Init()
     {
         base.Init();
+        
+        Engine.CursorState = CursorState.Normal;
         
         // Reset lightings
         if (Engine.Renderer is ILighting lightings)
@@ -86,10 +89,7 @@ public class MainMenuScene : ABScene
         CameraData cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         RenderArgs args = new RenderArgs(renderer, GuiLayerId, MatrixStack, cameraData);
         
-        MatrixStack.Push();
-        MatrixStack.Translate(48.0f, 306.0f, 0.0f);
         ScreenHandler.Render(args);
-        MatrixStack.Pop();
         
         MatrixStack.Push();
         MatrixStack.Push();

@@ -9,6 +9,7 @@ using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Game;
@@ -42,6 +43,8 @@ public class GameScene : ABScene
     public override void Init()
     {
         base.Init();
+        
+        Engine.CursorState = CursorState.Grabbed;
         
         inputProvider = Context.InputSystem.AcquireInputProvider();
         physicsWorld = new PhysicsWorld(Engine);

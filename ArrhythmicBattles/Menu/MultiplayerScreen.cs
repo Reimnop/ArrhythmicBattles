@@ -5,6 +5,7 @@ using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
 
 namespace ArrhythmicBattles.Menu;
@@ -15,11 +16,17 @@ public class MultiplayerScreen : Screen, IDisposable
 
     private readonly FlexFrameworkMain engine;
     private readonly Element root;
+    
+    private readonly ABScene scene;
+    private readonly IInputProvider inputProvider;
 
     public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
     {
         this.engine = engine;
-        Bounds bounds = new Bounds(0, 0, engine.Size.X, engine.Size.Y);
+        this.scene = scene;
+        this.inputProvider = inputProvider;
+        
+        Bounds bounds = new Bounds(48.0f, 306.0f, engine.Size.X, engine.Size.Y);
         
         root = InitUI();
         root.UpdateLayout(bounds);
@@ -30,7 +37,8 @@ public class MultiplayerScreen : Screen, IDisposable
         Font font = engine.TextResources.GetFont("inconsolata-regular");
 
         return new StackLayout(
-            new RectElement(
+            new ButtonElement(
+                inputProvider,
                 new TextElement(engine, font)
                 {
                     Text = "Lorem ipsum dolor sit amet,",
@@ -39,12 +47,12 @@ public class MultiplayerScreen : Screen, IDisposable
                     Height = Length.Full
                 })
             {
-                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(12.0f, Unit.Pixel)
             },
-            new RectElement(
+            new ButtonElement(
+                inputProvider,
                 new TextElement(engine, font)
                 {
                     Text = "consectetur adipiscing elit.",
@@ -53,12 +61,12 @@ public class MultiplayerScreen : Screen, IDisposable
                     Height = Length.Full
                 })
             {
-                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(12.0f, Unit.Pixel)
             },
-            new RectElement(
+            new ButtonElement(
+                inputProvider,
                 new TextElement(engine, font)
                 {
                     Text = "Nulla ut tincidunt quam.",
@@ -67,7 +75,6 @@ public class MultiplayerScreen : Screen, IDisposable
                     Height = Length.Full
                 })
             {
-                Radius = 8.0f,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(12.0f, Unit.Pixel)
@@ -83,6 +90,11 @@ public class MultiplayerScreen : Screen, IDisposable
     public override void Update(UpdateArgs args)
     {
         root.UpdateRecursive(args);
+        
+        if (inputProvider.GetKeyDown(Keys.Escape))
+        {
+            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
+        }
     }
 
     public override void Render(RenderArgs args)
