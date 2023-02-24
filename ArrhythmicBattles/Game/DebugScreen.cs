@@ -31,11 +31,13 @@ public class DebugScreen : Screen, IDisposable
 
         GpuInfo gpuInfo = engine.Renderer.GpuInfo;
 
-        leftTextEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-small"));
-        leftTextEntity.BaselineOffset = 16;
+        Font font = engine.TextResources.GetFont("inconsolata-small");
+
+        leftTextEntity = new TextEntity(engine, font);
+        leftTextEntity.BaselineOffset = font.Height;
         
-        rightTextEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-small"));
-        rightTextEntity.BaselineOffset = 16;
+        rightTextEntity = new TextEntity(engine, font);
+        rightTextEntity.BaselineOffset = font.Height;
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +
