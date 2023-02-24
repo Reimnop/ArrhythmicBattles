@@ -81,7 +81,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         RigidPose rigidPose = new RigidPose(position.ToSystem(), Quaternion.FromAxisAngle(Vector3.UnitY, yaw).ToSystem());
         BodyDescription bodyDescription = BodyDescription.CreateDynamic(
             rigidPose, 
-            new BodyInertia { InverseMass = 1.0f / 70.0f },
+            new BodyInertia { InverseMass = 1.0f / 40.0f },
             new CollidableDescription(capsuleIndex, 0.1f, float.MaxValue, ContinuousDetection.Passive),
             0.01f);
         bodyHandle = physicsWorld.Simulation.Bodies.Add(bodyDescription);
@@ -108,16 +108,27 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
             Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
             Vector3 direction = forward * movement.Y + right * movement.X;
             Vector2 move = new Vector2(direction.X, direction.Z).Normalized();
-            Vector3 velocity = bodyReference.Velocity.Linear.ToOpenTK();
-            velocity.X = move.X * 6.0f;
-            velocity.Z = move.Y * 6.0f;
-            bodyReference.Velocity.Linear = velocity.ToSystem();
+            Vector3 force = new Vector3(move.X, 0.0f, move.Y) * (grounded ? 15.0f : 8.0f);
+            
+            bodyReference.Awake = true;
+            bodyReference.ApplyLinearImpulse(force.ToSystem()); // why does this not wake the body?
         }
 
         // apply jump
         if (grounded && jump)
         {
-            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 350.0f, 0.0f));
+            bodyReference.Awake = true; 
+            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 250.0f, 0.0f));
+        }
+        
+        Vector3 velocity = bodyReference.Velocity.Linear.ToOpenTK();
+        if (velocity != Vector3.Zero)
+        {
+            const float dragCoefficient = 0.15f;
+            
+            Vector3 velocityDirection = velocity.Normalized();
+            Vector3 drag = velocityDirection * -dragCoefficient * velocity.LengthSquared;
+            bodyReference.ApplyLinearImpulse(drag.ToSystem());
         }
         
         // reset jump
