@@ -4,7 +4,7 @@ namespace FlexFramework.Core.UserInterface;
 
 public delegate void MouseEventHandler(MouseButton button);
 
-public class Interactivity
+public class Interactivity : IUpdateable // In case you want to cast it to IUpdateable (don't do that)
 {
     public event Action? MouseEnter;
     public event Action? MouseLeave;
@@ -53,6 +53,11 @@ public class Interactivity
             
             lastMouseButtons[i] = mouseButton;
         }
+    }
+    
+    public void Update(UpdateArgs args)
+    {
+        Update();
     }
     
     private bool IsMouseOver()
