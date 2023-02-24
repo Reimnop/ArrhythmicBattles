@@ -25,6 +25,8 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseButtonDown += OnMouseButtonDown;
         interactivity.MouseEnter += OnMouseEnter;
         interactivity.MouseLeave += OnMouseLeave;
+        
+        mesh = new Mesh<Vertex>("button-mesh");
     }
 
     private void OnMouseLeave()
