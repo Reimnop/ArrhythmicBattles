@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using FlexFramework;
-using FlexFramework.Core;
+﻿using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Entities;
@@ -48,13 +46,17 @@ public abstract class UIElement : Entity
     public bool IsMouseOver()
     {
         Vector2 mousePos = GetMousePos();
-        RectangleF rectangle = GetBounds();
-        return rectangle.Contains(mousePos.X, mousePos.Y);
+        Bounds bounds = GetBounds();
+        return bounds.Contains(mousePos.X, mousePos.Y);
     }
 
-    public RectangleF GetBounds()
+    public Bounds GetBounds()
     {
-        return new RectangleF(Position.X - Origin.X * Size.X, Position.Y - Origin.Y * Size.Y, Size.X, Size.Y);
+        return new Bounds(
+            Position.X - Origin.X * Size.X, 
+            Position.Y - Origin.Y * Size.Y, 
+            Position.X + (1.0f - Origin.X) * Size.X, 
+            Position.Y + (1.0f - Origin.Y) * Size.Y);
     }
 
     protected virtual void OnUnfocused()

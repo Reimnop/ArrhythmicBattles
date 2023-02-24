@@ -3,10 +3,8 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core.Data;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Util;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -63,14 +61,16 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
     public event NodeSelectedEventHandler? OnNodeSelected;
 
     private readonly IInputProvider inputProvider;
-    private readonly MeshEntity meshEntity;
-    private readonly Mesh<Vertex> mesh;
-    private readonly List<Vector2> vertexPositions = new List<Vector2>();
     
-    private SimpleAnimator<RectangleF> highlightAnimator = null!;
+    private readonly RectEntity rectEntity= new RectEntity()
+    {
+        Radius = 8.0f
+    };
+
+    private SimpleAnimator<Bounds> highlightAnimator = null!;
 
     private NavNode currentNode;
-    private RectangleF currentHighlightRect;
+    private Bounds currentHighlightRect;
 
     private Vector2 currentRectSize;
 
@@ -81,26 +81,16 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         
         RootNode.Element.IsFocused = true;
         currentNode = RootNode;
-
-        mesh = new Mesh<Vertex>("mesh");
-
-        meshEntity = new MeshEntity();
-        meshEntity.Mesh = mesh;
     }
 
     public override void Start()
     {
-        highlightAnimator = new SimpleAnimator<RectangleF>(
-            (left, right, factor) =>
-            {
-                float t = Easing.QuadInOut(factor);
-
-                return new RectangleF(
-                    MathHelper.Lerp(left.X, right.X, t),
-                    MathHelper.Lerp(left.Y, right.Y, t),
-                    MathHelper.Lerp(left.Width, right.Width, t),
-                    MathHelper.Lerp(left.Height, right.Height, t));
-            },
+        highlightAnimator = new SimpleAnimator<Bounds>(
+            (left, right, factor) => new Bounds(
+                MathHelper.Lerp(left.X0, right.X0, factor),
+                MathHelper.Lerp(left.Y0, right.Y0, factor),
+                MathHelper.Lerp(left.X1, right.X1, factor),
+                MathHelper.Lerp(left.Y1, right.Y1, factor)),
             value => currentHighlightRect = value,
             RootNode.Element.GetBounds(),
             10.0f);
@@ -111,8 +101,7 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         base.Update(args);
         
         highlightAnimator.Update(args);
-        meshEntity.Update(args);
-        
+
         if (inputProvider.GetKeyDown(Keys.Up))
         {
             AdvanceTo(currentNode.Top);
@@ -157,20 +146,10 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         {
             return;
         }
-
         currentRectSize = actualRectSize;
-        
-        vertexPositions.Clear();
-        MeshGenerator.GenerateRoundedRectangle(vertexPositions, Vector2.Zero, new Vector2(actualRectSize.X, actualRectSize.Y), 8.0f);
-        
-        Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
-        for (int i = 0; i < vertexPositions.Count; i++)
-        {
-            Vector2 pos = vertexPositions[i];
-            vertices[i] = new Vertex(pos.X, pos.Y, 0.0f, actualRectSize.X / pos.X, actualRectSize.Y / pos.Y);
-        }
-        
-        mesh.LoadData(vertices);
+
+        rectEntity.Min = Vector2.Zero;
+        rectEntity.Max = actualRectSize;
     }
     
     public void Render(RenderArgs args)
@@ -180,13 +159,13 @@ public class KeyboardNavigator : Entity, IRenderable, IDisposable
         MatrixStack matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(currentHighlightRect.X, currentHighlightRect.Y, 0.0f);
-        meshEntity.Render(args);
+        matrixStack.Translate(currentHighlightRect.X0, currentHighlightRect.Y0, 0.0f);
+        rectEntity.Render(args);
         matrixStack.Pop();
     }
 
     public void Dispose()
     {
-        mesh.Dispose();
+        rectEntity.Dispose();
     }
 }

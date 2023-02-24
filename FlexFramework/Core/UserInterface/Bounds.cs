@@ -48,10 +48,15 @@ public struct Bounds
         X1 = x1;
         Y1 = y1;
     }
+
+    public bool Contains(float x, float y)
+    {
+        return x >= X0 && x <= X1 && y >= Y0 && y <= Y1;
+    }
     
     public bool Contains(Vector2 point)
     {
-        return point.X >= X0 && point.X <= X1 && point.Y >= Y0 && point.Y <= Y1;
+        return Contains(point.X, point.Y);
     }
     
     public static Bounds operator +(Bounds a, Bounds b)
