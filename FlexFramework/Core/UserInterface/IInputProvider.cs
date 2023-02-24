@@ -10,7 +10,7 @@ public interface IInputProvider
     Vector2 MouseDelta { get; }
     Vector2 MouseScroll { get; }
     Vector2 MouseScrollDelta { get; }
-    Vector2 GetMovement();
+    Vector2 Movement { get; }
     bool GetMouseDown(MouseButton button);
     bool GetMouseUp(MouseButton button);
     bool GetMouse(MouseButton button);

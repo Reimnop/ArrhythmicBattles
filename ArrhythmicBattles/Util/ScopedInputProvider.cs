@@ -11,6 +11,7 @@ public class ScopedInputProvider : IInputProvider, IDisposable
     public Vector2 MouseDelta => InputSystem.GetMouseDelta(Capture);
     public Vector2 MouseScroll => InputSystem.GetMouseScroll(Capture);
     public Vector2 MouseScrollDelta => InputSystem.GetMouseScrollDelta(Capture);
+    public Vector2 Movement => InputSystem.GetMovement(Capture);
     
     public InputCapture Capture { get; }
     public InputSystem InputSystem { get; }
@@ -19,11 +20,6 @@ public class ScopedInputProvider : IInputProvider, IDisposable
     {
         Capture = capture;
         InputSystem = inputSystem;
-    }
-    
-    public Vector2 GetMovement()
-    {
-        return InputSystem.GetMovement(Capture);
     }
 
     public bool GetMouseDown(MouseButton button)

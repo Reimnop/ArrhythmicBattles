@@ -132,7 +132,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         base.Update(args);
         
         // get movement
-        movement = inputProvider.GetMovement();
+        movement = inputProvider.Movement;
 
         // jump
         if (inputProvider.GetKeyDown(Keys.Space))
