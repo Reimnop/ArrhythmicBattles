@@ -80,6 +80,13 @@ public class MainMenuScene : ABScene
         copyrightText.Update(args);
     }
 
+    public override void SwitchScreen(Screen before, Screen after)
+    {
+        base.SwitchScreen(before, after);
+        
+        Context.Sound.SelectSfx.Play();
+    }
+
     public override void CloseScreen(Screen screen)
     {
         base.CloseScreen(screen);

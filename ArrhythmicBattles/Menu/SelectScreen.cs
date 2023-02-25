@@ -75,11 +75,6 @@ public class SelectScreen : Screen, IDisposable
     public override void Update(UpdateArgs args)
     {
         root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        }
     }
 
     public override void Render(RenderArgs args)
