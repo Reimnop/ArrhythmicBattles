@@ -7,6 +7,7 @@ using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using Textwriter;
 
 namespace ArrhythmicBattles.Menu;
 
@@ -23,9 +24,10 @@ public class CreditsScreen : Screen, IDisposable
         this.scene = scene;
         this.inputProvider = inputProvider;
 
-        textEntity = new TextEntity(engine, engine.TextResources.GetFont("inconsolata-regular"));
-        textEntity.BaselineOffset = 24;
-        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\nLuce no\nLuce.\n\nPress [Esc] to return";
+        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        textEntity = new TextEntity(engine, font);
+        textEntity.BaselineOffset = font.Height;
+        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce no\nLuce.\n\nalso music made by LemmieDot lmao\n\nPress [Esc] to return";
     }
     
     public override void Update(UpdateArgs args)
