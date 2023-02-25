@@ -30,8 +30,8 @@ void main() {
     
     // add small sun
     float sun = max(dot(direction, -lightDir), 0.0);
-    sun = smoothstep(0.998, 0.9995, sun);
-    color = mix(color, lightColor, sun);
+    sun = smoothstep(0.999, 0.99925, sun);
+    color = mix(color, lightColor * 5.0, sun);
     
     imageStore(outputImage, pixelCoord, vec4(color, 1.0));
 }
