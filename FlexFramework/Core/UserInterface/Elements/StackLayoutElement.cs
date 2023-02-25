@@ -2,11 +2,11 @@
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class StackLayout : Element
+public class StackLayoutElement : Element
 {
     public Length Spacing { get; set; } = Length.Zero;
 
-    public StackLayout(params Element[] children)
+    public StackLayoutElement(params Element[] children)
     {
         Children.AddRange(children);
     }

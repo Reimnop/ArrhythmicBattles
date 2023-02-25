@@ -1,13 +1,15 @@
 ﻿using ArrhythmicBattles.UserInterface;
-using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Util;
 
 public abstract class ABScene : Scene, IDisposable
 {
+    public Bounds ScreenBounds { get; protected set; }
+
     public ABContext Context { get; }
     
     protected MatrixStack MatrixStack { get; } = new MatrixStack();

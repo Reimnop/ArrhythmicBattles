@@ -18,10 +18,10 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
     public ButtonElement(IInputProvider inputProvider, params Element[] children) : base(children)
     {
         interactivity = new Interactivity(inputProvider);
-        interactivity.MouseButtonDown += OnMouseButtonDown;
+        interactivity.MouseButtonUp += OnMouseButtonUp;
     }
 
-    private void OnMouseButtonDown(MouseButton button)
+    private void OnMouseButtonUp(MouseButton button)
     {
         if (button == MouseButton.Left)
         {

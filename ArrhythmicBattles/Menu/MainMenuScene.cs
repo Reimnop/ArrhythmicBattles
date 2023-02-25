@@ -6,6 +6,7 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using Textwriter;
@@ -17,11 +18,9 @@ public class MainMenuScene : ABScene
 {
     private Texture2D bannerTexture;
     private ImageEntity bannerEntity;
-    
-    private MeshEntity header;
-    private MeshEntity footer;
-    
     private TextEntity copyrightText;
+    
+    private MeshEntity border;
 
     private ScopedInputProvider inputProvider;
 
@@ -53,35 +52,42 @@ public class MainMenuScene : ABScene
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
         
-        EngineResources resources = Engine.Resources;
-
-        header = new MeshEntity();
-        header.Color = new Color4(24, 24, 24, 255);
-        header.Mesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
-        
-        footer = new MeshEntity();
-        footer.Color = new Color4(24, 24, 24, 255);
-        footer.Mesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);;
-
         copyrightText = new TextEntity(Engine, Engine.TextResources.GetFont("inconsolata-small"));
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = "Version 0.0.1 BETA\n© 2021 Arrhythmic Battles"; // TODO: It's not 2021 anymore
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
+        EngineResources resources = Engine.Resources;
+        Mesh<Vertex> quadMesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+
+        border = new MeshEntity();
+        border.Color = new Color4(24, 24, 24, 255);
+        border.Mesh = quadMesh;
+
         // Init input
         inputProvider = Context.InputSystem.AcquireInputProvider();
         
+        // Init UI
+        ScreenBounds = new Bounds(48.0f, 306.0f, 560.0f, 0.0f);
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
     }
 
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
-
-        header.Update(args);
-        footer.Update(args);
+        
         bannerEntity.Update(args);
         copyrightText.Update(args);
+    }
+
+    public override void CloseScreen(Screen screen)
+    {
+        base.CloseScreen(screen);
+
+        if (ScreenHandler.Screens.Count == 0)
+        {
+            Engine.Close();
+        }
     }
 
     public override void Render(Renderer renderer)
@@ -95,7 +101,7 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
-        header.Render(args);
+        border.Render(args);
         MatrixStack.Pop();
         bannerEntity.Render(args);
         MatrixStack.Pop();
@@ -105,7 +111,7 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);
-        footer.Render(args);
+        border.Render(args);
         MatrixStack.Pop();
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
         copyrightText.Render(args);

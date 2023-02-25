@@ -12,8 +12,6 @@ namespace ArrhythmicBattles.Menu;
 
 public class CreditsScreen : Screen, IDisposable
 {
-    public override Vector2 Position { get; set; }
-
     private readonly FlexFrameworkMain engine;
     private readonly TextEntity textEntity;
     private readonly ABScene scene;
@@ -46,7 +44,6 @@ public class CreditsScreen : Screen, IDisposable
         
         matrixStack.Push();
         matrixStack.Translate(48.0f, 306.0f, 0.0f);
-        matrixStack.Translate(Position.X, Position.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
     }

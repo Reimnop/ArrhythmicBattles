@@ -13,7 +13,7 @@
         <DefineConstants>$(DefineConstants)</DefineConstants>
 
         <!-- Show UI bounding boxes -->
-        <DefineConstants>DEBUG_SHOW_BOUNDING_BOXES</DefineConstants>
+        <!-- <DefineConstants>DEBUG_SHOW_BOUNDING_BOXES</DefineConstants> -->
     </PropertyGroup>
 
     <ItemGroup>

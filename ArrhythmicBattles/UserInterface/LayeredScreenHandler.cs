@@ -6,7 +6,7 @@ namespace ArrhythmicBattles.UserInterface;
 
 public class LayeredScreenHandler : Entity, IRenderable, IDisposable
 {
-    public IEnumerable<Screen> Screens => screens;
+    public IReadOnlyList<Screen> Screens => screens;
     
     private readonly List<Screen> screens = new List<Screen>();
     private readonly List<Screen> currentScreens = new List<Screen>();

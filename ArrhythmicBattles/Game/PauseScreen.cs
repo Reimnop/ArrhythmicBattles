@@ -14,8 +14,6 @@ namespace ArrhythmicBattles.Game;
 
 public class PauseScreen : Screen, IDisposable
 {
-    public override Vector2 Position { get; set; }
-    
     private readonly TextEntity textEntity;
     private readonly MeshEntity background;
 
@@ -65,7 +63,6 @@ public class PauseScreen : Screen, IDisposable
         matrixStack.Pop();
         
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
     }

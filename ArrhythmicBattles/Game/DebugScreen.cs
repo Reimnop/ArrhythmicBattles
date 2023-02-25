@@ -11,8 +11,6 @@ namespace ArrhythmicBattles.Game;
 
 public class DebugScreen : Screen, IDisposable
 {
-    public override Vector2 Position { get; set; }
-
     private readonly TextEntity leftTextEntity;
     private readonly TextEntity rightTextEntity;
     
@@ -75,7 +73,6 @@ public class DebugScreen : Screen, IDisposable
         MatrixStack matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(Position.X, Position.Y, 0.0f);
         leftTextEntity.Render(args);
         
         matrixStack.Push();

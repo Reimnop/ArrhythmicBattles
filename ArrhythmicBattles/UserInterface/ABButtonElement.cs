@@ -21,7 +21,6 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Color4 TextPressedColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
-
     public Action? Click { get; set; }
 
     private readonly FlexFrameworkMain engine;
@@ -42,10 +41,8 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         this.engine = engine;
         
         interactivity = new Interactivity(inputProvider);
-        interactivity.MouseButtonDown += OnMouseButtonDown;
-        interactivity.MouseEnter += () => engine.Cursor = MouseCursor.Hand;
-        interactivity.MouseLeave += () => engine.Cursor = MouseCursor.Default;
-        
+        interactivity.MouseButtonUp += OnMouseButtonUp;
+
         LerpFunc<Color4> colorLerpFunc = (left, right, factor) => new Color4(
             MathHelper.Lerp(left.R, right.R, factor), 
             MathHelper.Lerp(left.G, right.G, factor), 
@@ -62,7 +59,7 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         textColorAnimator = new SimpleAnimator<Color4>(colorLerpFunc, res => textEntity.Color = res, TextDefaultColor, 5.0f);
     }
 
-    private void OnMouseButtonDown(MouseButton button)
+    private void OnMouseButtonUp(MouseButton button)
     {
         if (button == MouseButton.Left)
         {

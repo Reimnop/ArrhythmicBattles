@@ -18,12 +18,6 @@ public abstract class MenuScreen : Screen, IDisposable
     protected static Color4 ExitColor => new Color4(233, 81, 83, 255);
     
     protected abstract Screen? LastScreen { get; }
-    
-    public override Vector2 Position
-    {
-        get => stackLayout.Position;
-        set => stackLayout.Position = value;
-    }
 
     protected FlexFrameworkMain Engine { get; }
     protected ABScene Scene { get; }
