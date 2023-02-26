@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Diagnostics;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;

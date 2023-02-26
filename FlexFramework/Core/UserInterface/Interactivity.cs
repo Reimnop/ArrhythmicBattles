@@ -16,10 +16,8 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
     public bool[] MouseButtons { get; } = new bool[(int) MouseButton.Last + 1];
     
     private readonly IInputProvider inputProvider;
-
     private bool lastMouseOver;
-    private readonly bool[] lastMouseButtons = new bool[(int) MouseButton.Last + 1];
-    
+
     public Interactivity(IInputProvider inputProvider)
     {
         this.inputProvider = inputProvider;
@@ -29,11 +27,7 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
     {
         // Get input
         MouseOver = IsMouseOver();
-        for (int i = 0; i < MouseButtons.Length; i++)
-        {
-            MouseButtons[i] = IsMouseButton((MouseButton) i) && MouseOver;
-        }
-        
+
         // Check for mouse enter/leave
         if (MouseOver && !lastMouseOver)
         {
@@ -43,9 +37,14 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
         {
             MouseLeave?.Invoke();
         }
+        
+        // Update last values
+        lastMouseOver = MouseOver;
 
         for (int i = 0; i < MouseButtons.Length; i++)
         {
+            MouseButtons[i] = inputProvider.GetMouse((MouseButton) i) && MouseOver;
+            
             if (inputProvider.GetMouseDown((MouseButton) i) && MouseOver)
             {
                 MouseButtonDown?.Invoke((MouseButton) i);
@@ -55,9 +54,6 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
                 MouseButtonUp?.Invoke((MouseButton) i);
             }
         }
-        
-        // Update last values
-        lastMouseOver = MouseOver;
     }
     
     public void Update(UpdateArgs args)

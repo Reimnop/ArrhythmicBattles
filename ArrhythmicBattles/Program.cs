@@ -7,21 +7,16 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using FlexFramework.Logging;
-using log4net;
-using log4net.Config;
 using OpenTK.Windowing.Common.Input;
 using StbImageSharp;
+using Image = OpenTK.Windowing.Common.Input.Image;
 
 namespace ArrhythmicBattles;
 
 public class Program
 {
-    private static ILog log = LogManager.GetLogger("ArrhythmicBattles");
-
     public static void Main(string[] args)
     {
-        BasicConfigurator.Configure();
-        
         Image imageS = GetImageFromFile("Assets/Icons/icon_s.png");
         Image imageM = GetImageFromFile("Assets/Icons/icon_m.png");
         Image imageL = GetImageFromFile("Assets/Icons/icon_l.png");
@@ -33,7 +28,9 @@ public class Program
         {
             Title = "Arrhythmic Battles",
             Size = new Vector2i(1366, 768),
+            API = ContextAPI.OpenGL,
             APIVersion = new Version(4, 3),
+            AutoLoadBindings = true,
             Profile = ContextProfile.Core,
             Icon = icon
         };
@@ -66,21 +63,26 @@ public class Program
         switch (eventArgs.Severity)
         {
             case Severity.Debug:
-                log.Debug($"[FlexFramework] {eventArgs.Message}");
+                Log("DEBUG", $"[FlexFramework] {eventArgs.Message}");
                 break;
             case Severity.Info:
-                log.Info($"[FlexFramework] {eventArgs.Message}");
+                Log("INFO", $"[FlexFramework] {eventArgs.Message}");
                 break;
             case Severity.Warning:
-                log.Warn($"[FlexFramework] {eventArgs.Message}");
+                Log("WARN", $"[FlexFramework] {eventArgs.Message}");
                 break;
             case Severity.Error:
-                log.Error($"[FlexFramework] {eventArgs.Message}");
+                Log("ERROR", $"[FlexFramework] {eventArgs.Message}");
                 break;
             case Severity.Fatal:
-                log.Fatal($"[FlexFramework] {eventArgs.Message}");
+                Log("FATAL", $"[FlexFramework] {eventArgs.Message}");
                 break;
         }
+    }
+    
+    private static void Log(string severity, string message)
+    {
+        Console.WriteLine($"{DateTime.Now:hh:mm:ss} | {severity} | {message}");
     }
     
     private static Image GetImageFromFile(string path)

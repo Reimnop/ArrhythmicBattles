@@ -27,7 +27,7 @@ public class CreditsScreen : Screen, IDisposable
         Font font = engine.TextResources.GetFont("inconsolata-regular");
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
-        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce no\nLuce.\n\nalso music made by LemmieDot lmao\n\nPress [Esc] to return";
+        textEntity.Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce no\nLuce, your status.\nLuce.\n\nalso music made by LemmieDot lmao\n\nPress [Esc] to return";
     }
     
     public override void Update(UpdateArgs args)

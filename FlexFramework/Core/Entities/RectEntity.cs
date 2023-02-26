@@ -43,6 +43,8 @@ public class RectEntity : Entity, IRenderable, IDisposable
     private Vector2 min;
     private Vector2 max;
     private float radius;
+    
+    private Vector2 lastSize;
 
     private bool meshValid = false;
     
@@ -61,27 +63,32 @@ public class RectEntity : Entity, IRenderable, IDisposable
 
     private void GenerateMesh()
     {
-        float width = max.X - min.X;
-        float height = max.Y - min.Y;
+        Vector2 size = max - min;
         
-        if (width * height == 0)
+        if (size.X * size.Y == 0)
+        {
+            return;
+        }
+
+        if (size == lastSize)
         {
             return;
         }
         
         vertexPositions.Clear();
-        MeshGenerator.GenerateRoundedRectangle(vertexPositions, Min, Max, Radius);
-        
+        MeshGenerator.GenerateRoundedRectangle(vertexPositions, Vector2.Zero, size, Radius);
+
         Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
         for (int i = 0; i < vertexPositions.Count; i++)
         {
             Vector2 pos = vertexPositions[i];
-            Vector2 relativePos = pos - Min;
-            Vector2 uv = new Vector2(relativePos.X / width, relativePos.Y / height);
+            Vector2 uv = new Vector2(pos.X / size.X, pos.Y / size.Y);
             vertices[i] = new Vertex(new Vector3(pos), uv);
         }
-        
+
         mesh.LoadData(vertices);
+        
+        lastSize = size;
     }
 
     public void Render(RenderArgs args)
@@ -102,6 +109,7 @@ public class RectEntity : Entity, IRenderable, IDisposable
         int layerId = args.LayerId;
         
         matrixStack.Push();
+        matrixStack.Translate(Min.X, Min.Y, 0.0f);
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();

@@ -34,8 +34,6 @@ public class FlexFrameworkMain : NativeWindow
 
     public FlexFrameworkMain(NativeWindowSettings nws) : base(nws)
     {
-        Context.MakeCurrent();
-
 #if DEBUG
         // init GL debug callback
         GL.Enable(EnableCap.DebugOutput);
