@@ -1,26 +1,81 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using FlexFramework;
+using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
+using FlexFramework.Core.UserInterface.Elements;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Menu;
 
-public class AudioSettingsScreen : MenuScreen
+public class AudioSettingsScreen : Screen, IDisposable
 {
-    protected override Screen LastScreen => new SettingsScreen(Engine, Scene, InputProvider);
+    private readonly FlexFrameworkMain engine;
+    private readonly ABScene scene;
+    private readonly IInputProvider inputProvider;
     
-    public AudioSettingsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider) : base(engine, scene, inputProvider)
+    private readonly Element root;
+
+    public AudioSettingsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
     {
+        this.engine = engine;
+        this.scene = scene;
+        this.inputProvider = inputProvider;
+
+        root = BuildInterface();
+        root.UpdateLayout(scene.ScreenBounds);
     }
 
-    protected override void InitUI()
+    private Element BuildInterface()
     {
-        CreateSlider("SFX VOLUME", Scene.Context.Sound.SfxVolumeLevel, value => Scene.Context.Sound.SfxVolumeLevel = value);
-        CreateSlider("MUSIC VOLUME", Scene.Context.Sound.MusicVolumeLevel, value => Scene.Context.Sound.MusicVolumeLevel = value);
-        CreateButton("BACK", ExitColor, () =>
+        return new StackLayoutElement(
+            new ABSliderElement(engine, inputProvider, "SFX VOLUME")  
+            {
+                Value = scene.Context.Sound.SfxVolumeLevel,
+                ValueChanged = value => scene.Context.Sound.SfxVolumeLevel = value,
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel)
+            },
+            new ABSliderElement(engine, inputProvider, "MUSIC VOLUME")
+            {
+                Value = scene.Context.Sound.MusicVolumeLevel,
+                ValueChanged = value => scene.Context.Sound.MusicVolumeLevel = value,
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel)
+            },
+            new ABButtonElement(engine, inputProvider, "BACK")
+            {
+                Width = Length.Full,
+                Height = new Length(64.0f, Unit.Pixel),
+                Padding = new Length(16.0f, Unit.Pixel),
+                TextDefaultColor = new Color4(233, 81, 83, 255),
+                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
+            })
         {
-            Scene.Context.SaveSettings();
-            Scene.SwitchScreen(this, LastScreen);
-        });
+            Width = Length.Full
+        };
+    }
+
+    public override void Update(UpdateArgs args)
+    {
+        root.UpdateRecursive(args);
+        
+        if (inputProvider.GetKeyDown(Keys.Escape))
+        {
+            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
+        }
+    }
+
+    public override void Render(RenderArgs args)
+    {
+        root.RenderRecursive(args);
+    }
+
+    public void Dispose()
+    {
+        root.DisposeRecursive();
     }
 }

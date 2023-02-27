@@ -6,36 +6,36 @@ namespace ArrhythmicBattles;
 
 public class ABSound : IDisposable, IConfigurable
 {
-    public int SfxVolumeLevel
+    public float SfxVolumeLevel
     {
-        get => sfxVolumeLevel;
+        get => SelectSfx.Gain;
         set
         {
-            sfxVolumeLevel = value;
-            SelectSfx.Gain = value * 0.1f;
+            SelectSfx.Gain = value;
+            context.SaveSettings();
         }
     }
     
-    public int MusicVolumeLevel
+    public float MusicVolumeLevel
     {
-        get => musicVolumeLevel;
+        get => MenuBackgroundMusic.Gain;
         set
         {
-            musicVolumeLevel = value;
-            MenuBackgroundMusic.Gain = value * 0.1f;
+            MenuBackgroundMusic.Gain = value;
+            context.SaveSettings();
         }
     }
 
-    private int sfxVolumeLevel = 10;
-    private int musicVolumeLevel = 10;
-    
     public AudioSource SelectSfx { get; }
     public AudioSource MenuBackgroundMusic { get; }
 
+    private readonly ABContext context;
     private readonly List<AudioStream> audioStreams = new List<AudioStream>();
 
-    public ABSound()
+    public ABSound(ABContext context)
     {
+        this.context = context;
+        
         MenuBackgroundMusic = InitAudioSource("Assets/Audio/Arrhythmic.ogg", true);
         SelectSfx = InitAudioSource("Assets/Audio/Select.ogg", false);
     }
@@ -63,8 +63,8 @@ public class ABSound : IDisposable, IConfigurable
 
     public void FromJson(JsonObject jsonObject)
     {
-        SfxVolumeLevel = (int) jsonObject["sfx"];
-        MusicVolumeLevel = (int) jsonObject["music"];
+        SelectSfx.Gain = (float) jsonObject["sfx"];
+        MenuBackgroundMusic.Gain = (float) jsonObject["music"];
     }
     
     public void Dispose()

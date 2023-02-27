@@ -14,6 +14,15 @@ public class TypedPacketTunnel
         { new Identifier("arrhythmicbattles", "player_leave"), typeof(PlayerLeavePacket) }
     };
 
+    private readonly Dictionary<Type, Func<Packet>> packetFactories = new Dictionary<Type, Func<Packet>>()
+    {
+        { typeof(AuthPacket), () => new AuthPacket() },
+        { typeof(HeartbeatPacket), () => new HeartbeatPacket() },
+        { typeof(PlayerListPacket), () => new PlayerListPacket() },
+        { typeof(PlayerJoinPacket), () => new PlayerJoinPacket() },
+        { typeof(PlayerLeavePacket), () => new PlayerLeavePacket() }
+    };
+
     private readonly ISenderReceiver senderReceiver;
 
     public TypedPacketTunnel(ISenderReceiver senderReceiver)
@@ -74,12 +83,13 @@ public class TypedPacketTunnel
         }
 
         Type packetType = packetTypes.Forward[packetIdentifier];
-        Packet? packet = (Packet?) Activator.CreateInstance(packetType);
         
-        if (packet is null)
+        if (!packetFactories.TryGetValue(packetType, out Func<Packet>? packetFactory))
         {
-            throw new InvalidOperationException($"Failed to create packet of type '{packetType}'");
+            throw new InvalidDataException($"Cannot create packet type '{packetType}'");
         }
+
+        Packet packet = packetFactory();
 
         // Slice the packet buffer to exclude the packet identifier
         ReadOnlyMemory<byte> packetData = packetBuffer.Slice((int) stream.Position);

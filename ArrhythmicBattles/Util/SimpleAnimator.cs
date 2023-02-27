@@ -36,7 +36,7 @@ public class SimpleAnimator<T> : Entity where T : struct
         base.Update(args);
         
         t += args.DeltaTime * speed;
-        
+
         if (t < 1.0f)
         {
             currentValue = lerpFunc(currentValue, targetValue, t);
@@ -50,14 +50,14 @@ public class SimpleAnimator<T> : Entity where T : struct
         }
     }
 
-    public void LerpTo(T targetValue)
+    public void LerpTo(T value)
     {
-        if (Equals(this.targetValue, targetValue))
+        if (Equals(targetValue, value))
         {
             return;
         }
 
-        this.targetValue = targetValue;
+        targetValue = value;
         t = 0.0f;
     }
 

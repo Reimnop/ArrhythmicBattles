@@ -12,6 +12,9 @@ public static class MeshGenerator
             return;
         }
         
+        float maxRadius = Math.Min(max.X - min.X, max.Y - min.Y) * 0.5f;
+        radius = Math.Min(radius, maxRadius);
+        
         Vector2 a = new Vector2(max.X - radius, max.Y - radius);
         Vector2 b = new Vector2(min.X + radius, max.Y - radius);
         Vector2 c = new Vector2(min.X + radius, min.Y + radius);

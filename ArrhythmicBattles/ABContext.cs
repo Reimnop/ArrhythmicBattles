@@ -20,7 +20,7 @@ public class ABContext : IDisposable
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
-        Sound = new ABSound();
+        Sound = new ABSound(this);
 
         Settings = new ABSettings(new SettingsCategory("sound", Sound));
         LoadSettings();

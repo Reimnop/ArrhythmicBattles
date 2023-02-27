@@ -37,10 +37,11 @@ public class Program
 
         using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
         flexFramework.Log += OnLog;
+        flexFramework.VSync = VSyncMode.On;
 
         using ABContext context = new ABContext(flexFramework);
 
-        flexFramework.UseRenderer<DefaultRenderer>();
+        flexFramework.UseRenderer(new DefaultRenderer());
         flexFramework.LoadFonts(2048,
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
             new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));

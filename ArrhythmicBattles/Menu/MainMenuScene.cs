@@ -68,7 +68,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
         
         // Init UI
-        ScreenBounds = new Bounds(48.0f, 306.0f, 560.0f, 0.0f);
+        ScreenBounds = new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
     }
 
