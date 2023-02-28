@@ -52,7 +52,7 @@ public class AudioSettingsScreen : Screen, IDisposable
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
+                Click = () => scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider))
             })
         {
             Width = Length.Full
