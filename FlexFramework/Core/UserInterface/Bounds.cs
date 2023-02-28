@@ -51,7 +51,7 @@ public struct Bounds
 
     public bool Contains(float x, float y)
     {
-        return x >= X0 && x <= X1 && y >= Y0 && y <= Y1;
+        return x > X0 && x < X1 && y > Y0 && y < Y1;
     }
     
     public bool Contains(Vector2 point)

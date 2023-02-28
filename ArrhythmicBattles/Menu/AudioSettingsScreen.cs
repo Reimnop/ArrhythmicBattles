@@ -65,7 +65,7 @@ public class AudioSettingsScreen : Screen, IDisposable
         
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
+            scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider));
         }
     }
 

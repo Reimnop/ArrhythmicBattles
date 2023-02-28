@@ -122,6 +122,16 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         backgroundColorAnimator.Update(args);
         colorAnimator.Update(args);
 
+        if (interactivity.MouseOver)
+        {
+            Vector2 scrollDelta = inputProvider.MouseScrollDelta;
+            
+            if (scrollDelta.Y != 0.0f)
+            {
+                Value += scrollDelta.Y * 0.01f;
+            }
+        }
+
         if (focusedInputProvider != null)
         {
             if (focusedInputProvider.GetKeyDown(Keys.Left))
