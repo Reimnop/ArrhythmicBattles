@@ -128,7 +128,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             
             if (scrollDelta.Y != 0.0f)
             {
-                Value += scrollDelta.Y * 0.01f;
+                Value += scrollDelta.Y * 0.02f;
             }
         }
 
