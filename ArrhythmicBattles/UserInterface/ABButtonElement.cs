@@ -15,9 +15,6 @@ namespace ArrhythmicBattles.UserInterface;
 
 public class ABButtonElement : VisualElement, IUpdateable, IDisposable
 {
-    public Color4 BackgroundDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 0.0f);
-    public Color4 BackgroundHoverColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-    public Color4 BackgroundPressedColor { get; set; } = new Color4(0.7f, 0.7f, 0.7f, 1.0f);
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Color4 TextPressedColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -33,8 +30,10 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
 
     private readonly TextEntity textEntity;
     
-    private SimpleAnimator<Color4> backgroundColorAnimator = null!;
+    private SimpleAnimator<Bounds> backgroundAnimator = null!;
+    private SimpleAnimator<float> backgroundOpacityAnimator = null!;
     private SimpleAnimator<Color4> textColorAnimator = null!;
+    private Bounds backgroundBounds = new Bounds();
     private bool initialized = false;
 
     public ABButtonElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text, params Element[] children) : base(children)
@@ -43,12 +42,32 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonUp += OnMouseButtonUp;
+        interactivity.MouseEnter += OnMouseEnter;
+        interactivity.MouseLeave += OnMouseLeave;
 
         Font font = engine.TextResources.GetFont("inconsolata-regular");
         
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
         textEntity.Text = text;
+    }
+
+    private void OnMouseEnter()
+    {
+        Bounds from = new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1);
+        Bounds to = backgroundBounds;
+        
+        backgroundAnimator.LerpFromTo(from, to);
+        backgroundOpacityAnimator.LerpTo(1.0f);
+    }
+    
+    private void OnMouseLeave()
+    {
+        Bounds from = backgroundBounds;
+        Bounds to = new Bounds(backgroundBounds.X1, backgroundBounds.Y0, backgroundBounds.X1, backgroundBounds.Y1);
+        
+        backgroundAnimator.LerpFromTo(from, to);
+        backgroundOpacityAnimator.LerpTo(0.0f);
     }
 
     private void OnMouseButtonUp(MouseButton button)
@@ -71,33 +90,48 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
                 MathHelper.Lerp(left.B, right.B, factor), 
                 MathHelper.Lerp(left.A, right.A, factor));
             
-            backgroundColorAnimator = new SimpleAnimator<Color4>(colorLerpFunc,res => rectEntity.Color = res, BackgroundDefaultColor, 5.0f);
+            LerpFunc<Bounds> boundsLerpFunc = (left, right, factor) => new Bounds(
+                MathHelper.Lerp(left.X0, right.X0, factor),
+                MathHelper.Lerp(left.Y0, right.Y0, factor),
+                MathHelper.Lerp(left.X1, right.X1, factor),
+                MathHelper.Lerp(left.Y1, right.Y1, factor));
+
+            backgroundAnimator = new SimpleAnimator<Bounds>(
+                boundsLerpFunc, 
+                res =>
+                {
+                    rectEntity.Min = res.Min;
+                    rectEntity.Max = res.Max;
+                },
+                new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1),
+                5.0f);
+            backgroundOpacityAnimator = new SimpleAnimator<float>(
+                MathHelper.Lerp, 
+                res => rectEntity.Color = new Color4(1.0f, 1.0f, 1.0f, res),
+                0.0f,
+                5.0f);
             textColorAnimator = new SimpleAnimator<Color4>(colorLerpFunc, res => textEntity.Color = res, TextDefaultColor, 5.0f);
         }
         
         interactivity.Update();
-        backgroundColorAnimator.Update(args);
+        backgroundAnimator.Update(args);
+        backgroundOpacityAnimator.Update(args);
         textColorAnimator.Update(args);
-
-        Color4 backgroundColor;
+        
         Color4 textColor;
         if (interactivity.MouseButtons[(int) MouseButton.Left])
         {
-            backgroundColor = BackgroundPressedColor;
             textColor = TextPressedColor;
         }
         else if (interactivity.MouseOver)
         {
-            backgroundColor = BackgroundHoverColor;
             textColor = TextHoverColor;
         }
         else
         {
-            backgroundColor = BackgroundDefaultColor;
             textColor = TextDefaultColor;
         }
         
-        backgroundColorAnimator.LerpTo(backgroundColor);
         textColorAnimator.LerpTo(textColor);
     }
 
@@ -107,8 +141,7 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         UpdateChildrenLayout(ContentBounds);
         
         interactivity.Bounds = ElementBounds;
-        rectEntity.Min = ElementBounds.Min;
-        rectEntity.Max = ElementBounds.Max;
+        backgroundBounds = ElementBounds;
     }
 
     public override void Render(RenderArgs args)

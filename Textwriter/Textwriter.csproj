@@ -16,15 +16,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="freetype.dll">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="harfbuzz.dll">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\HardFuzz\HardFuzz.csproj" />
       <ProjectReference Include="..\SharpFont\SharpFont.csproj" />
     </ItemGroup>

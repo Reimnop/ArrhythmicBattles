@@ -15,9 +15,6 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 {
     private const float SliderWidth = 256.0f;
     
-    public Color4 BackgroundDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 0.0f);
-    public Color4 BackgroundHoverColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-    public Color4 BackgroundPressedColor { get; set; } = new Color4(0.7f, 0.7f, 0.7f, 1.0f);
     public Color4 DefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 HoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Color4 PressedColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -40,7 +37,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         set
         {
             this.value = Math.Clamp(value, 0.0f, 1.0f);
-            UpdateScrubber(this.value);
+            valueAnimator?.LerpTo(Value);
             ValueChanged?.Invoke(this.value);
         }
     }
@@ -74,8 +71,11 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     private ScopedInputProvider inputProvider;
     private ScopedInputProvider? focusedInputProvider;
 
-    private SimpleAnimator<Color4> backgroundColorAnimator = null!;
+    private SimpleAnimator<Bounds> backgroundAnimator = null!;
+    private SimpleAnimator<float> backgroundOpacityAnimator = null!;
     private SimpleAnimator<Color4> colorAnimator = null!;
+    private SimpleAnimator<float> valueAnimator = null!;
+    private Bounds backgroundBounds = new Bounds();
     private bool initialized = false;
 
     public ABSliderElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text,
@@ -86,12 +86,37 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonUp += OnMouseButtonUp;
+        interactivity.MouseEnter += AnimateHighlight;
+        interactivity.MouseLeave += AnimateUnhighlight;
 
         Font font = engine.TextResources.GetFont("inconsolata-regular");
 
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
         textEntity.Text = text;
+    }
+    
+    private void AnimateHighlight()
+    {
+        Bounds from = new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1);
+        Bounds to = backgroundBounds;
+        
+        backgroundAnimator.LerpFromTo(from, to);
+        backgroundOpacityAnimator.LerpTo(1.0f);
+    }
+    
+    private void AnimateUnhighlight()
+    {
+        if (focusedInputProvider != null)
+        {
+            return;
+        }
+        
+        Bounds from = backgroundBounds;
+        Bounds to = new Bounds(backgroundBounds.X1, backgroundBounds.Y0, backgroundBounds.X1, backgroundBounds.Y1);
+        
+        backgroundAnimator.LerpFromTo(from, to);
+        backgroundOpacityAnimator.LerpTo(0.0f);
     }
 
     private void OnMouseButtonUp(MouseButton button)
@@ -114,13 +139,35 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
                 MathHelper.Lerp(left.B, right.B, factor),
                 MathHelper.Lerp(left.A, right.A, factor));
         
-            backgroundColorAnimator = new SimpleAnimator<Color4>(colorLerpFunc, res => elementBackgroundEntity.Color = res, BackgroundDefaultColor, 5.0f);
+            LerpFunc<Bounds> boundsLerpFunc = (left, right, factor) => new Bounds(
+                MathHelper.Lerp(left.X0, right.X0, factor),
+                MathHelper.Lerp(left.Y0, right.Y0, factor),
+                MathHelper.Lerp(left.X1, right.X1, factor),
+                MathHelper.Lerp(left.Y1, right.Y1, factor));
+
+            backgroundAnimator = new SimpleAnimator<Bounds>(
+                boundsLerpFunc, 
+                res =>
+                {
+                    elementBackgroundEntity.Min = res.Min;
+                    elementBackgroundEntity.Max = res.Max;
+                },
+                new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1),
+                5.0f);
+            backgroundOpacityAnimator = new SimpleAnimator<float>(
+                MathHelper.Lerp, 
+                res => elementBackgroundEntity.Color = new Color4(1.0f, 1.0f, 1.0f, res),
+                0.0f,
+                5.0f);
             colorAnimator = new SimpleAnimator<Color4>(colorLerpFunc, res => textEntity.Color = res, DefaultColor, 5.0f);
+            valueAnimator = new SimpleAnimator<float>(MathHelper.Lerp, UpdateScrubber, Value, 15.0f);
         }
 
         interactivity.Update();
-        backgroundColorAnimator.Update(args);
+        backgroundAnimator.Update(args);
+        backgroundOpacityAnimator.Update(args);
         colorAnimator.Update(args);
+        valueAnimator.Update(args);
 
         if (interactivity.MouseOver)
         {
@@ -147,6 +194,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             {
                 focusedInputProvider.Dispose();
                 focusedInputProvider = null;
+                AnimateUnhighlight();
             }
         }
 
@@ -154,21 +202,17 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         Color4 color;
         if (focusedInputProvider != null || interactivity.MouseButtons[(int) MouseButton.Left])
         {
-            backgroundColor = BackgroundPressedColor;
             color = PressedColor;
         }
         else if (interactivity.MouseOver)
         {
-            backgroundColor = BackgroundHoverColor;
             color = HoverColor;
         }
         else
         {
-            backgroundColor = BackgroundDefaultColor;
             color = DefaultColor;
         }
-
-        backgroundColorAnimator.LerpTo(backgroundColor);
+        
         colorAnimator.LerpTo(color);
     }
 
@@ -178,8 +222,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         UpdateChildrenLayout(ContentBounds);
 
         interactivity.Bounds = ElementBounds;
-        elementBackgroundEntity.Min = ElementBounds.Min;
-        elementBackgroundEntity.Max = ElementBounds.Max;
+        backgroundBounds = ElementBounds;
         
         sliderBackgroundEntity.Min = new Vector2(ContentBounds.X1 - SliderWidth, ContentBounds.Y0);
         sliderBackgroundEntity.Max = ContentBounds.Max;

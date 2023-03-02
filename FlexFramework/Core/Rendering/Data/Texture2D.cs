@@ -13,14 +13,23 @@ public class Texture2D : GpuObject, IDisposable
     public int Width { get; }
     public int Height { get; }
 
-    public Texture2D(string name, int width, int height, SizedInternalFormat internalFormat)
+    public Texture2D(string name, int width, int height, SizedInternalFormat internalFormat, int samples = 0)
     {
         Name = name;
         Width = width;
         Height = height;
         
-        GL.CreateTextures(TextureTarget.Texture2D, 1, out int handle);
-        GL.TextureStorage2D(handle, 1, internalFormat, width, height);
+        GL.CreateTextures(samples > 0 ? TextureTarget.Texture2DMultisample : TextureTarget.Texture2D, 1, out int handle);
+
+        if (samples > 0)
+        {
+            GL.TextureStorage2DMultisample(handle, samples, internalFormat, width, height, true);
+        }
+        else
+        {
+            GL.TextureStorage2D(handle, 1, internalFormat, width, height);
+        }
+        
         
         GL.ObjectLabel(ObjectLabelIdentifier.Texture, handle, name.Length, name);
         Handle = handle;

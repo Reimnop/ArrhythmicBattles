@@ -93,6 +93,13 @@ public class RectEntity : Entity, IRenderable, IDisposable
 
     public void Render(RenderArgs args)
     {
+        Vector2 size = max - min;
+        
+        if (size.X * size.Y == 0)
+        {
+            return;
+        }
+
         if (!meshValid)
         {
             meshValid = true;

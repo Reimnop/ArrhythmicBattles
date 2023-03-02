@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetworkTest", "Client
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABDedicatedServer", "ABDedicatedServer\ABDedicatedServer.csproj", "{12FFE98D-EDA4-4269-9311-23CAB63FCE52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexFramework.Text", "FlexFramework.Text\FlexFramework.Text.csproj", "{19A49983-4746-44D7-906F-F573218A8AEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontGenerator", "FontGenerator\FontGenerator.csproj", "{AA01CDF8-7BF6-4244-B7B2-2E41E347E3B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,5 +82,13 @@ Global
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19A49983-4746-44D7-906F-F573218A8AEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19A49983-4746-44D7-906F-F573218A8AEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19A49983-4746-44D7-906F-F573218A8AEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19A49983-4746-44D7-906F-F573218A8AEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA01CDF8-7BF6-4244-B7B2-2E41E347E3B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA01CDF8-7BF6-4244-B7B2-2E41E347E3B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA01CDF8-7BF6-4244-B7B2-2E41E347E3B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA01CDF8-7BF6-4244-B7B2-2E41E347E3B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

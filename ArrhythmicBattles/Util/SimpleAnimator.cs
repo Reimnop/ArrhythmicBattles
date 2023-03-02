@@ -18,6 +18,7 @@ public class SimpleAnimator<T> : Entity where T : struct
 
     private float t = 1.0f;
     private T currentValue;
+    private T oldValue;
     private T targetValue;
 
     public SimpleAnimator(LerpFunc<T> lerpFunc, ValueConsumer<T>? valueConsumer, T initialValue, float speed)
@@ -25,8 +26,9 @@ public class SimpleAnimator<T> : Entity where T : struct
         this.lerpFunc = lerpFunc;
         this.valueConsumer = valueConsumer;
         this.speed = speed;
-        
+
         currentValue = initialValue;
+        oldValue = initialValue;
         targetValue = initialValue;
         valueConsumer?.Invoke(initialValue);
     }
@@ -39,7 +41,7 @@ public class SimpleAnimator<T> : Entity where T : struct
 
         if (t < 1.0f)
         {
-            currentValue = lerpFunc(currentValue, targetValue, t);
+            currentValue = lerpFunc(oldValue, targetValue, EaseInOut(t));
             valueConsumer?.Invoke(currentValue);
         }
         
@@ -49,6 +51,12 @@ public class SimpleAnimator<T> : Entity where T : struct
             valueConsumer?.Invoke(currentValue);
         }
     }
+    
+    // cubic-bezier(0.25, 0.1, 0.25, 1)
+    private float EaseInOut(float t)
+    {
+        return t < 0.5f ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    }
 
     public void LerpTo(T value)
     {
@@ -57,7 +65,15 @@ public class SimpleAnimator<T> : Entity where T : struct
             return;
         }
 
+        oldValue = currentValue;
         targetValue = value;
+        t = 0.0f;
+    }
+
+    public void LerpFromTo(T from, T to)
+    {
+        oldValue = from;
+        targetValue = to;
         t = 0.0f;
     }
 

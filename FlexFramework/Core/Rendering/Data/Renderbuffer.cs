@@ -7,13 +7,21 @@ public class Renderbuffer : GpuObject, IDisposable
     public int Handle { get; }
     public string Name { get; }
 
-    public Renderbuffer(string name, int width, int height, RenderbufferStorage format)
+    public Renderbuffer(string name, int width, int height, RenderbufferStorage format, int samples = 0)
     {
         Name = name;
         
         GL.CreateRenderbuffers(1, out int handle);
-        GL.NamedRenderbufferStorage(handle, format, width, height);
-        
+
+        if (samples > 0)
+        {
+            GL.NamedRenderbufferStorageMultisample(handle, samples, format, width, height);
+        }
+        else 
+        {
+            GL.NamedRenderbufferStorage(handle, format, width, height);
+        }
+
         GL.ObjectLabel(ObjectLabelIdentifier.Renderbuffer, handle, name.Length, name);
 
         Handle = handle;

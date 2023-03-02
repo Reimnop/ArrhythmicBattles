@@ -169,7 +169,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         if (ShouldUpdateCapturer(size, guiScreenCapturer))
         {
             guiScreenCapturer?.Dispose();
-            guiScreenCapturer = new ScreenCapturer("gui", size.X, size.Y, false);
+            guiScreenCapturer = new ScreenCapturer("gui", size.X, size.Y, false, 4);
         }
     }
 
@@ -195,18 +195,21 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         using TemporaryList<IDrawData> transparentLayer = renderLayerRegistry[transparentLayerId];
         using TemporaryList<IDrawData> guiLayer = renderLayerRegistry[guiLayerId];
         
+        stateManager.SetCapability(EnableCap.Multisample, false);
         stateManager.SetCapability(EnableCap.DepthTest, true);
         stateManager.SetCapability(EnableCap.CullFace, true);
         stateManager.SetCapability(EnableCap.Blend, false);
         stateManager.SetDepthMask(true);
         RenderLayer(opaqueLayer);
         
+        stateManager.SetCapability(EnableCap.Multisample, false);
         stateManager.SetCapability(EnableCap.DepthTest, true);
         stateManager.SetCapability(EnableCap.CullFace, false);
         stateManager.SetCapability(EnableCap.Blend, false);
         stateManager.SetDepthMask(true);
         RenderLayer(alphaClipLayer);
         
+        stateManager.SetCapability(EnableCap.Multisample, false);
         stateManager.SetCapability(EnableCap.DepthTest, true);
         stateManager.SetCapability(EnableCap.CullFace, false);
         stateManager.SetCapability(EnableCap.Blend, true);
@@ -227,6 +230,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             0, 0, guiScreenCapturer.Width, guiScreenCapturer.Height,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 
+        stateManager.SetCapability(EnableCap.Multisample, true);
         stateManager.SetCapability(EnableCap.DepthTest, false);
         stateManager.SetCapability(EnableCap.CullFace, false);
         stateManager.SetCapability(EnableCap.Blend, true);
