@@ -1,13 +1,11 @@
-﻿using System.Security.AccessControl;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Util;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using Glide;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
 
@@ -17,7 +15,6 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
 {
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
-    public Color4 TextPressedColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
 
     private readonly FlexFrameworkMain engine;
@@ -29,11 +26,7 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
     };
 
     private readonly TextEntity textEntity;
-    
-    private SimpleAnimator<Bounds> backgroundAnimator = null!;
-    private SimpleAnimator<float> backgroundOpacityAnimator = null!;
-    private SimpleAnimator<Color4> textColorAnimator = null!;
-    private Bounds backgroundBounds = new Bounds();
+    private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
 
     public ABButtonElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text, params Element[] children) : base(children)
@@ -54,20 +47,24 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
 
     private void OnMouseEnter()
     {
-        Bounds from = new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1);
-        Bounds to = backgroundBounds;
+        Bounds from = new Bounds(ElementBounds.X0, ElementBounds.Y0, ElementBounds.X0, ElementBounds.Y1);
+        Bounds to = ElementBounds;
         
-        backgroundAnimator.LerpFromTo(from, to);
-        backgroundOpacityAnimator.LerpTo(1.0f);
+        rectEntity.Min = from.Min;
+        rectEntity.Max = from.Max;
+        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(textEntity, new {Color = TextHoverColor}, 0.2f).Ease(Easing.QuadInOut);
     }
     
     private void OnMouseLeave()
     {
-        Bounds from = backgroundBounds;
-        Bounds to = new Bounds(backgroundBounds.X1, backgroundBounds.Y0, backgroundBounds.X1, backgroundBounds.Y1);
+        Bounds from = ElementBounds;
+        Bounds to = new Bounds(ElementBounds.X1, ElementBounds.Y0, ElementBounds.X1, ElementBounds.Y1);
         
-        backgroundAnimator.LerpFromTo(from, to);
-        backgroundOpacityAnimator.LerpTo(0.0f);
+        rectEntity.Min = from.Min;
+        rectEntity.Max = from.Max;
+        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(textEntity, new {Color = TextDefaultColor}, 0.2f).Ease(Easing.QuadInOut);
     }
 
     private void OnMouseButtonUp(MouseButton button)
@@ -84,55 +81,15 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         {
             initialized = true;
             
-            LerpFunc<Color4> colorLerpFunc = (left, right, factor) => new Color4(
-                MathHelper.Lerp(left.R, right.R, factor), 
-                MathHelper.Lerp(left.G, right.G, factor), 
-                MathHelper.Lerp(left.B, right.B, factor), 
-                MathHelper.Lerp(left.A, right.A, factor));
-            
-            LerpFunc<Bounds> boundsLerpFunc = (left, right, factor) => new Bounds(
-                MathHelper.Lerp(left.X0, right.X0, factor),
-                MathHelper.Lerp(left.Y0, right.Y0, factor),
-                MathHelper.Lerp(left.X1, right.X1, factor),
-                MathHelper.Lerp(left.Y1, right.Y1, factor));
+            rectEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
+            textEntity.Color = TextDefaultColor;
 
-            backgroundAnimator = new SimpleAnimator<Bounds>(
-                boundsLerpFunc, 
-                res =>
-                {
-                    rectEntity.Min = res.Min;
-                    rectEntity.Max = res.Max;
-                },
-                new Bounds(backgroundBounds.X0, backgroundBounds.Y0, backgroundBounds.X0, backgroundBounds.Y1),
-                5.0f);
-            backgroundOpacityAnimator = new SimpleAnimator<float>(
-                MathHelper.Lerp, 
-                res => rectEntity.Color = new Color4(1.0f, 1.0f, 1.0f, res),
-                0.0f,
-                5.0f);
-            textColorAnimator = new SimpleAnimator<Color4>(colorLerpFunc, res => textEntity.Color = res, TextDefaultColor, 5.0f);
+            rectEntity.Min = ElementBounds.Min;
+            rectEntity.Max = ElementBounds.Max;
         }
         
         interactivity.Update();
-        backgroundAnimator.Update(args);
-        backgroundOpacityAnimator.Update(args);
-        textColorAnimator.Update(args);
-        
-        Color4 textColor;
-        if (interactivity.MouseButtons[(int) MouseButton.Left])
-        {
-            textColor = TextPressedColor;
-        }
-        else if (interactivity.MouseOver)
-        {
-            textColor = TextHoverColor;
-        }
-        else
-        {
-            textColor = TextDefaultColor;
-        }
-        
-        textColorAnimator.LerpTo(textColor);
+        tweener.Update(args.DeltaTime);
     }
 
     public override void UpdateLayout(Bounds constraintBounds)
@@ -141,7 +98,6 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         UpdateChildrenLayout(ContentBounds);
         
         interactivity.Bounds = ElementBounds;
-        backgroundBounds = ElementBounds;
     }
 
     public override void Render(RenderArgs args)

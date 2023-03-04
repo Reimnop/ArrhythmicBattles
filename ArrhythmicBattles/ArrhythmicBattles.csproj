@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FlexFramework\FlexFramework.csproj" />
+      <ProjectReference Include="..\Glide\Glide.csproj" />
     </ItemGroup>
 
     <ItemGroup>

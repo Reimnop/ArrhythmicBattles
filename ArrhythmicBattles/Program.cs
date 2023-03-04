@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Menu;
+using ArrhythmicBattles.UserInterface.Animation;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Text;
@@ -7,6 +8,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using FlexFramework.Logging;
+using Glide;
 using OpenTK.Windowing.Common.Input;
 using StbImageSharp;
 using Image = OpenTK.Windowing.Common.Input.Image;
@@ -17,6 +19,10 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        // Init glide
+        Tweener.SetLerper<Vector2Lerper>(typeof(Vector2));
+        Tweener.SetLerper<Color4Lerper>(typeof(Color4));
+        
         Image imageS = GetImageFromFile("Assets/Icons/icon_s.png");
         Image imageM = GetImageFromFile("Assets/Icons/icon_m.png");
         Image imageL = GetImageFromFile("Assets/Icons/icon_l.png");
