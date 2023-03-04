@@ -1,86 +1,85 @@
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Glide
+namespace Glide;
+
+internal class MemberAccessor
 {
-    internal class MemberAccessor
+    private static readonly BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+                                                 BindingFlags.Static;
+
+    protected Func<object, object> getMethod;
+    protected Action<object, object> setMethod;
+
+    public MemberAccessor(object target, string name, bool writeRequired = true)
     {
-        public object Target { get; private set; }
-        public string MemberName { get; private set; }
-        public Type MemberType { get; private set; }
+        var T = target.GetType();
+        PropertyInfo propInfo = null;
+        FieldInfo fieldInfo = null;
+        Target = target;
 
-        public object Value
+        if ((propInfo = T.GetProperty(name, flags)) != null)
         {
-            get { return getMethod(Target); }
-            set { setMethod(Target, value); }
-        }
+            MemberType = propInfo.PropertyType;
+            MemberName = propInfo.Name;
 
-        public MemberAccessor(object target, string name, bool writeRequired = true)
-        {
-            var T = target.GetType();
-            PropertyInfo propInfo = null;
-            FieldInfo fieldInfo = null;
-			Target = target;
-
-            if ((propInfo = T.GetProperty(name, flags)) != null)
             {
-                MemberType = propInfo.PropertyType;
-                MemberName = propInfo.Name;
-
-                {
-                    var param = Expression.Parameter(typeof(object));
-                    var instance = Expression.Convert(param, propInfo.DeclaringType);
-                    var convert = Expression.TypeAs(Expression.Property(instance, propInfo), typeof(object));
-                    getMethod = Expression.Lambda<Func<object, object>>(convert, param).Compile();
-                }
-
-                if (writeRequired)
-                {
-                    var param = Expression.Parameter(typeof(object));
-                    var argument = Expression.Parameter(typeof(object));
-                    var setterCall = Expression.Call(
-                        Expression.Convert(param, propInfo.DeclaringType),
-                        propInfo.GetSetMethod(),
-                        Expression.Convert(argument, propInfo.PropertyType));
-
-                    setMethod = Expression.Lambda<Action<object, object>>(setterCall, param, argument).Compile();
-                }
+                var param = Expression.Parameter(typeof(object));
+                var instance = Expression.Convert(param, propInfo.DeclaringType);
+                var convert = Expression.TypeAs(Expression.Property(instance, propInfo), typeof(object));
+                getMethod = Expression.Lambda<Func<object, object>>(convert, param).Compile();
             }
-            else if ((fieldInfo = T.GetField(name, flags)) != null)
+
+            if (writeRequired)
             {
-                MemberType = fieldInfo.FieldType;
-                MemberName = fieldInfo.Name;
+                var param = Expression.Parameter(typeof(object));
+                var argument = Expression.Parameter(typeof(object));
+                var setterCall = Expression.Call(
+                    Expression.Convert(param, propInfo.DeclaringType),
+                    propInfo.GetSetMethod(),
+                    Expression.Convert(argument, propInfo.PropertyType));
 
-                {
-                    var self = Expression.Parameter(typeof(object));
-                    var instance = Expression.Convert(self, fieldInfo.DeclaringType);
-                    var field = Expression.Field(instance, fieldInfo);
-                    var convert = Expression.TypeAs(field, typeof(object));
-                    getMethod = Expression.Lambda<Func<object, object>>(convert, self).Compile();
-                }
-
-                {
-                    var self = Expression.Parameter(typeof(object));
-                    var value = Expression.Parameter(typeof(object));
-
-                    var fieldExp = Expression.Field(Expression.Convert(self, fieldInfo.DeclaringType), fieldInfo);
-                    var assignExp = Expression.Assign(fieldExp, Expression.Convert(value, fieldInfo.FieldType));
-
-                    setMethod = Expression.Lambda<Action<object, object>>(assignExp, self, value).Compile();
-                }
-            }
-            else
-            {
-                throw new Exception(string.Format("Field or {0} property '{1}' not found on object of type {2}.",
-                        writeRequired ? "read/write" : "readable",
-                        name, T.FullName));
+                setMethod = Expression.Lambda<Action<object, object>>(setterCall, param, argument).Compile();
             }
         }
-        
-        protected Func<object, object> getMethod;
-        protected Action<object, object> setMethod;
-        private static BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+        else if ((fieldInfo = T.GetField(name, flags)) != null)
+        {
+            MemberType = fieldInfo.FieldType;
+            MemberName = fieldInfo.Name;
+
+            {
+                var self = Expression.Parameter(typeof(object));
+                var instance = Expression.Convert(self, fieldInfo.DeclaringType);
+                var field = Expression.Field(instance, fieldInfo);
+                var convert = Expression.TypeAs(field, typeof(object));
+                getMethod = Expression.Lambda<Func<object, object>>(convert, self).Compile();
+            }
+
+            {
+                var self = Expression.Parameter(typeof(object));
+                var value = Expression.Parameter(typeof(object));
+
+                var fieldExp = Expression.Field(Expression.Convert(self, fieldInfo.DeclaringType), fieldInfo);
+                var assignExp = Expression.Assign(fieldExp, Expression.Convert(value, fieldInfo.FieldType));
+
+                setMethod = Expression.Lambda<Action<object, object>>(assignExp, self, value).Compile();
+            }
+        }
+        else
+        {
+            throw new Exception(string.Format("Field or {0} property '{1}' not found on object of type {2}.",
+                writeRequired ? "read/write" : "readable",
+                name, T.FullName));
+        }
+    }
+
+    public object Target { get; }
+    public string MemberName { get; }
+    public Type MemberType { get; }
+
+    public object Value
+    {
+        get => getMethod(Target);
+        set => setMethod(Target, value);
     }
 }
