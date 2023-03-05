@@ -24,8 +24,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetworkTest", "Client
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABDedicatedServer", "ABDedicatedServer\ABDedicatedServer.csproj", "{12FFE98D-EDA4-4269-9311-23CAB63FCE52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexFramework.Text", "FlexFramework.Text\FlexFramework.Text.csproj", "{19A49983-4746-44D7-906F-F573218A8AEF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glide", "Glide\Glide.csproj", "{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}"
 EndProject
 Global
@@ -82,10 +80,6 @@ Global
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12FFE98D-EDA4-4269-9311-23CAB63FCE52}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19A49983-4746-44D7-906F-F573218A8AEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19A49983-4746-44D7-906F-F573218A8AEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19A49983-4746-44D7-906F-F573218A8AEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19A49983-4746-44D7-906F-F573218A8AEF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
