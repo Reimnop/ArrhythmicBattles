@@ -30,23 +30,20 @@ public class MultiplayerScreen : Screen, IDisposable
     private Element BuildInterface()
     {
         return new StackLayoutElement(
-            new ABButtonElement(engine, inputProvider, "Lorem ipsum dolor sit amet,")  
+            Direction.Vertical,
+            new TextElement(engine, "inconsolata-regular")
             {
+                Text = "Feature not yet available!\nJust pretend this is a multiplayer menu.",
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
+                Height = new Length(64.0f, Unit.Pixel)
             },
-            new ABButtonElement(engine, inputProvider, "consectetur adipiscing elit.")
+            new ABButtonElement(engine, inputProvider, "BACK")
             {
+                TextDefaultColor = new Color4(233, 81, 83, 255),
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
-            },
-            new ABButtonElement(engine, inputProvider, "Nulla ut tincidunt quam.")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
+                Padding = new Length(16.0f, Unit.Pixel),
+                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
             })
         {
             Width = Length.Full

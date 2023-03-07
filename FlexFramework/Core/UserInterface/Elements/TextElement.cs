@@ -20,8 +20,10 @@ public class TextElement : VisualElement, IRenderable, IDisposable
 
     private readonly TextEntity textEntity;
 
-    public TextElement(FlexFrameworkMain engine, Font font, params Element[] children) : base(children)
+    public TextElement(FlexFrameworkMain engine, string fontName, params Element[] children) : base(children)
     {
+        Font font = engine.TextResources.GetFont(fontName);
+        
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
     }

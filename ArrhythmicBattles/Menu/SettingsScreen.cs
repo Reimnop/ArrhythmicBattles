@@ -31,6 +31,7 @@ public class SettingsScreen : Screen, IDisposable
     private Element BuildInterface()
     {
         return new StackLayoutElement(
+            Direction.Vertical,
             new ABButtonElement(engine, inputProvider, "VIDEO")  
             {
                 Width = Length.Full,

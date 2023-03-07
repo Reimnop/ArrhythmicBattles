@@ -30,6 +30,7 @@ public class AudioSettingsScreen : Screen, IDisposable
     private Element BuildInterface()
     {
         return new StackLayoutElement(
+            Direction.Vertical,
             new ABSliderElement(engine, inputProvider, "SFX VOLUME")  
             {
                 Value = scene.Context.Sound.SfxVolumeLevel,
