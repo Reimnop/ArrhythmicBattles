@@ -50,8 +50,7 @@ public class Program
         flexFramework.UseRenderer(new DefaultRenderer());
         flexFramework.LoadFonts(2048,
             new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
-            new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"),
-            new FontFileInfo("emoji", 24, "C:/Windows/Fonts/seguiemj.ttf"));
+            new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
         
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
