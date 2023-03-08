@@ -1,9 +1,6 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using HardFuzz.HarfBuzz;
+﻿using HardFuzz.HarfBuzz;
+using Msdfgen;
 using SharpFont;
-using SharpFont.TrueType;
 using Buffer = HardFuzz.HarfBuzz.Buffer;
 using FtFace = SharpFont.Face;
 using HbFont = HardFuzz.HarfBuzz.Font;
@@ -21,7 +18,7 @@ public class Font : IDisposable
     public int Descender { get; }
     public int TotalHeight => Ascender - Descender;
 
-    public AtlasTexture Atlas { get; }
+    public AtlasTexture<FloatRgb> Atlas { get; }
 
     private readonly FtFace ftFace;
     private readonly HbFont hbFont;
@@ -30,36 +27,72 @@ public class Font : IDisposable
 
     public Font(Library library, string path, int size, int atlasWidth)
     {
+        const float range = 0.5f;
+        
         Size = size;
         
         ftFace = new FtFace(library, path);
-        ftFace.SetPixelSizes(0, (uint)size);
+        ftFace.SetPixelSizes(0, (uint) size);
 
         FamilyName = ftFace.FamilyName;
         Height = ftFace.Size.Metrics.Height.Value;
         Ascender = ftFace.Size.Metrics.Ascender.Value;
         Descender = ftFace.Size.Metrics.Descender.Value;
 
-        List<ClientTexture> glyphTextures = new List<ClientTexture>();
+        List<ClientTexture<FloatRgb>> glyphTextures = new List<ClientTexture<FloatRgb>>();
 
         glyphs = new Glyph[ftFace.GlyphCount];
         for (uint i = 0; i < glyphs.Length; i++)
         {
-            ftFace.LoadGlyph(i, LoadFlags.Render | LoadFlags.Color, LoadTarget.Normal);
-
-            GlyphSlot gs = ftFace.Glyph;
-            GlyphMetrics metrics = gs.Metrics;
-        
-            ClientTexture glyphTexture = new ClientTexture(gs.Bitmap.Width, gs.Bitmap.Rows, 4);
+            ftFace.LoadGlyph(i, LoadFlags.Default, LoadTarget.Normal);
             
-            if (gs.Bitmap.Buffer != IntPtr.Zero)
+            GlyphSlot glyph = ftFace.Glyph;
+            GlyphMetrics metrics = glyph.Metrics;
+            
+            // Get glyph size
+            int width = metrics.Width.Value / 64; // Shift by 6 is equivalent to dividing by 64
+            int height = metrics.Height.Value / 64;
+            width += (int) (range * 2.0f); // Add padding
+            height += (int) (range * 2.0f);
+            
+            int offsetX = metrics.HorizontalBearingX.Value / 64;
+            int offsetY = metrics.HorizontalBearingY.Value / 64 - metrics.Height.Value / 64;
+
+            // Use msdfgen to generate an msdf texture for the glyph
+            Outline outline = glyph.Outline;
+            ShapeBuilder shapeBuilder = new ShapeBuilder(outline);
+
+            // Init output image
+            Bitmap<FloatRgb> output = new Bitmap<FloatRgb>(width, height);
+
+            // Init glyph generator
+            var generator = Generate.Msdf();
+            generator.Output = output;
+            generator.Range = range;
+            generator.Scale = new Vector2(1.0f);
+            generator.Translate = new Vector2(range) - new Vector2(offsetX, offsetY);
+
+            // Generate the msdf texture
+            Shape shape = shapeBuilder.Shape;
+            shape.Normalize();
+            generator.Shape = shape;
+            Coloring.EdgeColoringSimple(shape, 2.0);
+            generator.Compute();
+
+            // Copy bitmap to client texture
+            ClientTexture<FloatRgb> glyphTexture = new ClientTexture<FloatRgb>(width, height);
+            for (int y = 0; y < height; y++)
             {
-                int pixelSize = gs.Bitmap.PixelMode == PixelMode.Gray ? 1 : 4;
-                glyphTexture.WritePartial(gs.Bitmap.BufferData, pixelSize, gs.Bitmap.Width, gs.Bitmap.Rows, 0, 0);
+                for (int x = 0; x < width; x++)
+                {
+                    glyphTexture[x, y] = output[x, height - y - 1];
+                }
             }
-
+            
+            // Add glyph texture to atlas
             glyphTextures.Add(glyphTexture);
-
+            
+            // Create glyph
             glyphs[i].Width = metrics.Width.Value;
             glyphs[i].Height = metrics.Height.Value;
             glyphs[i].AdvanceX = metrics.HorizontalAdvance.Value;
@@ -68,10 +101,9 @@ public class Font : IDisposable
             glyphs[i].HorizontalBearingY = metrics.HorizontalBearingY.Value;
             glyphs[i].VerticalBearingX = metrics.VerticalBearingX.Value;
             glyphs[i].VerticalBearingY = metrics.VerticalBearingY.Value;
-            glyphs[i].Colored = gs.Bitmap.PixelMode != PixelMode.Gray;
         }
         
-        Atlas = new AtlasTexture(atlasWidth, CalculateAtlasHeight(glyphTextures, atlasWidth), 4);
+        Atlas = new AtlasTexture<FloatRgb>(atlasWidth, CalculateAtlasHeight(glyphTextures, atlasWidth));
         for (int i = 0; i < glyphs.Length; i++)
         {
             glyphs[i].Uv = Atlas.AddGlyphTexture(glyphTextures[i]);
@@ -80,12 +112,12 @@ public class Font : IDisposable
         hbFont = HbFont.FromFreeType(ftFace.Reference);
     }
 
-    private int CalculateAtlasHeight(IEnumerable<ClientTexture> textures, int atlasWidth)
+    private int CalculateAtlasHeight(IEnumerable<IClientTexture> textures, int atlasWidth)
     {
         int ptrX = 0;
         int ptrY = 0;
         int maxY = 0;
-        foreach (ClientTexture texture in textures)
+        foreach (IClientTexture texture in textures)
         {
             if (ptrX + texture.Width > atlasWidth)
             {
@@ -116,7 +148,7 @@ public class Font : IDisposable
             yield return new GlyphInfo(this, 
                 glyphPositions[i].XAdvance, glyphPositions[i].YAdvance, 
                 glyphPositions[i].XOffset, glyphPositions[i].YOffset, 
-                glyphs[glyphInfos[i].Codepoint].Colored, (int) glyphInfos[i].Codepoint);
+                (int) glyphInfos[i].Codepoint);
         }
     }
 

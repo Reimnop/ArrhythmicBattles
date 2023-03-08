@@ -29,22 +29,22 @@ public static class TextMeshGenerator
 
                outVertices.Add(new TextVertex(minX, minY, minU, maxV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
                outVertices.Add(new TextVertex(maxX, maxY, maxU, minV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
                outVertices.Add(new TextVertex(minX, maxY, minU, minV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
                outVertices.Add(new TextVertex(minX, minY, minU, maxV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
                outVertices.Add(new TextVertex(maxX, minY, maxU, maxV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
                outVertices.Add(new TextVertex(maxX, maxY, maxU, minV,
                     color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                    builtGlyph.Colored, builtGlyph.TextureIndex));
+                    builtGlyph.TextureIndex));
           }
      }
 }

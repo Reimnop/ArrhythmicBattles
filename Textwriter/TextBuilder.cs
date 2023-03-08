@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Msdfgen;
 
 namespace Textwriter;
 
@@ -24,7 +25,7 @@ public class TextBuilder
     }
     
     private readonly List<StyledText> styledTexts = new List<StyledText>();
-    private readonly Dictionary<AtlasTexture, int> atlases = new Dictionary<AtlasTexture, int>();
+    private readonly Dictionary<AtlasTexture<FloatRgb>, int> atlases = new Dictionary<AtlasTexture<FloatRgb>, int>();
     private int minLineHeight = 0;
     private int baselineOffset = 0;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
@@ -81,8 +82,8 @@ public class TextBuilder
             {
                 BuiltGlyph glyph = new BuiltGlyph(
                     style, glyphInfo.Font, 
-                    advance, 0,
-                    glyphInfo.Colored, glyphInfo.Index, atlases[glyphInfo.Font.Atlas]);
+                    advance, 0, 
+                    glyphInfo.Index, atlases[glyphInfo.Font.Atlas]);
                 builtLine.AddGlyph(glyph, glyphInfo.AdvanceX, glyphInfo.Font.Height);
                 advance += glyphInfo.AdvanceX;
             }

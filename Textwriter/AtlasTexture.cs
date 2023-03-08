@@ -4,20 +4,20 @@ using System.Numerics;
 
 namespace Textwriter;
 
-public class AtlasTexture
+public class AtlasTexture<T> where T : unmanaged
 {
-    public ClientTexture Texture { get; }
+    public ClientTexture<T> Texture { get; }
 
     private int ptrX = 0;
     private int ptrY = 0;
     private int maxY = 0;
 
-    public AtlasTexture(int width, int height, int pixelSize)
+    public AtlasTexture(int width, int height)
     {
-        Texture = new ClientTexture(width, height, pixelSize);
+        Texture = new ClientTexture<T>(width, height);
     }
 
-    public UvInfo AddGlyphTexture(ClientTexture texture)
+    public UvInfo AddGlyphTexture(ClientTexture<T> texture)
     {
         // overflow check
         if (ptrX + texture.Width > Texture.Width)
