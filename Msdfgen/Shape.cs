@@ -3,6 +3,11 @@ namespace Msdfgen;
 /// Vector shape representation.
 public class Shape : List<Contour>
 {
+    // Threshold of the dot product of adjacent edge directions to be considered convergent.
+    private const double MsdfgenCornerDotEpsilon = .000001;
+    // The proportional amount by which a curve's control point will be adjusted to eliminate convergent corners.
+    private const double MsdfgenDeconvergenceFactor = .000001;
+    
     /// Specifies whether the shape uses bottom-to-top (false) or top-to-bottom (true) Y coordinates.
     public bool InverseYAxis = false;
 
@@ -19,6 +24,33 @@ public class Shape : List<Contour>
                 contour.Add(parts[1]);
                 contour.Add(parts[2]);
             }
+            else
+            {
+                EdgeSegment prevEdge = contour[^1];
+                foreach (EdgeSegment edge in contour)
+                {
+                    Vector2 prevDir = prevEdge.Direction(1).Normalize();
+                    Vector2 curDir = edge.Direction(0).Normalize();
+                    if (Vector2.Dot(prevDir, curDir) < MsdfgenCornerDotEpsilon - 1.0)
+                    {
+                        DeconvergeEdge(prevEdge, 1);
+                        DeconvergeEdge(edge, 0);
+                    }
+
+                    prevEdge = edge;
+                }
+            }
+    }
+    
+    private void DeconvergeEdge(EdgeSegment edgeSegment, int param) 
+    {
+        QuadraticSegment? quadraticSegment = edgeSegment as QuadraticSegment;
+        if (quadraticSegment != null)
+            edgeSegment = quadraticSegment.ToCubic();
+        
+        CubicSegment? cubicSegment = edgeSegment as CubicSegment;
+        if (cubicSegment != null)
+            cubicSegment.Deconverge(param, MsdfgenDeconvergenceFactor);
     }
 
     /// Performs basic checks to determine if the object represents a valid shape.
@@ -27,7 +59,7 @@ public class Shape : List<Contour>
         foreach (var contour in this)
             if (contour.Count > 0)
             {
-                var corner = contour[contour.Count - 1].Point(1);
+                var corner = contour[^1].Point(1);
                 foreach (var edge in contour)
                 {
                     if (edge == null)

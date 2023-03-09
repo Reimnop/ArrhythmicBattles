@@ -306,7 +306,7 @@ public static class Generate
                         Math.Abs(ContourSd[i].Dist) < Math.Abs(context.NegDist))
                         sd = ContourSd[i];
             }
-            else if (context.NegDist <= 0 && Math.Abs(context.NegDist) <= Math.Abs(context.PosDist))
+            if (context.NegDist <= 0 && Math.Abs(context.NegDist) <= Math.Abs(context.PosDist))
             {
                 sd.Dist = context.NegDist;
                 context.Winding = -1;

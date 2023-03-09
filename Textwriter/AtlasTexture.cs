@@ -6,7 +6,7 @@ namespace Textwriter;
 
 public class AtlasTexture<T> where T : unmanaged
 {
-    private const int Gap = 0;
+    private const int Gap = 1;
     
     public ClientTexture<T> Texture { get; }
 

@@ -150,6 +150,11 @@ public class QuadraticSegment : EdgeSegment
             p[1] = 0.5 * (p[0] + p[2]);
         _p = p;
     }
+    
+    public CubicSegment ToCubic()
+    {
+        return new CubicSegment(Color, _p[0], 2.0 / 3.0 * _p[1] + 1.0 / 3.0 * _p[0], 2.0 / 3.0 * _p[1] + 1.0 / 3.0 * _p[2], _p[2]);
+    }
 
     public override Vector2 Point(double param)
     {
@@ -277,6 +282,26 @@ public class CubicSegment : EdgeSegment
         base(edgeColor)
     {
         _p = p;
+    }
+
+    public void Deconverge(int param, double amount)
+    {
+        Vector2 dir = Direction(param);
+        Vector2 normal = dir.GetOrthonormal();
+        double h = Vector2.Dot(DirectionChange(param)-dir, normal);
+        switch (param) {
+            case 0:
+                _p[1] += amount*(dir+Arithmetic.Sign(h)*Math.Sqrt(Math.Abs(h))*normal);
+                break;
+            case 1:
+                _p[2] -= amount*(dir-Arithmetic.Sign(h)*Math.Sqrt(Math.Abs(h))*normal);
+                break;
+        }
+    }
+
+    public Vector2 DirectionChange(double param)
+    {
+        return Arithmetic.Mix((_p[2]-_p[1])-(_p[1]-_p[0]), (_p[3]-_p[2])-(_p[2]-_p[1]), param);
     }
 
     public override Vector2 Point(double param)
