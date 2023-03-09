@@ -20,6 +20,7 @@ public class ShapeBuilder
         funcs.LineFunction = LineTo;
         funcs.ConicFunction = ConicTo;
         funcs.CubicFunction = CubicTo;
+        funcs.Shift = 0;
         
         outline.Decompose(funcs, IntPtr.Zero);
     }

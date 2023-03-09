@@ -27,7 +27,7 @@ public class Font : IDisposable
 
     public Font(Library library, string path, int size, int atlasWidth)
     {
-        const float range = 0.5f;
+        const double range = 4.0;
         
         Size = size;
         
@@ -52,15 +52,19 @@ public class Font : IDisposable
             // Get glyph size
             int width = metrics.Width.Value / 64; // Shift by 6 is equivalent to dividing by 64
             int height = metrics.Height.Value / 64;
-            width += (int) (range * 2.0f); // Add padding
-            height += (int) (range * 2.0f);
+            // width += (int) (range * 2.0f); // Add padding
+            // height += (int) (range * 2.0f);
             
-            int offsetX = metrics.HorizontalBearingX.Value / 64;
-            int offsetY = metrics.HorizontalBearingY.Value / 64 - metrics.Height.Value / 64;
+            double offsetX = metrics.HorizontalBearingX.Value / 64.0;
+            double offsetY = (metrics.HorizontalBearingY.Value - metrics.Height.Value) / 64.0;
 
             // Use msdfgen to generate an msdf texture for the glyph
             Outline outline = glyph.Outline;
             ShapeBuilder shapeBuilder = new ShapeBuilder(outline);
+            Shape shape = shapeBuilder.Shape;
+            shape.Normalize();
+            
+            Coloring.EdgeColoringSimple(shape, 3.0);
 
             // Init output image
             Bitmap<FloatRgb> output = new Bitmap<FloatRgb>(width, height);
@@ -69,14 +73,11 @@ public class Font : IDisposable
             var generator = Generate.Msdf();
             generator.Output = output;
             generator.Range = range;
-            generator.Scale = new Vector2(1.0f);
-            generator.Translate = new Vector2(range) - new Vector2(offsetX, offsetY);
-
-            // Generate the msdf texture
-            Shape shape = shapeBuilder.Shape;
-            shape.Normalize();
+            generator.Scale = new Vector2(1.0);
+            generator.Translate = /* new Vector2(range) */ - new Vector2(offsetX, offsetY);
             generator.Shape = shape;
-            Coloring.EdgeColoringSimple(shape, 2.0);
+
+            // Generate msdf
             generator.Compute();
 
             // Copy bitmap to client texture

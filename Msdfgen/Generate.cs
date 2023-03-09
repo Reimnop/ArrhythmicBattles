@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Msdfgen;
@@ -461,7 +462,7 @@ public static class Generate
             for (var i = 0; i < Shape.Count; ++i)
             {
                 var minDistance = SignedDistance.Infinite;
-                EdgeSegment nearEdge = null;
+                EdgeSegment? nearEdge = null;
                 double nearParam = 0;
                 foreach (var edge in Shape[i])
                 {

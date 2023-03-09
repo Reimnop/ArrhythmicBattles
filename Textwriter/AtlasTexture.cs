@@ -6,6 +6,8 @@ namespace Textwriter;
 
 public class AtlasTexture<T> where T : unmanaged
 {
+    private const int Gap = 0;
+    
     public ClientTexture<T> Texture { get; }
 
     private int ptrX = 0;
@@ -22,7 +24,7 @@ public class AtlasTexture<T> where T : unmanaged
         // overflow check
         if (ptrX + texture.Width > Texture.Width)
         {
-            ptrY += maxY + 4;
+            ptrY += maxY + Gap;
             maxY = 0;
             ptrX = 0;
         }
@@ -38,7 +40,7 @@ public class AtlasTexture<T> where T : unmanaged
             Min = new Vector2(ptrX / (float)Texture.Width, ptrY / (float)Texture.Height),
             Max = new Vector2((ptrX + texture.Width) / (float)Texture.Width, (ptrY + texture.Height) / (float)Texture.Height)
         };
-        ptrX += texture.Width + 4;
+        ptrX += texture.Width + Gap;
         maxY = Math.Max(maxY, texture.Height);
         return uvInfo;
     }
