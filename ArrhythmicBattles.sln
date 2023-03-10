@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABDedicatedServer", "ABDedi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glide", "Glide\Glide.csproj", "{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Msdfgen", "Msdfgen\Msdfgen.csproj", "{907B5040-2A96-46FD-AEC5-E527845E7184}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsdfGen", "MsdfGen\MsdfGen.csproj", "{2C3DF09F-226C-4C98-B065-3415EA466564}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,9 +86,9 @@ Global
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDC1EA46-A239-48B2-A9CE-951751CC9CDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{907B5040-2A96-46FD-AEC5-E527845E7184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{907B5040-2A96-46FD-AEC5-E527845E7184}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{907B5040-2A96-46FD-AEC5-E527845E7184}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{907B5040-2A96-46FD-AEC5-E527845E7184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C3DF09F-226C-4C98-B065-3415EA466564}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C3DF09F-226C-4C98-B065-3415EA466564}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C3DF09F-226C-4C98-B065-3415EA466564}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C3DF09F-226C-4C98-B065-3415EA466564}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
