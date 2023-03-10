@@ -16,7 +16,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\HardFuzz\HardFuzz.csproj" />
-      <ProjectReference Include="..\Msdfgen\Msdfgen.csproj" />
       <ProjectReference Include="..\SharpFont\SharpFont.csproj" />
     </ItemGroup>
 

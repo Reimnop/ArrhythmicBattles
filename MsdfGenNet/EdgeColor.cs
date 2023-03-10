@@ -1,8 +1,6 @@
-namespace Msdfgen;
+﻿namespace MsdfGenNet;
 
-/// Edge color specifies which color channels an edge belongs to.
-[Flags]
-public enum EdgeColor
+public enum EdgeColor 
 {
     Black = 0,
     Red = 1,
