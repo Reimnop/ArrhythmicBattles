@@ -1,4 +1,4 @@
-﻿using Msdfgen;
+﻿using MsdfGenNet;
 using SharpFont;
 
 namespace Textwriter;
@@ -9,7 +9,7 @@ public class ShapeBuilder
     
     private readonly Shape shape;
     private Contour currentContour;
-    private Vector2 lastPoint;
+    private Vector2d lastPoint;
 
     public ShapeBuilder(Outline outline)
     {
@@ -23,38 +23,48 @@ public class ShapeBuilder
         funcs.Shift = 0;
         
         outline.Decompose(funcs, IntPtr.Zero);
+
+        if (currentContour != null)
+        {
+            shape.AddContour(currentContour);
+        }
+        
     }
 
-    private Vector2 FromFtVector(ref FTVector vector)
+    private Vector2d FromFtVector(ref FTVector vector)
     {
-        return new Vector2(vector.X.Value / 64.0, vector.Y.Value / 64.0);
+        return new Vector2d(vector.X.Value / 64.0, vector.Y.Value / 64.0);
     }
     
     private int MoveTo(ref FTVector to, IntPtr context)
     {
+        if (currentContour != null)
+        {
+            shape.AddContour(currentContour);
+        }
+        
         currentContour = new Contour();
-        shape.Add(currentContour);
         lastPoint = FromFtVector(ref to);
         return 0;
     }
 
     private int LineTo(ref FTVector to, IntPtr context)
     {
-        currentContour.Add(new LinearSegment(lastPoint, FromFtVector(ref to)));
+        currentContour.AddEdge(new Edge(lastPoint, FromFtVector(ref to)));
         lastPoint = FromFtVector(ref to);
         return 0;
     }
 
     private int ConicTo(ref FTVector control, ref FTVector to, IntPtr context)
     {
-        currentContour.Add(new QuadraticSegment(EdgeColor.White, lastPoint, FromFtVector(ref control), FromFtVector(ref to)));
+        currentContour.AddEdge(new Edge(lastPoint, FromFtVector(ref control), FromFtVector(ref to)));
         lastPoint = FromFtVector(ref to);
         return 0;
     }
 
     private int CubicTo(ref FTVector control1, ref FTVector control2, ref FTVector to, IntPtr context)
     {
-        currentContour.Add(new CubicSegment(EdgeColor.White, lastPoint, FromFtVector(ref control1), FromFtVector(ref control2),FromFtVector(ref to)));
+        currentContour.AddEdge(new Edge(lastPoint, FromFtVector(ref control1), FromFtVector(ref control2),FromFtVector(ref to)));
         lastPoint = FromFtVector(ref to);
         return 0;
     }

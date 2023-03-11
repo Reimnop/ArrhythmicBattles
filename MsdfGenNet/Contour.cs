@@ -2,23 +2,14 @@
 
 namespace MsdfGenNet;
 
-public class Contour : IDisposable
+public class Contour : NativeObject
 {
-    internal IntPtr Handle { get; private set; }
-    
-    public Contour()
+    public Contour() : base(MsdfGenNative.msdfgen_Contour_new())
     {
-        Handle = MsdfGenNative.msdfgen_Contour_new();
     }
     
-    internal Contour(IntPtr handle)
+    internal Contour(IntPtr handle) : base(handle)
     {
-        Handle = handle;
-    }
-
-    ~Contour()
-    {
-        Dispose();
     }
 
     public void AddEdge(Edge edge)
@@ -52,13 +43,8 @@ public class Contour : IDisposable
         MsdfGenNative.msdfgen_Contour_reverse(Handle);
     }
 
-    public void Dispose()
+    protected override void FreeHandle()
     {
-        if (Handle != IntPtr.Zero)
-        {
-            MsdfGenNative.msdfgen_Contour_free(Handle);
-            Handle = IntPtr.Zero;
-        }
-        GC.SuppressFinalize(this);
+        MsdfGenNative.msdfgen_Contour_free(Handle);
     }
 }

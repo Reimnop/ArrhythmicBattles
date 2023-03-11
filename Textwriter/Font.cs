@@ -1,5 +1,6 @@
-﻿using HardFuzz.HarfBuzz;
-using Msdfgen;
+﻿using System.Numerics;
+using HardFuzz.HarfBuzz;
+using MsdfGenNet;
 using SharpFont;
 using Buffer = HardFuzz.HarfBuzz.Buffer;
 using FtFace = SharpFont.Face;
@@ -18,7 +19,7 @@ public class Font : IDisposable
     public int Descender { get; }
     public int TotalHeight => Ascender - Descender;
 
-    public AtlasTexture<FloatRgb> Atlas { get; }
+    public AtlasTexture<Vector3> Atlas { get; }
 
     private readonly FtFace ftFace;
     private readonly HbFont hbFont;
@@ -39,7 +40,7 @@ public class Font : IDisposable
         Ascender = ftFace.Size.Metrics.Ascender.Value;
         Descender = ftFace.Size.Metrics.Descender.Value;
 
-        List<ClientTexture<FloatRgb>> glyphTextures = new List<ClientTexture<FloatRgb>>();
+        List<ClientTexture<Vector3>> glyphTextures = new List<ClientTexture<Vector3>>();
 
         glyphs = new Glyph[ftFace.GlyphCount];
         for (uint i = 0; i < glyphs.Length; i++)
@@ -63,30 +64,37 @@ public class Font : IDisposable
             ShapeBuilder shapeBuilder = new ShapeBuilder(outline);
             Shape shape = shapeBuilder.Shape;
             shape.Normalize();
-            
-            Coloring.EdgeColoringSimple(shape, 3.0);
+
+            MsdfGen.EdgeColoringByDistance(shape, 3.0);
 
             // Init output image
-            Bitmap<FloatRgb> output = new Bitmap<FloatRgb>(width, height);
+            using Bitmap<float> output = new Bitmap<float>(width, height, 3);
+            
+            ErrorCorrectionConfig errorConfig = new ErrorCorrectionConfig();
+            errorConfig.Mode = ErrorCorrectionMode.EdgePriority;
+            errorConfig.DistanceCheckMode = DistanceCheckMode.CheckDistanceAtEdge;
+            errorConfig.MinDeviationRatio = 0.0;
+            errorConfig.MinImproveRatio = 0.0;
+            
+            MSDFGeneratorConfig config = new MSDFGeneratorConfig();
+            config.OverlapSupport = true;
+            config.ErrorCorrection = errorConfig;
 
-            // Init glyph generator
-            var generator = Generate.Msdf();
-            generator.Output = output;
-            generator.Range = range;
-            generator.Scale = new Vector2(1.0);
-            generator.Translate = /* new Vector2(range) */ - new Vector2(offsetX, offsetY);
-            generator.Shape = shape;
+            Vector2d scale = new Vector2d(1.0);
+            Vector2d translate = /* new Vector2d(range) */ - new Vector2d(offsetX, offsetY);
+            Projection projection = new Projection(ref scale, ref translate);
 
             // Generate msdf
-            generator.Compute();
+            MsdfGen.GenerateMSDF(output, shape, projection, range, ref config);
 
             // Copy bitmap to client texture
-            ClientTexture<FloatRgb> glyphTexture = new ClientTexture<FloatRgb>(width, height);
+            ClientTexture<Vector3> glyphTexture = new ClientTexture<Vector3>(width, height);
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    glyphTexture[x, y] = output[x, height - y - 1];
+                    Span<float> pixel = output[x, height - 1 - y];
+                    glyphTexture[x, y] = new Vector3(pixel[0], pixel[1], pixel[2]);
                 }
             }
             
@@ -104,7 +112,7 @@ public class Font : IDisposable
             glyphs[i].VerticalBearingY = metrics.VerticalBearingY.Value;
         }
         
-        Atlas = new AtlasTexture<FloatRgb>(atlasWidth, CalculateAtlasHeight(glyphTextures, atlasWidth));
+        Atlas = new AtlasTexture<Vector3>(atlasWidth, CalculateAtlasHeight(glyphTextures, atlasWidth));
         for (int i = 0; i < glyphs.Length; i++)
         {
             glyphs[i].Uv = Atlas.AddGlyphTexture(glyphTextures[i]);

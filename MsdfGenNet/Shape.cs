@@ -2,25 +2,16 @@
 
 namespace MsdfGenNet;
 
-public class Shape : IDisposable
+public class Shape : NativeObject
 {
-    internal IntPtr Handle { get; private set; }
-    
-    public Shape()
+    public Shape() : base(MsdfGenNative.msdfgen_Shape_new())
     {
-        Handle = MsdfGenNative.msdfgen_Shape_new();
     }
     
-    internal Shape(IntPtr handle)
+    internal Shape(IntPtr handle) : base(handle)
     {
-        Handle = handle;
     }
 
-    ~Shape()
-    {
-        Dispose();
-    }
-    
     public void AddContour(Contour contour)
     {
         MsdfGenNative.msdfgen_Shape_addContour(Handle, contour.Handle);
@@ -72,14 +63,9 @@ public class Shape : IDisposable
     {
         MsdfGenNative.msdfgen_Shape_orientContours(Handle);
     }
-    
-    public void Dispose()
+
+    protected override void FreeHandle()
     {
-        if (Handle != IntPtr.Zero)
-        {
-            MsdfGenNative.msdfgen_Shape_free(Handle);
-            Handle = IntPtr.Zero;
-        }
-        GC.SuppressFinalize(this);
+        MsdfGenNative.msdfgen_Shape_free(Handle);
     }
 }

@@ -5,6 +5,7 @@ using static MsdfGenNet.Native.Constants;
 namespace MsdfGenNet.Native;
 
 // msdfgen_wrap.h
+// This is a wrapper around the msdfgen library, which is a C++ library.
 internal static class MsdfGenNative
 {
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -18,6 +19,15 @@ internal static class MsdfGenNative
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void msdfgen_generateMTSDF(IntPtr output, IntPtr shape, IntPtr projection, double range, IntPtr config);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void msdfgen_edgeColoringSimple(IntPtr shape, double angleThreshold, ulong seed = 0);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void msdfgen_edgeColoringInkTrap(IntPtr shape, double angleThreshold, ulong seed = 0);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void msdfgen_edgeColoringByDistance(IntPtr shape, double angleThreshold, ulong seed = 0);
     
     // Shape
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -89,17 +99,45 @@ internal static class MsdfGenNative
     internal static extern IntPtr msdfgen_EdgeHolder_newFromEdgeSegment(IntPtr edgeSegment); // hell no
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr msdfgen_EdgeHolder_newLinear(Point2 p0, Point2 p1, EdgeColor edgeColor);
+    internal static extern IntPtr msdfgen_EdgeHolder_newLinear(Vector2d p0, Vector2d p1, EdgeColor edgeColor);
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr msdfgen_EdgeHolder_newQuadratic(Point2 p0, Point2 p1, Point2 p2, EdgeColor edgeColor);
+    internal static extern IntPtr msdfgen_EdgeHolder_newQuadratic(Vector2d p0, Vector2d p1, Vector2d p2, EdgeColor edgeColor);
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr msdfgen_EdgeHolder_newCubic(Point2 p0, Point2 p1, Point2 p2, Point2 p3, EdgeColor edgeColor);
+    internal static extern IntPtr msdfgen_EdgeHolder_newCubic(Vector2d p0, Vector2d p1, Vector2d p2, Vector2d p3, EdgeColor edgeColor);
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr msdfgen_EdgeHolder_newClone(IntPtr edge);
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void msdfgen_EdgeHolder_free(IntPtr edge);
+    
+    // Projection
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr msdfgen_Projection_new();
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr msdfgen_Projection_newScaleTranslate(ref Vector2d scale, ref Vector2d translate);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void msdfgen_Projection_free(IntPtr projection);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern Vector2d msdfgen_Projection_project(IntPtr projection, ref Vector2d coord);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern Vector2d msdfgen_Projection_unproject(IntPtr projection, ref Vector2d coord);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern double msdfgen_Projection_projectX(IntPtr projection, double x);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern double msdfgen_Projection_projectY(IntPtr projection, double y);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern double msdfgen_Projection_unprojectX(IntPtr projection, double x);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern double msdfgen_Projection_unprojectY(IntPtr projection, double y);
 }

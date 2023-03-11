@@ -3,52 +3,34 @@
 namespace MsdfGenNet;
 
 // Wrapper for EdgeHolder, but simplified to just Edge
-public class Edge : IDisposable
+public class Edge : NativeObject
 {
-    internal IntPtr Handle { get; private set; }
-    
-    public Edge()
+    public Edge() : base(MsdfGenNative.msdfgen_EdgeHolder_new())
     {
-        Handle = MsdfGenNative.msdfgen_EdgeHolder_new();
     }
     
-    public Edge(Point2 p0, Point2 p1, EdgeColor edgeColor)
+    public Edge(Vector2d p0, Vector2d p1, EdgeColor edgeColor = EdgeColor.White) : base(MsdfGenNative.msdfgen_EdgeHolder_newLinear(p0, p1, edgeColor))
     {
-        Handle = MsdfGenNative.msdfgen_EdgeHolder_newLinear(p0, p1, edgeColor);
     }
     
-    public Edge(Point2 p0, Point2 p1, Point2 p2, EdgeColor edgeColor)
+    public Edge(Vector2d p0, Vector2d p1, Vector2d p2, EdgeColor edgeColor = EdgeColor.White) : base(MsdfGenNative.msdfgen_EdgeHolder_newQuadratic(p0, p1, p2, edgeColor))
     {
-        Handle = MsdfGenNative.msdfgen_EdgeHolder_newQuadratic(p0, p1, p2, edgeColor);
     }
     
-    public Edge(Point2 p0, Point2 p1, Point2 p2, Point2 p3, EdgeColor edgeColor)
+    public Edge(Vector2d p0, Vector2d p1, Vector2d p2, Vector2d p3, EdgeColor edgeColor = EdgeColor.White) : base(MsdfGenNative.msdfgen_EdgeHolder_newCubic(p0, p1, p2, p3, edgeColor))
     {
-        Handle = MsdfGenNative.msdfgen_EdgeHolder_newCubic(p0, p1, p2, p3, edgeColor);
     }
 
-    public Edge(Edge edge)
+    public Edge(Edge edge) : base(MsdfGenNative.msdfgen_EdgeHolder_newClone(edge.Handle))
     {
-        Handle = MsdfGenNative.msdfgen_EdgeHolder_newClone(edge.Handle);
     }
     
-    internal Edge(IntPtr handle)
+    internal Edge(IntPtr handle) : base(handle)
     {
-        Handle = handle;
     }
 
-    ~Edge()
+    protected override void FreeHandle()
     {
-        Dispose();
-    }
-    
-    public void Dispose()
-    {
-        if (Handle != IntPtr.Zero)
-        {
-            MsdfGenNative.msdfgen_EdgeHolder_free(Handle);
-            Handle = IntPtr.Zero;
-        }
-        GC.SuppressFinalize(this);
+        MsdfGenNative.msdfgen_EdgeHolder_free(Handle);
     }
 }

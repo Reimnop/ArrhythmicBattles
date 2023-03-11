@@ -1,5 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
-using Msdfgen;
+﻿using System.Numerics;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using SharpFont;
 using Textwriter;
@@ -29,9 +29,9 @@ public class TextResources : IDisposable
         List<Texture2D> textures = new List<Texture2D>();
         foreach (Font font in Fonts)
         {
-            AtlasTexture<FloatRgb> atlasTexture = font.Atlas;
+            AtlasTexture<Vector3> atlasTexture = font.Atlas;
             Texture2D texture = new Texture2D($"{font.FamilyName}-atlas", atlasTexture.Texture.Width, atlasTexture.Texture.Height, SizedInternalFormat.Rgb32f);
-            texture.LoadData<FloatRgb>(atlasTexture.Texture.Pixels, PixelFormat.Rgb, PixelType.Float);
+            texture.LoadData<Vector3>(atlasTexture.Texture.Pixels, PixelFormat.Rgb, PixelType.Float);
             texture.SetMinFilter(TextureMinFilter.Linear);
             texture.SetMagFilter(TextureMagFilter.Linear);
             textures.Add(texture);

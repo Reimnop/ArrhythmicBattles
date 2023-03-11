@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using Msdfgen;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Textwriter;
 
@@ -25,7 +25,7 @@ public class TextBuilder
     }
     
     private readonly List<StyledText> styledTexts = new List<StyledText>();
-    private readonly Dictionary<AtlasTexture<FloatRgb>, int> atlases = new Dictionary<AtlasTexture<FloatRgb>, int>();
+    private readonly Dictionary<AtlasTexture<Vector3>, int> atlases = new Dictionary<AtlasTexture<Vector3>, int>();
     private int minLineHeight = 0;
     private int baselineOffset = 0;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
