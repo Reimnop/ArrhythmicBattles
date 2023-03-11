@@ -1,6 +1,5 @@
 ﻿using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
-using Textwriter;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -22,7 +21,9 @@ public class TextElement : VisualElement, IRenderable, IDisposable
 
     public TextElement(FlexFrameworkMain engine, string fontName, params Element[] children) : base(children)
     {
-        Font font = engine.TextResources.GetFont(fontName);
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        var font = textAssets[fontName];
         
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

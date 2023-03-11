@@ -32,9 +32,9 @@ public class TextBuilder
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
     
     /// <param name="minLineHeight">Use height of first font if null</param>
-    public TextBuilder(int? minLineHeight, params Font[] fonts)
+    public TextBuilder(int? minLineHeight, IReadOnlyList<Font> fonts)
     {
-        for (int i = 0; i < fonts.Length; i++)
+        for (int i = 0; i < fonts.Count; i++)
         {
             atlases.Add(fonts[i].Atlas, i);
         }

@@ -35,7 +35,7 @@ public class CreditsScreen : Screen, IDisposable
     {
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(engine, "inconsolata-regular")
+            new TextElement(engine, "inconsolata")
             {
                 Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce no\nLuce, your status.\nLuce.\n\nbtw Golden is the GOAT\n\nalso music made by LemmieDot",
                 Width = Length.Full,

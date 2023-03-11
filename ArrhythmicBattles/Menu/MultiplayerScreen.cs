@@ -31,7 +31,7 @@ public class MultiplayerScreen : Screen, IDisposable
     {
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(engine, "inconsolata-regular")
+            new TextElement(engine, "inconsolata")
             {
                 Text = "Feature not yet available!\nJust pretend this is a multiplayer menu.",
                 Width = Length.Full,

@@ -1,5 +1,4 @@
 ﻿using FlexFramework.Core.Data;
-using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
@@ -58,7 +57,9 @@ public class TextEntity : Entity, IRenderable, IDisposable
             InvalidateMesh();
         }
     }
-    
+
+    public float EmSize { get; set; } = 1.0f;
+
     public Color4 Color { get; set; } = Color4.White;
 
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
@@ -70,6 +71,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
     private bool meshValid = false;
 
     private readonly FlexFrameworkMain engine;
+    private readonly TextAssets textAssets;
     private readonly Mesh<TextVertexAdapter> mesh;
     
     private readonly List<TextVertex> vertices = new List<TextVertex>();
@@ -78,8 +80,10 @@ public class TextEntity : Entity, IRenderable, IDisposable
     {
         this.engine = engine;
         this.font = font;
-        HorizontalAlignment = horizontalAlignment;
-        
+
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+
         mesh = new Mesh<TextVertexAdapter>("text");
     }
 
@@ -90,7 +94,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
 
     private void GenerateMesh()
     {
-        TextBuilder builder = new TextBuilder(font.Height, engine.TextResources.Fonts)
+        TextBuilder builder = new TextBuilder(null, textAssets.Fonts)
             .WithBaselineOffset(baselineOffset)
             .WithHorizontalAlignment(horizontalAlignment)
             .WithVerticalAlignment(verticalAlignment)
@@ -125,11 +129,16 @@ public class TextEntity : Entity, IRenderable, IDisposable
         int layerId = args.LayerId;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
+        
+        matrixStack.Push();
+        matrixStack.Scale(EmSize, EmSize, 1.0f);
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color);
-
+        TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color, 4.0f * EmSize);
+        
         renderer.EnqueueDrawData(layerId, textDrawData);
+        
+        matrixStack.Pop();
     }
     
     public void Dispose()

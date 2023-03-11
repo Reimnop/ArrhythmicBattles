@@ -28,13 +28,15 @@ public class PauseScreen : Screen, IDisposable
         
         inputProvider = scene.Context.InputSystem.AcquireInputProvider();
         
-        EngineResources resources = engine.Resources;
+        EngineAssets assets = engine.DefaultAssets;
 
         background = new MeshEntity();
-        background.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        background.Mesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets["inconsolata"];
         
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

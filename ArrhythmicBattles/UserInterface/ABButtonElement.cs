@@ -37,9 +37,11 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseButtonUp += OnMouseButtonUp;
         interactivity.MouseEnter += OnMouseEnter;
         interactivity.MouseLeave += OnMouseLeave;
-
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
         
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets["inconsolata"];
+
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
         textEntity.Text = text;

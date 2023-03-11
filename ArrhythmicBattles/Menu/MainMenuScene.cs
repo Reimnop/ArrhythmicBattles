@@ -52,13 +52,18 @@ public class MainMenuScene : ABScene
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
         
-        copyrightText = new TextEntity(Engine, Engine.TextResources.GetFont("inconsolata-small"));
+        var textAssetsLocation = Engine.DefaultAssets.TextAssets;
+        var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets["inconsolata"];
+        
+        copyrightText = new TextEntity(Engine, font);
+        copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = "Version 0.0.1 BETA\n© 2021 Arrhythmic Battles"; // TODO: It's not 2021 anymore
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
-        EngineResources resources = Engine.Resources;
-        Mesh<Vertex> quadMesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        EngineAssets assets = Engine.DefaultAssets;
+        Mesh<Vertex> quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
 
         border = new MeshEntity();
         border.Color = new Color4(24, 24, 24, 255);

@@ -3,7 +3,6 @@ using ArrhythmicBattles.Menu;
 using ArrhythmicBattles.UserInterface.Animation;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Rendering.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -48,10 +47,11 @@ public class Program
         using ABContext context = new ABContext(flexFramework);
 
         flexFramework.UseRenderer(new DefaultRenderer());
-        flexFramework.LoadFonts(2048,
-            new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
-            new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
         
+        var textAssetsLocation = flexFramework.DefaultAssets.TextAssets;
+        var textAssets = flexFramework.ResourceRegistry.GetResource(textAssetsLocation);
+        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", "inconsolata", 24);
+
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
 #else

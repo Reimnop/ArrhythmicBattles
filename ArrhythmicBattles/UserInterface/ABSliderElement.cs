@@ -85,7 +85,9 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseEnter += AnimateHighlight;
         interactivity.MouseLeave += AnimateUnhighlight;
 
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets["inconsolata"];
 
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

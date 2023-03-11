@@ -31,8 +31,8 @@ public class ImageEntity : UIElement, IRenderable
 
     public ImageEntity(FlexFrameworkMain engine) : base(engine)
     {
-        EngineResources resources = engine.Resources;
-        quadMesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        EngineAssets assets = engine.DefaultAssets;
+        quadMesh = engine.ResourceRegistry.GetResource<Mesh<Vertex>>(assets.QuadMesh);
         
     }
 

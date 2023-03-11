@@ -29,6 +29,7 @@ public class Font : IDisposable
     public Font(Library library, string path, int size, int atlasWidth)
     {
         const double range = 4.0;
+        const double textureScale = 2.0;
         
         Size = size;
         
@@ -51,11 +52,9 @@ public class Font : IDisposable
             GlyphMetrics metrics = glyph.Metrics;
             
             // Get glyph size
-            int width = metrics.Width.Value / 64; // Shift by 6 is equivalent to dividing by 64
-            int height = metrics.Height.Value / 64;
-            // width += (int) (range * 2.0f); // Add padding
-            // height += (int) (range * 2.0f);
-            
+            int width = (int) (metrics.Width.Value / 64.0 * textureScale); // Shift by 6 is equivalent to dividing by 64
+            int height = (int) (metrics.Height.Value / 64.0 * textureScale);
+
             double offsetX = metrics.HorizontalBearingX.Value / 64.0;
             double offsetY = (metrics.HorizontalBearingY.Value - metrics.Height.Value) / 64.0;
 
@@ -80,8 +79,8 @@ public class Font : IDisposable
             config.OverlapSupport = true;
             config.ErrorCorrection = errorConfig;
 
-            Vector2d scale = new Vector2d(1.0);
-            Vector2d translate = /* new Vector2d(range) */ - new Vector2d(offsetX, offsetY);
+            Vector2d scale = new Vector2d(textureScale);
+            Vector2d translate = new Vector2d(-offsetX, -offsetY);
             Projection projection = new Projection(ref scale, ref translate);
 
             // Generate msdf

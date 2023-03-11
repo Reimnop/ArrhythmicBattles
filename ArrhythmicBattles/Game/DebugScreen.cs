@@ -29,7 +29,9 @@ public class DebugScreen : Screen, IDisposable
 
         GpuInfo gpuInfo = engine.Renderer.GpuInfo;
 
-        Font font = engine.TextResources.GetFont("inconsolata-small");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets["inconsolata"];
 
         leftTextEntity = new TextEntity(engine, font);
         leftTextEntity.BaselineOffset = font.Height;

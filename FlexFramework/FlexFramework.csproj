@@ -94,4 +94,8 @@
         <ProjectReference Include="..\Textwriter\Textwriter.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Core\Rendering\Text" />
+    </ItemGroup>
+
 </Project>

@@ -4,8 +4,6 @@ using FlexFramework.Core.Audio;
 using FlexFramework.Core;
 using FlexFramework.Logging;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Rendering.Text;
-using FlexFramework.Physics;
 using FlexFramework.Util.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
@@ -15,13 +13,12 @@ namespace FlexFramework;
 
 public class FlexFrameworkMain : NativeWindow
 {
-    public Renderer Renderer { get; private set; } = null!;
-    public TextResources TextResources { get; private set; } = null!;
-    public EngineResources Resources { get; }
-    public ResourceManager ResourceManager { get; }
     public SceneManager SceneManager { get; }
+    public ResourceRegistry ResourceRegistry { get; }
+    public EngineAssets DefaultAssets { get; }
     public AudioManager AudioManager { get; }
     public Input Input { get; }
+    public Renderer Renderer { get; private set; } = null!;
 
     public event LogEventHandler? Log;
 
@@ -45,8 +42,8 @@ public class FlexFrameworkMain : NativeWindow
 #endif
 
         SceneManager = new SceneManager(this);
-        ResourceManager = new ResourceManager();
-        Resources = new EngineResources(ResourceManager);
+        ResourceRegistry = new ResourceRegistry();
+        DefaultAssets = new EngineAssets(this, ResourceRegistry);
         AudioManager = new AudioManager();
         Input = new Input(this);
     }
@@ -125,19 +122,6 @@ public class FlexFrameworkMain : NativeWindow
         return (T) UseRenderer(renderer);
     }
 
-    public TextResources LoadFonts(int atlasWidth, params FontFileInfo[] fontFiles)
-    {
-        LogMessage(null, Severity.Info, null, $"Loading font atlas(es) with width [{atlasWidth}]");
-        
-        if (TextResources != null)
-        {
-            TextResources.Dispose();
-        }
-
-        TextResources = new TextResources(atlasWidth, fontFiles);
-        return TextResources;
-    }
-
     public Scene LoadScene(Scene scene)
     {
         return SceneManager.LoadScene(scene);
@@ -213,9 +197,8 @@ public class FlexFrameworkMain : NativeWindow
     {
         base.Dispose(disposing);
         
-        TextResources.Dispose();
         AudioManager.Dispose();
-        ResourceManager.Dispose();
+        ResourceRegistry.Dispose();
         if (Renderer is IDisposable disposable)
         {
             disposable.Dispose();
