@@ -29,7 +29,7 @@ public class Font : IDisposable
     public Font(Library library, string path, int size, int atlasWidth)
     {
         const double range = 4.0;
-        const double textureScale = 2.0;
+        const double textureScale = 1.0;
         
         Size = size;
         
@@ -52,7 +52,7 @@ public class Font : IDisposable
             GlyphMetrics metrics = glyph.Metrics;
             
             // Get glyph size
-            int width = (int) (metrics.Width.Value / 64.0 * textureScale); // Shift by 6 is equivalent to dividing by 64
+            int width = (int) (metrics.Width.Value / 64.0 * textureScale);
             int height = (int) (metrics.Height.Value / 64.0 * textureScale);
 
             double offsetX = metrics.HorizontalBearingX.Value / 64.0;

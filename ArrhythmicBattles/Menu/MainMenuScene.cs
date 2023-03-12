@@ -54,7 +54,7 @@ public class MainMenuScene : ABScene
         
         var textAssetsLocation = Engine.DefaultAssets.TextAssets;
         var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets["inconsolata"];
+        Font font = textAssets[Constants.DefaultFontName];
         
         copyrightText = new TextEntity(Engine, font);
         copyrightText.EmSize = 18.0f / 24.0f;

@@ -31,7 +31,7 @@ public class DebugScreen : Screen, IDisposable
 
         var textAssetsLocation = engine.DefaultAssets.TextAssets;
         var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets["inconsolata"];
+        Font font = textAssets[Constants.DefaultFontName];
 
         leftTextEntity = new TextEntity(engine, font);
         leftTextEntity.BaselineOffset = font.Height;

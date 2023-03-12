@@ -1,5 +1,6 @@
 ﻿using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
+using Textwriter;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -8,7 +9,17 @@ public class TextElement : VisualElement, IRenderable, IDisposable
     public string Text
     {
         get => textEntity.Text;
-        set => textEntity.Text = value;
+        set
+        {
+            textEntity.Text = value;
+
+            if (autoHeight)
+            {
+                int lines = value.Split('\n').Length;
+                float height = lines * (font.Height / 64) * textEntity.EmSize;
+                Height = height;
+            }
+        }
     }
 
     public Color4 Color
@@ -18,12 +29,16 @@ public class TextElement : VisualElement, IRenderable, IDisposable
     }
 
     private readonly TextEntity textEntity;
+    private readonly Font font;
+    private readonly bool autoHeight;
 
-    public TextElement(FlexFrameworkMain engine, string fontName, params Element[] children) : base(children)
+    public TextElement(FlexFrameworkMain engine, string fontName, bool autoHeight = true, params Element[] children) : base(children)
     {
+        this.autoHeight = autoHeight;
+        
         var textAssetsLocation = engine.DefaultAssets.TextAssets;
         var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        var font = textAssets[fontName];
+        font = textAssets[fontName];
         
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

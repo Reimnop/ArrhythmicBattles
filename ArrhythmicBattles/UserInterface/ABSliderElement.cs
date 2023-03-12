@@ -87,7 +87,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 
         var textAssetsLocation = engine.DefaultAssets.TextAssets;
         var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets["inconsolata"];
+        Font font = textAssets[Constants.DefaultFontName];
 
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

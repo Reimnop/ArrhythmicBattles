@@ -50,7 +50,7 @@ public class Program
         
         var textAssetsLocation = flexFramework.DefaultAssets.TextAssets;
         var textAssets = flexFramework.ResourceRegistry.GetResource(textAssetsLocation);
-        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", "inconsolata", 24);
+        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", Constants.DefaultFontName, 24);
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));

@@ -31,22 +31,22 @@ public class MultiplayerScreen : Screen, IDisposable
     {
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(engine, "inconsolata")
+            new TextElement(engine, Constants.DefaultFontName)
             {
                 Text = "Feature not yet available!\nJust pretend this is a multiplayer menu.",
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel)
+                Width = Length.Full
             },
             new ABButtonElement(engine, inputProvider, "BACK")
             {
                 TextDefaultColor = new Color4(233, 81, 83, 255),
                 Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
+                Height = 64.0f,
+                Padding = 16.0f,
                 Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
             })
         {
-            Width = Length.Full
+            Width = Length.Full,
+            Spacing = 16.0f
         };
     }
 
