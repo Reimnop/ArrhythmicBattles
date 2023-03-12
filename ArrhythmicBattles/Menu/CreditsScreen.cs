@@ -33,7 +33,7 @@ public class CreditsScreen : Screen, IDisposable
             Direction.Vertical,
             new TextElement(engine, Constants.DefaultFontName)
             {
-                Text = "Windows.\nWindows, what the fuck.\nWindows, your skin.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce no\nLuce, your status.\nLuce.\n\nbtw Golden is the GOAT\n\nalso music made by LemmieDot",
+                Text = "Windows.\nWindows, what the fuck.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce of muck\nLuce, your status.\nalso music made by LemmieDot",
                 Width = Length.Full
             },
             new ABButtonElement(engine, inputProvider, "BACK")
