@@ -3,14 +3,14 @@ using ArrhythmicBattles.Menu;
 using ArrhythmicBattles.UserInterface.Animation;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Rendering.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using FlexFramework.Logging;
 using Glide;
 using OpenTK.Windowing.Common.Input;
-using StbImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+
 using Image = OpenTK.Windowing.Common.Input.Image;
 
 namespace ArrhythmicBattles;
@@ -44,14 +44,14 @@ public class Program
         using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
         flexFramework.Log += OnLog;
         flexFramework.VSync = VSyncMode.On;
+        flexFramework.UseRenderer(new DefaultRenderer());
 
         using ABContext context = new ABContext(flexFramework);
 
-        flexFramework.UseRenderer(new DefaultRenderer());
-        flexFramework.LoadFonts(2048,
-            new FontFileInfo("inconsolata-regular", 24, "Assets/Fonts/Inconsolata-Regular.ttf"), 
-            new FontFileInfo("inconsolata-small", 16, "Assets/Fonts/Inconsolata-Regular.ttf"));
-        
+        var textAssetsLocation = flexFramework.DefaultAssets.TextAssets;
+        var textAssets = flexFramework.ResourceRegistry.GetResource(textAssetsLocation);
+        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", Constants.DefaultFontName, 24);
+
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
 #else
@@ -94,8 +94,10 @@ public class Program
     
     private static Image GetImageFromFile(string path)
     {
-        using FileStream stream = File.OpenRead(path);
-        ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
-        return new Image(result.Width, result.Height, result.Data);
+        using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
+        byte[] pixels = new byte[image.Width * image.Height * 4];
+        image.CopyPixelDataTo(pixels);
+        
+        return new Image(image.Width, image.Height, pixels);
     }
 }

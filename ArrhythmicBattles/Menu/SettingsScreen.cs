@@ -1,6 +1,5 @@
-﻿using ArrhythmicBattles.Game;
-using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.UserInterface;
+using ArrhythmicBattles.Core;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Textwriter;
 
@@ -24,16 +25,16 @@ public class TextBuilder
     }
     
     private readonly List<StyledText> styledTexts = new List<StyledText>();
-    private readonly Dictionary<AtlasTexture, int> atlases = new Dictionary<AtlasTexture, int>();
+    private readonly Dictionary<AtlasTexture<Vector3>, int> atlases = new Dictionary<AtlasTexture<Vector3>, int>();
     private int minLineHeight = 0;
     private int baselineOffset = 0;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
     
     /// <param name="minLineHeight">Use height of first font if null</param>
-    public TextBuilder(int? minLineHeight, params Font[] fonts)
+    public TextBuilder(int? minLineHeight, IReadOnlyList<Font> fonts)
     {
-        for (int i = 0; i < fonts.Length; i++)
+        for (int i = 0; i < fonts.Count; i++)
         {
             atlases.Add(fonts[i].Atlas, i);
         }
@@ -81,8 +82,8 @@ public class TextBuilder
             {
                 BuiltGlyph glyph = new BuiltGlyph(
                     style, glyphInfo.Font, 
-                    advance, 0,
-                    glyphInfo.Colored, glyphInfo.Index, atlases[glyphInfo.Font.Atlas]);
+                    advance, 0, 
+                    glyphInfo.Index, atlases[glyphInfo.Font.Atlas]);
                 builtLine.AddGlyph(glyph, glyphInfo.AdvanceX, glyphInfo.Font.Height);
                 advance += glyphInfo.AdvanceX;
             }

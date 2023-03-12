@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
+using ArrhythmicBattles.Core;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
@@ -44,7 +44,7 @@ public class MainMenuScene : ABScene
         Context.Sound.MenuBackgroundMusic.Play();
 
         // Init entities
-        string bannerPath = Utils.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
+        string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
         bannerTexture = Texture2D.FromFile("banner", bannerPath);
         bannerEntity = new ImageEntity(Engine);
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
@@ -52,13 +52,18 @@ public class MainMenuScene : ABScene
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
         
-        copyrightText = new TextEntity(Engine, Engine.TextResources.GetFont("inconsolata-small"));
+        var textAssetsLocation = Engine.DefaultAssets.TextAssets;
+        var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets[Constants.DefaultFontName];
+        
+        copyrightText = new TextEntity(Engine, font);
+        copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = "Version 0.0.1 BETA\n© 2021 Arrhythmic Battles"; // TODO: It's not 2021 anymore
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
         
-        EngineResources resources = Engine.Resources;
-        Mesh<Vertex> quadMesh = Engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        EngineAssets assets = Engine.DefaultAssets;
+        Mesh<Vertex> quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
 
         border = new MeshEntity();
         border.Color = new Color4(24, 24, 24, 255);

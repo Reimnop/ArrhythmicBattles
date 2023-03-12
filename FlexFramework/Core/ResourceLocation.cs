@@ -1,6 +1,11 @@
 ﻿namespace FlexFramework.Core;
 
-public struct ResourceLocation
+public interface IResourceLocation
+{
+    int Id { get; }
+}
+
+public struct ResourceLocation<T> : IResourceLocation
 {
     public int Id { get; }
     

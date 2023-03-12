@@ -1,25 +1,26 @@
-﻿using FlexFramework.Core.Data;
-using FlexFramework.Core.Rendering.Text;
-using OpenTK.Graphics.OpenGL4;
+﻿namespace FlexFramework.Core;
 
-namespace FlexFramework.Core;
-
-public class ResourceManager : IDisposable
+public class ResourceRegistry : IDisposable
 {
     private readonly List<object> resources = new List<object>();
 
-    public ResourceLocation AddResource(object resource)
+    public ResourceLocation<T> Register<T>(T resource)
     {
+        if (resource is null)
+        {
+            throw new NullReferenceException();
+        }
+        
         resources.Add(resource);
-        return new ResourceLocation(resources.Count - 1);
+        return new ResourceLocation<T>(resources.Count - 1);
     }
-    
-    public object GetResource(ResourceLocation location)
+
+    public object GetResource(IResourceLocation location)
     {
         return resources[location.Id];
     }
     
-    public T GetResource<T>(ResourceLocation location)
+    public T GetResource<T>(ResourceLocation<T> location)
     {
         return (T) resources[location.Id];
     }

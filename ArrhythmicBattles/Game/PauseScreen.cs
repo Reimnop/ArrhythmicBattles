@@ -1,11 +1,8 @@
-﻿using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
-using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
-using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Textwriter;
@@ -28,13 +25,15 @@ public class PauseScreen : Screen, IDisposable
         
         inputProvider = scene.Context.InputSystem.AcquireInputProvider();
         
-        EngineResources resources = engine.Resources;
+        EngineAssets assets = engine.DefaultAssets;
 
         background = new MeshEntity();
-        background.Mesh = engine.ResourceManager.GetResource<Mesh<Vertex>>(resources.QuadMesh);
+        background.Mesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets[Constants.DefaultFontName];
         
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;

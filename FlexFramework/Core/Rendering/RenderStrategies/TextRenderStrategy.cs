@@ -6,12 +6,15 @@ namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class TextRenderStrategy : RenderStrategy, IDisposable
 {
-    private readonly ShaderProgram textShader;
     private readonly FlexFrameworkMain engine;
-
+    private readonly TextAssets textAssets;
+    private readonly ShaderProgram textShader;
+    
     public TextRenderStrategy(FlexFrameworkMain engine)
     {
         this.engine = engine;
+        var textAssetLocation = engine.DefaultAssets.TextAssets;
+        textAssets = engine.ResourceRegistry.GetResource(textAssetLocation);
 
         using Shader vertexShader = new Shader("text-vert", File.ReadAllText("Assets/Shaders/text.vert"),
             ShaderType.VertexShader);
@@ -32,13 +35,14 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         Matrix4 transformation = textDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
                 
-        for (int i = 0; i < engine.TextResources.FontTextures.Length; i++)
+        for (int i = 0; i < textAssets.AtlasTextures.Count; i++)
         {
             GL.Uniform1(i + 1, i);
-            glStateManager.BindTextureUnit(i, engine.TextResources.FontTextures[i].Handle);
+            glStateManager.BindTextureUnit(i, textAssets.AtlasTextures[i].Handle);
         }
 
         GL.Uniform4(17, textDrawData.Color);
+        GL.Uniform1(18, textDrawData.DistanceRange);
                 
         GL.DrawArrays(PrimitiveType.Triangles, 0, textDrawData.Count);
     }

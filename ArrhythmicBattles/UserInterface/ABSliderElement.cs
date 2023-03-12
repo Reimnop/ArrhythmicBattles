@@ -1,5 +1,4 @@
-﻿using System.IO.Pipes;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Core;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
@@ -85,7 +84,9 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseEnter += AnimateHighlight;
         interactivity.MouseLeave += AnimateUnhighlight;
 
-        Font font = engine.TextResources.GetFont("inconsolata-regular");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets[Constants.DefaultFontName];
 
         textEntity = new TextEntity(engine, font);
         textEntity.BaselineOffset = font.Height;
@@ -99,8 +100,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
-        tweener.Tween(elementBackgroundEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Easing.QuadInOut);
-        tweener.Tween(textEntity, new {Color = new Color4(0.0f, 0.0f, 0.0f, 1.0f)}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(elementBackgroundEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
+        tweener.Tween(textEntity, new {Color = new Color4(0.0f, 0.0f, 0.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
     }
     
     private void AnimateUnhighlight()
@@ -115,8 +116,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
-        tweener.Tween(elementBackgroundEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Easing.QuadInOut);
-        tweener.Tween(textEntity, new {Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(elementBackgroundEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Ease.QuadInOut);
+        tweener.Tween(textEntity, new {Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
     }
 
     private void OnMouseButtonUp(MouseButton button)

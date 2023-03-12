@@ -1,10 +1,9 @@
 ﻿using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Util;
+using ArrhythmicBattles.Core;
 using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core;
-using OpenTK.Mathematics;
 using Textwriter;
 
 namespace ArrhythmicBattles.Game;
@@ -29,7 +28,9 @@ public class DebugScreen : Screen, IDisposable
 
         GpuInfo gpuInfo = engine.Renderer.GpuInfo;
 
-        Font font = engine.TextResources.GetFont("inconsolata-small");
+        var textAssetsLocation = engine.DefaultAssets.TextAssets;
+        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        Font font = textAssets[Constants.DefaultFontName];
 
         leftTextEntity = new TextEntity(engine, font);
         leftTextEntity.BaselineOffset = font.Height;
@@ -63,9 +64,6 @@ public class DebugScreen : Screen, IDisposable
                           $"FPS: {fps}\n\n" +
                           $"\"uwaaa <3\"\n" +
                           $"    - Windows 98, the vg moderator.";
-        
-        leftTextEntity.Update(args);
-        rightTextEntity.Update(args);
     }
     
     public override void Render(RenderArgs args)

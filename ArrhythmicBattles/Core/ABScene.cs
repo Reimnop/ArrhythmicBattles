@@ -4,7 +4,7 @@ using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Util;
+namespace ArrhythmicBattles.Core;
 
 public abstract class ABScene : Scene, IDisposable
 {

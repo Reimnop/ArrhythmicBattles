@@ -22,15 +22,12 @@ public struct Length
     
     public float Calculate(float parentSize)
     {
-        switch (Unit)
+        return Unit switch
         {
-            case Unit.Pixel:
-                return Value;
-            case Unit.Percent:
-                return parentSize * Value;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            Unit.Pixel => Value,
+            Unit.Percent => parentSize * Value,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
     
     public static Length operator +(Length a, Length b)
