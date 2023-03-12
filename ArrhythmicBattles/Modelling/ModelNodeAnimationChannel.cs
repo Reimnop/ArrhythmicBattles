@@ -1,6 +1,7 @@
-﻿using OpenTK.Mathematics;
+﻿using ArrhythmicBattles.Core.Animation;
+using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Modelling.Animate;
+namespace ArrhythmicBattles.Modelling;
 
 public class ModelNodeAnimationChannel
 {

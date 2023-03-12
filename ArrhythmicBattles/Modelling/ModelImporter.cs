@@ -1,5 +1,5 @@
 ﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Modelling.Animate;
+using ArrhythmicBattles.Core.Animation;
 using Assimp;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
@@ -180,7 +180,7 @@ public class ModelImporter : IDisposable
     {
         List<ModelAnimation> animations = new List<ModelAnimation>();
 
-        foreach (Animation animation in scene.Animations)
+        foreach (Assimp.Animation animation in scene.Animations)
         {
             List<ModelNodeAnimationChannel> nodeAnimationChannels = new List<ModelNodeAnimationChannel>();
             

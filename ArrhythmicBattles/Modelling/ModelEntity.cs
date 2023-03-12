@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using ArrhythmicBattles.Modelling.Animate;
 using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.Animation;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;

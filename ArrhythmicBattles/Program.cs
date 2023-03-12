@@ -1,6 +1,6 @@
-﻿using ArrhythmicBattles.Game;
+﻿using ArrhythmicBattles.Core.Animation;
+using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Menu;
-using ArrhythmicBattles.UserInterface.Animation;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;

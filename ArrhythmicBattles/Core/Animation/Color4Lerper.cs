@@ -1,7 +1,7 @@
 ﻿using Glide;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.UserInterface.Animation;
+namespace ArrhythmicBattles.Core.Animation;
 
 public class Color4Lerper : MemberLerper
 {

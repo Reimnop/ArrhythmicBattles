@@ -1,4 +1,4 @@
-﻿namespace ArrhythmicBattles.Modelling.Animate;
+﻿namespace ArrhythmicBattles.Modelling;
 
 public class ModelAnimation
 {

@@ -1,5 +1,5 @@
-﻿using ArrhythmicBattles.Modelling.Animate;
-using ArrhythmicBattles.Core;
+﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.Animation;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;

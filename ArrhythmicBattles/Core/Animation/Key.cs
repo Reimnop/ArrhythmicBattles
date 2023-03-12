@@ -1,4 +1,4 @@
-﻿namespace ArrhythmicBattles.Modelling.Animate;
+﻿namespace ArrhythmicBattles.Core.Animation;
 
 public struct Key<T>
 {
