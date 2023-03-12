@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using ArrhythmicBattles.Settings;
-using ArrhythmicBattles.Util;
+using ArrhythmicBattles.Core;
 using DiscordRPC;
 using FlexFramework;
 

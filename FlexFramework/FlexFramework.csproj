@@ -16,11 +16,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BepuPhysics" Version="2.4.0" />
-        <PackageReference Include="NVorbis" Version="0.10.4" />
-        <PackageReference Include="OpenTK" Version="4.7.7" />
-        <PackageReference Include="SharpEXR" Version="1.0.0.19" />
-        <PackageReference Include="StbImageSharp" Version="2.27.13" />
+        <PackageReference Include="BepuPhysics" Version="2.4.0"/>
+        <PackageReference Include="NVorbis" Version="0.10.4"/>
+        <PackageReference Include="OpenTK" Version="4.7.7"/>
+        <PackageReference Include="SharpEXR" Version="1.0.0.19"/>
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -49,52 +49,52 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\skinned.vert">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\lit.vert">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\lit.frag">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\bloom_downsample.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\bloom_upsample.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\bloom_combine.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\bloom_prefilter.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\aces.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\reinhard.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\exposure.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\gamma_correct.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\skybox.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Assets\Shaders\Compute\procedural_skybox.comp">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Textwriter\Textwriter.csproj" />
+        <ProjectReference Include="..\Textwriter\Textwriter.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Core\Rendering\Text" />
+        <Folder Include="Core\Rendering\Text"/>
     </ItemGroup>
 
 </Project>

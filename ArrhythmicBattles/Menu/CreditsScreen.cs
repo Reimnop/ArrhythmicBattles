@@ -1,15 +1,11 @@
-﻿using ArrhythmicBattles.Game;
-using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.UserInterface;
+using ArrhythmicBattles.Core;
 using FlexFramework;
-using FlexFramework.Core.Entities;
 using FlexFramework.Core;
-using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.Menu;
 

@@ -1,6 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using SharpEXR;
-using StbImageSharp;
 using PixelType = OpenTK.Graphics.OpenGL4.PixelType;
 
 namespace FlexFramework.Core.Rendering.Data;
@@ -43,9 +42,12 @@ public class Texture2D : GpuObject, IDisposable
     
     public static Texture2D FromStream(string name, Stream stream)
     {
-        ImageResult result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
-        Texture2D texture2D = new Texture2D(name, result.Width, result.Height, SizedInternalFormat.Rgba8);
-        texture2D.LoadData<byte>(result.Data, PixelFormat.Rgba, PixelType.UnsignedByte);
+        using var image = Image.Load<Rgba32>(stream);
+        Span<Rgba32> pixels = stackalloc Rgba32[image.Width * image.Height];
+        image.CopyPixelDataTo(pixels);
+        
+        var texture2D = new Texture2D(name, image.Width, image.Height, SizedInternalFormat.Rgba8);
+        texture2D.LoadData<Rgba32>(pixels, PixelFormat.Rgba, PixelType.UnsignedByte);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
         return texture2D;

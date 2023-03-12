@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ArrhythmicBattles.Util;
+namespace ArrhythmicBattles.Core;
 
 public class TreeBuilder<T>
 {

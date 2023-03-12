@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
+using ArrhythmicBattles.Core;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
@@ -44,7 +44,7 @@ public class MainMenuScene : ABScene
         Context.Sound.MenuBackgroundMusic.Play();
 
         // Init entities
-        string bannerPath = Utils.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
+        string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
         bannerTexture = Texture2D.FromFile("banner", bannerPath);
         bannerEntity = new ImageEntity(Engine);
         bannerEntity.Position = new Vector2(32.0f, 32.0f);

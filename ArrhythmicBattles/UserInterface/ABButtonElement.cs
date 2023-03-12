@@ -54,8 +54,8 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
-        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Easing.QuadInOut);
-        tweener.Tween(textEntity, new {Color = TextHoverColor}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
+        tweener.Tween(textEntity, new {Color = TextHoverColor}, 0.2f).Ease(Ease.QuadInOut);
     }
     
     private void OnMouseLeave()
@@ -65,8 +65,8 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
-        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Easing.QuadInOut);
-        tweener.Tween(textEntity, new {Color = TextDefaultColor}, 0.2f).Ease(Easing.QuadInOut);
+        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Ease.QuadInOut);
+        tweener.Tween(textEntity, new {Color = TextDefaultColor}, 0.2f).Ease(Ease.QuadInOut);
     }
 
     private void OnMouseButtonUp(MouseButton button)

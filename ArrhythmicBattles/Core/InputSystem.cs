@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.Util;
+namespace ArrhythmicBattles.Core;
 
 public struct InputCapture
 {

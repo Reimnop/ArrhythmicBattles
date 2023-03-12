@@ -1,6 +1,6 @@
 ﻿namespace ArrhythmicBattles.Util;
 
-public static class Utils
+public static class RandomHelper
 {
     public static float RandomFromTime()
     {
