@@ -67,8 +67,8 @@ public class GameScene : ABScene
 
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
-        camera.Position = Vector3.UnitZ * 4.0f;
-        
+        camera.Position = new Vector3(0.0f, 1.5f, 4.0f);
+
         playerEntity = new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
 
         // Create floor
@@ -111,15 +111,6 @@ public class GameScene : ABScene
         }
         
         envModelEntity.Update(args);
-        
-        // update camera
-        Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
-                              Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
-        
-        Vector3 backward = Vector3.Transform(Vector3.UnitZ, rotation);
-
-        camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
-        camera.Rotation = rotation;
     }
 
     public override void Render(Renderer renderer)
