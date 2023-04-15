@@ -9,7 +9,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.Game;
 
-public class PauseScreen : Screen, IDisposable
+public class PauseScreen : Screen
 {
     private readonly TextEntity textEntity;
     private readonly MeshEntity background;
@@ -68,7 +68,6 @@ public class PauseScreen : Screen, IDisposable
 
     public void Dispose()
     {
-        textEntity.Dispose();
         inputProvider.Dispose();
     }
 }

@@ -6,7 +6,7 @@ using Textwriter;
 
 namespace FlexFramework.Core.Entities;
 
-public class TextEntity : Entity, IRenderable, IDisposable
+public class TextEntity : Entity, IRenderable
 {
     public Font Font
     {
@@ -109,7 +109,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
             vertexSpan[i] = new TextVertexAdapter(vertices[i]);
         }
         
-        mesh.LoadData(vertexSpan);
+        mesh.SetData(vertexSpan, null);
     }
 
     public void Render(RenderArgs args)
@@ -119,12 +119,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
             meshValid = true;
             GenerateMesh();
         }
-        
-        if (mesh.Count == 0)
-        {
-            return;
-        }
-        
+
         Renderer renderer = args.Renderer;
         int layerId = args.LayerId;
         MatrixStack matrixStack = args.MatrixStack;
@@ -134,15 +129,10 @@ public class TextEntity : Entity, IRenderable, IDisposable
         matrixStack.Scale(EmSize, EmSize, 1.0f);
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color, 4.0f * EmSize);
+        TextDrawData textDrawData = new TextDrawData(mesh, transformation, Color, 4.0f * EmSize);
         
         renderer.EnqueueDrawData(layerId, textDrawData);
         
         matrixStack.Pop();
-    }
-    
-    public void Dispose()
-    {
-        mesh.Dispose();
     }
 }

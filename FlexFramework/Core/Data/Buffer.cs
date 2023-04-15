@@ -21,7 +21,7 @@ public class Buffer
     }
 
     private void UpdateHash()
-    {
+    { 
         hash = HashUtil.GetMD5(data);
     }
 
@@ -46,5 +46,11 @@ public class Buffer
         {
             SetData((IntPtr) ptr, length);
         }
+    }
+    
+    public void Clear()
+    {
+        size = 0;
+        UpdateHash();
     }
 }

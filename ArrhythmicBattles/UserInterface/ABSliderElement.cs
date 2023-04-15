@@ -222,9 +222,5 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     public void Dispose()
     {
         focusedInputProvider?.Dispose();
-        elementBackgroundEntity.Dispose();
-        sliderBackgroundEntity.Dispose();
-        sliderEntity.Dispose();
-        textEntity.Dispose();
     }
 }

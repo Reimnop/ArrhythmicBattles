@@ -87,9 +87,9 @@ public class ModelImporter : IDisposable
         return materials;
     }
     
-    public List<IndexedMesh<LitVertex>> LoadMeshes()
+    public List<Mesh<LitVertex>> LoadMeshes()
     {
-        List<IndexedMesh<LitVertex>> meshes = new List<IndexedMesh<LitVertex>>();
+        List<Mesh<LitVertex>> meshes = new List<Mesh<LitVertex>>();
         
         foreach (Mesh sceneMesh in scene.Meshes)
         {
@@ -112,16 +112,16 @@ public class ModelImporter : IDisposable
                     color.R, color.G, color.B, color.A));
             }
 
-            IndexedMesh<LitVertex> mesh = new IndexedMesh<LitVertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
+            Mesh<LitVertex> mesh = new Mesh<LitVertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
             meshes.Add(mesh);
         }
 
         return meshes;
     }
 
-    public List<IndexedMesh<SkinnedVertex>> LoadSkinnedMeshes()
+    public List<Mesh<SkinnedVertex>> LoadSkinnedMeshes()
     {
-        List<IndexedMesh<SkinnedVertex>> meshes = new List<IndexedMesh<SkinnedVertex>>();
+        List<Mesh<SkinnedVertex>> meshes = new List<Mesh<SkinnedVertex>>();
 
         foreach (Mesh sceneMesh in scene.Meshes)
         {
@@ -146,7 +146,7 @@ public class ModelImporter : IDisposable
             
             FillVertexWeights(vertices, sceneMesh);
 
-            IndexedMesh<SkinnedVertex> mesh = new IndexedMesh<SkinnedVertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
+            Mesh<SkinnedVertex> mesh = new Mesh<SkinnedVertex>(sceneMesh.Name, vertices.ToArray(), sceneMesh.GetIndices());
             meshes.Add(mesh);
         }
 

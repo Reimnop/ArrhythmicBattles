@@ -28,7 +28,7 @@ public class MeshEntity : Entity, IRenderable
         CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(Mesh.VertexArray, Mesh.Count, transformation, Texture, Color, PrimitiveType);
+        VertexDrawData vertexDrawData = new VertexDrawData(Mesh, transformation, Texture, Color, PrimitiveType);
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

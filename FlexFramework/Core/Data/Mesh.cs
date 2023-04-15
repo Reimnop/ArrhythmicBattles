@@ -20,15 +20,25 @@ public class Mesh<T> : DataObject, IMeshView where T : unmanaged, IVertex
     {
     }
 
-    public void SetData(T[] vertices, int[]? indices)
+    public Mesh(string name, ReadOnlySpan<T> vertices) : this(name)
     {
-        vertexBuffer.SetData<T>(vertices);
+        SetData(vertices, null);
+    }
+    
+    public Mesh(string name, ReadOnlySpan<T> vertices, ReadOnlySpan<int> indices) : this(name)
+    {
+        SetData(vertices, indices);
+    }
+
+    public void SetData(ReadOnlySpan<T> vertices, ReadOnlySpan<int> indices)
+    {
+        vertexBuffer.SetData(vertices);
         verticesCount = vertices.Length;
         
-        if (indices != null && indices.Length > 0)
+        if (indices.Length > 0)
         {
             indexBuffer = new Buffer();
-            indexBuffer.SetData<int>(indices);
+            indexBuffer.SetData(indices);
             indicesCount = indices.Length;
         }
         else

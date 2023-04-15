@@ -78,16 +78,16 @@ public class Model : IDisposable
 
     // lazily load meshes
     // yes, Rider converted my if statements and getter to this
-    public IReadOnlyList<IndexedMesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
-    public IReadOnlyList<IndexedMesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
+    public IReadOnlyList<Mesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
+    public IReadOnlyList<Mesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
 
     public IReadOnlyList<ModelMaterial> Materials => materials;
     public IReadOnlyList<ModelAnimation> Animations => animations;
     public IReadOnlyList<ModelBone> Bones => bones;
     public IReadOnlyDictionary<string, int> BoneIndexMap => boneIndexMap;
     
-    private List<IndexedMesh<LitVertex>>? meshes;
-    private List<IndexedMesh<SkinnedVertex>>? skinnedMeshes;
+    private List<Mesh<LitVertex>>? meshes;
+    private List<Mesh<SkinnedVertex>>? skinnedMeshes;
     
     private readonly List<ModelMaterial> materials;
     private readonly List<ModelAnimation> animations;

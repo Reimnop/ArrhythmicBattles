@@ -11,7 +11,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.UserInterface;
 
-public class ABButtonElement : VisualElement, IUpdateable, IDisposable
+public class ABButtonElement : VisualElement, IUpdateable
 {
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -112,11 +112,5 @@ public class ABButtonElement : VisualElement, IUpdateable, IDisposable
         matrixStack.Translate(ContentBounds.X0, ContentBounds.Y0, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
-    }
-
-    public void Dispose()
-    {
-        rectEntity.Dispose();
-        textEntity.Dispose();
     }
 }

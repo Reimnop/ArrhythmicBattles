@@ -4,7 +4,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class ButtonElement : VisualElement, IUpdateable, IDisposable
+public class ButtonElement : VisualElement, IUpdateable
 {
     public event Action? Click;
     
@@ -57,10 +57,5 @@ public class ButtonElement : VisualElement, IUpdateable, IDisposable
     public override void Render(RenderArgs args)
     {
         rectEntity.Render(args);
-    }
-
-    public void Dispose()
-    {
-        rectEntity.Dispose();
     }
 }
