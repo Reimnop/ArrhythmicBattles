@@ -8,9 +8,13 @@ public class VertexRenderStrategy : RenderStrategy
 {
     private readonly ShaderProgram unlitShader;
 
-    public VertexRenderStrategy(ShaderProgram unlitShader)
+    public VertexRenderStrategy()
     {
-        this.unlitShader = unlitShader;
+        using var vertexShader = new Shader("unlit-vert", File.ReadAllText("Assets/Shaders/unlit.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("unlit-frag", File.ReadAllText("Assets/Shaders/unlit.frag"), ShaderType.FragmentShader);
+        
+        unlitShader = new ShaderProgram("unlit");
+        unlitShader.LinkShaders(vertexShader, fragmentShader);
     }
     
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)

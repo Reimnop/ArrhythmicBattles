@@ -5,6 +5,8 @@
 /// </summary>
 public struct TemporaryList<T> : IDisposable
 {
+    public int Count => list.Count;
+    
     private readonly List<T> list;
     
     public TemporaryList(List<T> list) 

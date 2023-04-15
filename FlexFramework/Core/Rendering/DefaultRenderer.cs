@@ -69,12 +69,10 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         
         // Register render strategies
         RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy(unlitShader));
-        RegisterRenderStrategy<IndexedVertexDrawData>(new IndexedVertexRenderStrategy(unlitShader));
         RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this, litShader));
         RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
         RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy(Engine));
-        RegisterRenderStrategy<CustomDrawData>(new CustomRenderStrategy());
-        
+
         // Set GL modes
         GL.CullFace(CullFaceMode.Back);
         GL.FrontFace(FrontFaceDirection.Ccw);
@@ -94,17 +92,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         return renderLayerRegistry.Register(name, () => new List<IDrawData>());
     }
 
-    private ShaderProgram LoadProgram(string name, string path)
-    {
-        using Shader vertexShader = new Shader($"{name}-vs", File.ReadAllText($"{path}.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader($"{name}-fs", File.ReadAllText($"{path}.frag"), ShaderType.FragmentShader);
-
-        ShaderProgram program = new ShaderProgram(name);
-        program.LinkShaders(vertexShader, fragmentShader);
-
-        return program;
-    }
-    
     private ShaderProgram LoadComputeProgram(string name, string path)
     {
         using Shader shader = new Shader($"{name}-vs", File.ReadAllText($"{path}.comp"), ShaderType.ComputeShader);
@@ -195,27 +182,39 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         using TemporaryList<IDrawData> transparentLayer = renderLayerRegistry[transparentLayerId];
         using TemporaryList<IDrawData> guiLayer = renderLayerRegistry[guiLayerId];
         
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, true);
-        stateManager.SetCapability(EnableCap.Blend, false);
-        stateManager.SetDepthMask(true);
-        RenderLayer(opaqueLayer);
-        
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, false);
-        stateManager.SetDepthMask(true);
-        RenderLayer(alphaClipLayer);
-        
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, true);
-        stateManager.SetDepthMask(false);
-        RenderLayer(transparentLayer);
-        
+        // Opaque
+        if (opaqueLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, true);
+            stateManager.SetCapability(EnableCap.Blend, false);
+            stateManager.SetDepthMask(true);
+            RenderLayer(opaqueLayer);
+        }
+
+        // Alpha clip
+        if (alphaClipLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, false);
+            stateManager.SetDepthMask(true);
+            RenderLayer(alphaClipLayer);
+        }
+
+        // Transparent
+        if (transparentLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, true);
+            stateManager.SetDepthMask(false);
+            RenderLayer(transparentLayer);
+        }
+
         // Post-process world framebuffer
         using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
         RunPostProcessors(postProcessors, stateManager, worldScreenCapturer.ColorBuffer);
@@ -230,12 +229,16 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             0, 0, guiScreenCapturer.Width, guiScreenCapturer.Height,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 
-        stateManager.SetCapability(EnableCap.Multisample, true);
-        stateManager.SetCapability(EnableCap.DepthTest, false);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, true);
-        stateManager.SetDepthMask(true);
-        RenderLayer(guiLayer);
+        // GUI
+        if (guiLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, true);
+            stateManager.SetCapability(EnableCap.DepthTest, false);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, true);
+            stateManager.SetDepthMask(true);
+            RenderLayer(guiLayer);
+        }
 
         stateManager.BindFramebuffer(0); // Finally, bind default framebuffer
 

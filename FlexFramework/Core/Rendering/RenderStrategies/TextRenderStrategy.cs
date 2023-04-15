@@ -16,10 +16,8 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         var textAssetLocation = engine.DefaultAssets.TextAssets;
         textAssets = engine.ResourceRegistry.GetResource(textAssetLocation);
 
-        using Shader vertexShader = new Shader("text-vert", File.ReadAllText("Assets/Shaders/text.vert"),
-            ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader("text-frag", File.ReadAllText("Assets/Shaders/text.frag"),
-            ShaderType.FragmentShader);
+        using var vertexShader = new Shader("text-vert", File.ReadAllText("Assets/Shaders/text.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("text-frag", File.ReadAllText("Assets/Shaders/text.frag"), ShaderType.FragmentShader);
         
         textShader = new ShaderProgram("text");
         textShader.LinkShaders(vertexShader, fragmentShader);

@@ -1,18 +1,19 @@
-﻿using OpenTK.Mathematics;
+﻿using FlexFramework.Core.Data;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.Data;
 
 public struct TextDrawData : IDrawData
 {
-    public VertexArray VertexArray { get; }
+    public Mesh<TextVertexAdapter> Mesh { get; }
     public int Count { get; }
     public Matrix4 Transformation { get; }
     public Color4 Color { get; }
     public float DistanceRange { get; }
 
-    public TextDrawData(VertexArray vertexArray, int count, Matrix4 transformation, Color4 color, float distanceRange)
+    public TextDrawData(Mesh<TextVertexAdapter> mesh, int count, Matrix4 transformation, Color4 color, float distanceRange)
     {
-        VertexArray = vertexArray;
+        Mesh = mesh;
         Count = count;
         Transformation = transformation;
         Color = color;

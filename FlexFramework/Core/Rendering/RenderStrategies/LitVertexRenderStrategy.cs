@@ -9,10 +9,15 @@ public class LitVertexRenderStrategy : RenderStrategy
     private readonly ILighting lighting;
     private readonly ShaderProgram litShader;
 
-    public LitVertexRenderStrategy(ILighting lighting, ShaderProgram litShader)
+    public LitVertexRenderStrategy(ILighting lighting)
     {
         this.lighting = lighting;
-        this.litShader = litShader;
+        
+        using var vertexShader = new Shader("lit-vert", File.ReadAllText("Assets/Shaders/lit.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("lit-frag", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        
+        litShader = new ShaderProgram("lit");
+        litShader.LinkShaders(vertexShader, fragmentShader);
     }
     
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)

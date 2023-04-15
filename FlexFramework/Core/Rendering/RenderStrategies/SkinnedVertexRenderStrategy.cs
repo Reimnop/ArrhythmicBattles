@@ -13,8 +13,8 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     {
         this.lighting = lighting;
         
-        using Shader vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        using var vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
 
         skinnedShader = new ShaderProgram("skinned");
         skinnedShader.LinkShaders(vertexShader, fragmentShader);

@@ -1,62 +1,85 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
-using FlexFramework.Core.Rendering.Data;
-using OpenTK.Graphics.OpenGL4;
-using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
+using System.Runtime.InteropServices;
 
 namespace FlexFramework.Core.Data;
 
-public class Mesh<T> : IDisposable where T : unmanaged, IVertex
+public class Mesh<T> : DataObject, IMeshView where T : unmanaged, IVertex
 {
-    public VertexArray VertexArray { get; }
-    public Buffer VertexBuffer { get; }
-    public int Count { get; private set; }
+    public Buffer VertexBuffer => vertexBuffer;
+    public Buffer? IndexBuffer => indexBuffer;
+    public int VerticesCount => verticesCount;
+    public int IndicesCount => indicesCount;
+    public int VertexSize => Unsafe.SizeOf<T>();
 
-    public Mesh(string name)
+    private readonly Buffer vertexBuffer = new Buffer();
+    private Buffer? indexBuffer = null;
+    private int verticesCount = 0;
+    private int indicesCount = 0;
+
+    public Mesh(string name) : base(name)
     {
-        VertexBuffer = new Buffer($"{name}-vtx");
-        VertexArray = new VertexArray(name);
-        
-        T.SetupAttributes(Attribute, AttributeI);
     }
 
-    public Mesh(string name, ReadOnlySpan<T> vertices)
+    public void SetData(T[] vertices, int[]? indices)
     {
-        VertexBuffer = new Buffer($"{name}-vtx");
-        VertexArray = new VertexArray(name);
+        vertexBuffer.SetData<T>(vertices);
+        verticesCount = vertices.Length;
         
-        T.SetupAttributes(Attribute, AttributeI);
-        
-        LoadData(vertices);
-    }
-
-    public void LoadData(ReadOnlySpan<T> vertices)
-    {
-        Count = vertices.Length;
-
-        if (VertexBuffer.SizeInBytes >= vertices.Length * Unsafe.SizeOf<T>())
+        if (indices != null && indices.Length > 0)
         {
-            VertexBuffer.LoadDataPartial(vertices, 0);
+            indexBuffer = new Buffer();
+            indexBuffer.SetData<int>(indices);
+            indicesCount = indices.Length;
         }
         else
         {
-            VertexBuffer.LoadData(vertices);
+            indexBuffer = null;
         }
     }
-
-    private void Attribute(int index, int size, int offset, VertexAttribType vertexAttribType, bool normalized)
+    
+    public T GetVertex(int index)
     {
-        VertexArray.VertexBuffer(VertexBuffer, index, index, size, offset, vertexAttribType, normalized, Unsafe.SizeOf<T>());
+        if (index < 0 || index >= verticesCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+        
+        int size = Unsafe.SizeOf<T>();
+        ReadOnlySpan<byte> data = vertexBuffer.Data;
+        return Unsafe.ReadUnaligned<T>(ref MemoryMarshal.GetReference(data.Slice(index * size, size)));
     }
     
-    private void AttributeI(int index, int size, int offset, VertexAttribIntegerType vertexAttribIntegerType)
+    public int GetIndex(int index)
     {
-        VertexArray.VertexBuffer(VertexBuffer, index, index, size, offset, vertexAttribIntegerType, Unsafe.SizeOf<T>());
+        if (index < 0 || index >= indicesCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+        
+        ReadOnlySpan<byte> data = indexBuffer!.Data;
+        return Unsafe.ReadUnaligned<int>(ref MemoryMarshal.GetReference(data.Slice(index * sizeof(int), sizeof(int))));
     }
-
-    public void Dispose()
+    
+    public void SetVertex(int index, T vertex)
     {
-        VertexArray.Dispose();
-        VertexBuffer.Dispose();
+        if (index < 0 || index >= verticesCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+        
+        int size = Unsafe.SizeOf<T>();
+        Span<byte> data = vertexBuffer.Data;
+        Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(data.Slice(index * size, size)), vertex);
+    }
+    
+    public void SetIndex(int index, int value)
+    {
+        if (index < 0 || index >= indicesCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+        
+        Span<byte> data = indexBuffer!.Data;
+        Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(data.Slice(index * sizeof(int), sizeof(int))), value);
     }
 }
