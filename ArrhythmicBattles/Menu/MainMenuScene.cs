@@ -17,7 +17,6 @@ namespace ArrhythmicBattles.Menu;
 public class MainMenuScene : ABScene
 {
     private ImageEntity bannerEntity;
-    private GifEntity memeGif;
     private TextEntity copyrightText;
 
     private MeshEntity border;
@@ -52,12 +51,7 @@ public class MainMenuScene : ABScene
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
-        
-        memeGif = new GifEntity(Engine, "Assets/meme.gif");
-        memeGif.Position = new Vector2(608.0f, 32.0f);
-        memeGif.Size = new Vector2(0.0f, 192.0f);
-        memeGif.ImageMode = ImageMode.Stretch;
-        
+
         var textAssetsLocation = Engine.DefaultAssets.TextAssets;
         var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
         Font font = textAssets[Constants.DefaultFontName];
@@ -88,7 +82,6 @@ public class MainMenuScene : ABScene
         base.Update(args);
         
         bannerEntity.Update(args);
-        memeGif.Update(args);
         copyrightText.Update(args);
     }
 
@@ -123,7 +116,6 @@ public class MainMenuScene : ABScene
         border.Render(args);
         MatrixStack.Pop();
         bannerEntity.Render(args);
-        memeGif.Render(args);
         MatrixStack.Pop();
         
         MatrixStack.Push();
