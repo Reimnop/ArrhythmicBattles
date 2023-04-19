@@ -25,7 +25,7 @@ public class LitMeshEntity : Entity, IRenderable
         CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh, matrixStack.GlobalTransformation, transformation, Texture, Color);
+        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh.AsReadOnly(), matrixStack.GlobalTransformation, transformation, Texture, Color);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

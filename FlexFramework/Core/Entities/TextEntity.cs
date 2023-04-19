@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Data;
+﻿using System.Runtime.CompilerServices;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
@@ -72,7 +73,7 @@ public class TextEntity : Entity, IRenderable
 
     private readonly FlexFrameworkMain engine;
     private readonly TextAssets textAssets;
-    private readonly Mesh<TextVertexAdapter> mesh;
+    private readonly Mesh<TextVertex> mesh;
     
     private readonly List<TextVertex> vertices = new List<TextVertex>();
 
@@ -83,8 +84,15 @@ public class TextEntity : Entity, IRenderable
 
         var textAssetsLocation = engine.DefaultAssets.TextAssets;
         textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        
+        VertexLayout vertexLayout = new VertexLayout(
+            Unsafe.SizeOf<TextVertex>(), 
+            new VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 2, 0),
+            new VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4, 2 * sizeof(float)),
+            new VertexAttribute(VertexAttributeIntent.TexCoord, VertexAttributeType.Float, 2, 6 * sizeof(float)),
+            new VertexAttribute(VertexAttributeIntent.Any, VertexAttributeType.Int, 1, 8 * sizeof(float)));
 
-        mesh = new Mesh<TextVertexAdapter>("text");
+        mesh = new Mesh<TextVertex>("text", vertexLayout);
     }
 
     public void InvalidateMesh()
@@ -103,10 +111,10 @@ public class TextEntity : Entity, IRenderable
         
         TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         
-        Span<TextVertexAdapter> vertexSpan = stackalloc TextVertexAdapter[vertices.Count];
+        Span<TextVertex> vertexSpan = stackalloc TextVertex[vertices.Count];
         for (int i = 0; i < vertices.Count; i++)
         {
-            vertexSpan[i] = new TextVertexAdapter(vertices[i]);
+            vertexSpan[i] = vertices[i];
         }
         
         mesh.SetData(vertexSpan, null);
@@ -129,7 +137,7 @@ public class TextEntity : Entity, IRenderable
         matrixStack.Scale(EmSize, EmSize, 1.0f);
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh, transformation, Color, 4.0f * EmSize);
+        TextDrawData textDrawData = new TextDrawData(mesh.AsReadOnly(), transformation, Color, 4.0f * EmSize);
         
         renderer.EnqueueDrawData(layerId, textDrawData);
         

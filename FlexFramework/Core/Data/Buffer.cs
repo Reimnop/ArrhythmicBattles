@@ -6,6 +6,20 @@ namespace FlexFramework.Core.Data;
 
 public class Buffer
 {
+    private struct ReadOnlyBuffer : IBufferView
+    {
+        public ReadOnlySpan<byte> Data => buffer.Data;
+        public int Size => buffer.Size;
+        public Hash128 Hash => buffer.Hash;
+        
+        private readonly Buffer buffer;
+        
+        public ReadOnlyBuffer(Buffer buffer)
+        {
+            this.buffer = buffer;
+        }
+    }
+    
     public Span<byte> Data => new(data, 0, size);
     public int Size => size;
     public Hash128 Hash => hash;
@@ -52,5 +66,10 @@ public class Buffer
     {
         size = 0;
         UpdateHash();
+    }
+    
+    public IBufferView AsReadOnly()
+    {
+        return new ReadOnlyBuffer(this);
     }
 }

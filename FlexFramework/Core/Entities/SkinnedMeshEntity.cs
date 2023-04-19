@@ -25,7 +25,7 @@ public class SkinnedMeshEntity : Entity, IRenderable
         CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        SkinnedVertexDrawData vertexDrawData = new SkinnedVertexDrawData(Mesh, matrixStack.GlobalTransformation, transformation, Texture, Bones, Color);
+        SkinnedVertexDrawData vertexDrawData = new SkinnedVertexDrawData(Mesh.AsReadOnly(), matrixStack.GlobalTransformation, transformation, Texture, Bones, Color);
         
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

@@ -2,9 +2,10 @@
 
 public interface IMeshView
 {
-    Buffer VertexBuffer { get; }
-    Buffer? IndexBuffer { get; }
+    IBufferView VertexBuffer { get; }
+    IBufferView? IndexBuffer { get; }
     int VerticesCount { get; }
     int IndicesCount { get; }
     int VertexSize { get; }
+    VertexLayout VertexLayout { get; }
 }
