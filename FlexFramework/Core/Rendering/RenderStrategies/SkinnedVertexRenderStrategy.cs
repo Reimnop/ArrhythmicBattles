@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -8,6 +9,15 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
 {
     private readonly ILighting lighting;
     private readonly ShaderProgram skinnedShader;
+    
+    private readonly MeshHandler meshHandler = new(
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.Normal, 1),
+            (VertexAttributeIntent.TexCoord0, 2),
+            (VertexAttributeIntent.Color, 3),
+            (VertexAttributeIntent.BoneIndex, 4),
+            (VertexAttributeIntent.BoneWeight, 5)
+        );
     
     public SkinnedVertexRenderStrategy(ILighting lighting)
     {
@@ -24,8 +34,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     {
         SkinnedVertexDrawData vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         
+        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        
         glStateManager.UseProgram(skinnedShader.Handle);
-        glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
+        glStateManager.BindVertexArray(vertexArray.Handle);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -33,10 +45,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
 
-        if (vertexDrawData.Texture != null)
-        {
-            glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
-        }
+        // if (vertexDrawData.Texture != null)
+        // {
+        //     glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
+        // }
 
         GL.Uniform4(4, vertexDrawData.Color);
         
@@ -59,7 +71,14 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             }
         }
 
-        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
+        if (vertexDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
+        
+        vertexArray.Dispose();
+        vertexBuffer.Dispose();
+        indexBuffer?.Dispose();
     }
 
     public void Dispose()

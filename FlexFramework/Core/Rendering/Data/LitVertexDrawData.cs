@@ -8,10 +8,10 @@ public struct LitVertexDrawData : IDrawData
     public IMeshView Mesh { get; }
     public Matrix4 ModelMatrix { get; }
     public Matrix4 Transformation { get; }
-    public Texture2D? Texture { get; }
+    public ITextureView? Texture { get; }
     public Color4 Color { get; }
 
-    public LitVertexDrawData(IMeshView mesh, Matrix4 modelMatrix, Matrix4 transformation, Texture2D? texture, Color4 color)
+    public LitVertexDrawData(IMeshView mesh, Matrix4 modelMatrix, Matrix4 transformation, ITextureView? texture, Color4 color)
     {
         Mesh = mesh;
         ModelMatrix = modelMatrix;

@@ -17,19 +17,15 @@ public class Texture2D : GpuObject, IDisposable
         Name = name;
         Width = width;
         Height = height;
-        
+
         GL.CreateTextures(samples > 0 ? TextureTarget.Texture2DMultisample : TextureTarget.Texture2D, 1, out int handle);
 
         if (samples > 0)
-        {
             GL.TextureStorage2DMultisample(handle, samples, internalFormat, width, height, true);
-        }
         else
-        {
             GL.TextureStorage2D(handle, 1, internalFormat, width, height);
-        }
-        
-        
+
+
         GL.ObjectLabel(ObjectLabelIdentifier.Texture, handle, name.Length, name);
         Handle = handle;
     }
@@ -50,22 +46,6 @@ public class Texture2D : GpuObject, IDisposable
         texture2D.LoadData<Rgba32>(pixels, PixelFormat.Rgba, PixelType.UnsignedByte);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
-        return texture2D;
-    }
-
-    public static Texture2D FromExr(string name, string path)
-    {
-        EXRFile exrFile = EXRFile.FromFile(path);
-        EXRPart part = exrFile.Parts[0];
-        part.OpenParallel(path);
-
-        Texture2D texture2D = new Texture2D(name, part.DataWindow.Width, part.DataWindow.Height, SizedInternalFormat.Rgb16f);
-        texture2D.LoadData<byte>(part.GetBytes(ImageDestFormat.RGB16, GammaEncoding.Linear), PixelFormat.Rgb, PixelType.HalfFloat);
-        texture2D.SetMinFilter(TextureMinFilter.Linear);
-        texture2D.SetMagFilter(TextureMagFilter.Linear);
-        
-        part.Close();
-
         return texture2D;
     }
 

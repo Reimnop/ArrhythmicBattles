@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -9,6 +10,13 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
     private readonly FlexFrameworkMain engine;
     private readonly TextAssets textAssets;
     private readonly ShaderProgram textShader;
+    
+    private readonly MeshHandler meshHandler = new(
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.Color, 1),
+            (VertexAttributeIntent.TexCoord0, 2),
+            (VertexAttributeIntent.TexCoord1, 3)
+        );
     
     public TextRenderStrategy(FlexFrameworkMain engine)
     {
@@ -27,8 +35,10 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
     {
         TextDrawData textDrawData = EnsureDrawDataType<TextDrawData>(drawData);
         
+        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(textDrawData.Mesh);
+        
         glStateManager.UseProgram(textShader.Handle);
-        glStateManager.BindVertexArray(textDrawData.VertexArray.Handle);
+        glStateManager.BindVertexArray(vertexArray.Handle);
 
         Matrix4 transformation = textDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
@@ -41,8 +51,15 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
 
         GL.Uniform4(17, textDrawData.Color);
         GL.Uniform1(18, textDrawData.DistanceRange);
-                
-        GL.DrawArrays(PrimitiveType.Triangles, 0, textDrawData.Count);
+        
+        if (textDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(PrimitiveType.Triangles, textDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(PrimitiveType.Triangles, 0, textDrawData.Mesh.VerticesCount);
+        
+        vertexArray.Dispose();
+        vertexBuffer.Dispose();
+        indexBuffer?.Dispose();
     }
 
     public void Dispose()

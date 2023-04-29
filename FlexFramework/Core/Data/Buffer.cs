@@ -23,6 +23,7 @@ public class Buffer
     public Span<byte> Data => new(data, 0, size);
     public int Size => size;
     public Hash128 Hash => hash;
+    public IBufferView ReadOnly => new ReadOnlyBuffer(this);
     
     private byte[] data;
     private int size = 0;
@@ -66,10 +67,5 @@ public class Buffer
     {
         size = 0;
         UpdateHash();
-    }
-    
-    public IBufferView AsReadOnly()
-    {
-        return new ReadOnlyBuffer(this);
     }
 }

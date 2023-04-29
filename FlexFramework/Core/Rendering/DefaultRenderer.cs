@@ -36,8 +36,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     private ScreenCapturer? guiScreenCapturer;
 
     private GLStateManager stateManager;
-    private ShaderProgram unlitShader;
-    private ShaderProgram litShader;
     private ShaderProgram skyboxShader;
 
     private int opaqueLayerId;
@@ -56,8 +54,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         gpuInfo = new GpuInfo(name, vendor, version);
         
         // Init GL objects
-        unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
-        litShader = LoadProgram("lit", "Assets/Shaders/lit");
         skyboxShader = LoadComputeProgram("skybox", "Assets/Shaders/Compute/skybox");
 
         // Register render layers
@@ -68,8 +64,8 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         renderLayerRegistry.Freeze();
         
         // Register render strategies
-        RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy(unlitShader));
-        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this, litShader));
+        RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
+        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this));
         RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
         RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy(Engine));
 
@@ -283,8 +279,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
 
     public void Dispose()
     {
-        unlitShader.Dispose();
-        litShader.Dispose();
         skyboxShader.Dispose();
         worldScreenCapturer?.Dispose();
         guiScreenCapturer?.Dispose();

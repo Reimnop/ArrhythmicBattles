@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -8,6 +9,13 @@ public class LitVertexRenderStrategy : RenderStrategy
 {
     private readonly ILighting lighting;
     private readonly ShaderProgram litShader;
+    
+    private readonly MeshHandler meshHandler = new (
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.Normal, 1),
+            (VertexAttributeIntent.TexCoord0, 2),
+            (VertexAttributeIntent.Color, 3)
+        );
 
     public LitVertexRenderStrategy(ILighting lighting)
     {
@@ -23,20 +31,23 @@ public class LitVertexRenderStrategy : RenderStrategy
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         LitVertexDrawData vertexDrawData = EnsureDrawDataType<LitVertexDrawData>(drawData);
+
+        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
         
         glStateManager.UseProgram(litShader.Handle);
-        glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
+        glStateManager.BindVertexArray(vertexArray.Handle);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
         GL.UniformMatrix4(0, true, ref transformation);
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
-
-        if (vertexDrawData.Texture != null)
-        {
-            glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
-        }
+        
+        // TODO: implement texture binding
+        // if (vertexDrawData.Texture != null)
+        // {
+        //     glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
+        // }
 
         GL.Uniform4(4, vertexDrawData.Color);
         
@@ -50,6 +61,14 @@ public class LitVertexRenderStrategy : RenderStrategy
         
         GL.Uniform1(8, lighting.DirectionalLight?.Intensity ?? 0.0f);
 
-        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
+        if (vertexDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
+        
+        // TODO: this is dumb
+        vertexArray.Dispose();
+        vertexBuffer.Dispose();
+        indexBuffer?.Dispose();
     }
 }

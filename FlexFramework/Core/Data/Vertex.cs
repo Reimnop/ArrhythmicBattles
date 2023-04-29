@@ -10,7 +10,7 @@ public struct Vertex
     [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
     public Vector3 Position { get; set; }
     
-    [VertexAttribute(VertexAttributeIntent.TexCoord, VertexAttributeType.Float, 2)]
+    [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
     public Vector2 Uv { get; set; }
     
     [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]

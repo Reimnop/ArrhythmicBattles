@@ -12,7 +12,6 @@ public abstract class RenderStrategy
         }
         throw new InvalidCastException();
     }
-
-    public abstract void Update();
+    
     public abstract void Draw(GLStateManager glStateManager, IDrawData drawData);
 }

@@ -64,14 +64,14 @@ public class ModelImporter : IDisposable
 
         foreach (Material sceneMaterial in scene.Materials)
         {
-            Texture2D? texture = null;
+            Texture? texture = null;
             if (sceneMaterial.HasTextureDiffuse)
             {
                 string path = GetPath(sceneMaterial.TextureDiffuse.FilePath);
                 
                 if (File.Exists(path)) 
                 {
-                    texture = Texture2D.FromFile(Path.GetFileName(path), path);
+                    texture = Texture.FromFile(Path.GetFileName(path), path);
                 }
             }
 

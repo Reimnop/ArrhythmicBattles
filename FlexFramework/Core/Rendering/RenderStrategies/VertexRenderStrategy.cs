@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -7,6 +8,11 @@ namespace FlexFramework.Core.Rendering.RenderStrategies;
 public class VertexRenderStrategy : RenderStrategy
 {
     private readonly ShaderProgram unlitShader;
+    private readonly MeshHandler meshHandler = new (
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.TexCoord0, 1),
+            (VertexAttributeIntent.Color, 2)
+        );
 
     public VertexRenderStrategy()
     {
@@ -21,8 +27,10 @@ public class VertexRenderStrategy : RenderStrategy
     {
         VertexDrawData vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
         
+        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        
         glStateManager.UseProgram(unlitShader.Handle);
-        glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
+        glStateManager.BindVertexArray(vertexArray.Handle);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
@@ -35,6 +43,13 @@ public class VertexRenderStrategy : RenderStrategy
 
         GL.Uniform4(3, vertexDrawData.Color);
 
-        GL.DrawArrays(vertexDrawData.PrimitiveType, 0, vertexDrawData.Count);
+        if (vertexDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(vertexDrawData.PrimitiveType, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(vertexDrawData.PrimitiveType, 0, vertexDrawData.Mesh.VerticesCount);
+        
+        vertexArray.Dispose();
+        vertexBuffer.Dispose();
+        indexBuffer?.Dispose();
     }
 }

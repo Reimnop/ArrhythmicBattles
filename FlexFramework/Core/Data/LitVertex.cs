@@ -1,5 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Data;
 
@@ -11,7 +10,7 @@ public struct LitVertex
     [VertexAttribute(VertexAttributeIntent.Normal, VertexAttributeType.Float, 3)]
     public Vector3 Normal { get; set; }
     
-    [VertexAttribute(VertexAttributeIntent.TexCoord, VertexAttributeType.Float, 2)]
+    [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
     public Vector2 Uv { get; set; }
     
     [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]

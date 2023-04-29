@@ -89,8 +89,8 @@ public class TextEntity : Entity, IRenderable
             Unsafe.SizeOf<TextVertex>(), 
             new VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 2, 0),
             new VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4, 2 * sizeof(float)),
-            new VertexAttribute(VertexAttributeIntent.TexCoord, VertexAttributeType.Float, 2, 6 * sizeof(float)),
-            new VertexAttribute(VertexAttributeIntent.Any, VertexAttributeType.Int, 1, 8 * sizeof(float)));
+            new VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2, 6 * sizeof(float)),
+            new VertexAttribute(VertexAttributeIntent.TexCoord1, VertexAttributeType.Int, 1, 8 * sizeof(float)));
 
         mesh = new Mesh<TextVertex>("text", vertexLayout);
     }
@@ -137,7 +137,7 @@ public class TextEntity : Entity, IRenderable
         matrixStack.Scale(EmSize, EmSize, 1.0f);
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh.AsReadOnly(), transformation, Color, 4.0f * EmSize);
+        TextDrawData textDrawData = new TextDrawData(mesh.ReadOnly, transformation, Color, 4.0f * EmSize);
         
         renderer.EnqueueDrawData(layerId, textDrawData);
         

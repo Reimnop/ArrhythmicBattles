@@ -112,7 +112,7 @@ public class RectEntity : Entity, IRenderable
         
         matrixStack.Push();
         matrixStack.Translate(Min.X, Min.Y, 0.0f);
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.AsReadOnly(), matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
+        VertexDrawData vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
     }
