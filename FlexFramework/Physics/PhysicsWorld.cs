@@ -9,7 +9,7 @@ using FlexFramework.Logging;
 
 namespace FlexFramework.Physics;
 
-public class PhysicsWorld : IDisposable
+public class PhysicsWorld : IDisposable, IUpdateable
 {
     public Simulation Simulation => simulation;
     public float TimeStep { get; set; } = 1.0f / 50.0f;

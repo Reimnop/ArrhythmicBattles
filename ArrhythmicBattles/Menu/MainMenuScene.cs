@@ -16,13 +16,13 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
-    private ImageEntity bannerEntity;
-    private TextEntity copyrightText;
+    private ImageEntity bannerEntity = null!;
+    private TextEntity copyrightText = null!;
 
-    private MeshEntity border;
+    private MeshEntity border = null!;
 
-    private ScopedInputProvider inputProvider;
-    private Texture2D bannerTexture;
+    private ScopedInputProvider inputProvider = null!;
+    private Texture2D bannerTexture = null!;
 
     public MainMenuScene(ABContext context) : base(context)
     {
@@ -46,11 +46,14 @@ public class MainMenuScene : ABScene
         // Init entities
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
         bannerTexture = Texture2D.FromFile("banner", bannerPath);
+        RegisterObject(bannerTexture);
+        
         bannerEntity = new ImageEntity(Engine);
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
+        RegisterObject(bannerEntity);
 
         var textAssetsLocation = Engine.DefaultAssets.TextAssets;
         var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
@@ -59,8 +62,9 @@ public class MainMenuScene : ABScene
         copyrightText = new TextEntity(Engine, font);
         copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
-        copyrightText.Text = "Version 0.0.1 BETA\n© 2021 Arrhythmic Battles"; // TODO: It's not 2021 anymore
+        copyrightText.Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles";
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
+        RegisterObject(copyrightText);
         
         EngineAssets assets = Engine.DefaultAssets;
         Mesh<Vertex> quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
@@ -68,21 +72,15 @@ public class MainMenuScene : ABScene
         border = new MeshEntity();
         border.Color = new Color4(24, 24, 24, 255);
         border.Mesh = quadMesh;
+        RegisterObject(border);
 
         // Init input
         inputProvider = Context.InputSystem.AcquireInputProvider();
+        RegisterObject(inputProvider);
         
         // Init UI
         ScreenBounds = new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
-    }
-
-    public override void Update(UpdateArgs args)
-    {
-        base.Update(args);
-        
-        bannerEntity.Update(args);
-        copyrightText.Update(args);
     }
 
     public override void SwitchScreen(Screen before, Screen after)
@@ -134,7 +132,6 @@ public class MainMenuScene : ABScene
     {
         base.Dispose();
         
-        inputProvider.Dispose();
         Context.Sound.MenuBackgroundMusic.Stop();
     }
 }
