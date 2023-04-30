@@ -19,6 +19,8 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             (VertexAttributeIntent.BoneWeight, 5)
         );
     
+    private readonly TextureHandler textureHandler = new();
+    
     public SkinnedVertexRenderStrategy(ILighting lighting)
     {
         this.lighting = lighting;
@@ -35,9 +37,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         SkinnedVertexDrawData vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         
         var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
-        glStateManager.UseProgram(skinnedShader.Handle);
-        glStateManager.BindVertexArray(vertexArray.Handle);
+        glStateManager.UseProgram(skinnedShader);
+        glStateManager.BindVertexArray(vertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -45,10 +48,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
 
-        // if (vertexDrawData.Texture != null)
-        // {
-        //     glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
-        // }
+        if (texture != null)
+        {
+            glStateManager.BindTextureUnit(0, texture);
+        }
 
         GL.Uniform4(4, vertexDrawData.Color);
         
@@ -79,6 +82,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         vertexArray.Dispose();
         vertexBuffer.Dispose();
         indexBuffer?.Dispose();
+        texture?.Dispose();
     }
 
     public void Dispose()

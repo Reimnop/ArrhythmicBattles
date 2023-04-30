@@ -43,13 +43,13 @@ public class Texture2D : GpuObject, IDisposable
         image.CopyPixelDataTo(pixels);
         
         var texture2D = new Texture2D(name, image.Width, image.Height, SizedInternalFormat.Rgba8);
-        texture2D.LoadData<Rgba32>(pixels, PixelFormat.Rgba, PixelType.UnsignedByte);
+        texture2D.SetData<Rgba32>(pixels, PixelFormat.Rgba, PixelType.UnsignedByte);
         texture2D.SetMinFilter(TextureMinFilter.Linear);
         texture2D.SetMagFilter(TextureMagFilter.Linear);
         return texture2D;
     }
 
-    public unsafe void LoadData<T>(ReadOnlySpan<T> data, PixelFormat pixelFormat, PixelType pixelType) where T : unmanaged
+    public unsafe void SetData<T>(ReadOnlySpan<T> data, PixelFormat pixelFormat, PixelType pixelType) where T : unmanaged
     {
         fixed (T* ptr = data)
         {

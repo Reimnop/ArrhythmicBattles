@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Data;
+﻿using System.Diagnostics;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using Buffer = FlexFramework.Core.Rendering.Data.Buffer;

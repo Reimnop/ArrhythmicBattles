@@ -29,7 +29,7 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
             return;
         }
         
-        stateManager.UseProgram(program.Handle);
+        stateManager.UseProgram(program);
 
         Matrix4 inverseView = Matrix4.Invert(cameraData.View);
         Matrix4 inverseProjection = Matrix4.Invert(cameraData.Projection);

@@ -5,16 +5,16 @@ namespace FlexFramework.Core.Data;
 public struct LitVertex
 {
     [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
-    public Vector3 Position { get; set; }
-    
+    public Vector3 Position;
+
     [VertexAttribute(VertexAttributeIntent.Normal, VertexAttributeType.Float, 3)]
-    public Vector3 Normal { get; set; }
-    
+    public Vector3 Normal;
+
     [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
-    public Vector2 Uv { get; set; }
-    
+    public Vector2 Uv;
+
     [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]
-    public Color4 Color { get; set; }
+    public Color4 Color;
 
     public LitVertex(Vector3 position, Vector3 normal, Vector2 uv, Color4 color)
     {

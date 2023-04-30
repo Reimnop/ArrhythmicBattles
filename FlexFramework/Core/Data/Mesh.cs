@@ -81,14 +81,14 @@ public class VertexLayout
     public static VertexLayout GetLayout<T>() where T : unmanaged
     {
         var type = typeof(T);
-        var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         var attributes = new List<VertexAttribute>();
         foreach (var field in fields)
         {
             var attribute = field.GetCustomAttribute<VertexAttributeAttribute>();
             if (attribute == null)
                 continue;
-            var offset = Marshal.OffsetOf(type, field.Name).ToInt32();
+            var offset = (int) Marshal.OffsetOf(type, field.Name);
             attributes.Add(new VertexAttribute(attribute.Intent, attribute.Type, attribute.Size, offset));
         }
         return new VertexLayout(Unsafe.SizeOf<T>(), attributes.ToArray());

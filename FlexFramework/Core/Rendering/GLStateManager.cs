@@ -1,13 +1,14 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using FlexFramework.Core.Rendering.Data;
+using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Core.Rendering;
 
 public class GLStateManager
 {
-    private int currentFramebuffer = 0;
-    private int currentProgram = 0;
-    private int currentVertexArray = 0;
-    private int[] currentTextureUnits = new int[16];
+    private Framebuffer? currentFramebuffer = null;
+    private ShaderProgram? currentProgram = null;
+    private VertexArray? currentVertexArray = null;
+    private Texture2D?[] currentTextureUnits = new Texture2D?[16];
     
     private bool depthMask = true;
 
@@ -52,7 +53,7 @@ public class GLStateManager
         }
     }
 
-    public void BindFramebuffer(int framebuffer)
+    public void BindFramebuffer(Framebuffer? framebuffer)
     {
         if (currentFramebuffer == framebuffer)
         {
@@ -60,10 +61,10 @@ public class GLStateManager
         }
 
         currentFramebuffer = framebuffer;
-        GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+        GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer?.Handle ?? 0);
     }
 
-    public void UseProgram(int program)
+    public void UseProgram(ShaderProgram? program)
     {
         if (currentProgram == program)
         {
@@ -71,10 +72,10 @@ public class GLStateManager
         }
         
         currentProgram = program;
-        GL.UseProgram(program);
+        GL.UseProgram(program?.Handle ?? 0);
     }
     
-    public void BindVertexArray(int vertexArray)
+    public void BindVertexArray(VertexArray vertexArray)
     {
         if (currentVertexArray == vertexArray)
         {
@@ -82,10 +83,10 @@ public class GLStateManager
         }
         
         currentVertexArray = vertexArray;
-        GL.BindVertexArray(vertexArray);
+        GL.BindVertexArray(vertexArray.Handle);
     }
     
-    public void BindTextureUnit(int unit, int texture)
+    public void BindTextureUnit(int unit, Texture2D? texture)
     {
         if (currentTextureUnits[unit] == texture)
         {
@@ -93,6 +94,6 @@ public class GLStateManager
         }
         
         currentTextureUnits[unit] = texture;
-        GL.BindTextureUnit(unit, texture);
+        GL.BindTextureUnit(unit, texture?.Handle ?? 0);
     }
 }

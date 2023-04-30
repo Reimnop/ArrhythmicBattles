@@ -37,8 +37,8 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         
         var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(textDrawData.Mesh);
         
-        glStateManager.UseProgram(textShader.Handle);
-        glStateManager.BindVertexArray(vertexArray.Handle);
+        glStateManager.UseProgram(textShader);
+        glStateManager.BindVertexArray(vertexArray);
 
         Matrix4 transformation = textDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
@@ -46,7 +46,7 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         for (int i = 0; i < textAssets.AtlasTextures.Count; i++)
         {
             GL.Uniform1(i + 1, i);
-            glStateManager.BindTextureUnit(i, textAssets.AtlasTextures[i].Handle);
+            glStateManager.BindTextureUnit(i, textAssets.AtlasTextures[i]);
         }
 
         GL.Uniform4(17, textDrawData.Color);

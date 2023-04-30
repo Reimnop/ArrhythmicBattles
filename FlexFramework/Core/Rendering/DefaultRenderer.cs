@@ -161,7 +161,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         Debug.Assert(worldScreenCapturer != null);
         Debug.Assert(guiScreenCapturer != null);
         
-        stateManager.BindFramebuffer(worldScreenCapturer.FrameBuffer.Handle); // Bind world framebuffer
+        stateManager.BindFramebuffer(worldScreenCapturer.FrameBuffer); // Bind world framebuffer
 
         GL.Viewport(0, 0, worldScreenCapturer.Width, worldScreenCapturer.Height);
         
@@ -215,7 +215,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
         RunPostProcessors(postProcessors, stateManager, worldScreenCapturer.ColorBuffer);
         
-        stateManager.BindFramebuffer(guiScreenCapturer.FrameBuffer.Handle); // Finish rendering world, bind gui framebuffer
+        stateManager.BindFramebuffer(guiScreenCapturer.FrameBuffer); // Finish rendering world, bind gui framebuffer
         
         // Blit world framebuffer to gui framebuffer
         GL.ClearColor(Color.Black);
@@ -236,7 +236,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             RenderLayer(guiLayer);
         }
 
-        stateManager.BindFramebuffer(0); // Finally, bind default framebuffer
+        stateManager.BindFramebuffer(null); // Finally, bind default framebuffer
 
         // Blit to backbuffer
         GL.ClearColor(Color.Black);

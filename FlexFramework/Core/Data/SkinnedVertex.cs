@@ -20,18 +20,18 @@ public struct BoneWeight
 public unsafe struct SkinnedVertex
 {
     public const int MaxBoneInfluence = 4;
-    
+
     [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
-    public Vector3 Position { get; set; }
-    
+    public Vector3 Position;
+
     [VertexAttribute(VertexAttributeIntent.Normal, VertexAttributeType.Float, 3)]
-    public Vector3 Normal { get; set; }
-    
+    public Vector3 Normal;
+
     [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
-    public Vector2 Uv { get; set; }
-    
+    public Vector2 Uv;
+
     [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 2)]
-    public Color4 Color { get; set; }
+    public Color4 Color;
 
     [VertexAttribute(VertexAttributeIntent.BoneIndex, VertexAttributeType.Int, MaxBoneInfluence)]
     public fixed int BoneIndices[MaxBoneInfluence];

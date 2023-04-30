@@ -26,8 +26,8 @@ public class SkyboxRenderer : BackgroundRenderer, IDisposable
             return;
         }
         
-        stateManager.UseProgram(program.Handle);
-        stateManager.BindTextureUnit(0, Texture.Handle);
+        stateManager.UseProgram(program);
+        stateManager.BindTextureUnit(0, Texture);
             
         Matrix4 inverseView = Matrix4.Invert(cameraData.View);
         Matrix4 inverseProjection = Matrix4.Invert(cameraData.Projection);

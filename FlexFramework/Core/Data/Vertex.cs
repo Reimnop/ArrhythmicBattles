@@ -8,13 +8,13 @@ namespace FlexFramework.Core.Data;
 public struct Vertex
 {
     [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
-    public Vector3 Position { get; set; }
-    
+    public Vector3 Position;
+
     [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
-    public Vector2 Uv { get; set; }
-    
+    public Vector2 Uv;
+
     [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]
-    public Color4 Color { get; set; }
+    public Color4 Color;
 
     public Vertex(Vector3 position, Vector2 uv)
     {

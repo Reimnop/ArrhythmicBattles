@@ -13,6 +13,7 @@ public class VertexRenderStrategy : RenderStrategy
             (VertexAttributeIntent.TexCoord0, 1),
             (VertexAttributeIntent.Color, 2)
         );
+    private readonly TextureHandler textureHandler = new();
 
     public VertexRenderStrategy()
     {
@@ -28,17 +29,18 @@ public class VertexRenderStrategy : RenderStrategy
         VertexDrawData vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
         
         var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
-        glStateManager.UseProgram(unlitShader.Handle);
-        glStateManager.BindVertexArray(vertexArray.Handle);
+        glStateManager.UseProgram(unlitShader);
+        glStateManager.BindVertexArray(vertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
         GL.Uniform1(1, vertexDrawData.Texture == null ? 0 : 1);
 
-        if (vertexDrawData.Texture != null)
+        if (texture != null)
         {
-            glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
+            glStateManager.BindTextureUnit(0, texture);
         }
 
         GL.Uniform4(3, vertexDrawData.Color);
@@ -51,5 +53,6 @@ public class VertexRenderStrategy : RenderStrategy
         vertexArray.Dispose();
         vertexBuffer.Dispose();
         indexBuffer?.Dispose();
+        texture?.Dispose();
     }
 }

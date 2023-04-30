@@ -23,7 +23,7 @@ public class MainMenuScene : ABScene
     private MeshEntity border;
 
     private ScopedInputProvider inputProvider;
-    private Texture2D bannerTexture;
+    private Texture bannerTexture;
 
     public MainMenuScene(ABContext context) : base(context)
     {
@@ -46,7 +46,7 @@ public class MainMenuScene : ABScene
 
         // Init entities
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
-        bannerTexture = Texture2D.FromFile("banner", bannerPath);
+        bannerTexture = Texture.FromFile("banner", bannerPath);
         bannerEntity = new ImageEntity(Engine);
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);

@@ -1,4 +1,6 @@
-﻿namespace FlexFramework.Core.Data;
+﻿using System.Runtime.CompilerServices;
+
+namespace FlexFramework.Core.Data;
 
 public enum PixelFormat
 {
@@ -68,8 +70,10 @@ public class Texture : DataObject
 
     public void SetData<T>(ReadOnlySpan<T> data) where T : unmanaged
     {
-        if (data.Length != GetPixelSize(Format, Type))
-            throw new ArgumentException("Data size does not match texture size");
+        var dataSize = data.Length * Unsafe.SizeOf<T>();
+        var requiredSize = Width * Height * GetPixelSize(Format, Type);
+        if (dataSize != requiredSize)
+            throw new ArgumentException($"Data size does not match texture size (expected {requiredSize}, got {dataSize})");
         Data.SetData(data);
     }
 

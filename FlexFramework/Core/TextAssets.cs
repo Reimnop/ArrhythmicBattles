@@ -50,7 +50,7 @@ public class TextAssets : IDisposable
 
         AtlasTexture<Vector3> atlas = font.Atlas;
         var texture = new Texture2D(name, atlas.Texture.Width, atlas.Texture.Height, SizedInternalFormat.Rgb32f);
-        texture.LoadData<Vector3>(atlas.Texture.Pixels, PixelFormat.Rgb, PixelType.Float);
+        texture.SetData<Vector3>(atlas.Texture.Pixels, PixelFormat.Rgb, PixelType.Float);
         texture.SetMinFilter(TextureMinFilter.Linear);
         texture.SetMagFilter(TextureMagFilter.Linear);
         

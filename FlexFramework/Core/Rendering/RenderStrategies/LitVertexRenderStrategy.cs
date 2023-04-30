@@ -10,12 +10,14 @@ public class LitVertexRenderStrategy : RenderStrategy
     private readonly ILighting lighting;
     private readonly ShaderProgram litShader;
     
-    private readonly MeshHandler meshHandler = new (
+    private readonly MeshHandler meshHandler = new(
             (VertexAttributeIntent.Position, 0),
             (VertexAttributeIntent.Normal, 1),
             (VertexAttributeIntent.TexCoord0, 2),
             (VertexAttributeIntent.Color, 3)
         );
+    
+    private readonly TextureHandler textureHandler = new();
 
     public LitVertexRenderStrategy(ILighting lighting)
     {
@@ -33,9 +35,10 @@ public class LitVertexRenderStrategy : RenderStrategy
         LitVertexDrawData vertexDrawData = EnsureDrawDataType<LitVertexDrawData>(drawData);
 
         var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
-        glStateManager.UseProgram(litShader.Handle);
-        glStateManager.BindVertexArray(vertexArray.Handle);
+        glStateManager.UseProgram(litShader);
+        glStateManager.BindVertexArray(vertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -43,11 +46,10 @@ public class LitVertexRenderStrategy : RenderStrategy
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
         
-        // TODO: implement texture binding
-        // if (vertexDrawData.Texture != null)
-        // {
-        //     glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
-        // }
+        if (texture != null)
+        {
+            glStateManager.BindTextureUnit(0, texture);
+        }
 
         GL.Uniform4(4, vertexDrawData.Color);
         
@@ -70,5 +72,6 @@ public class LitVertexRenderStrategy : RenderStrategy
         vertexArray.Dispose();
         vertexBuffer.Dispose();
         indexBuffer?.Dispose();
+        texture?.Dispose();
     }
 }
