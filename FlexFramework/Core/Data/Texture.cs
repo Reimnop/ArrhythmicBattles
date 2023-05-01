@@ -60,7 +60,7 @@ public class Texture : DataObject
     public static Texture FromFile(string name, string path)
     {
         using var image = Image.Load<Rgba32>(path);
-        Span<Rgba32> pixels = stackalloc Rgba32[image.Width * image.Height];
+        Rgba32[] pixels = new Rgba32[image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
         
         var texture = new Texture(name, image.Width, image.Height, PixelFormat.Rgba8);
