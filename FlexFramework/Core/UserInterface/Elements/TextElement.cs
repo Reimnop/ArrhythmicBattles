@@ -4,7 +4,7 @@ using Textwriter;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class TextElement : VisualElement, IRenderable, IDisposable
+public class TextElement : VisualElement, IRenderable
 {
     public string Text
     {
@@ -58,10 +58,5 @@ public class TextElement : VisualElement, IRenderable, IDisposable
         matrixStack.Translate(ElementBounds.X0, ElementBounds.Y0, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
-    }
-
-    public void Dispose()
-    {
-        textEntity.Dispose();
     }
 }

@@ -7,24 +7,19 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
 
-public class ModelMaterial : IDisposable
+public class ModelMaterial
 {
     public string Name { get; }
     public Color4 Color { get; set; }
     public float EmissiveStrength { get; set; }
-    public Texture2D? Texture { get; set; }
+    public Texture? Texture { get; set; }
 
-    public ModelMaterial(string name, Color4 color, float emissiveStrength, Texture2D? texture)
+    public ModelMaterial(string name, Color4 color, float emissiveStrength, Texture? texture)
     {
         Name = name;
         Color = color;
         EmissiveStrength = emissiveStrength;
         Texture = texture;
-    }
-
-    public void Dispose()
-    {
-        Texture?.Dispose();
     }
 }
 
@@ -77,17 +72,16 @@ public class Model : IDisposable
     public ImmutableTree<ModelNode> Tree { get; }
 
     // lazily load meshes
-    // yes, Rider converted my if statements and getter to this
-    public IReadOnlyList<IndexedMesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
-    public IReadOnlyList<IndexedMesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
+    public IReadOnlyList<Mesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
+    public IReadOnlyList<Mesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
 
     public IReadOnlyList<ModelMaterial> Materials => materials;
     public IReadOnlyList<ModelAnimation> Animations => animations;
     public IReadOnlyList<ModelBone> Bones => bones;
     public IReadOnlyDictionary<string, int> BoneIndexMap => boneIndexMap;
     
-    private List<IndexedMesh<LitVertex>>? meshes;
-    private List<IndexedMesh<SkinnedVertex>>? skinnedMeshes;
+    private List<Mesh<LitVertex>>? meshes;
+    private List<Mesh<SkinnedVertex>>? skinnedMeshes;
     
     private readonly List<ModelMaterial> materials;
     private readonly List<ModelAnimation> animations;
@@ -108,6 +102,8 @@ public class Model : IDisposable
         boneIndexMap = modelImporter.GetBoneIndexMap();
     }
 
+    // TODO: add more material properties
+    /*
     public void TextureMinFilter(TextureMinFilter filter)
     {
         materials.ForEach(mat => mat.Texture?.SetMinFilter(filter));
@@ -127,10 +123,10 @@ public class Model : IDisposable
     {
         materials.ForEach(mat => mat.Texture?.GenerateMipmap());
     }
+    */
 
     public void Dispose()
     {
-        materials.ForEach(x => x.Dispose());
         modelImporter.Dispose();
     }
 }

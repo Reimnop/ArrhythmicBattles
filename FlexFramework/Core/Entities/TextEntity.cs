@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Data;
+﻿using System.Runtime.CompilerServices;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
@@ -6,7 +7,7 @@ using Textwriter;
 
 namespace FlexFramework.Core.Entities;
 
-public class TextEntity : Entity, IRenderable, IDisposable
+public class TextEntity : Entity, IRenderable
 {
     public Font Font
     {
@@ -72,7 +73,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
 
     private readonly FlexFrameworkMain engine;
     private readonly TextAssets textAssets;
-    private readonly Mesh<TextVertexAdapter> mesh;
+    private readonly Mesh<TextVertex> mesh;
     
     private readonly List<TextVertex> vertices = new List<TextVertex>();
 
@@ -83,8 +84,15 @@ public class TextEntity : Entity, IRenderable, IDisposable
 
         var textAssetsLocation = engine.DefaultAssets.TextAssets;
         textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
+        
+        VertexLayout vertexLayout = new VertexLayout(
+            Unsafe.SizeOf<TextVertex>(), 
+            new VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 2, 0),
+            new VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4, 2 * sizeof(float)),
+            new VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2, 6 * sizeof(float)),
+            new VertexAttribute(VertexAttributeIntent.TexCoord1, VertexAttributeType.Int, 1, 8 * sizeof(float)));
 
-        mesh = new Mesh<TextVertexAdapter>("text");
+        mesh = new Mesh<TextVertex>("text", vertexLayout);
     }
 
     public void InvalidateMesh()
@@ -103,13 +111,13 @@ public class TextEntity : Entity, IRenderable, IDisposable
         
         TextMeshGenerator.GenerateVertices(builder.Build(), vertices);
         
-        Span<TextVertexAdapter> vertexSpan = stackalloc TextVertexAdapter[vertices.Count];
+        Span<TextVertex> vertexSpan = stackalloc TextVertex[vertices.Count];
         for (int i = 0; i < vertices.Count; i++)
         {
-            vertexSpan[i] = new TextVertexAdapter(vertices[i]);
+            vertexSpan[i] = vertices[i];
         }
         
-        mesh.LoadData(vertexSpan);
+        mesh.SetData(vertexSpan, null);
     }
 
     public void Render(RenderArgs args)
@@ -119,12 +127,7 @@ public class TextEntity : Entity, IRenderable, IDisposable
             meshValid = true;
             GenerateMesh();
         }
-        
-        if (mesh.Count == 0)
-        {
-            return;
-        }
-        
+
         Renderer renderer = args.Renderer;
         int layerId = args.LayerId;
         MatrixStack matrixStack = args.MatrixStack;
@@ -134,15 +137,10 @@ public class TextEntity : Entity, IRenderable, IDisposable
         matrixStack.Scale(EmSize, EmSize, 1.0f);
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh.VertexArray, mesh.Count, transformation, Color, 4.0f * EmSize);
+        TextDrawData textDrawData = new TextDrawData(mesh.ReadOnly, transformation, Color, 4.0f * EmSize);
         
         renderer.EnqueueDrawData(layerId, textDrawData);
         
         matrixStack.Pop();
-    }
-    
-    public void Dispose()
-    {
-        mesh.Dispose();
     }
 }

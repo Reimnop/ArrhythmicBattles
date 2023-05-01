@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Entities;
 
-public class RectEntity : Entity, IRenderable, IDisposable
+public class RectEntity : Entity, IRenderable
 {
     public Vector2 Min
     {
@@ -86,8 +86,8 @@ public class RectEntity : Entity, IRenderable, IDisposable
             vertices[i] = new Vertex(new Vector3(pos), uv);
         }
 
-        mesh.LoadData(vertices);
-        
+        mesh.SetData(vertices, null);
+
         lastSize = size;
     }
 
@@ -105,25 +105,15 @@ public class RectEntity : Entity, IRenderable, IDisposable
             meshValid = true;
             GenerateMesh();
         }
-        
-        if (mesh.Count == 0)
-        {
-            return;
-        }
-        
+
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
         int layerId = args.LayerId;
         
         matrixStack.Push();
         matrixStack.Translate(Min.X, Min.Y, 0.0f);
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.VertexArray, mesh.Count, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
+        VertexDrawData vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();
-    }
-    
-    public void Dispose()
-    {
-        mesh.Dispose();
     }
 }

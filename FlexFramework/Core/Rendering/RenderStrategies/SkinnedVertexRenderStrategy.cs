@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -9,23 +10,42 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     private readonly ILighting lighting;
     private readonly ShaderProgram skinnedShader;
     
+    private readonly MeshHandler meshHandler = new(
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.Normal, 1),
+            (VertexAttributeIntent.TexCoord0, 2),
+            (VertexAttributeIntent.Color, 3),
+            (VertexAttributeIntent.BoneIndex, 4),
+            (VertexAttributeIntent.BoneWeight, 5)
+        );
+    private readonly TextureHandler textureHandler = new();
+    
     public SkinnedVertexRenderStrategy(ILighting lighting)
     {
         this.lighting = lighting;
         
-        using Shader vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        using var vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
 
         skinnedShader = new ShaderProgram("skinned");
         skinnedShader.LinkShaders(vertexShader, fragmentShader);
     }
-    
+
+    public override void Update(UpdateArgs args)
+    {
+        meshHandler.Update(args.DeltaTime);
+        textureHandler.Update(args.DeltaTime);
+    }
+
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         SkinnedVertexDrawData vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         
-        glStateManager.UseProgram(skinnedShader.Handle);
-        glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
+        var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
+        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
+        
+        glStateManager.UseProgram(skinnedShader);
+        glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -33,9 +53,9 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
 
-        if (vertexDrawData.Texture != null)
+        if (texture != null)
         {
-            glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
+            glStateManager.BindTextureUnit(0, texture);
         }
 
         GL.Uniform4(4, vertexDrawData.Color);
@@ -59,7 +79,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             }
         }
 
-        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
+        if (vertexDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
     }
 
     public void Dispose()

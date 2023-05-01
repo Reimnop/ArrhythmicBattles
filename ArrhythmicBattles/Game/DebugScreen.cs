@@ -8,7 +8,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.Game;
 
-public class DebugScreen : Screen, IDisposable
+public class DebugScreen : Screen
 {
     private readonly TextEntity leftTextEntity;
     private readonly TextEntity rightTextEntity;
@@ -79,10 +79,5 @@ public class DebugScreen : Screen, IDisposable
         matrixStack.Pop();
         
         matrixStack.Pop();
-    }
-
-    public void Dispose()
-    {
-        leftTextEntity.Dispose();
     }
 }

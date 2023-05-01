@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public class RectElement : VisualElement, IRenderable, IDisposable
+public class RectElement : VisualElement, IRenderable
 {
     public float Radius
     {
@@ -35,10 +35,5 @@ public class RectElement : VisualElement, IRenderable, IDisposable
     public override void Render(RenderArgs args)
     {
         rectEntity.Render(args);
-    }
-
-    public void Dispose()
-    {
-        rectEntity.Dispose();
     }
 }

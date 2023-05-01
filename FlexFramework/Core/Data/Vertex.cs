@@ -5,11 +5,16 @@ using OpenTK.Mathematics;
 namespace FlexFramework.Core.Data;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Vertex : IVertex
+public struct Vertex
 {
-    public Vector3 Position { get; set; }
-    public Vector2 Uv { get; set; }
-    public Color4 Color { get; set; }
+    [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
+    public Vector3 Position;
+
+    [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
+    public Vector2 Uv;
+
+    [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]
+    public Color4 Color;
 
     public Vertex(Vector3 position, Vector2 uv)
     {
@@ -37,12 +42,5 @@ public struct Vertex : IVertex
         Position = new Vector3(x, y, z);
         Uv = new Vector2(u, v);
         Color = new Color4(r, g, b, a);
-    }
-
-    public static void SetupAttributes(VertexAttributeConsumer attribConsumer, VertexAttributeIConsumer intAttribConsumer)
-    {
-        attribConsumer(0, 3, 0, VertexAttribType.Float, false);
-        attribConsumer(1, 2, 3 * sizeof(float), VertexAttribType.Float, false);
-        attribConsumer(2, 4, 5 * sizeof(float), VertexAttribType.Float, false);
     }
 }

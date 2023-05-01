@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -8,33 +9,54 @@ public class LitVertexRenderStrategy : RenderStrategy
 {
     private readonly ILighting lighting;
     private readonly ShaderProgram litShader;
+    
+    private readonly MeshHandler meshHandler = new(
+            (VertexAttributeIntent.Position, 0),
+            (VertexAttributeIntent.Normal, 1),
+            (VertexAttributeIntent.TexCoord0, 2),
+            (VertexAttributeIntent.Color, 3)
+        );
+    private readonly TextureHandler textureHandler = new();
 
-    public LitVertexRenderStrategy(ILighting lighting, ShaderProgram litShader)
+    public LitVertexRenderStrategy(ILighting lighting)
     {
         this.lighting = lighting;
-        this.litShader = litShader;
+        
+        using var vertexShader = new Shader("lit-vert", File.ReadAllText("Assets/Shaders/lit.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("lit-frag", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        
+        litShader = new ShaderProgram("lit");
+        litShader.LinkShaders(vertexShader, fragmentShader);
     }
-    
+
+    public override void Update(UpdateArgs args)
+    {
+        meshHandler.Update(args.DeltaTime);
+        textureHandler.Update(args.DeltaTime);
+    }
+
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         LitVertexDrawData vertexDrawData = EnsureDrawDataType<LitVertexDrawData>(drawData);
+
+        var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
+        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
-        glStateManager.UseProgram(litShader.Handle);
-        glStateManager.BindVertexArray(vertexDrawData.VertexArray.Handle);
+        glStateManager.UseProgram(litShader);
+        glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
         GL.UniformMatrix4(0, true, ref transformation);
         GL.UniformMatrix4(1, true, ref model);
         GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
-
-        if (vertexDrawData.Texture != null)
+        
+        if (texture != null)
         {
-            glStateManager.BindTextureUnit(0, vertexDrawData.Texture.Handle);
+            glStateManager.BindTextureUnit(0, texture);
         }
 
         GL.Uniform4(4, vertexDrawData.Color);
-        
         GL.Uniform3(5, lighting.AmbientLight); 
 
         if (lighting.DirectionalLight.HasValue)
@@ -45,6 +67,9 @@ public class LitVertexRenderStrategy : RenderStrategy
         
         GL.Uniform1(8, lighting.DirectionalLight?.Intensity ?? 0.0f);
 
-        GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Count, DrawElementsType.UnsignedInt, 0);
+        if (vertexDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        else
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
     }
 }

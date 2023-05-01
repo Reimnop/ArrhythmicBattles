@@ -1,14 +1,20 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Data;
 
-public struct LitVertex : IVertex
+public struct LitVertex
 {
-    public Vector3 Position { get; set; }
-    public Vector3 Normal { get; set; }
-    public Vector2 Uv { get; set; }
-    public Color4 Color { get; set; }
+    [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
+    public Vector3 Position;
+
+    [VertexAttribute(VertexAttributeIntent.Normal, VertexAttributeType.Float, 3)]
+    public Vector3 Normal;
+
+    [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
+    public Vector2 Uv;
+
+    [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]
+    public Color4 Color;
 
     public LitVertex(Vector3 position, Vector3 normal, Vector2 uv, Color4 color)
     {
@@ -24,13 +30,5 @@ public struct LitVertex : IVertex
         Normal = new Vector3(nx, ny, nz);
         Uv = new Vector2(u, v);
         Color = new Color4(r, g, b, a);
-    }
-
-    public static void SetupAttributes(VertexAttributeConsumer attribConsumer, VertexAttributeIConsumer intAttribConsumer)
-    {
-        attribConsumer(0, 3, 0, VertexAttribType.Float, false);
-        attribConsumer(1, 3, 3 * sizeof(float), VertexAttribType.Float, false);
-        attribConsumer(2, 2, 6 * sizeof(float), VertexAttribType.Float, false);
-        attribConsumer(3, 4, 8 * sizeof(float), VertexAttribType.Float, false);
     }
 }

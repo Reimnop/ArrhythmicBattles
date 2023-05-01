@@ -89,15 +89,15 @@ public class Bloom : PostProcessor, IDisposable
 
     public override void Process(GLStateManager stateManager, Texture2D texture)
     {
-        stateManager.UseProgram(prefilterShader.Handle);
+        stateManager.UseProgram(prefilterShader);
         GL.Uniform1(1, HardThreshold);
         GL.Uniform1(2, SoftThreshold);
-        stateManager.BindTextureUnit(0, texture.Handle);
+        stateManager.BindTextureUnit(0, texture);
         GL.BindImageTexture(0, prefilteredTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(DivideIntCeil(CurrentSize.X, 8), DivideIntCeil(CurrentSize.Y, 8), 1);
 
-        stateManager.UseProgram(downsampleShader.Handle);
+        stateManager.UseProgram(downsampleShader);
         GL.Uniform1(2, 0);
         
         for (int i = 0; i < 6; i++)
@@ -105,14 +105,14 @@ public class Bloom : PostProcessor, IDisposable
             Texture2D inputTexture = i == 0 ? prefilteredTexture : downsampleMipChain[i - 1];
             Texture2D outputTexture = i == 5 ? smallestTexture : downsampleMipChain[i];
             
-            stateManager.BindTextureUnit(0, inputTexture.Handle);
+            stateManager.BindTextureUnit(0, inputTexture);
             GL.Uniform2(1, 1.0f / inputTexture.Width, 1.0f / inputTexture.Height); // input texture pixel size
             GL.BindImageTexture(0, outputTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(DivideIntCeil(outputTexture.Width, 8), DivideIntCeil(outputTexture.Height, 8), 1);
         }
         
-        stateManager.UseProgram(upsampleShader.Handle);
+        stateManager.UseProgram(upsampleShader);
         GL.Uniform1(0, 0);
         GL.Uniform1(1, 1);
         GL.Uniform1(2, Strength);
@@ -123,18 +123,18 @@ public class Bloom : PostProcessor, IDisposable
             Texture2D inputTexture2 = downsampleMipChain[^(i + 1)];
             Texture2D outputTexture = upsampleMipChain[i];
 
-            stateManager.BindTextureUnit(0, inputTexture1.Handle);
-            stateManager.BindTextureUnit(1, inputTexture2.Handle);
+            stateManager.BindTextureUnit(0, inputTexture1);
+            stateManager.BindTextureUnit(1, inputTexture2);
             GL.BindImageTexture(0, outputTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(DivideIntCeil(outputTexture.Width, 8), DivideIntCeil(outputTexture.Height, 8), 1);
         }
         
-        stateManager.UseProgram(combineShader.Handle);
+        stateManager.UseProgram(combineShader);
         GL.Uniform1(0, 0);
         GL.Uniform1(1, 1);
-        stateManager.BindTextureUnit(0, upsampleMipChain[^1].Handle);
-        stateManager.BindTextureUnit(1, texture.Handle);
+        stateManager.BindTextureUnit(0, upsampleMipChain[^1]);
+        stateManager.BindTextureUnit(1, texture);
         GL.BindImageTexture(0, finalTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(DivideIntCeil(CurrentSize.X, 8), DivideIntCeil(CurrentSize.Y, 8), 1);

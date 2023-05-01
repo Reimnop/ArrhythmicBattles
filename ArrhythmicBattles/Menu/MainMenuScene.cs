@@ -20,7 +20,7 @@ public class MainMenuScene : ABScene
     private TextEntity copyrightText = null!;
 
     private MeshEntity border = null!;
-
+    
     private ScopedInputProvider inputProvider = null!;
     private Texture2D bannerTexture = null!;
 
@@ -45,6 +45,7 @@ public class MainMenuScene : ABScene
 
         // Init entities
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
+        
         bannerTexture = Texture2D.FromFile("banner", bannerPath);
         RegisterObject(bannerTexture);
         

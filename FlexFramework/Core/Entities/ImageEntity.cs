@@ -23,7 +23,7 @@ public class ImageEntity : UIElement, IRenderable
     public override Vector2 Origin { get; set; } = Vector2.Zero;
     public override bool IsFocused { get; set; }
 
-    public Texture2D? Texture { get; set; }
+    public Texture? Texture { get; set; }
     public ImageMode ImageMode { get; set; } = ImageMode.Fill;
     public Color4 Color { get; set; } = Color4.White;
 
@@ -32,7 +32,7 @@ public class ImageEntity : UIElement, IRenderable
     public ImageEntity(FlexFrameworkMain engine) : base(engine)
     {
         EngineAssets assets = engine.DefaultAssets;
-        quadMesh = engine.ResourceRegistry.GetResource<Mesh<Vertex>>(assets.QuadMesh);
+        quadMesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
         
     }
 
@@ -79,7 +79,7 @@ public class ImageEntity : UIElement, IRenderable
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
         
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.VertexArray, quadMesh.Count, transformation, Texture, Color, PrimitiveType.Triangles);
+        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
         matrixStack.Pop();

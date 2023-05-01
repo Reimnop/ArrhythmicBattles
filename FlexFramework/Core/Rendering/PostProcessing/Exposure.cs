@@ -36,9 +36,9 @@ public class Exposure : PostProcessor, IDisposable
     
     public override void Process(GLStateManager stateManager, Texture2D texture)
     {
-        stateManager.UseProgram(program.Handle);
+        stateManager.UseProgram(program);
         GL.Uniform1(1, ExposureValue);
-        stateManager.BindTextureUnit(0, texture.Handle);
+        stateManager.BindTextureUnit(0, texture);
         GL.BindImageTexture(0, tonemappedTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(DivideIntCeil(CurrentSize.X, 8), DivideIntCeil(CurrentSize.Y, 8), 1);

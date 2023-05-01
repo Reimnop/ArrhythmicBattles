@@ -1,19 +1,17 @@
 ﻿using FlexFramework;
 using FlexFramework.Core;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering.Data;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace ArrhythmicBattles.Core;
 
-public class GifEntity : ImageEntity, IDisposable // Because who doesn't want to have in-game memes?
+public class GifEntity : ImageEntity // Because who doesn't want to have in-game memes?
 {
     private struct Frame
     {
-        public Texture2D Texture { get; set; }
+        public Texture Texture { get; set; }
         public float Delay { get; set; }
     }
     
@@ -26,15 +24,14 @@ public class GifEntity : ImageEntity, IDisposable // Because who doesn't want to
         // Use ImageSharp to load the gif
         using var image = Image.Load<Rgba32>(path);
         
-        Rgba32[] pixels = new Rgba32[image.Width * image.Height];
+        byte[] pixels = new byte[image.Width * image.Height * 4];
 
         foreach (var frame in image.Frames)
         {
             frame.CopyPixelDataTo(pixels);
 
-            Texture2D texture = new Texture2D("gif-frame", image.Width, image.Height, SizedInternalFormat.Rgba8);
-            texture.LoadData<Rgba32>(pixels, PixelFormat.Rgba, PixelType.UnsignedByte);
-            
+            Texture texture = new Texture("gif-frame", image.Width, image.Height, PixelFormat.Rgba8, pixels);
+
             int delay = frame.Metadata.GetGifMetadata().FrameDelay;
             
             // Add the frame to the list
@@ -61,13 +58,5 @@ public class GifEntity : ImageEntity, IDisposable // Because who doesn't want to
         
         // Set the texture to the current frame
         Texture = frames[currentFrame].Texture;
-    }
-
-    public void Dispose()
-    {
-        foreach (var frame in frames)
-        {
-            frame.Texture.Dispose();
-        }
     }
 }

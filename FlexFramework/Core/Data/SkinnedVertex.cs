@@ -17,16 +17,26 @@ public struct BoneWeight
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SkinnedVertex : IVertex
+public unsafe struct SkinnedVertex
 {
     public const int MaxBoneInfluence = 4;
-    
-    public Vector3 Position { get; set; }
-    public Vector3 Normal { get; set; }
-    public Vector2 Uv { get; set; }
-    public Color4 Color { get; set; }
 
+    [VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 3)]
+    public Vector3 Position;
+
+    [VertexAttribute(VertexAttributeIntent.Normal, VertexAttributeType.Float, 3)]
+    public Vector3 Normal;
+
+    [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
+    public Vector2 Uv;
+
+    [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 2)]
+    public Color4 Color;
+
+    [VertexAttribute(VertexAttributeIntent.BoneIndex, VertexAttributeType.Int, MaxBoneInfluence)]
     public fixed int BoneIndices[MaxBoneInfluence];
+    
+    [VertexAttribute(VertexAttributeIntent.BoneWeight, VertexAttributeType.Float, MaxBoneInfluence)]
     public fixed float Weights[MaxBoneInfluence];
 
     public SkinnedVertex(Vector3 position, Vector3 normal, Vector2 uv, Color4 color, params BoneWeight[] weights)
@@ -94,15 +104,5 @@ public unsafe struct SkinnedVertex : IVertex
         }
 
         return newVertex;
-    }
-
-    public static void SetupAttributes(VertexAttributeConsumer attribConsumer, VertexAttributeIConsumer intAttribConsumer)
-    {
-        attribConsumer(0, 3, 0, VertexAttribType.Float, false);
-        attribConsumer(1, 3, 3 * sizeof(float), VertexAttribType.Float, false);
-        attribConsumer(2, 2, 6 * sizeof(float), VertexAttribType.Float, false);
-        attribConsumer(3, 4, 8 * sizeof(float), VertexAttribType.Float, false);
-        intAttribConsumer(4, MaxBoneInfluence, 12 * sizeof(float), VertexAttribIntegerType.Int);
-        attribConsumer(5, MaxBoneInfluence, 12 * sizeof(float) + MaxBoneInfluence * sizeof(int), VertexAttribType.Float, false);
     }
 }

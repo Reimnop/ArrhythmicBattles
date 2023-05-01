@@ -36,8 +36,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     private ScreenCapturer? guiScreenCapturer;
 
     private GLStateManager stateManager;
-    private ShaderProgram unlitShader;
-    private ShaderProgram litShader;
     private ShaderProgram skyboxShader;
 
     private int opaqueLayerId;
@@ -56,8 +54,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         gpuInfo = new GpuInfo(name, vendor, version);
         
         // Init GL objects
-        unlitShader = LoadProgram("unlit", "Assets/Shaders/unlit");
-        litShader = LoadProgram("lit", "Assets/Shaders/lit");
         skyboxShader = LoadComputeProgram("skybox", "Assets/Shaders/Compute/skybox");
 
         // Register render layers
@@ -68,13 +64,11 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         renderLayerRegistry.Freeze();
         
         // Register render strategies
-        RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy(unlitShader));
-        RegisterRenderStrategy<IndexedVertexDrawData>(new IndexedVertexRenderStrategy(unlitShader));
-        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this, litShader));
+        RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
+        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this));
         RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
         RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy(Engine));
-        RegisterRenderStrategy<CustomDrawData>(new CustomRenderStrategy());
-        
+
         // Set GL modes
         GL.CullFace(CullFaceMode.Back);
         GL.FrontFace(FrontFaceDirection.Ccw);
@@ -94,17 +88,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         return renderLayerRegistry.Register(name, () => new List<IDrawData>());
     }
 
-    private ShaderProgram LoadProgram(string name, string path)
-    {
-        using Shader vertexShader = new Shader($"{name}-vs", File.ReadAllText($"{path}.vert"), ShaderType.VertexShader);
-        using Shader fragmentShader = new Shader($"{name}-fs", File.ReadAllText($"{path}.frag"), ShaderType.FragmentShader);
-
-        ShaderProgram program = new ShaderProgram(name);
-        program.LinkShaders(vertexShader, fragmentShader);
-
-        return program;
-    }
-    
     private ShaderProgram LoadComputeProgram(string name, string path)
     {
         using Shader shader = new Shader($"{name}-vs", File.ReadAllText($"{path}.comp"), ShaderType.ComputeShader);
@@ -171,6 +154,12 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             guiScreenCapturer?.Dispose();
             guiScreenCapturer = new ScreenCapturer("gui", size.X, size.Y, false, 4);
         }
+        
+        // Update strategies
+        foreach (var strategy in renderStrategies.Values)
+        {
+            strategy.Update(args);
+        }
     }
 
     public override void Render()
@@ -178,7 +167,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         Debug.Assert(worldScreenCapturer != null);
         Debug.Assert(guiScreenCapturer != null);
         
-        stateManager.BindFramebuffer(worldScreenCapturer.FrameBuffer.Handle); // Bind world framebuffer
+        stateManager.BindFramebuffer(worldScreenCapturer.FrameBuffer); // Bind world framebuffer
 
         GL.Viewport(0, 0, worldScreenCapturer.Width, worldScreenCapturer.Height);
         
@@ -195,32 +184,44 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         using TemporaryList<IDrawData> transparentLayer = renderLayerRegistry[transparentLayerId];
         using TemporaryList<IDrawData> guiLayer = renderLayerRegistry[guiLayerId];
         
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, true);
-        stateManager.SetCapability(EnableCap.Blend, false);
-        stateManager.SetDepthMask(true);
-        RenderLayer(opaqueLayer);
-        
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, false);
-        stateManager.SetDepthMask(true);
-        RenderLayer(alphaClipLayer);
-        
-        stateManager.SetCapability(EnableCap.Multisample, false);
-        stateManager.SetCapability(EnableCap.DepthTest, true);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, true);
-        stateManager.SetDepthMask(false);
-        RenderLayer(transparentLayer);
-        
+        // Opaque
+        if (opaqueLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, true);
+            stateManager.SetCapability(EnableCap.Blend, false);
+            stateManager.SetDepthMask(true);
+            RenderLayer(opaqueLayer);
+        }
+
+        // Alpha clip
+        if (alphaClipLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, false);
+            stateManager.SetDepthMask(true);
+            RenderLayer(alphaClipLayer);
+        }
+
+        // Transparent
+        if (transparentLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, false);
+            stateManager.SetCapability(EnableCap.DepthTest, true);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, true);
+            stateManager.SetDepthMask(false);
+            RenderLayer(transparentLayer);
+        }
+
         // Post-process world framebuffer
         using TemporaryList<PostProcessor> postProcessors = this.postProcessors;
         RunPostProcessors(postProcessors, stateManager, worldScreenCapturer.ColorBuffer);
         
-        stateManager.BindFramebuffer(guiScreenCapturer.FrameBuffer.Handle); // Finish rendering world, bind gui framebuffer
+        stateManager.BindFramebuffer(guiScreenCapturer.FrameBuffer); // Finish rendering world, bind gui framebuffer
         
         // Blit world framebuffer to gui framebuffer
         GL.ClearColor(Color.Black);
@@ -230,14 +231,18 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             0, 0, guiScreenCapturer.Width, guiScreenCapturer.Height,
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 
-        stateManager.SetCapability(EnableCap.Multisample, true);
-        stateManager.SetCapability(EnableCap.DepthTest, false);
-        stateManager.SetCapability(EnableCap.CullFace, false);
-        stateManager.SetCapability(EnableCap.Blend, true);
-        stateManager.SetDepthMask(true);
-        RenderLayer(guiLayer);
+        // GUI
+        if (guiLayer.Count > 0)
+        {
+            stateManager.SetCapability(EnableCap.Multisample, true);
+            stateManager.SetCapability(EnableCap.DepthTest, false);
+            stateManager.SetCapability(EnableCap.CullFace, false);
+            stateManager.SetCapability(EnableCap.Blend, true);
+            stateManager.SetDepthMask(true);
+            RenderLayer(guiLayer);
+        }
 
-        stateManager.BindFramebuffer(0); // Finally, bind default framebuffer
+        stateManager.BindFramebuffer(null); // Finally, bind default framebuffer
 
         // Blit to backbuffer
         GL.ClearColor(Color.Black);
@@ -280,8 +285,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
 
     public void Dispose()
     {
-        unlitShader.Dispose();
-        litShader.Dispose();
         skyboxShader.Dispose();
         worldScreenCapturer?.Dispose();
         guiScreenCapturer?.Dispose();

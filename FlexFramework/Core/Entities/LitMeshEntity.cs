@@ -8,8 +8,8 @@ namespace FlexFramework.Core.Entities;
 
 public class LitMeshEntity : Entity, IRenderable
 {
-    public IndexedMesh<LitVertex>? Mesh { get; set; }
-    public Texture2D? Texture { get; set; }
+    public Mesh<LitVertex>? Mesh { get; set; }
+    public Texture? Texture { get; set; }
     public Color4 Color { get; set; } = Color4.White;
 
     public void Render(RenderArgs args)
@@ -25,7 +25,7 @@ public class LitMeshEntity : Entity, IRenderable
         CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh.VertexArray, Mesh.Count, matrixStack.GlobalTransformation, transformation, Texture, Color);
+        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh.ReadOnly, matrixStack.GlobalTransformation, transformation, Texture?.ReadOnly, Color);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }
