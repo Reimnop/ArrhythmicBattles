@@ -56,10 +56,17 @@ public class Buffer
     public unsafe void SetData<T>(ReadOnlySpan<T> buffer) where T : unmanaged
     {
         var length = buffer.Length * Unsafe.SizeOf<T>();
-        
-        fixed (T* ptr = buffer)
+
+        if (length > 0)
         {
-            SetData((IntPtr) ptr, length);
+            fixed (T* ptr = buffer)
+            {
+                SetData((IntPtr) ptr, length);
+            }
+        }
+        else
+        {
+            Clear();
         }
     }
     
