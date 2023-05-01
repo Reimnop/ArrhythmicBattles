@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using FlexFramework.Util;
 
 namespace FlexFramework.Core.Data;
 
@@ -64,6 +65,7 @@ public class VertexLayout
 {
     public int Stride { get; }
     public ReadOnlySpan<VertexAttribute> Attributes => attributes.AsSpan();
+    public Hash256 Hash { get; }
 
     private readonly VertexAttribute[] attributes;
 
@@ -71,6 +73,10 @@ public class VertexLayout
     {
         Stride = stride;
         this.attributes = attributes;
+        
+        Span<byte> attributeData = stackalloc byte[Unsafe.SizeOf<VertexAttribute>() * attributes.Length];
+        MemoryMarshal.Cast<VertexAttribute, byte>(attributes).CopyTo(attributeData);
+        Hash = HashUtil.Hash(attributeData);
     }
     
     public VertexLayout DeepCopy()
@@ -181,28 +187,5 @@ public class Mesh<T> : DataObject where T : unmanaged
         
         ReadOnlySpan<byte> data = indexBuffer!.Data;
         return Unsafe.ReadUnaligned<int>(ref MemoryMarshal.GetReference(data.Slice(index * sizeof(int), sizeof(int))));
-    }
-    
-    public void SetVertex(int index, T vertex)
-    {
-        if (index < 0 || index >= verticesCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        
-        int size = Unsafe.SizeOf<T>();
-        Span<byte> data = vertexBuffer.Data;
-        Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(data.Slice(index * size, size)), vertex);
-    }
-    
-    public void SetIndex(int index, int value)
-    {
-        if (index < 0 || index >= indicesCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        
-        Span<byte> data = indexBuffer!.Data;
-        Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(data.Slice(index * sizeof(int), sizeof(int))), value);
     }
 }

@@ -21,6 +21,7 @@
         <PackageReference Include="OpenTK" Version="4.7.7" />
         <PackageReference Include="SharpEXR" Version="1.0.0.19" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
+        <PackageReference Include="System.IO.Hashing" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>

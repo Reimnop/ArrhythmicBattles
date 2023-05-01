@@ -57,7 +57,6 @@ public class LitVertexRenderStrategy : RenderStrategy
         }
 
         GL.Uniform4(4, vertexDrawData.Color);
-        
         GL.Uniform3(5, lighting.AmbientLight); 
 
         if (lighting.DirectionalLight.HasValue)

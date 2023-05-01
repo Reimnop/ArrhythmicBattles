@@ -10,7 +10,7 @@ public class Buffer
     {
         public ReadOnlySpan<byte> Data => buffer.Data;
         public int Size => buffer.Size;
-        public Hash128 Hash => buffer.Hash;
+        public Hash256 Hash => buffer.Hash;
         
         private readonly Buffer buffer;
         
@@ -20,14 +20,14 @@ public class Buffer
         }
     }
     
-    public Span<byte> Data => new(data, 0, size);
+    public ReadOnlySpan<byte> Data => new(data, 0, size);
     public int Size => size;
-    public Hash128 Hash => hash;
+    public Hash256 Hash => hash;
     public IBufferView ReadOnly => new ReadOnlyBuffer(this);
     
     private byte[] data;
     private int size = 0;
-    private Hash128 hash;
+    private Hash256 hash;
     
     public Buffer(int capacity = 1024)
     {
@@ -37,7 +37,7 @@ public class Buffer
 
     private void UpdateHash()
     { 
-        hash = HashUtil.GetMD5(data);
+        hash = HashUtil.Hash(data);
     }
 
     public void SetData(IntPtr ptr, int length)

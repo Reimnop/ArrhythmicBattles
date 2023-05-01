@@ -28,7 +28,7 @@ public class TextureHandler
         return gc.GetOrAllocate(texture);
     }
     
-    private static Hash128 GetHash(ITextureView texture)
+    private static Hash256 GetHash(ITextureView texture)
     {
         return texture.Data.Hash;
     }

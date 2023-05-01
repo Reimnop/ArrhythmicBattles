@@ -6,5 +6,5 @@ public interface IBufferView
 {
     ReadOnlySpan<byte> Data { get; }
     int Size { get; }
-    Hash128 Hash { get; }
+    Hash256 Hash { get; }
 }
