@@ -35,6 +35,15 @@ public class GameScene : ABScene
     private int opaqueLayer;
     private int alphaClipLayer;
 
+#if DEBUG
+    private ModelEntity? testModelEntity;
+    private Model? testModel;
+    
+    private ScopedInputProvider? freeCamInputProvider;
+    private float freeCamYaw;
+    private float freeCamPitch;
+#endif
+    
     public GameScene(ABContext context) : base(context)
     {
     }
@@ -69,6 +78,20 @@ public class GameScene : ABScene
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
         RegisterObject(envModelEntity);
+
+#if DEBUG
+        const string testModelPath = @"Assets/test.dae";
+
+        if (File.Exists(testModelPath))
+        {
+            testModel = new Model(testModelPath);
+            RegisterObject(testModel);
+        
+            testModelEntity = new ModelEntity();
+            testModelEntity.Model = testModel;
+            RegisterObject(testModelEntity);
+        }
+#endif
 
         opaqueLayer = Engine.Renderer.GetLayerId(DefaultRenderer.OpaqueLayerName);
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
@@ -119,10 +142,52 @@ public class GameScene : ABScene
         {
             OpenScreen(new PauseScreen(Engine, this));
         }
+
+#if DEBUG
+        if (inputProvider.GetKeyDown(Keys.F1))
+        {
+            // Toggle free cam
+            freeCamInputProvider = Context.InputSystem.AcquireInputProvider();
+        }
         
+        if (freeCamInputProvider != null && freeCamInputProvider.GetKeyDown(Keys.F1))
+        {
+            freeCamInputProvider.Dispose();
+            freeCamInputProvider = null;
+        }
+#endif
+        
+#if DEBUG
         // Update camera pos
-        Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 1.0f, 4.0f);
-        camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
+        if (freeCamInputProvider == null)
+        {
+#endif
+            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
+            // Vector3 backward = Vector3.Transform(Vector3.UnitZ, rotation);
+            // camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
+            // camera.Rotation = rotation;
+
+            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 1.0f, 4.0f);
+            camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
+            camera.Rotation = rotation;
+#if DEBUG
+        }
+        else
+        {
+            // Free cam
+            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
+            Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
+            Vector2 move = freeCamInputProvider.Movement;
+            
+            Vector3 moveDir = (forward * move.Y + right * move.X) * 5.0f;
+            camera.Position += moveDir * args.DeltaTime;
+            
+            freeCamYaw -= freeCamInputProvider.MouseDelta.X / 480.0f;
+            freeCamPitch -= freeCamInputProvider.MouseDelta.Y / 480.0f;
+            freeCamPitch = Math.Clamp(freeCamPitch, -MathF.PI * 0.5f, MathF.PI * 0.5f);
+            camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, freeCamYaw) * Quaternion.FromAxisAngle(Vector3.UnitX, freeCamPitch);
+        }
+#endif
     }
 
     public override void Render(Renderer renderer)
@@ -142,6 +207,18 @@ public class GameScene : ABScene
         // render environment
         MatrixStack.Push();
         envModelEntity.Render(alphaClipArgs);
+
+#if DEBUG
+        if (testModelEntity != null)
+        {
+            // render test model
+            MatrixStack.Push();
+            MatrixStack.Translate(0.0f, 0.0f, 0.0f);
+            testModelEntity.Render(alphaClipArgs);
+            MatrixStack.Pop();
+        }
+#endif
+
         MatrixStack.Pop();
 
         // render gui
