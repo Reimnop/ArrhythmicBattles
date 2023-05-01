@@ -9,7 +9,7 @@ using Textwriter;
 
 namespace ArrhythmicBattles.Game;
 
-public class PauseScreen : Screen
+public class PauseScreen : Screen, IDisposable
 {
     private readonly TextEntity textEntity;
     private readonly MeshEntity background;
