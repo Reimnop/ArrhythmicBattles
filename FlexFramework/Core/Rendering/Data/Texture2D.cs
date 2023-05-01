@@ -39,7 +39,7 @@ public class Texture2D : GpuObject, IDisposable
     public static Texture2D FromStream(string name, Stream stream)
     {
         using var image = Image.Load<Rgba32>(stream);
-        Span<Rgba32> pixels = stackalloc Rgba32[image.Width * image.Height];
+        Rgba32[] pixels = new Rgba32[image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
         
         var texture2D = new Texture2D(name, image.Width, image.Height, SizedInternalFormat.Rgba8);

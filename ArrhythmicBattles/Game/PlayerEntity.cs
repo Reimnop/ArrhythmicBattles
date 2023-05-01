@@ -152,9 +152,9 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         }
 
         // camera rotation
-        Vector2 delta = inputProvider.MouseDelta / 480.0f;
-        yaw -= delta.X;
-        pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
+        // Vector2 delta = inputProvider.MouseDelta / 480.0f;
+        // yaw -= delta.X;
+        // pitch = Math.Clamp(pitch - delta.Y, -MathHelper.PiOver2 + 0.01f, MathHelper.PiOver2 - 0.01f);
     }
 
     public void Render(RenderArgs args)

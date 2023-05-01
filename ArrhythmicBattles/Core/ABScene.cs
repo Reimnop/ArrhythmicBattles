@@ -17,10 +17,26 @@ public abstract class ABScene : Scene, IDisposable
     protected int GuiLayerId { get; private set; }
 
     protected LayeredScreenHandler ScreenHandler { get; } = new LayeredScreenHandler();
+    
+    private List<IUpdateable> updateables = new List<IUpdateable>();
+    private List<IDisposable> disposables = new List<IDisposable>();
 
     public ABScene(ABContext context)
     {
         Context = context;
+    }
+
+    protected void RegisterObject(object obj)
+    {
+        if (obj is IUpdateable updateable)
+        {
+            updateables.Add(updateable);
+        }
+        
+        if (obj is IDisposable disposable)
+        {
+            disposables.Add(disposable);
+        }
     }
 
     public override void Init()
@@ -36,6 +52,11 @@ public abstract class ABScene : Scene, IDisposable
     public override void Update(UpdateArgs args)
     {
         ScreenHandler.Update(args);
+        
+        foreach (IUpdateable updateable in updateables)
+        {
+            updateable.Update(args);
+        }
     }
 
     public virtual void OpenScreen(Screen screen)
@@ -56,5 +77,10 @@ public abstract class ABScene : Scene, IDisposable
     public virtual void Dispose()
     {
         ScreenHandler.Dispose();
+        
+        foreach (IDisposable disposable in disposables)
+        {
+            disposable.Dispose();
+        }
     }
 }

@@ -46,8 +46,13 @@ public class GameScene : ABScene
         Engine.CursorState = CursorState.Grabbed;
         
         inputProvider = Context.InputSystem.AcquireInputProvider();
+        RegisterObject(inputProvider);
+        
         physicsWorld = new PhysicsWorld(Engine);
+        RegisterObject(physicsWorld);
+        
         skyboxRenderer = new ProceduralSkyboxRenderer();
+        RegisterObject(skyboxRenderer);
 
         Renderer renderer = Engine.Renderer;
         
@@ -58,38 +63,43 @@ public class GameScene : ABScene
         }
         
         envModel = new Model(@"Assets/Models/Map01.dae");
+        envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
+        RegisterObject(envModel);
+
         envModelEntity = new ModelEntity();
         envModelEntity.Model = envModel;
-        envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
-        
+        RegisterObject(envModelEntity);
+
         opaqueLayer = Engine.Renderer.GetLayerId(DefaultRenderer.OpaqueLayerName);
         alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
-        camera.Position = Vector3.UnitZ * 4.0f;
-        
+
         playerEntity = new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
+        RegisterObject(playerEntity);
 
         // Create floor
-        Box floorBox = new Box(20.0f, 0.1f, 20.0f);
-        TypedIndex floorShapeIndex = physicsWorld.Simulation.Shapes.Add(floorBox);
-        RigidPose floorPose = RigidPose.Identity;
-        BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
-        physicsWorld.Simulation.Bodies.Add(floorBodyDescription);
+        {
+            Box floorBox = new Box(20.0f, 0.1f, 20.0f);
+            TypedIndex floorShapeIndex = physicsWorld.Simulation.Shapes.Add(floorBox);
+            RigidPose floorPose = RigidPose.Identity;
+            BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
+            physicsWorld.Simulation.Bodies.Add(floorBodyDescription);
+        }
 
         // Init post processing
         bloom = new Bloom();
+        RegisterObject(bloom);
+        
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
+        RegisterObject(tonemapper);
     }
 
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
-        
-        physicsWorld.Update(args);
-        playerEntity.Update(args);
 
         if (inputProvider.GetKeyDown(Keys.F3))
         {
@@ -110,16 +120,9 @@ public class GameScene : ABScene
             OpenScreen(new PauseScreen(Engine, this));
         }
         
-        envModelEntity.Update(args);
-        
-        // update camera
-        Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * 
-                              Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
-        
-        Vector3 backward = Vector3.Transform(Vector3.UnitZ, rotation);
-
-        camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
-        camera.Rotation = rotation;
+        // Update camera pos
+        Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 1.0f, 4.0f);
+        camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
     }
 
     public override void Render(Renderer renderer)
@@ -146,21 +149,5 @@ public class GameScene : ABScene
         RenderArgs guiArgs = new RenderArgs(renderer, GuiLayerId, MatrixStack, guiCameraData);
         
         ScreenHandler.Render(guiArgs);
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        playerEntity.Dispose();
-        physicsWorld.Dispose();
-        
-        envModel.Dispose();
-        inputProvider.Dispose();
-        
-        bloom.Dispose();
-        tonemapper.Dispose();
-        
-        skyboxRenderer.Dispose();
     }
 }
