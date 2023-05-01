@@ -18,7 +18,6 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             (VertexAttributeIntent.BoneIndex, 4),
             (VertexAttributeIntent.BoneWeight, 5)
         );
-    
     private readonly TextureHandler textureHandler = new();
     
     public SkinnedVertexRenderStrategy(ILighting lighting)
@@ -31,16 +30,22 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         skinnedShader = new ShaderProgram("skinned");
         skinnedShader.LinkShaders(vertexShader, fragmentShader);
     }
-    
+
+    public override void Update(UpdateArgs args)
+    {
+        meshHandler.Update(args.DeltaTime);
+        textureHandler.Update(args.DeltaTime);
+    }
+
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         SkinnedVertexDrawData vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         
-        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
         Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
         glStateManager.UseProgram(skinnedShader);
-        glStateManager.BindVertexArray(vertexArray);
+        glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -78,11 +83,6 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
         else
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
-        
-        vertexArray.Dispose();
-        vertexBuffer.Dispose();
-        indexBuffer?.Dispose();
-        texture?.Dispose();
     }
 
     public void Dispose()

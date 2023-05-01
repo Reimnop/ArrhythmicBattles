@@ -30,7 +30,7 @@ public class GifEntity : ImageEntity // Because who doesn't want to have in-game
         {
             frame.CopyPixelDataTo(pixels);
 
-            Texture texture = new Texture("gif-frame", image.Width, image.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+            Texture texture = new Texture("gif-frame", image.Width, image.Height, PixelFormat.Rgba8, pixels);
 
             int delay = frame.Metadata.GetGifMetadata().FrameDelay;
             

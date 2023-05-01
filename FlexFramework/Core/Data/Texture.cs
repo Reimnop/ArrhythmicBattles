@@ -4,18 +4,21 @@ namespace FlexFramework.Core.Data;
 
 public enum PixelFormat
 {
-    Rgba,
-    Rgb,
-    R
-}
-
-public enum PixelType
-{
-    UnsignedByte,
-    UnsignedShort,
-    UnsignedInt,
-    Half,
-    Float
+    Rgba8,
+    Rgba16f,
+    Rgba16i,
+    Rgba32f,
+    Rgba32i,
+    Rgb8,
+    Rgb16f,
+    Rgb16i,
+    Rgb32f,
+    Rgb32i,
+    R8,
+    R16f,
+    R16i,
+    R32f,
+    R32i
 }
 
 public class Texture : DataObject
@@ -25,7 +28,6 @@ public class Texture : DataObject
         public int Width => texture.Width;
         public int Height => texture.Height;
         public PixelFormat Format => texture.Format;
-        public PixelType Type => texture.Type;
         public IBufferView Data => texture.Data.ReadOnly;
 
         private readonly Texture texture;
@@ -39,20 +41,18 @@ public class Texture : DataObject
     public int Width { get; }
     public int Height { get; }
     public PixelFormat Format { get; }
-    public PixelType Type { get; }
     public Buffer Data { get; }
     public ITextureView ReadOnly => new ReadOnlyTexture(this);
     
-    public Texture(string name, int width, int height, PixelFormat format, PixelType type) : base(name)
+    public Texture(string name, int width, int height, PixelFormat format) : base(name)
     {
         Width = width;
         Height = height;
         Format = format;
-        Type = type;
-        Data = new Buffer(width * height * GetPixelSize(format, type));
+        Data = new Buffer(width * height * GetPixelSize(format));
     }
     
-    public Texture(string name, int width, int height, PixelFormat format, PixelType type, ReadOnlySpan<byte> data) : this(name, width, height, format, type)
+    public Texture(string name, int width, int height, PixelFormat format, ReadOnlySpan<byte> data) : this(name, width, height, format)
     {
         SetData(data);
     }
@@ -63,7 +63,7 @@ public class Texture : DataObject
         Span<Rgba32> pixels = stackalloc Rgba32[image.Width * image.Height];
         image.CopyPixelDataTo(pixels);
         
-        var texture = new Texture(name, image.Width, image.Height, PixelFormat.Rgba, PixelType.UnsignedByte);
+        var texture = new Texture(name, image.Width, image.Height, PixelFormat.Rgba8);
         texture.SetData<Rgba32>(pixels);
         return texture;
     }
@@ -71,40 +71,32 @@ public class Texture : DataObject
     public void SetData<T>(ReadOnlySpan<T> data) where T : unmanaged
     {
         var dataSize = data.Length * Unsafe.SizeOf<T>();
-        var requiredSize = Width * Height * GetPixelSize(Format, Type);
+        var requiredSize = Width * Height * GetPixelSize(Format);
         if (dataSize != requiredSize)
             throw new ArgumentException($"Data size does not match texture size (expected {requiredSize}, got {dataSize})");
         Data.SetData(data);
     }
 
-    public static int GetPixelSize(PixelFormat format, PixelType type)
-    {
-        int componentsCount = GetComponentsCount(format);
-        int typeSize = GetTypeSize(type);
-        return componentsCount * typeSize;
-    }
-
-    public static int GetComponentsCount(PixelFormat format)
+    public static int GetPixelSize(PixelFormat format)
     {
         return format switch
         {
-            PixelFormat.Rgba => 4,
-            PixelFormat.Rgb => 3,
-            PixelFormat.R => 1,
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-        };
-    }
-    
-    public static int GetTypeSize(PixelType type)
-    {
-        return type switch
-        {
-            PixelType.UnsignedByte => 1,
-            PixelType.UnsignedShort => 2,
-            PixelType.UnsignedInt => 4,
-            PixelType.Half => 2,
-            PixelType.Float => 4,
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            PixelFormat.Rgba8 => 4,
+            PixelFormat.Rgba16f => 8,
+            PixelFormat.Rgba16i => 8,
+            PixelFormat.Rgba32f => 16,
+            PixelFormat.Rgba32i => 16,
+            PixelFormat.Rgb8 => 3,
+            PixelFormat.Rgb16f => 6,
+            PixelFormat.Rgb16i => 6,
+            PixelFormat.Rgb32f => 12,
+            PixelFormat.Rgb32i => 12,
+            PixelFormat.R8 => 1,
+            PixelFormat.R16f => 2,
+            PixelFormat.R16i => 2,
+            PixelFormat.R32f => 4,
+            PixelFormat.R32i => 4,
+            _ => throw new ArgumentException(nameof(format))
         };
     }
 }

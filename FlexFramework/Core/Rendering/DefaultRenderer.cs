@@ -154,6 +154,12 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             guiScreenCapturer?.Dispose();
             guiScreenCapturer = new ScreenCapturer("gui", size.X, size.Y, false, 4);
         }
+        
+        // Update strategies
+        foreach (var strategy in renderStrategies.Values)
+        {
+            strategy.Update(args);
+        }
     }
 
     public override void Render()

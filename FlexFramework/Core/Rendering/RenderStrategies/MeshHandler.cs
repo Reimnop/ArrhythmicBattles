@@ -1,23 +1,65 @@
-﻿using System.Diagnostics;
-using FlexFramework.Core.Data;
+﻿using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
+using Timer = FlexFramework.Util.Timer;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
-// TODO: This is dumb. Don't use this in production.
-// Someone should probably implement a GC for this. A simple one would be fine.
+public class GpuMesh : IDisposable
+{
+    public VertexArray VertexArray { get; }
+    public Buffer VertexBuffer { get; }
+    public Buffer? IndexBuffer { get; }
+    
+    public GpuMesh(VertexArray vertexArray, Buffer vertexBuffer, Buffer? indexBuffer)
+    {
+        VertexArray = vertexArray;
+        VertexBuffer = vertexBuffer;
+        IndexBuffer = indexBuffer;
+    }
+    
+    public void Dispose()
+    {
+        VertexArray.Dispose();
+        VertexBuffer.Dispose();
+        IndexBuffer?.Dispose();
+    }
+}
+
 public class MeshHandler
 {
     private readonly IDictionary<VertexAttributeIntent, int> attributeLocations;
+    private readonly GarbageCollector<IMeshView, GpuMesh> gc;
+    private readonly Timer timer;
 
     public MeshHandler(params (VertexAttributeIntent, int)[] locations)
     {
         attributeLocations = locations.ToDictionary(x => x.Item1, x => x.Item2);
+        gc = new GarbageCollector<IMeshView, GpuMesh>(GetHash, CreateMesh);
+        timer = new Timer(1.0f, () => gc.Sweep());
     }
 
-    public (VertexArray, Buffer, Buffer?) GetMesh(IMeshView mesh)
+    public void Update(float deltaTime)
+    {
+        timer.Update(deltaTime);
+    }
+
+    public GpuMesh GetMesh(IMeshView mesh)
+    {
+        return gc.GetOrAllocate(mesh);
+    }
+    
+    private Hash128 GetHash(IMeshView mesh)
+    {
+        Hash128 hash = mesh.VertexBuffer.Hash;
+        if (mesh.IndexBuffer != null)
+            hash ^= mesh.IndexBuffer.Hash;
+        return hash;
+    }
+
+    private GpuMesh CreateMesh(IMeshView mesh)
     {
         Buffer vertexBuffer = new Buffer("vertex");
         vertexBuffer.LoadData(mesh.VertexBuffer.Data);
@@ -62,6 +104,6 @@ public class MeshHandler
                 vertexArray.VertexBuffer(vertexBuffer, location, location, attribute.Size, attribute.Offset, VertexAttribType.Double, false, mesh.VertexSize);
         }
 
-        return (vertexArray, vertexBuffer, indexBuffer);
+        return new GpuMesh(vertexArray, vertexBuffer, indexBuffer);
     }
 }

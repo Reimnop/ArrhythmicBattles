@@ -30,15 +30,20 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         textShader = new ShaderProgram("text");
         textShader.LinkShaders(vertexShader, fragmentShader);
     }
-    
+
+    public override void Update(UpdateArgs args)
+    {
+        meshHandler.Update(args.DeltaTime);
+    }
+
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         TextDrawData textDrawData = EnsureDrawDataType<TextDrawData>(drawData);
         
-        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(textDrawData.Mesh);
+        var mesh = meshHandler.GetMesh(textDrawData.Mesh);
         
         glStateManager.UseProgram(textShader);
-        glStateManager.BindVertexArray(vertexArray);
+        glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = textDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
@@ -56,10 +61,6 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
             GL.DrawElements(PrimitiveType.Triangles, textDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
         else
             GL.DrawArrays(PrimitiveType.Triangles, 0, textDrawData.Mesh.VerticesCount);
-        
-        vertexArray.Dispose();
-        vertexBuffer.Dispose();
-        indexBuffer?.Dispose();
     }
 
     public void Dispose()

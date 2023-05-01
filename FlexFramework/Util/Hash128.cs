@@ -14,6 +14,14 @@ public unsafe struct Hash128
             buffer.CopyTo(new Span<byte>(ptr, 16));
         }
     }
+    
+    public static Hash128 operator ^(Hash128 left, Hash128 right)
+    {
+        Hash128 hash = new Hash128();
+        for (int i = 0; i < 16; i++)
+            hash.data[i] = (byte) (left.data[i] ^ right.data[i]);
+        return hash;
+    }
 
     public byte this[int index]
     {

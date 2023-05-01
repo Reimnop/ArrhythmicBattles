@@ -16,7 +16,6 @@ public class LitVertexRenderStrategy : RenderStrategy
             (VertexAttributeIntent.TexCoord0, 2),
             (VertexAttributeIntent.Color, 3)
         );
-    
     private readonly TextureHandler textureHandler = new();
 
     public LitVertexRenderStrategy(ILighting lighting)
@@ -29,16 +28,22 @@ public class LitVertexRenderStrategy : RenderStrategy
         litShader = new ShaderProgram("lit");
         litShader.LinkShaders(vertexShader, fragmentShader);
     }
-    
+
+    public override void Update(UpdateArgs args)
+    {
+        meshHandler.Update(args.DeltaTime);
+        textureHandler.Update(args.DeltaTime);
+    }
+
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         LitVertexDrawData vertexDrawData = EnsureDrawDataType<LitVertexDrawData>(drawData);
 
-        var (vertexArray, vertexBuffer, indexBuffer) = meshHandler.GetMesh(vertexDrawData.Mesh);
+        var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
         Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
         
         glStateManager.UseProgram(litShader);
-        glStateManager.BindVertexArray(vertexArray);
+        glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
         Matrix4 model = vertexDrawData.ModelMatrix;
@@ -67,11 +72,5 @@ public class LitVertexRenderStrategy : RenderStrategy
             GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
         else
             GL.DrawArrays(PrimitiveType.Triangles, 0, vertexDrawData.Mesh.VerticesCount);
-        
-        // TODO: this is dumb
-        vertexArray.Dispose();
-        vertexBuffer.Dispose();
-        indexBuffer?.Dispose();
-        texture?.Dispose();
     }
 }
