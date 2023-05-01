@@ -51,9 +51,9 @@ public class MeshHandler
         return gc.GetOrAllocate(mesh);
     }
     
-    private static Hash256 GetHash(IMeshView mesh)
+    private static Hash128 GetHash(IMeshView mesh)
     {
-        Hash256 hash = mesh.VertexBuffer.Hash;
+        Hash128 hash = mesh.VertexBuffer.Hash;
         hash ^= mesh.VertexLayout.Hash;
         if (mesh.IndexBuffer != null)
             hash ^= mesh.IndexBuffer.Hash;

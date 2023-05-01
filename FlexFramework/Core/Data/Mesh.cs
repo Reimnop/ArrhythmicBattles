@@ -65,7 +65,7 @@ public class VertexLayout
 {
     public int Stride { get; }
     public ReadOnlySpan<VertexAttribute> Attributes => attributes.AsSpan();
-    public Hash256 Hash { get; }
+    public Hash128 Hash { get; }
 
     private readonly VertexAttribute[] attributes;
 

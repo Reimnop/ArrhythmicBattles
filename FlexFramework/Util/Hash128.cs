@@ -2,13 +2,13 @@
 
 namespace FlexFramework.Util;
 
-public unsafe struct Hash256
+public unsafe struct Hash128
 {
-    const int Length = 32;
+    public const int Length = 16;
     
     private fixed byte data[Length];
 
-    public Hash256(ReadOnlySpan<byte> buffer)
+    public Hash128(ReadOnlySpan<byte> buffer)
     {
         if (buffer.Length != Length)
             throw new ArgumentException($"Buffer must be {Length} bytes long!", nameof(buffer));
@@ -19,14 +19,25 @@ public unsafe struct Hash256
         }
     }
     
-    public static Hash256 operator ^(Hash256 left, Hash256 right)
+    public static Hash128 operator ^(Hash128 left, Hash128 right)
     {
         Span<byte> result = stackalloc byte[Length];
         for (int i = 0; i < Length; i++)
         {
             result[i] = (byte)(left[i] ^ right[i]);
         }
-        return new Hash256(result);
+        return new Hash128(result);
+    }
+
+    public override int GetHashCode()
+    {
+        // Return hash code
+        HashCode hashCode = new();
+        for (int i = 0; i < Length; i++)
+        {
+            hashCode.Add(data[i]);
+        }
+        return hashCode.ToHashCode();
     }
 
     public override string ToString()

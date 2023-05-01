@@ -15,11 +15,11 @@ public class GarbageCollector<TInput, TOutput> : IDisposable where TOutput : IDi
         }
     }
     
-    private readonly Dictionary<Hash256, AliveObjectReference> allocated = new();
-    private readonly Func<TInput, Hash256> hashFunc;
+    private readonly Dictionary<Hash128, AliveObjectReference> allocated = new();
+    private readonly Func<TInput, Hash128> hashFunc;
     private readonly Func<TInput, TOutput> factoryFunc;
     
-    public GarbageCollector(Func<TInput, Hash256> hashFunc, Func<TInput, TOutput> factoryFunc)
+    public GarbageCollector(Func<TInput, Hash128> hashFunc, Func<TInput, TOutput> factoryFunc)
     {
         this.hashFunc = hashFunc;
         this.factoryFunc = factoryFunc;
@@ -27,7 +27,7 @@ public class GarbageCollector<TInput, TOutput> : IDisposable where TOutput : IDi
 
     public TOutput GetOrAllocate(TInput input)
     {
-        Hash256 hash = hashFunc(input);
+        Hash128 hash = hashFunc(input);
         if (allocated.TryGetValue(hash, out AliveObjectReference? reference))
         {
             reference.Used = true;
@@ -41,7 +41,7 @@ public class GarbageCollector<TInput, TOutput> : IDisposable where TOutput : IDi
     
     public void Sweep()
     {
-        List<Hash256> toClean = new List<Hash256>();
+        List<Hash128> toClean = new List<Hash128>();
         foreach (var (hash, reference) in allocated)
         {
             if (reference.Used)
