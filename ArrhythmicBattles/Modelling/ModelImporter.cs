@@ -180,23 +180,20 @@ public class ModelImporter : IDisposable
     {
         List<ModelAnimation> animations = new List<ModelAnimation>();
 
-        foreach (Assimp.Animation animation in scene.Animations)
+        foreach (Animation animation in scene.Animations)
         {
             List<ModelNodeAnimationChannel> nodeAnimationChannels = new List<ModelNodeAnimationChannel>();
             
             foreach (NodeAnimationChannel nodeAnimationChannel in animation.NodeAnimationChannels)
             {
-                List<Key<Vector3>> positionKeys = nodeAnimationChannel.PositionKeys
-                    .Select(x => new Key<Vector3>((float) x.Time, new Vector3(x.Value.X, x.Value.Y, x.Value.Z)))
-                    .ToList();
-                
-                List<Key<Vector3>> scaleKeys = nodeAnimationChannel.ScalingKeys
-                    .Select(x => new Key<Vector3>((float) x.Time, new Vector3(x.Value.X, x.Value.Y, x.Value.Z)))
-                    .ToList();
-                
-                List<Key<Quaternion>> rotationKeys = nodeAnimationChannel.RotationKeys
-                    .Select(x => new Key<Quaternion>((float) x.Time, new Quaternion(x.Value.X, x.Value.Y, x.Value.Z, x.Value.W)))
-                    .ToList();
+                IEnumerable<Key<Vector3>> positionKeys = nodeAnimationChannel.PositionKeys
+                    .Select(x => new Key<Vector3>((float) x.Time, new Vector3(x.Value.X, x.Value.Y, x.Value.Z)));
+
+                IEnumerable<Key<Vector3>> scaleKeys = nodeAnimationChannel.ScalingKeys
+                    .Select(x => new Key<Vector3>((float) x.Time, new Vector3(x.Value.X, x.Value.Y, x.Value.Z)));
+
+                IEnumerable<Key<Quaternion>> rotationKeys = nodeAnimationChannel.RotationKeys
+                    .Select(x => new Key<Quaternion>((float) x.Time, new Quaternion(x.Value.X, x.Value.Y, x.Value.Z, x.Value.W)));
 
                 nodeAnimationChannels.Add(new ModelNodeAnimationChannel(nodeAnimationChannel.NodeName, positionKeys, scaleKeys, rotationKeys));
             }

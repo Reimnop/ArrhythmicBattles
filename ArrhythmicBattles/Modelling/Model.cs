@@ -102,29 +102,6 @@ public class Model : IDisposable
         boneIndexMap = modelImporter.GetBoneIndexMap();
     }
 
-    // TODO: add more material properties
-    /*
-    public void TextureMinFilter(TextureMinFilter filter)
-    {
-        materials.ForEach(mat => mat.Texture?.SetMinFilter(filter));
-    }
-    
-    public void TextureMagFilter(TextureMagFilter filter)
-    {
-        materials.ForEach(mat => mat.Texture?.SetMagFilter(filter));
-    }
-    
-    public void TextureAnisotropicFiltering(float value)
-    {
-        materials.ForEach(mat => mat.Texture?.AnisotropicFiltering(value));
-    }
-
-    public void TextureGenerateMipmap()
-    {
-        materials.ForEach(mat => mat.Texture?.GenerateMipmap());
-    }
-    */
-
     public void Dispose()
     {
         modelImporter.Dispose();

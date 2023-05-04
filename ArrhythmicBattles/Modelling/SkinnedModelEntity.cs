@@ -76,7 +76,7 @@ public class SkinnedModelEntity : Entity, IRenderable
         if (animationHandler != null)
         {
             Debug.Assert(animation != null);
-            animationHandler.Update(time % (animation.DurationInTicks * animation.TicksPerSecond));
+            animationHandler.Update(time % (animation.DurationInTicks / animation.TicksPerSecond));
         }
         
         CalculateBoneMatricesRecursively(model.Tree.RootNode, boneMatrixStack);
@@ -119,8 +119,7 @@ public class SkinnedModelEntity : Entity, IRenderable
     private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
         Debug.Assert(model != null);
-
-        MatrixStack matrixStack = args.MatrixStack;
+        
         ModelNode modelNode = node.Value;
 
         foreach (ModelMesh modelMesh in modelNode.Meshes)

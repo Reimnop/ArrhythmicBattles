@@ -14,11 +14,11 @@ public class ModelNodeAnimationChannel
     private readonly List<Key<Vector3>> scaleKeys;
     private readonly List<Key<Quaternion>> rotationKeys;
 
-    public ModelNodeAnimationChannel(string nodeName, List<Key<Vector3>> positionKeys, List<Key<Vector3>> scaleKeys, List<Key<Quaternion>> rotationKeys)
+    public ModelNodeAnimationChannel(string nodeName, IEnumerable<Key<Vector3>> positionKeys, IEnumerable<Key<Vector3>> scaleKeys, IEnumerable<Key<Quaternion>> rotationKeys)
     {
         NodeName = nodeName;
-        this.positionKeys = positionKeys;
-        this.scaleKeys = scaleKeys;
-        this.rotationKeys = rotationKeys;
+        this.positionKeys = positionKeys.ToList();
+        this.scaleKeys = scaleKeys.ToList();
+        this.rotationKeys = rotationKeys.ToList();
     }
 }
