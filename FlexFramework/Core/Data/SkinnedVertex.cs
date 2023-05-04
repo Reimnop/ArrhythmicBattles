@@ -30,7 +30,7 @@ public unsafe struct SkinnedVertex
     [VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2)]
     public Vector2 Uv;
 
-    [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 2)]
+    [VertexAttribute(VertexAttributeIntent.Color, VertexAttributeType.Float, 4)]
     public Color4 Color;
 
     [VertexAttribute(VertexAttributeIntent.BoneIndex, VertexAttributeType.Int, MaxBoneInfluence)]
