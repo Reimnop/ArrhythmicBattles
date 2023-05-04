@@ -68,7 +68,7 @@ public class ModelEntity : Entity, IRenderable
         if (animationHandler != null)
         {
             Debug.Assert(animation != null);
-            animationHandler.Update(time % (animation.DurationInTicks * animation.TicksPerSecond));
+            animationHandler.Update((time * animation.TicksPerSecond) % animation.DurationInTicks);
         }
     }
 
