@@ -17,17 +17,23 @@ out vec3 Normal;
 out vec4 Color;
 
 void main() {
-    mat4 boneTransform = mat4(0.0);
-    for (int i = 0; i < 4; i++) {
-        if (aBoneIds[i] == -1) {
-            continue;
-        }
-        if (aBoneIds[i] >= MAX_BONES) {
-            boneTransform = mat4(1.0);
-            break;
-        }
+    float weightSum = aWeights.x + aWeights.y + aWeights.z + aWeights.w;
+    mat4 boneTransform;
+    if (weightSum != 0.0) {
+        boneTransform = mat4(0.0);
+        for (int i = 0; i < 4; i++) {
+            if (aBoneIds[i] == -1) {
+                continue;
+            }
+            if (aBoneIds[i] >= MAX_BONES) {
+                boneTransform = mat4(1.0);
+                break;
+            }
 
-        boneTransform += bones[aBoneIds[i]] * aWeights[i];
+            boneTransform += bones[aBoneIds[i]] * (aWeights[i] / weightSum);
+        }
+    } else {
+        boneTransform = mat4(1.0);
     }
     
     Uv = aUv;

@@ -120,6 +120,7 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         Debug.Assert(model != null);
         
+        MatrixStack matrixStack = args.MatrixStack;
         ModelNode modelNode = node.Value;
 
         foreach (ModelMesh modelMesh in modelNode.Meshes)
