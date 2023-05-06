@@ -39,7 +39,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
 
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
-        SkinnedVertexDrawData vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
+        var vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         
         var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
         Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
@@ -70,13 +70,10 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         
         GL.Uniform1(8, lighting.DirectionalLight?.Intensity ?? 0.0f);
 
-        if (vertexDrawData.Bones != null)
+        for (int i = 0; i < vertexDrawData.Bones.Length; i++)
         {
-            for (int i = 0; i < vertexDrawData.Bones.Length; i++)
-            {
-                Matrix4 bone = vertexDrawData.Bones[i];
-                GL.UniformMatrix4(9 + i, true, ref bone);
-            }
+            Matrix4 bone = vertexDrawData.Bones[i];
+            GL.UniformMatrix4(9 + i, true, ref bone);
         }
 
         if (vertexDrawData.Mesh.IndicesCount > 0)

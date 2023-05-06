@@ -1,75 +1,89 @@
-﻿using ArrhythmicBattles.Core.Animation;
-using ArrhythmicBattles.Modelling;
+﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.Animation;
+using Assimp;
 using OpenTK.Mathematics;
+using Quaternion = OpenTK.Mathematics.Quaternion;
 
 namespace ArrhythmicBattles.Modelling;
 
 public class AnimationHandler
 {
-    private class NodeSequenceCollection
+    private class TransformableNode
     {
-        public Sequence<Vector3> PositionSequence { get; }
-        public Sequence<Vector3> ScaleSequence { get; }
-        public Sequence<Quaternion> RotationSequence { get; }
+        public Vector3 Position { get; set; }
+        public Vector3 Scale { get; set; }
+        public Quaternion Rotation { get; set; }
 
-        public Matrix4 Transform { get; private set; } = Matrix4.Identity;
-
-        public NodeSequenceCollection(ModelNodeAnimationChannel nodeAnimationChannel)
+        private readonly ModelNode node;
+        
+        public TransformableNode(ModelNode node)
         {
-            Interpolator<Vector3> vec3Interpolator = (first, second, factor) => new Vector3(
-                MathHelper.Lerp(first.X, second.X, factor),
-                MathHelper.Lerp(first.Y, second.Y, factor),
-                MathHelper.Lerp(first.Z, second.Z, factor));
-
-            PositionSequence = new Sequence<Vector3>(nodeAnimationChannel.PositionKeys, vec3Interpolator);
-            ScaleSequence = new Sequence<Vector3>(nodeAnimationChannel.ScaleKeys, vec3Interpolator);
-            RotationSequence = new Sequence<Quaternion>(nodeAnimationChannel.RotationKeys, Quaternion.Slerp);
+            this.node = node;
+            ResetTransformation();
         }
 
-        public void Update(float time)
+        public void ResetTransformation()
         {
-            PositionSequence.Interpolate(time);
-            ScaleSequence.Interpolate(time);
-            RotationSequence.Interpolate(time);
-
-            Transform = CalculateTransform();
-        }
-
-        private Matrix4 CalculateTransform()
-        {
-            return Matrix4.CreateScale(ScaleSequence.CurrentValue) *
-                   Matrix4.CreateFromQuaternion(RotationSequence.CurrentValue) *
-                   Matrix4.CreateTranslation(PositionSequence.CurrentValue);
+            var transform = node.Transform;
+            Position = transform.ExtractTranslation();
+            Scale = transform.ExtractScale();
+            Rotation = transform.ExtractRotation();
         }
     }
     
-    private readonly Dictionary<string, NodeSequenceCollection> nodeNameToAnim;
+    private ImmutableNode<ModelNode> rootModelNode;
+    private Dictionary<string, TransformableNode> nodes;
 
-    public AnimationHandler(ModelAnimation animation)
+    private ModelAnimation? animation;
+
+    public AnimationHandler(Model model)
     {
-        nodeNameToAnim = new Dictionary<string, NodeSequenceCollection>();
+        rootModelNode = model.RootNode;
+        nodes = model.RootNode.ToDictionary(node => node.Value.Name, node => new TransformableNode(node.Value));
+    }
+    
+    public void Transition(ModelAnimation? animation)
+    {
+        this.animation = animation;
         
-        foreach (ModelNodeAnimationChannel nodeAnimationChannel in animation.NodeAnimationChannels)
-        {
-            nodeNameToAnim.Add(nodeAnimationChannel.NodeName, new NodeSequenceCollection(nodeAnimationChannel));
-        }
+        if (this.animation == null)
+            foreach (var node in nodes.Values)
+                node.ResetTransformation();
     }
 
     public void Update(float time)
     {
-        foreach (var (_, anim) in nodeNameToAnim)
+        if (animation == null) 
+            return;
+
+        var t = (time * animation.TicksPerSecond) % animation.DurationInTicks;
+
+        foreach (var (name, node) in nodes)
         {
-            anim.Update(time);
+            var channel = animation.GetAnimationChannelFromName(name);
+            if (channel == null) 
+                continue;
+            
+            node.Position = Sequence.Interpolate(t, channel.PositionKeys, Vector3Lerp);
+            node.Scale = Sequence.Interpolate(t, channel.ScaleKeys, Vector3Lerp);
+            node.Rotation = Sequence.Interpolate(t, channel.RotationKeys, Quaternion.Slerp);
         }
+    }
+
+    private static Vector3 Vector3Lerp(Vector3 a, Vector3 b, float t)
+    {
+        return new Vector3(
+                MathHelper.Lerp(a.X, b.X, t), 
+                MathHelper.Lerp(a.Y, b.Y, t), 
+                MathHelper.Lerp(a.Z, b.Z, t)
+            );
     }
 
     public Matrix4 GetNodeTransform(ModelNode node)
     {
-        if (nodeNameToAnim.TryGetValue(node.Name, out NodeSequenceCollection? anim))
-        {
-            return anim.Transform;
-        }
-
-        return node.Transform;
+        var transformableNode = nodes[node.Name];
+        return Matrix4.CreateScale(transformableNode.Scale) * 
+               Matrix4.CreateFromQuaternion(transformableNode.Rotation) *
+               Matrix4.CreateTranslation(transformableNode.Position);
     }
 }

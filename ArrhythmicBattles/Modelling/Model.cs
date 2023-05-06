@@ -69,37 +69,40 @@ public class Model : IDisposable
 {
     private readonly ModelImporter modelImporter;
     
-    public ImmutableTree<ModelNode> Tree { get; }
-
-    // lazily load meshes
-    public IReadOnlyList<Mesh<LitVertex>> Meshes => meshes ??= modelImporter.LoadMeshes();
-    public IReadOnlyList<Mesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= modelImporter.LoadSkinnedMeshes();
-
-    public IReadOnlyList<ModelMaterial> Materials => materials;
-    public IReadOnlyList<ModelAnimation> Animations => animations;
-    public IReadOnlyList<ModelBone> Bones => bones;
-    public IReadOnlyDictionary<string, int> BoneIndexMap => boneIndexMap;
+    public ImmutableNode<ModelNode> RootNode { get; }
+    public IReadOnlyList<ModelBone> Bones { get; }
+    public IReadOnlyDictionary<string, int> BoneIndexMap { get; }
     
+    // Lazily load everything
+    public IReadOnlyList<Mesh<LitVertex>> Meshes => meshes ??= lazyMeshes.ToList();
+    public IReadOnlyList<Mesh<SkinnedVertex>> SkinnedMeshes => skinnedMeshes ??= lazySkinnedMeshes.ToList();
+    public IReadOnlyList<ModelMaterial> Materials => materials ??= lazyMaterials.ToList();
+    public IReadOnlyList<ModelAnimation> Animations => animations ??= lazyAnimations.ToList();
+    
+    // Internal collections
     private List<Mesh<LitVertex>>? meshes;
     private List<Mesh<SkinnedVertex>>? skinnedMeshes;
-    
-    private readonly List<ModelMaterial> materials;
-    private readonly List<ModelAnimation> animations;
-    private readonly List<ModelBone> bones;
-    private readonly Dictionary<string, int> boneIndexMap;
+    private List<ModelMaterial>? materials;
+    private List<ModelAnimation>? animations;
+
+    private readonly IEnumerable<Mesh<LitVertex>> lazyMeshes;
+    private readonly IEnumerable<Mesh<SkinnedVertex>> lazySkinnedMeshes;
+    private readonly IEnumerable<ModelMaterial> lazyMaterials;
+    private readonly IEnumerable<ModelAnimation> lazyAnimations;
 
     public Model(string path)
     {
         modelImporter = new ModelImporter(path);
         
-        Tree = modelImporter.LoadModel();
-        meshes = modelImporter.LoadMeshes();
-        skinnedMeshes = modelImporter.LoadSkinnedMeshes();
-        materials = modelImporter.LoadMaterials();
-        animations = modelImporter.LoadAnimations();
-        bones = modelImporter.LoadBones();
-
-        boneIndexMap = modelImporter.GetBoneIndexMap();
+        RootNode = modelImporter.LoadModel();
+        Bones = modelImporter.Bones;
+        BoneIndexMap = modelImporter.BoneIndexMap;
+        
+        // This doesn't actually "load" anything yet
+        lazyMeshes = modelImporter.LoadMeshes();
+        lazySkinnedMeshes = modelImporter.LoadSkinnedMeshes();
+        lazyMaterials = modelImporter.LoadMaterials();
+        lazyAnimations = modelImporter.LoadAnimations();
     }
 
     public void Dispose()

@@ -11,23 +11,10 @@ public class NoKeyException : Exception
 
 public delegate T Interpolator<T>(T first, T second, float factor);
 
-public class Sequence<T> where T : struct
+public static class Sequence
 {
-    public T CurrentValue { get; private set; }
-
-    private readonly IReadOnlyList<Key<T>> keys;
-    private readonly Interpolator<T> interpolator;
-
-    private float lastTime = 0.0f;
-    private int index = 0;
-
-    public Sequence(IReadOnlyList<Key<T>> keys, Interpolator<T> interpolator)
-    {
-        this.interpolator = interpolator;
-        this.keys = keys;
-    }
-    
-    public T Interpolate(float time)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Interpolate<T>(float time, IReadOnlyList<Key<T>> keys, Interpolator<T> interpolator)
     {
         if (keys.Count == 0)
         {
@@ -36,50 +23,59 @@ public class Sequence<T> where T : struct
 
         if (keys.Count == 1)
         {
-            return SetCurrentValue(ResultFromSingleKey(keys[0]));
+            return keys[0].Value;
         }
 
         if (time < keys[0].Time)
         {
-            return SetCurrentValue(ResultFromSingleKey(keys[0]));
+            return keys[0].Value;
         }
         
         if (time >= keys[^1].Time)
         {
-            return SetCurrentValue(ResultFromSingleKey(keys[^1]));
+            return keys[^1].Value;
         }
 
-        int step = time >= lastTime ? 1 : -1;
-        lastTime = time;
-
-        while (!(time >= keys[index].Time && time < keys[index + 1].Time))
-        {
-            index += step;
-        }
-
+        int index = Search(time, keys);
         Key<T> first = keys[index];
         Key<T> second = keys[index + 1];
-        
-        float t = InverseLerp(first.Time, second.Time, time);
-        return SetCurrentValue(interpolator(first.Value, second.Value, t));
-    }
 
+        float t = InverseLerp(first.Time, second.Time, time);
+        return interpolator(first.Value, second.Value, t);
+    }
+    
+    // Binary search for the keyframe pair that contains the given time
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T SetCurrentValue(T currentValue)
+    private static int Search<T>(float time, IReadOnlyList<Key<T>> keys)
     {
-        CurrentValue = currentValue;
-        return currentValue;
+        int low = 0;
+        int high = keys.Count - 1;
+
+        while (low <= high)
+        {
+            int mid = (low + high) / 2;
+            float midTime = keys[mid].Time;
+
+            if (time < midTime)
+            {
+                high = mid - 1;
+            }
+            else if (time > midTime)
+            {
+                low = mid + 1;
+            }
+            else
+            {
+                return mid;
+            }
+        }
+
+        return low - 1;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T ResultFromSingleKey(Key<T> key)
+    private static float InverseLerp(float a, float b, float factor)
     {
-        return interpolator(key.Value, key.Value, 0.0f);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static float InverseLerp(float first, float second, float value)
-    {
-        return (value - first) / (second - first);
+        return (factor - a) / (b - a);
     }
 }

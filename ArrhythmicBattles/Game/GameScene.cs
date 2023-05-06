@@ -36,7 +36,7 @@ public class GameScene : ABScene
     private int alphaClipLayer;
 
 #if DEBUG
-    private ModelEntity? testModelEntity;
+    private SkinnedModelEntity? testModelEntity;
     private Model? testModel;
     
     private ScopedInputProvider? freeCamInputProvider;
@@ -75,20 +75,21 @@ public class GameScene : ABScene
         envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
         RegisterObject(envModel);
 
-        envModelEntity = new ModelEntity();
-        envModelEntity.Model = envModel;
+        envModelEntity = new ModelEntity(envModel);
         RegisterObject(envModelEntity);
 
 #if DEBUG
-        const string testModelPath = @"Assets/test.dae";
+        const string testModelPath = @"Assets/Test/test.fbx";
 
         if (File.Exists(testModelPath))
         {
             testModel = new Model(testModelPath);
             RegisterObject(testModel);
-        
-            testModelEntity = new ModelEntity();
-            testModelEntity.Model = testModel;
+            
+            ModelAnimation testAnimation = testModel.Animations[0];
+            
+            testModelEntity = new SkinnedModelEntity(testModel);
+            testModelEntity.AnimationHandler.Transition(testAnimation);
             RegisterObject(testModelEntity);
         }
 #endif
@@ -167,7 +168,7 @@ public class GameScene : ABScene
             // camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
             // camera.Rotation = rotation;
 
-            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 1.0f, 4.0f);
+            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 4.0f);
             camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
             camera.Rotation = rotation;
 #if DEBUG
@@ -213,7 +214,7 @@ public class GameScene : ABScene
         {
             // render test model
             MatrixStack.Push();
-            MatrixStack.Translate(0.0f, 0.0f, 0.0f);
+            MatrixStack.Scale(2.0f, 2.0f, 2.0f);
             testModelEntity.Render(alphaClipArgs);
             MatrixStack.Pop();
         }

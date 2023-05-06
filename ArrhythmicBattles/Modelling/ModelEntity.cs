@@ -1,57 +1,27 @@
 ﻿using System.Diagnostics;
 using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Core.Animation;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
 
 public class ModelEntity : Entity, IRenderable
 {
-    public Model? Model
-    {
-        get => model;
-        set
-        {
-            model = value;
-            animationHandler = null;
-            animation = null;
-        }
-    }
-
-    public ModelAnimation? Animation
-    {
-        get => animation;
-        set
-        {
-            animation = value;
-            
-            if (value == null)
-            {
-                animationHandler = null;
-            }
-            else
-            {
-                animationHandler = new AnimationHandler(value);
-            }
-        }
-    }
-
+    public AnimationHandler AnimationHandler { get; }
     public Color4 Color { get; set; } = Color4.White;
 
-    private Model? model;
-    private AnimationHandler? animationHandler;
-    private ModelAnimation? animation;
-
+    private readonly Model model;
     private readonly LitMeshEntity meshEntity;
 
     private float time = 0.0f;
 
-    public ModelEntity()
+    public ModelEntity(Model model)
     {
+        this.model = model;
+        
         meshEntity = new LitMeshEntity();
+        AnimationHandler = new AnimationHandler(model);
     }
 
     public override void Update(UpdateArgs args)
@@ -59,39 +29,24 @@ public class ModelEntity : Entity, IRenderable
         base.Update(args);
         
         time += args.DeltaTime;
-
-        if (model == null)
-        {
-            return;
-        }
-
-        if (animationHandler != null)
-        {
-            Debug.Assert(animation != null);
-            animationHandler.Update((time * animation.TicksPerSecond) % animation.DurationInTicks);
-        }
+        AnimationHandler.Update(time);
     }
 
     public void Render(RenderArgs args)
     {
-        if (Model == null)
-        {
-            return;
-        }
-        
-        RenderModelRecursively(Model.Tree.RootNode, args);
+        RenderModelRecursively(model.RootNode, args);
     }
     
     // more recursion bullshit
     private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
         Debug.Assert(model != null);
-
+        
         MatrixStack matrixStack = args.MatrixStack;
         ModelNode modelNode = node.Value;
 
         matrixStack.Push();
-        matrixStack.Transform(GetNodeTransform(modelNode));
+        matrixStack.Transform(AnimationHandler.GetNodeTransform(modelNode));
 
         foreach (ModelMesh modelMesh in modelNode.Meshes)
         {
@@ -113,10 +68,5 @@ public class ModelEntity : Entity, IRenderable
         }
         
         matrixStack.Pop();
-    }
-
-    private Matrix4 GetNodeTransform(ModelNode node)
-    {
-        return animationHandler?.GetNodeTransform(node) ?? node.Transform;
     }
 }

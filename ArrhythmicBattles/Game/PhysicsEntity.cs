@@ -28,9 +28,8 @@ public class PhysicsEntity : Entity, IRenderable, IDisposable
         
         Position = position;
         Rotation = rotation;
-        modelEntity = new ModelEntity();
-        modelEntity.Model = model;
-        
+        modelEntity = new ModelEntity(model);
+
         RigidPose pose = new RigidPose(Position.ToSystem(), Rotation.ToSystem());
 
         BodyDescription bodyDescription = BodyDescription.CreateDynamic(

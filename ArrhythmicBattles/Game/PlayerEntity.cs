@@ -60,7 +60,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
     
     private bool grounded = false;
     
-    private Vector2 movement = Vector2.Zero;
+    private float movementX = 0.0f;
     private bool jump = false;
 
     public PlayerEntity(IInputProvider inputProvider, PhysicsWorld physicsWorld, Vector3 position, float yaw, float pitch)
@@ -72,9 +72,8 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         this.pitch = pitch;
         
         model = new Model("Assets/Models/Capsule.dae");
-        modelEntity = new ModelEntity();
-        modelEntity.Model = model;
-        
+        modelEntity = new ModelEntity(model);
+
         // create shape
         Capsule capsule = new Capsule(0.5f, 1.0f);
         TypedIndex capsuleIndex = physicsWorld.Simulation.Shapes.Add(capsule);
@@ -101,12 +100,11 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         grounded = handler.Hit != null;
 
         // apply movement
-        if (movement != Vector2.Zero)
+        if (movementX != 0.0f)
         {
             Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, Yaw);
-            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, rotation);
             Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
-            Vector3 direction = forward * movement.Y + right * movement.X;
+            Vector3 direction = right * movementX;
             Vector2 move = new Vector2(direction.X, direction.Z).Normalized();
             Vector3 force = new Vector3(move.X, 0.0f, move.Y) * (grounded ? 15.0f : 8.0f);
             
@@ -143,7 +141,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         base.Update(args);
         
         // get movement
-        movement = inputProvider.Movement;
+        movementX = inputProvider.Movement.X;
 
         // jump
         if (inputProvider.GetKeyDown(Keys.Space))

@@ -9,10 +9,10 @@ public struct SkinnedVertexDrawData : IDrawData
     public Matrix4 ModelMatrix { get; }
     public Matrix4 Transformation { get; }
     public ITextureView? Texture { get; }
-    public Matrix4[]? Bones { get; }
+    public Matrix4[] Bones { get; }
     public Color4 Color { get; }
 
-    public SkinnedVertexDrawData(IMeshView mesh, Matrix4 modelMatrix, Matrix4 transformation, ITextureView? texture, Matrix4[]? bones, Color4 color)
+    public SkinnedVertexDrawData(IMeshView mesh, Matrix4 modelMatrix, Matrix4 transformation, ITextureView? texture, Matrix4[] bones, Color4 color)
     {
         Mesh = mesh;
         ModelMatrix = modelMatrix;

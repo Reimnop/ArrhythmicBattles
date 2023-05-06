@@ -8,58 +8,24 @@ namespace ArrhythmicBattles.Modelling;
 
 public class SkinnedModelEntity : Entity, IRenderable
 {
-    public Model? Model
-    {
-        get => model;
-        set
-        {
-            model = value;
-            animationHandler = null;
-            animation = null;
-            boneMatrices = null;
-
-            if (model != null)
-            {
-                boneMatrices = new Matrix4[model.Bones.Count];
-                meshEntity.Bones = boneMatrices;
-            }
-        }
-    }
-
-    public ModelAnimation? Animation
-    {
-        get => animation;
-        set
-        {
-            animation = value;
-            
-            if (value == null)
-            {
-                animationHandler = null;
-            }
-            else
-            {
-                animationHandler = new AnimationHandler(value);
-            }
-        }
-    }
-    
+    public AnimationHandler AnimationHandler { get; }
     public Color4 Color { get; set; } = Color4.White;
 
-    private Model? model;
-    private AnimationHandler? animationHandler;
-    private ModelAnimation? animation;
-    private Matrix4[]? boneMatrices;
-
+    private readonly Model model;
+    private readonly Matrix4[] boneMatrices;
     private readonly SkinnedMeshEntity meshEntity;
 
     private readonly MatrixStack boneMatrixStack = new MatrixStack();
 
     private float time = 0.0f;
 
-    public SkinnedModelEntity()
+    public SkinnedModelEntity(Model model)
     {
-        meshEntity = new SkinnedMeshEntity();
+        this.model = model;
+        boneMatrices = new Matrix4[model.Bones.Count];
+        
+        meshEntity = new SkinnedMeshEntity(boneMatrices);
+        AnimationHandler = new AnimationHandler(model);
     }
 
     public override void Update(UpdateArgs args)
@@ -67,19 +33,9 @@ public class SkinnedModelEntity : Entity, IRenderable
         base.Update(args);
         
         time += args.DeltaTime;
-
-        if (model == null)
-        {
-            return;
-        }
-
-        if (animationHandler != null)
-        {
-            Debug.Assert(animation != null);
-            animationHandler.Update((time * animation.TicksPerSecond) % animation.DurationInTicks);
-        }
+        AnimationHandler.Update(time);
         
-        CalculateBoneMatricesRecursively(model.Tree.RootNode, boneMatrixStack);
+        CalculateBoneMatricesRecursively(model.RootNode, boneMatrixStack);
     }
     
     private void CalculateBoneMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
@@ -90,7 +46,7 @@ public class SkinnedModelEntity : Entity, IRenderable
         ModelNode modelNode = node.Value;
         
         matrixStack.Push();
-        matrixStack.Transform(GetNodeTransform(modelNode));
+        matrixStack.Transform(AnimationHandler.GetNodeTransform(modelNode));
 
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
         {
@@ -107,12 +63,7 @@ public class SkinnedModelEntity : Entity, IRenderable
 
     public void Render(RenderArgs args)
     {
-        if (Model == null)
-        {
-            return;
-        }
-        
-        RenderModelRecursively(Model.Tree.RootNode, args);
+        RenderModelRecursively(model.RootNode, args);
     }
     
     // more recursion bullshit
@@ -137,10 +88,5 @@ public class SkinnedModelEntity : Entity, IRenderable
         {
             RenderModelRecursively(child, args);
         }
-    }
-
-    private Matrix4 GetNodeTransform(ModelNode node)
-    {
-        return animationHandler?.GetNodeTransform(node) ?? node.Transform;
     }
 }
