@@ -11,6 +11,9 @@ public class NoKeyException : Exception
 
 public delegate T Interpolator<T>(T first, T second, float factor);
 
+/// <summary>
+/// Provides functionality to interpolate on a list of keyframes
+/// </summary>
 public static class Sequence
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,6 +76,7 @@ public static class Sequence
         return low - 1;
     }
     
+    // Like lerp, but inverted
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static float InverseLerp(float a, float b, float factor)
     {
