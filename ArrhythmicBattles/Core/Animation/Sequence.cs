@@ -76,6 +76,6 @@ public static class Sequence
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static float InverseLerp(float a, float b, float factor)
     {
-        return (factor - a) / (b - a);
+        return a != b ? (factor - a) / (b - a) : 0.0f;
     }
 }
