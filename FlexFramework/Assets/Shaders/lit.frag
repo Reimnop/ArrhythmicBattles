@@ -14,8 +14,7 @@ in vec3 Normal;
 in vec4 Color;
 
 void main() {
-    vec3 norm = normalize(Normal);
-    float light = max(min(dot(norm, -lightDir), 1.0), 0.0);
+    float light = max(min(dot(Normal, -lightDir), 1.0), 0.0);
     vec3 lightCol = lightColor * light * lightIntensity + ambientColor;
     
     vec4 outColor = hasTexture ? texture(_texture, Uv) : vec4(1.0);

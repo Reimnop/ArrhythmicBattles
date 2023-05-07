@@ -13,7 +13,7 @@ out vec4 Color;
 
 void main() {
     Uv = aUv;
-    Normal = aNormal * mat3(transpose(inverse(model)));
+    Normal = normalize(aNormal * mat3(transpose(inverse(model))));
     Color = aColor;
     gl_Position = vec4(aPos, 1.0) * mvp;
 }

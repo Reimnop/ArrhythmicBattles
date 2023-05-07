@@ -12,16 +12,18 @@ public class SkinnedModelEntity : Entity, IRenderable
     public Color4 Color { get; set; } = Color4.White;
 
     private readonly Model model;
+    private readonly Matrix4 globalInverseTransform;
     private readonly Matrix4[] boneMatrices;
     private readonly SkinnedMeshEntity meshEntity;
 
-    private readonly MatrixStack boneMatrixStack = new MatrixStack();
+    private readonly MatrixStack boneMatrixStack = new();
 
     private float time = 0.0f;
 
     public SkinnedModelEntity(Model model)
     {
         this.model = model;
+        globalInverseTransform = Matrix4.Invert(model.RootNode.Value.Transform);
         boneMatrices = new Matrix4[model.Bones.Count];
         
         meshEntity = new SkinnedMeshEntity(boneMatrices);
@@ -40,9 +42,6 @@ public class SkinnedModelEntity : Entity, IRenderable
     
     private void CalculateBoneMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
     {
-        Debug.Assert(model != null);
-        Debug.Assert(boneMatrices != null);
-
         ModelNode modelNode = node.Value;
         
         matrixStack.Push();
@@ -50,10 +49,13 @@ public class SkinnedModelEntity : Entity, IRenderable
 
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
         {
-            boneMatrices[boneIndex] = model.Bones[boneIndex].Offset * matrixStack.GlobalTransformation;
+            var bone = model.Bones[boneIndex];
+            var offset = bone.Offset;
+
+            boneMatrices[boneIndex] = offset * matrixStack.GlobalTransformation * globalInverseTransform;
         }
 
-        foreach (ImmutableNode<ModelNode> child in node.Children)
+        foreach (var child in node.Children)
         {
             CalculateBoneMatricesRecursively(child, matrixStack);
         }
@@ -73,7 +75,7 @@ public class SkinnedModelEntity : Entity, IRenderable
         
         MatrixStack matrixStack = args.MatrixStack;
         ModelNode modelNode = node.Value;
-
+        
         foreach (ModelMesh modelMesh in modelNode.Meshes)
         {
             ModelMaterial material = model.Materials[modelMesh.MaterialIndex];

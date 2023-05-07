@@ -44,7 +44,9 @@ public class ModelImporter : IDisposable
                     aiOffset.A3, aiOffset.B3, aiOffset.C3, aiOffset.D3,
                     aiOffset.A4, aiOffset.B4, aiOffset.C4, aiOffset.D4);
 
-                var modelBone = new ModelBone(bone.Name, boneIndex, offset);
+                var inverseBindPose = Matrix4.Invert(offset);
+
+                var modelBone = new ModelBone(bone.Name, boneIndex, offset, inverseBindPose);
                 boneNameToBone.Add(bone.Name, modelBone);
                 boneIndex++;
             }

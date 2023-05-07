@@ -214,7 +214,6 @@ public class GameScene : ABScene
         {
             // render test model
             MatrixStack.Push();
-            MatrixStack.Scale(2.0f, 2.0f, 2.0f);
             testModelEntity.Render(alphaClipArgs);
             MatrixStack.Pop();
         }

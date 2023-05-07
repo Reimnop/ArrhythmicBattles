@@ -17,27 +17,17 @@ out vec3 Normal;
 out vec4 Color;
 
 void main() {
-    float weightSum = aWeights.x + aWeights.y + aWeights.z + aWeights.w;
-    mat4 boneTransform;
-    if (weightSum != 0.0) {
-        boneTransform = mat4(0.0);
-        for (int i = 0; i < 4; i++) {
-            if (aBoneIds[i] == -1) {
-                continue;
-            }
-            if (aBoneIds[i] >= MAX_BONES) {
-                boneTransform = mat4(1.0);
-                break;
-            }
-
-            boneTransform += bones[aBoneIds[i]] * (aWeights[i] / weightSum);
-        }
-    } else {
-        boneTransform = mat4(1.0);
+    mat4 boneTransform = mat4(1.0);
+    float weightSum = aWeights[0] + aWeights[1] + aWeights[2] + aWeights[3];
+    if (weightSum != 0) {
+        boneTransform  = bones[aBoneIds[0]] * (aWeights[0] / weightSum);
+        boneTransform += bones[aBoneIds[1]] * (aWeights[1] / weightSum);
+        boneTransform += bones[aBoneIds[2]] * (aWeights[2] / weightSum);
+        boneTransform += bones[aBoneIds[3]] * (aWeights[3] / weightSum);
     }
     
     Uv = aUv;
     Color = aColor;
-    Normal = vec3(vec4(aNormal, 0.0) * boneTransform) * mat3(transpose(inverse(model)));
+    Normal = normalize(vec3(vec4(aNormal, 0.0) * boneTransform) * mat3(transpose(inverse(model))));
     gl_Position = vec4(aPos, 1.0) * boneTransform * mvp;
 }
