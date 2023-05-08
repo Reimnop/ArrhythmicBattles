@@ -44,17 +44,17 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         ModelNode modelNode = node.Value;
         
-        var animationMatrix = AnimationHandler.GetNodeTransform(modelNode);
+        var animationTransform = AnimationHandler.GetNodeTransform(modelNode);
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
         {
             var bone = model.Bones[boneIndex];
             var offset = bone.Offset;
 
-            boneMatrices[boneIndex] = offset * animationMatrix * matrixStack.GlobalTransformation * globalInverseTransform;
+            boneMatrices[boneIndex] = offset * animationTransform * matrixStack.GlobalTransformation * globalInverseTransform;
         }
         
         matrixStack.Push();
-        matrixStack.Transform(animationMatrix);
+        matrixStack.Transform(animationTransform);
 
         foreach (var child in node.Children)
         {
