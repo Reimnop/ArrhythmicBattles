@@ -42,7 +42,7 @@ public class SkinnedModelEntity : Entity, IRenderable
     
     private void CalculateBoneMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
     {
-        ModelNode modelNode = node.Value;
+        var modelNode = node.Value;
         
         var animationTransform = AnimationHandler.GetNodeTransform(modelNode);
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
