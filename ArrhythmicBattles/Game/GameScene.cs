@@ -72,7 +72,6 @@ public class GameScene : ABScene
         }
         
         envModel = new Model(@"Assets/Models/Map01.dae");
-        envModel.Materials.First(x => x.Name == "Highlight").EmissiveStrength = 4.0f;
         RegisterObject(envModel);
 
         envModelEntity = new ModelEntity(envModel);

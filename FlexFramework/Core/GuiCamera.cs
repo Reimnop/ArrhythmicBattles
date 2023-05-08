@@ -19,6 +19,6 @@ public class GuiCamera : Camera
         Matrix4 view = Matrix4.Invert(Matrix4.CreateFromQuaternion(Rotation) * Matrix4.CreateTranslation(Position));
         Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0.0f, engine.ClientSize.X, engine.ClientSize.Y, 0.0f, DepthNear, DepthFar);
         
-        return new CameraData(view, projection);
+        return new CameraData(Position, Rotation, view, projection);
     }
 }

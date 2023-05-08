@@ -6,19 +6,28 @@ namespace FlexFramework.Core.Rendering.Data;
 public struct SkinnedVertexDrawData : IDrawData
 {
     public IMeshView Mesh { get; }
-    public Matrix4 ModelMatrix { get; }
     public Matrix4 Transformation { get; }
-    public ITextureView? Texture { get; }
+    public CameraData Camera { get; }
     public Matrix4[] Bones { get; }
-    public Color4 Color { get; }
+    public ITextureView? AlbedoTexture { get; }
+    public ITextureView? MetallicTexture { get; }
+    public ITextureView? RoughnessTexture { get; }
+    public MaterialData Material { get; }
 
-    public SkinnedVertexDrawData(IMeshView mesh, Matrix4 modelMatrix, Matrix4 transformation, ITextureView? texture, Matrix4[] bones, Color4 color)
+    public SkinnedVertexDrawData(
+        IMeshView mesh, 
+        Matrix4 transformation, CameraData camera, 
+        Matrix4[] bones, 
+        ITextureView? albedoTexture, ITextureView? metallicTexture, ITextureView? roughnessTexture, 
+        MaterialData material)
     {
         Mesh = mesh;
-        ModelMatrix = modelMatrix;
         Transformation = transformation;
-        Texture = texture;
+        Camera = camera;
         Bones = bones;
-        Color = color;
+        AlbedoTexture = albedoTexture;
+        MetallicTexture = metallicTexture;
+        RoughnessTexture = roughnessTexture;
+        Material = material;
     }
 }

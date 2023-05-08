@@ -14,6 +14,6 @@ public class OrthographicCamera : Camera
         Matrix4 view = Matrix4.Invert(Matrix4.CreateFromQuaternion(Rotation) * Matrix4.CreateTranslation(Position));
         Matrix4 projection = Matrix4.CreateOrthographic(Size * (viewportSize.X / (float) viewportSize.Y), Size, DepthNear, DepthFar);
         
-        return new CameraData(view, projection);
+        return new CameraData(Position, Rotation, view, projection);
     }
 }

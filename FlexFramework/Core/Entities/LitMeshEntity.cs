@@ -9,8 +9,12 @@ namespace FlexFramework.Core.Entities;
 public class LitMeshEntity : Entity, IRenderable
 {
     public Mesh<LitVertex>? Mesh { get; set; }
-    public Texture? Texture { get; set; }
-    public Color4 Color { get; set; } = Color4.White;
+    public Vector3 Albedo { get; set; } = Vector3.One; // White
+    public float Metallic { get; set; } = 0.0f;
+    public float Roughness { get; set; } = 1.0f;
+    public Texture? AlbedoTexture { get; set; }
+    public Texture? MetallicTexture { get; set; }
+    public Texture? RoughnessTexture { get; set; }
 
     public void Render(RenderArgs args)
     {
@@ -24,8 +28,21 @@ public class LitMeshEntity : Entity, IRenderable
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
 
-        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        LitVertexDrawData vertexDrawData = new LitVertexDrawData(Mesh.ReadOnly, matrixStack.GlobalTransformation, transformation, Texture?.ReadOnly, Color);
+        MaterialData materialData = new MaterialData()
+        {
+            UseAlbedoTexture = AlbedoTexture != null,
+            UseMetallicTexture = MetallicTexture != null,
+            UseRoughnessTexture = RoughnessTexture != null,
+            Albedo = Albedo,
+            Metallic = Metallic,
+            Roughness = Roughness
+        };
+        
+        LitVertexDrawData vertexDrawData = new LitVertexDrawData(
+            Mesh.ReadOnly, 
+            matrixStack.GlobalTransformation, cameraData, 
+            AlbedoTexture?.ReadOnly, MetallicTexture?.ReadOnly, RoughnessTexture?.ReadOnly,
+            materialData);
 
         renderer.EnqueueDrawData(layerId, vertexDrawData);
     }

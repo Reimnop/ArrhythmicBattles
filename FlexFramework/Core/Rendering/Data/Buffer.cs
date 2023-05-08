@@ -34,7 +34,16 @@ public class Buffer : GpuObject, IDisposable
             GL.NamedBufferData(Handle, SizeInBytes, (IntPtr) ptr, BufferUsageHint.DynamicDraw);
         }
     }
-    
+
+    public unsafe void LoadData<T>(T data) where T : unmanaged
+    {
+        SizeInBytes = Unsafe.SizeOf<T>();
+
+        T* ptr = stackalloc T[1];
+        ptr[0] = data;
+        GL.NamedBufferData(Handle, SizeInBytes, (IntPtr) ptr, BufferUsageHint.DynamicDraw);
+    }
+
     public unsafe void LoadDataPartial<T>(ReadOnlySpan<T> data, int offsetInBytes) where T : unmanaged
     {
         fixed (T* ptr = data)

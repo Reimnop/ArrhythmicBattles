@@ -2,6 +2,7 @@
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
@@ -19,16 +20,21 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             (VertexAttributeIntent.BoneWeight, 5)
         );
     private readonly TextureHandler textureHandler = new();
+    private readonly Buffer materialBuffer;
     
     public SkinnedVertexRenderStrategy(ILighting lighting)
     {
         this.lighting = lighting;
         
+        // Shader init
         using var vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
         using var fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
 
         skinnedShader = new ShaderProgram("skinned");
         skinnedShader.LinkShaders(vertexShader, fragmentShader);
+        
+        // Buffer init
+        materialBuffer = new Buffer("material");
     }
 
     public override void Update(UpdateArgs args)
@@ -40,35 +46,58 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
         var vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
+        var material = vertexDrawData.Material;
         
+        materialBuffer.LoadData(material);
+
         var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
-        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
+        var albedoTexture = vertexDrawData.AlbedoTexture != null
+            ? textureHandler.GetTexture(vertexDrawData.AlbedoTexture)
+            : null;
+        var metallicTexture = vertexDrawData.MetallicTexture != null
+            ? textureHandler.GetTexture(vertexDrawData.MetallicTexture)
+            : null;
+        var roughnessTexture = vertexDrawData.RoughnessTexture != null
+            ? textureHandler.GetTexture(vertexDrawData.RoughnessTexture)
+            : null;
         
         glStateManager.UseProgram(skinnedShader);
         glStateManager.BindVertexArray(mesh.VertexArray);
+        
+        GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, materialBuffer.Handle);
 
-        Matrix4 transformation = vertexDrawData.Transformation;
-        Matrix4 model = vertexDrawData.ModelMatrix;
-        GL.UniformMatrix4(0, true, ref transformation);
+        Matrix4 mvp = vertexDrawData.Transformation * vertexDrawData.Camera.View * vertexDrawData.Camera.Projection;
+        Matrix4 model = vertexDrawData.Transformation;
+        GL.UniformMatrix4(0, true, ref mvp);
         GL.UniformMatrix4(1, true, ref model);
-        GL.Uniform1(2, vertexDrawData.Texture == null ? 0 : 1);
 
-        if (texture != null)
+        if (albedoTexture != null)
         {
-            glStateManager.BindTextureUnit(0, texture);
+            GL.Uniform1(2, 0);
+            glStateManager.BindTextureUnit(0, albedoTexture);
+        }
+        
+        if (metallicTexture != null)
+        {
+            GL.Uniform1(3, 1);
+            glStateManager.BindTextureUnit(1, metallicTexture);
         }
 
-        GL.Uniform4(4, vertexDrawData.Color);
-        
+        if (roughnessTexture != null)
+        {
+            GL.Uniform1(4, 2);
+            glStateManager.BindTextureUnit(2, roughnessTexture);
+        }
+
         GL.Uniform3(5, lighting.AmbientLight); 
 
         if (lighting.DirectionalLight.HasValue)
         {
             GL.Uniform3(6, lighting.DirectionalLight.Value.Direction);
-            GL.Uniform3(7, lighting.DirectionalLight.Value.Color);
+            GL.Uniform3(7, lighting.DirectionalLight.Value.Color * lighting.DirectionalLight.Value.Intensity);
         }
         
-        GL.Uniform1(8, lighting.DirectionalLight?.Intensity ?? 0.0f);
+        GL.Uniform3(8, vertexDrawData.Camera.Position);
 
         for (int i = 0; i < vertexDrawData.Bones.Length; i++)
         {

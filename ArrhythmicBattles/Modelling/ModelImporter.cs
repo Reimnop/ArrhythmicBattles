@@ -64,24 +64,22 @@ public class ModelImporter : IDisposable
     {
         return scene.Materials.Select(material =>
         {
-            Texture? texture = null;
+            Texture? albedoTexture = null;
             if (material.HasTextureDiffuse)
             {
                 var path = Path.GetFullPath(material.TextureDiffuse.FilePath, directory);
 
                 if (File.Exists(path)) 
                 {
-                    texture = Texture.FromFile(Path.GetFileName(path), path);
+                    albedoTexture = Texture.FromFile(Path.GetFileName(path), path);
                 }
             }
 
-            var color = new Color4(
-                material.ColorDiffuse.R,
-                material.ColorDiffuse.G,
-                material.ColorDiffuse.B,
-                material.ColorDiffuse.A);
+            var albedo = new Vector3(material.ColorDiffuse.R, material.ColorDiffuse.G, material.ColorDiffuse.B);
+            var metallic = material.Reflectivity;
+            var roughness = 1.0f - material.Shininess;
 
-            return new ModelMaterial(material.Name, color, 1.0f, texture);
+            return new ModelMaterial(material.Name, albedo, metallic, roughness, albedoTexture, null, null);
         });
     }
     

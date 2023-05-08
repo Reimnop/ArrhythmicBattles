@@ -72,18 +72,20 @@ public class SkinnedModelEntity : Entity, IRenderable
     // more recursion bullshit
     private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
-        Debug.Assert(model != null);
+        var matrixStack = args.MatrixStack;
+        var modelNode = node.Value;
         
-        MatrixStack matrixStack = args.MatrixStack;
-        ModelNode modelNode = node.Value;
-        
-        foreach (ModelMesh modelMesh in modelNode.Meshes)
+        foreach (var modelMesh in modelNode.Meshes)
         {
-            ModelMaterial material = model.Materials[modelMesh.MaterialIndex];
+            var material = model.Materials[modelMesh.MaterialIndex];
             
             meshEntity.Mesh = model.SkinnedMeshes[modelMesh.MeshIndex];
-            meshEntity.Color = new Color4(material.Color.R * Color.R, material.Color.G * Color.G, material.Color.B * Color.B, material.Color.A * Color.A);
-            meshEntity.Texture = material.Texture;
+            meshEntity.Albedo = material.Albedo;
+            meshEntity.Metallic = material.Metallic;
+            meshEntity.Roughness = material.Roughness;
+            meshEntity.AlbedoTexture = material.AlbedoTexture;
+            meshEntity.MetallicTexture = material.MetallicTexture;
+            meshEntity.RoughnessTexture = material.RoughnessTexture;
             meshEntity.Render(args);
         }
 

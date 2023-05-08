@@ -10,16 +10,25 @@ namespace ArrhythmicBattles.Modelling;
 public class ModelMaterial
 {
     public string Name { get; }
-    public Color4 Color { get; set; }
-    public float EmissiveStrength { get; set; }
-    public Texture? Texture { get; set; }
+    public Vector3 Albedo { get; set; }
+    public float Metallic { get; set; } 
+    public float Roughness { get; set; } 
+    public Texture? AlbedoTexture { get; set; }
+    public Texture? MetallicTexture { get; set; }
+    public Texture? RoughnessTexture { get; set; }
 
-    public ModelMaterial(string name, Color4 color, float emissiveStrength, Texture? texture)
+    public ModelMaterial(
+        string name, 
+        Vector3 albedo, float metallic, float roughness, 
+        Texture? albedoTexture, Texture? metallicTexture, Texture? roughnessTexture)
     {
         Name = name;
-        Color = color;
-        EmissiveStrength = emissiveStrength;
-        Texture = texture;
+        Albedo = albedo;
+        Metallic = metallic;
+        Roughness = roughness;
+        AlbedoTexture = albedoTexture;
+        MetallicTexture = metallicTexture;
+        RoughnessTexture = roughnessTexture;
     }
 }
 

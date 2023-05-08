@@ -2,6 +2,7 @@
 using ArrhythmicBattles.Core;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
@@ -40,25 +41,23 @@ public class ModelEntity : Entity, IRenderable
     // more recursion bullshit
     private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
     {
-        Debug.Assert(model != null);
-        
-        MatrixStack matrixStack = args.MatrixStack;
-        ModelNode modelNode = node.Value;
+        var matrixStack = args.MatrixStack;
+        var modelNode = node.Value;
 
         matrixStack.Push();
         matrixStack.Transform(AnimationHandler.GetNodeTransform(modelNode));
 
-        foreach (ModelMesh modelMesh in modelNode.Meshes)
+        foreach (var modelMesh in modelNode.Meshes)
         {
-            ModelMaterial material = model.Materials[modelMesh.MaterialIndex];
+            var material = model.Materials[modelMesh.MaterialIndex];
             
             meshEntity.Mesh = model.Meshes[modelMesh.MeshIndex];
-            meshEntity.Color = new Color4(
-                material.EmissiveStrength * material.Color.R * Color.R, 
-                material.EmissiveStrength * material.Color.G * Color.G, 
-                material.EmissiveStrength * material.Color.B * Color.B, 
-                material.EmissiveStrength * material.Color.A * Color.A);;
-            meshEntity.Texture = material.Texture;
+            meshEntity.Albedo = material.Albedo;
+            meshEntity.Metallic = material.Metallic;
+            meshEntity.Roughness = material.Roughness;
+            meshEntity.AlbedoTexture = material.AlbedoTexture;
+            meshEntity.MetallicTexture = material.MetallicTexture;
+            meshEntity.RoughnessTexture = material.RoughnessTexture;
             meshEntity.Render(args);
         }
 

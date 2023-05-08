@@ -15,6 +15,7 @@ layout(location = 9) uniform mat4 bones[MAX_BONES];
 out vec2 Uv;
 out vec3 Normal;
 out vec4 Color;
+out vec3 WorldPos;
 
 void main() {
     mat4 boneTransform = mat4(1.0);
@@ -29,5 +30,6 @@ void main() {
     Uv = aUv;
     Color = aColor;
     Normal = normalize(vec3(vec4(aNormal, 0.0) * boneTransform) * mat3(transpose(inverse(model))));
+    WorldPos = vec3(vec4(aPos, 1.0) * boneTransform * model);
     gl_Position = vec4(aPos, 1.0) * boneTransform * mvp;
 }
