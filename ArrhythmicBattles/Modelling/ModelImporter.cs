@@ -18,8 +18,6 @@ public class ModelImporter : IDisposable
     private readonly AssimpContext context;
     private readonly Scene scene;
     private readonly string directory;
-    
-    private readonly Regex embeddedTextureRegex = new(@"\*(\d+)", RegexOptions.Compiled);
 
     public ModelImporter(string path)
     {
@@ -27,7 +25,7 @@ public class ModelImporter : IDisposable
         directory = Path.GetDirectoryName(path)!;
         
         context = new AssimpContext();
-        scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs);
+        scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs | PostProcessSteps.EmbedTextures);
 
         // Collect all bones
         var boneNameToBone = new Dictionary<string, ModelBone>();
@@ -81,52 +79,38 @@ public class ModelImporter : IDisposable
         });
     }
 
-    private Texture? LoadTexture(TextureSlot textureSlot)
+    private Texture LoadTexture(TextureSlot textureSlot)
     {
-        // Check if texture is embedded
-        var match = embeddedTextureRegex.Match(textureSlot.FilePath);
-        if (match.Success)
-        {
-            var index = int.Parse(match.Groups[1].Value);
-            var embeddedTexture = scene.Textures[index];
+        string filePath = textureSlot.FilePath;
 
-            // Check if texture is compressed
-            if (embeddedTexture.IsCompressed)
-            {
-                var data = embeddedTexture.CompressedData;
-                // Use ImageSharp to decompress
-                var image = Image.LoadPixelData<Rgba32>(data, embeddedTexture.Width, embeddedTexture.Height);
-                var pixels = new byte[image.Width * image.Height * 4]; // 4 bytes per pixel
-                image.CopyPixelDataTo(pixels);
-                
-                return new Texture($"embedded {index}", image.Width, image.Height, PixelFormat.Rgba8, pixels);
-            }
-            
-            // Not compressed, use raw data
-            byte[] rawData = new byte[embeddedTexture.Width * embeddedTexture.Height * 4];
-            
-            // Transpose the data
-            for (int i = 0; i < embeddedTexture.NonCompressedData.Length; i++)
-            {
-                rawData[i * 4 + 0] = embeddedTexture.NonCompressedData[i].R;
-                rawData[i * 4 + 1] = embeddedTexture.NonCompressedData[i].G;
-                rawData[i * 4 + 2] = embeddedTexture.NonCompressedData[i].B;
-                rawData[i * 4 + 3] = embeddedTexture.NonCompressedData[i].A;
-            }
-            
-            // Create texture
-            return new Texture($"embedded {index}", embeddedTexture.Width, embeddedTexture.Height, PixelFormat.Rgba8, rawData);
-        }
+        var embeddedTexture = scene.GetEmbeddedTexture(filePath);
         
-        // Not embedded, load from file
-        var path = Path.GetFullPath(textureSlot.FilePath, directory);
-
-        if (File.Exists(path)) 
+        // Check if texture is compressed
+        if (embeddedTexture.IsCompressed)
         {
-            return Texture.FromFile(Path.GetFileName(path), path);
+            var data = embeddedTexture.CompressedData;
+            // Use ImageSharp to decompress
+            var image = Image.Load<Rgba32>(data);
+            var pixels = new byte[image.Width * image.Height * 4]; // 4 bytes per pixel
+            image.CopyPixelDataTo(pixels);
+                
+            return new Texture($"embedded {filePath}", image.Width, image.Height, PixelFormat.Rgba8, pixels);
         }
-
-        return null;
+            
+        // Not compressed, use raw data
+        byte[] rawData = new byte[embeddedTexture.Width * embeddedTexture.Height * 4];
+            
+        // Transpose the data
+        for (int i = 0; i < embeddedTexture.NonCompressedData.Length; i++)
+        {
+            rawData[i * 4 + 0] = embeddedTexture.NonCompressedData[i].R;
+            rawData[i * 4 + 1] = embeddedTexture.NonCompressedData[i].G;
+            rawData[i * 4 + 2] = embeddedTexture.NonCompressedData[i].B;
+            rawData[i * 4 + 3] = embeddedTexture.NonCompressedData[i].A;
+        }
+            
+        // Create texture
+        return new Texture($"embedded {filePath}", embeddedTexture.Width, embeddedTexture.Height, PixelFormat.Rgba8, rawData);
     }
     
     public IEnumerable<Mesh<LitVertex>> LoadMeshes()
