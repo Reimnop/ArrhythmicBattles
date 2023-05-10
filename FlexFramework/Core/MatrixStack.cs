@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using System.Diagnostics;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core;
 
@@ -76,10 +77,19 @@ public class MatrixStack
         Transform(Matrix4.CreateFromAxisAngle(axis, angle));
     }
 
-    public void Reset()
+    public void Clear()
     {
         internalStack.Clear();
         LocalTransformation = Matrix4.Identity;
         GlobalTransformation = Matrix4.Identity;
+    }
+    
+    [Conditional("DEBUG")]
+    public void AssertEmpty()
+    {
+        if (internalStack.Count != 0)
+        {
+            throw new InvalidOperationException("Matrix stack is not empty.");
+        }
     }
 }

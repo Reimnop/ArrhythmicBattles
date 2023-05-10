@@ -1,8 +1,11 @@
-﻿using ArrhythmicBattles.Core;
+﻿using System.Text.RegularExpressions;
+using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Animation;
 using Assimp;
 using FlexFramework.Core.Data;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Quaternion = OpenTK.Mathematics.Quaternion;
 
 namespace ArrhythmicBattles.Modelling;
@@ -15,6 +18,8 @@ public class ModelImporter : IDisposable
     private readonly AssimpContext context;
     private readonly Scene scene;
     private readonly string directory;
+    
+    private readonly Regex embeddedTextureRegex = new(@"\*(\d+)", RegexOptions.Compiled);
 
     public ModelImporter(string path)
     {
@@ -23,11 +28,11 @@ public class ModelImporter : IDisposable
         
         context = new AssimpContext();
         scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs);
-        
+
         // Collect all bones
         var boneNameToBone = new Dictionary<string, ModelBone>();
         var boneIndex = 0;
-        
+
         foreach (var mesh in scene.Meshes)
         {
             foreach (var bone in mesh.Bones)
@@ -44,9 +49,7 @@ public class ModelImporter : IDisposable
                     aiOffset.A3, aiOffset.B3, aiOffset.C3, aiOffset.D3,
                     aiOffset.A4, aiOffset.B4, aiOffset.C4, aiOffset.D4);
 
-                var inverseBindPose = Matrix4.Invert(offset);
-
-                var modelBone = new ModelBone(bone.Name, boneIndex, offset, inverseBindPose);
+                var modelBone = new ModelBone(bone.Name, boneIndex, offset);
                 boneNameToBone.Add(bone.Name, modelBone);
                 boneIndex++;
             }
@@ -67,12 +70,7 @@ public class ModelImporter : IDisposable
             Texture? albedoTexture = null;
             if (material.HasTextureDiffuse)
             {
-                var path = Path.GetFullPath(material.TextureDiffuse.FilePath, directory);
-
-                if (File.Exists(path)) 
-                {
-                    albedoTexture = Texture.FromFile(Path.GetFileName(path), path);
-                }
+                albedoTexture = LoadTexture(material.TextureDiffuse);
             }
 
             var albedo = new Vector3(material.ColorDiffuse.R, material.ColorDiffuse.G, material.ColorDiffuse.B);
@@ -81,6 +79,54 @@ public class ModelImporter : IDisposable
 
             return new ModelMaterial(material.Name, albedo, metallic, roughness, albedoTexture, null, null);
         });
+    }
+
+    private Texture? LoadTexture(TextureSlot textureSlot)
+    {
+        // Check if texture is embedded
+        var match = embeddedTextureRegex.Match(textureSlot.FilePath);
+        if (match.Success)
+        {
+            var index = int.Parse(match.Groups[1].Value);
+            var embeddedTexture = scene.Textures[index];
+
+            // Check if texture is compressed
+            if (embeddedTexture.IsCompressed)
+            {
+                var data = embeddedTexture.CompressedData;
+                // Use ImageSharp to decompress
+                var image = Image.LoadPixelData<Rgba32>(data, embeddedTexture.Width, embeddedTexture.Height);
+                var pixels = new byte[image.Width * image.Height * 4]; // 4 bytes per pixel
+                image.CopyPixelDataTo(pixels);
+                
+                return new Texture($"embedded {index}", image.Width, image.Height, PixelFormat.Rgba8, pixels);
+            }
+            
+            // Not compressed, use raw data
+            byte[] rawData = new byte[embeddedTexture.Width * embeddedTexture.Height * 4];
+            
+            // Transpose the data
+            for (int i = 0; i < embeddedTexture.NonCompressedData.Length; i++)
+            {
+                rawData[i * 4 + 0] = embeddedTexture.NonCompressedData[i].R;
+                rawData[i * 4 + 1] = embeddedTexture.NonCompressedData[i].G;
+                rawData[i * 4 + 2] = embeddedTexture.NonCompressedData[i].B;
+                rawData[i * 4 + 3] = embeddedTexture.NonCompressedData[i].A;
+            }
+            
+            // Create texture
+            return new Texture($"embedded {index}", embeddedTexture.Width, embeddedTexture.Height, PixelFormat.Rgba8, rawData);
+        }
+        
+        // Not embedded, load from file
+        var path = Path.GetFullPath(textureSlot.FilePath, directory);
+
+        if (File.Exists(path)) 
+        {
+            return Texture.FromFile(Path.GetFileName(path), path);
+        }
+
+        return null;
     }
     
     public IEnumerable<Mesh<LitVertex>> LoadMeshes()

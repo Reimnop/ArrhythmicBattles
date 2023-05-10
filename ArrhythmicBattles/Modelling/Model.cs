@@ -65,14 +65,12 @@ public class ModelBone
     public string Name { get; }
     public int Index { get; }
     public Matrix4 Offset { get; }
-    public Matrix4 InverseBindPose { get; }
 
-    public ModelBone(string name, int index, Matrix4 offset, Matrix4 inverseBindPose)
+    public ModelBone(string name, int index, Matrix4 offset)
     {
         Name = name;
         Index = index;
         Offset = offset;
-        InverseBindPose = inverseBindPose;
     }
 }
 

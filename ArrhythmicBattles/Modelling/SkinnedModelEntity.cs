@@ -1,20 +1,22 @@
 ﻿using System.Diagnostics;
 using ArrhythmicBattles.Core;
 using FlexFramework.Core;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
+using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Modelling;
 
+// TODO: Implement support for non-zero mesh origins
 public class SkinnedModelEntity : Entity, IRenderable
 {
     public AnimationHandler AnimationHandler { get; }
-    public Color4 Color { get; set; } = Color4.White;
 
     private readonly Model model;
-    private readonly Matrix4 globalInverseTransform;
     private readonly Matrix4[] boneMatrices;
-    private readonly SkinnedMeshEntity meshEntity;
+    private readonly Matrix4[] inverseBindMatrices;
 
     private readonly MatrixStack boneMatrixStack = new();
 
@@ -23,11 +25,36 @@ public class SkinnedModelEntity : Entity, IRenderable
     public SkinnedModelEntity(Model model)
     {
         this.model = model;
-        globalInverseTransform = Matrix4.Invert(model.RootNode.Value.Transform);
         boneMatrices = new Matrix4[model.Bones.Count];
+        inverseBindMatrices = new Matrix4[model.Bones.Count];
         
-        meshEntity = new SkinnedMeshEntity(boneMatrices);
         AnimationHandler = new AnimationHandler(model);
+        
+        CalculateInverseBindMatricesRecursively(model.RootNode, boneMatrixStack);
+        boneMatrixStack.AssertEmpty();
+    }
+
+    private void CalculateInverseBindMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
+    {
+        var modelNode = node.Value;
+        
+        matrixStack.Push();
+        matrixStack.Transform(modelNode.Transform);
+        // matrixStack.Transform(modelNode.Transform);
+        
+        if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
+        {
+            var bone = model.Bones[boneIndex];
+            
+            inverseBindMatrices[boneIndex] = Matrix4.Invert(bone.Offset * matrixStack.GlobalTransformation);
+        }
+
+        foreach (var child in node.Children)
+        {
+            CalculateInverseBindMatricesRecursively(child, matrixStack);
+        }
+        
+        matrixStack.Pop();
     }
 
     public override void Update(UpdateArgs args)
@@ -44,17 +71,13 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         var modelNode = node.Value;
         
-        var animationTransform = AnimationHandler.GetNodeTransform(modelNode);
+        matrixStack.Push();
+        matrixStack.Transform(AnimationHandler.GetNodeTransform(modelNode));
+
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
         {
-            var bone = model.Bones[boneIndex];
-            var offset = bone.Offset;
-
-            boneMatrices[boneIndex] = offset * animationTransform * matrixStack.GlobalTransformation * globalInverseTransform;
+            boneMatrices[boneIndex] = model.Bones[boneIndex].Offset * matrixStack.GlobalTransformation;
         }
-        
-        matrixStack.Push();
-        matrixStack.Transform(animationTransform);
 
         foreach (var child in node.Children)
         {
@@ -74,19 +97,33 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         var matrixStack = args.MatrixStack;
         var modelNode = node.Value;
-        
+
         foreach (var modelMesh in modelNode.Meshes)
         {
             var material = model.Materials[modelMesh.MaterialIndex];
-            
-            meshEntity.Mesh = model.SkinnedMeshes[modelMesh.MeshIndex];
-            meshEntity.Albedo = material.Albedo;
-            meshEntity.Metallic = material.Metallic;
-            meshEntity.Roughness = material.Roughness;
-            meshEntity.AlbedoTexture = material.AlbedoTexture;
-            meshEntity.MetallicTexture = material.MetallicTexture;
-            meshEntity.RoughnessTexture = material.RoughnessTexture;
-            meshEntity.Render(args);
+
+            Renderer renderer = args.Renderer;
+            int layerId = args.LayerId;
+            CameraData cameraData = args.CameraData;
+
+            MaterialData materialData = new MaterialData()
+            {
+                UseAlbedoTexture = material.AlbedoTexture != null,
+                UseMetallicTexture = material.MetallicTexture != null,
+                UseRoughnessTexture = material.RoughnessTexture != null,
+                Albedo = material.Albedo,
+                Metallic = material.Metallic,
+                Roughness = material.Roughness
+            };
+        
+            SkinnedVertexDrawData vertexDrawData = new SkinnedVertexDrawData(
+                model.SkinnedMeshes[modelMesh.MeshIndex].ReadOnly, 
+                matrixStack.GlobalTransformation, cameraData,
+                boneMatrices,
+                material.AlbedoTexture?.ReadOnly, material.MetallicTexture?.ReadOnly, material.RoughnessTexture?.ReadOnly,
+                materialData);
+        
+            renderer.EnqueueDrawData(layerId, vertexDrawData);
         }
 
         foreach (ImmutableNode<ModelNode> child in node.Children)

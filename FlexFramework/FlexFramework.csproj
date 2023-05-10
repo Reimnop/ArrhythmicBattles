@@ -25,73 +25,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Assets\Shaders\unlit.frag">
+        <Content Include="Assets/**/*.*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\unlit.vert">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\text.frag">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\text.vert">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Fonts\Roboto-Bold.ttf">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Fonts\Roboto-Italic.ttf">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Fonts\Roboto-Regular.ttf">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="openal32.dll">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\skinned.vert">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\lit.vert">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\lit.frag">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\bloom_downsample.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\bloom_upsample.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\bloom_combine.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\bloom_prefilter.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\aces.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\reinhard.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\exposure.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\gamma_correct.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\skybox.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Shaders\Compute\procedural_skybox.comp">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Textwriter\Textwriter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="openal32.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
