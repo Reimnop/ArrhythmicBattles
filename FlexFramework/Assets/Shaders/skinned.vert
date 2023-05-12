@@ -27,9 +27,11 @@ void main() {
         boneTransform += bones[aBoneIds[3]] * (aWeights[3] / weightSum);
     }
     
+    mat4 finalModel = boneTransform * model;
+    
     Uv = aUv;
     Color = aColor;
-    Normal = normalize(vec3(vec4(aNormal, 0.0) * boneTransform) * mat3(transpose(inverse(model))));
-    WorldPos = vec3(vec4(aPos, 1.0) * boneTransform * model);
+    Normal = normalize(aNormal * mat3(transpose(inverse(finalModel))));
+    WorldPos = vec3(vec4(aPos, 1.0) * finalModel);
     gl_Position = vec4(aPos, 1.0) * boneTransform * mvp;
 }

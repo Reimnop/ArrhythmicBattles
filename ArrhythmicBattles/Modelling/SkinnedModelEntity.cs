@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using ArrhythmicBattles.Core;
+﻿using ArrhythmicBattles.Core;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
@@ -10,13 +9,15 @@ using OpenTK.Mathematics;
 namespace ArrhythmicBattles.Modelling;
 
 // TODO: Implement support for non-zero mesh origins
+// Alright, I can't fix this
+// Please don't use non-zero mesh origins
 public class SkinnedModelEntity : Entity, IRenderable
 {
     public AnimationHandler AnimationHandler { get; }
 
     private readonly Model model;
     private readonly Matrix4[] boneMatrices;
-    private readonly Matrix4[] inverseBindMatrices;
+    private readonly Matrix4 globalInverseTransform;
 
     private readonly MatrixStack boneMatrixStack = new();
 
@@ -26,35 +27,8 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         this.model = model;
         boneMatrices = new Matrix4[model.Bones.Count];
-        inverseBindMatrices = new Matrix4[model.Bones.Count];
-        
+        globalInverseTransform = Matrix4.Invert(model.RootNode.Value.Transform);
         AnimationHandler = new AnimationHandler(model);
-        
-        CalculateInverseBindMatricesRecursively(model.RootNode, boneMatrixStack);
-        boneMatrixStack.AssertEmpty();
-    }
-
-    private void CalculateInverseBindMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
-    {
-        var modelNode = node.Value;
-        
-        matrixStack.Push();
-        matrixStack.Transform(modelNode.Transform);
-        // matrixStack.Transform(modelNode.Transform);
-        
-        if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
-        {
-            var bone = model.Bones[boneIndex];
-            
-            inverseBindMatrices[boneIndex] = Matrix4.Invert(bone.Offset * matrixStack.GlobalTransformation);
-        }
-
-        foreach (var child in node.Children)
-        {
-            CalculateInverseBindMatricesRecursively(child, matrixStack);
-        }
-        
-        matrixStack.Pop();
     }
 
     public override void Update(UpdateArgs args)
@@ -97,6 +71,9 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         var matrixStack = args.MatrixStack;
         var modelNode = node.Value;
+        
+        matrixStack.Push();
+        matrixStack.Transform(modelNode.Transform);
 
         foreach (var modelMesh in modelNode.Meshes)
         {
@@ -105,7 +82,7 @@ public class SkinnedModelEntity : Entity, IRenderable
             Renderer renderer = args.Renderer;
             int layerId = args.LayerId;
             CameraData cameraData = args.CameraData;
-
+            
             MaterialData materialData = new MaterialData()
             {
                 UseAlbedoTexture = material.AlbedoTexture != null,
@@ -118,7 +95,8 @@ public class SkinnedModelEntity : Entity, IRenderable
         
             SkinnedVertexDrawData vertexDrawData = new SkinnedVertexDrawData(
                 model.SkinnedMeshes[modelMesh.MeshIndex].ReadOnly, 
-                matrixStack.GlobalTransformation, cameraData,
+                matrixStack.GlobalTransformation, 
+                cameraData, 
                 boneMatrices,
                 material.AlbedoTexture?.ReadOnly, material.MetallicTexture?.ReadOnly, material.RoughnessTexture?.ReadOnly,
                 materialData);
@@ -130,5 +108,7 @@ public class SkinnedModelEntity : Entity, IRenderable
         {
             RenderModelRecursively(child, args);
         }
+        
+        matrixStack.Pop();
     }
 }

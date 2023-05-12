@@ -16,7 +16,8 @@ public struct SkinnedVertexDrawData : IDrawData
 
     public SkinnedVertexDrawData(
         IMeshView mesh, 
-        Matrix4 transformation, CameraData camera, 
+        Matrix4 transformation,
+        CameraData camera, 
         Matrix4[] bones, 
         ITextureView? albedoTexture, ITextureView? metallicTexture, ITextureView? roughnessTexture, 
         MaterialData material)
