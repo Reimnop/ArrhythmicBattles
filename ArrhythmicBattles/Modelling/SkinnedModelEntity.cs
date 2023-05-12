@@ -50,7 +50,7 @@ public class SkinnedModelEntity : Entity, IRenderable
 
         if (model.BoneIndexMap.TryGetValue(modelNode.Name, out int boneIndex))
         {
-            boneMatrices[boneIndex] = model.Bones[boneIndex].Offset * matrixStack.GlobalTransformation;
+            boneMatrices[boneIndex] = model.Bones[boneIndex].Offset * matrixStack.GlobalTransformation * globalInverseTransform;
         }
 
         foreach (var child in node.Children)
@@ -71,9 +71,6 @@ public class SkinnedModelEntity : Entity, IRenderable
     {
         var matrixStack = args.MatrixStack;
         var modelNode = node.Value;
-        
-        matrixStack.Push();
-        matrixStack.Transform(modelNode.Transform);
 
         foreach (var modelMesh in modelNode.Meshes)
         {
@@ -108,7 +105,5 @@ public class SkinnedModelEntity : Entity, IRenderable
         {
             RenderModelRecursively(child, args);
         }
-        
-        matrixStack.Pop();
     }
 }
