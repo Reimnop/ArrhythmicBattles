@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace FlexFramework.Core.Rendering;
+namespace FlexFramework.Core.Rendering.Renderers;
 
 public class DefaultRenderBuffer : IRenderBuffer, IDisposable
 {

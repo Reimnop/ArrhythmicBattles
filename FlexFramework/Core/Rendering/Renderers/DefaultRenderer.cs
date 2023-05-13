@@ -10,7 +10,7 @@ using OpenTK.Mathematics;
 
 using Color = System.Drawing.Color;
 
-namespace FlexFramework.Core.Rendering;
+namespace FlexFramework.Core.Rendering.Renderers;
 
 public class DefaultRenderer : Renderer, ILighting, IDisposable
 {

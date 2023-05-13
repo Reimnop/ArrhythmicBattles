@@ -40,8 +40,4 @@
       </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Core\Rendering\Renderers\" />
-    </ItemGroup>
-
 </Project>
