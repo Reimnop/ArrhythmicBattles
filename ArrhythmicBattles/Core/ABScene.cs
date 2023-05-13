@@ -1,4 +1,5 @@
 ﻿using ArrhythmicBattles.UserInterface;
+using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
@@ -13,17 +14,20 @@ public abstract class ABScene : Scene, IDisposable
     public ABContext Context { get; }
     
     protected MatrixStack MatrixStack { get; } = new MatrixStack();
-    protected GuiCamera GuiCamera { get; private set; }
-    protected int GuiLayerId { get; private set; }
+    protected GuiCamera GuiCamera { get; }
 
     protected LayeredScreenHandler ScreenHandler { get; } = new LayeredScreenHandler();
     
     private List<IUpdateable> updateables = new List<IUpdateable>();
     private List<IDisposable> disposables = new List<IDisposable>();
 
-    public ABScene(ABContext context)
+    public ABScene(ABContext context) : base(context.Engine)
     {
         Context = context;
+        
+        Renderer renderer = Engine.Renderer;
+        renderer.ClearColor = new Color4(33, 33, 33, 255);
+        GuiCamera = new GuiCamera(Engine);
     }
 
     protected void RegisterObject(object obj)
@@ -37,16 +41,6 @@ public abstract class ABScene : Scene, IDisposable
         {
             disposables.Add(disposable);
         }
-    }
-
-    public override void Init()
-    {
-        Renderer renderer = Engine.Renderer;
-
-        renderer.ClearColor = new Color4(33, 33, 33, 255);
-        GuiLayerId = renderer.GetLayerId("gui");
-
-        GuiCamera = new GuiCamera(Engine);
     }
 
     public override void Update(UpdateArgs args)

@@ -4,11 +4,15 @@ using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.Core;
 using DiscordRPC;
 using FlexFramework;
+using FlexFramework.Core.Rendering;
+using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles;
 
 public class ABContext : IDisposable
 {
+    public FlexFrameworkMain Engine { get; }
+    public IRenderBuffer RenderBuffer { get; }
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
     public InputSystem InputSystem { get; }
@@ -17,6 +21,8 @@ public class ABContext : IDisposable
 
     public ABContext(FlexFrameworkMain engine)
     {
+        Engine = engine;
+        RenderBuffer = engine.Renderer.CreateRenderBuffer(Vector2i.One); // 1 * 1 init size
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
@@ -61,6 +67,11 @@ public class ABContext : IDisposable
     {
         DiscordRpcClient.Invoke();
         InputSystem.Update();
+
+        if (RenderBuffer.Size != Engine.Size)
+        {
+            RenderBuffer.Resize(Engine.Size);
+        }
     }
 
     public void Dispose()

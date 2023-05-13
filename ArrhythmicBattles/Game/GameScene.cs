@@ -2,6 +2,7 @@
 using ArrhythmicBattles.Core;
 using BepuPhysics;
 using BepuPhysics.Collidables;
+using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
@@ -15,25 +16,24 @@ namespace ArrhythmicBattles.Game;
 
 public class GameScene : ABScene
 {
-    private PlayerEntity playerEntity = null!;
+    private readonly PlayerEntity playerEntity;
     
-    private PerspectiveCamera camera = null!;
-    private ModelEntity envModelEntity = null!;
-    private Model envModel = null!;
+    private readonly PerspectiveCamera camera;
+    private readonly ModelEntity envModelEntity;
+    private readonly Model envModel;
 
-    private PhysicsWorld physicsWorld = null!;
+    private readonly PhysicsWorld physicsWorld;
 
-    private ProceduralSkyboxRenderer skyboxRenderer = null!;
+    private readonly ProceduralSkyboxRenderer skyboxRenderer;
     
-    private Bloom bloom = null!;
-    private Exposure tonemapper = null!;
+    private readonly Bloom bloom;
+    private readonly Exposure tonemapper;
     
-    private ScopedInputProvider inputProvider = null!;
+    private readonly ScopedInputProvider inputProvider;
 
     private DebugScreen? debugScreen;
 
-    private int opaqueLayer;
-    private int alphaClipLayer;
+    private CommandList commandList = new();
 
 #if DEBUG
     private SkinnedModelEntity? testModelEntity;
@@ -43,34 +43,29 @@ public class GameScene : ABScene
     private float freeCamYaw;
     private float freeCamPitch;
 #endif
-    
+
     public GameScene(ABContext context) : base(context)
     {
-    }
-    
-    public override void Init()
-    {
-        base.Init();
-        
         Engine.CursorState = CursorState.Grabbed;
-        
+
         inputProvider = Context.InputSystem.AcquireInputProvider();
         RegisterObject(inputProvider);
-        
+
         physicsWorld = new PhysicsWorld(Engine);
         RegisterObject(physicsWorld);
-        
+
         skyboxRenderer = new ProceduralSkyboxRenderer();
         RegisterObject(skyboxRenderer);
 
         Renderer renderer = Engine.Renderer;
-        
+
         renderer.ClearColor = Color4.Black;
         if (renderer is ILighting lighting)
         {
-            lighting.DirectionalLight = new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
+            lighting.DirectionalLight =
+                new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
-        
+
         envModel = new Model(@"Assets/Models/Map01.dae");
         RegisterObject(envModel);
 
@@ -84,17 +79,14 @@ public class GameScene : ABScene
         {
             testModel = new Model(testModelPath);
             RegisterObject(testModel);
-            
+
             ModelAnimation testAnimation = testModel.Animations[0];
-            
+
             testModelEntity = new SkinnedModelEntity(testModel);
             testModelEntity.AnimationHandler.Transition(testAnimation);
             RegisterObject(testModelEntity);
         }
 #endif
-
-        opaqueLayer = Engine.Renderer.GetLayerId(DefaultRenderer.OpaqueLayerName);
-        alphaClipLayer = Engine.Renderer.GetLayerId(DefaultRenderer.AlphaClipLayerName);
 
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
@@ -114,7 +106,7 @@ public class GameScene : ABScene
         // Init post processing
         bloom = new Bloom();
         RegisterObject(bloom);
-        
+
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
         RegisterObject(tonemapper);
@@ -192,14 +184,16 @@ public class GameScene : ABScene
 
     public override void Render(Renderer renderer)
     {
-        renderer.UsePostProcessor(bloom);
-        renderer.UsePostProcessor(tonemapper);
+        commandList.Clear();
+        
+        commandList.AddPostProcessor(bloom);
+        commandList.AddPostProcessor(tonemapper);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
-        renderer.UseBackgroundRenderer(skyboxRenderer, cameraData);
+        commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
         
-        RenderArgs alphaClipArgs = new RenderArgs(renderer, alphaClipLayer, MatrixStack, cameraData);
-        RenderArgs opaqueArgs = new RenderArgs(renderer, opaqueLayer, MatrixStack, cameraData);
+        RenderArgs alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);
+        RenderArgs opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
         
         // render player
         playerEntity.Render(opaqueArgs);
@@ -222,8 +216,12 @@ public class GameScene : ABScene
 
         // render gui
         CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        RenderArgs guiArgs = new RenderArgs(renderer, GuiLayerId, MatrixStack, guiCameraData);
+        RenderArgs guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
         
         ScreenHandler.Render(guiArgs);
+        
+        // Render scene
+        renderer.Render(commandList, Context.RenderBuffer);
+        Engine.Present(Context.RenderBuffer);
     }
 }

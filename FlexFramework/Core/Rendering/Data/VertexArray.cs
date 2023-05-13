@@ -2,7 +2,7 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class VertexArray : GpuObject, IDisposable
+public class VertexArray : IGpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }

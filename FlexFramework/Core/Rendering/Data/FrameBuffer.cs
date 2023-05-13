@@ -2,12 +2,12 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Framebuffer : GpuObject, IDisposable
+public class FrameBuffer : IGpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
 
-    public Framebuffer(string name)
+    public FrameBuffer(string name)
     {
         Name = name;
         
@@ -17,9 +17,9 @@ public class Framebuffer : GpuObject, IDisposable
         Handle = handle;
     }
 
-    public void Renderbuffer(FramebufferAttachment attachment, Renderbuffer renderbuffer)
+    public void Renderbuffer(FramebufferAttachment attachment, RenderBuffer renderBuffer)
     {
-        GL.NamedFramebufferRenderbuffer(Handle, attachment, RenderbufferTarget.Renderbuffer, renderbuffer.Handle);
+        GL.NamedFramebufferRenderbuffer(Handle, attachment, RenderbufferTarget.Renderbuffer, renderBuffer.Handle);
     }
     
     public void Texture(FramebufferAttachment attachment, Texture2D texture2D, int level = 0)

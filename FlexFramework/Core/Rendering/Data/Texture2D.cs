@@ -4,7 +4,7 @@ using PixelType = OpenTK.Graphics.OpenGL4.PixelType;
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Texture2D : GpuObject, IDisposable
+public class Texture2D : IGpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }

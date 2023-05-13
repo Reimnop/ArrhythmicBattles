@@ -16,24 +16,20 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
-    private ImageEntity bannerEntity = null!;
-    private TextEntity copyrightText = null!;
+    private readonly ImageEntity bannerEntity;
+    private readonly TextEntity copyrightText;
 
-    private MeshEntity border = null!;
+    private readonly MeshEntity border;
     
-    private ScopedInputProvider inputProvider = null!;
-    private Texture bannerTexture = null!;
+    private readonly ScopedInputProvider inputProvider;
+    private readonly Texture bannerTexture;
+
+    private readonly CommandList commandList = new();
 
     public MainMenuScene(ABContext context) : base(context)
     {
-    }
-
-    public override void Init()
-    {
-        base.Init();
-        
         Engine.CursorState = CursorState.Normal;
-        
+
         // Reset lightings
         if (Engine.Renderer is ILighting lightings)
         {
@@ -103,8 +99,10 @@ public class MainMenuScene : ABScene
 
     public override void Render(Renderer renderer)
     {
+        commandList.Clear();
+        
         CameraData cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        RenderArgs args = new RenderArgs(renderer, GuiLayerId, MatrixStack, cameraData);
+        RenderArgs args = new RenderArgs(commandList, LayerType.Gui, MatrixStack, cameraData);
         
         ScreenHandler.Render(args);
         
@@ -127,6 +125,10 @@ public class MainMenuScene : ABScene
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
         copyrightText.Render(args);
         MatrixStack.Pop();
+        
+        // Render scene
+        renderer.Render(commandList, Context.RenderBuffer);
+        Engine.Present(Context.RenderBuffer);
     }
 
     public override void Dispose()

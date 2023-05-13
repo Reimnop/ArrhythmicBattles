@@ -3,14 +3,15 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Core.Rendering;
 
+// TODO: Nuke this class
 public class ScreenCapturer : IDisposable
 {
     public int Width { get; }
     public int Height { get; }
 
-    public Framebuffer FrameBuffer { get; }
+    public FrameBuffer FrameBuffer { get; }
     public Texture2D ColorBuffer { get; }
-    public Renderbuffer? DepthBuffer { get; }
+    public RenderBuffer? DepthBuffer { get; }
 
     public ScreenCapturer(string name, int width, int height, bool useDepth = true, int samples = 0)
     {
@@ -27,12 +28,12 @@ public class ScreenCapturer : IDisposable
             ColorBuffer.SetWrapT(TextureWrapMode.ClampToEdge);
         }
 
-        FrameBuffer = new Framebuffer(name);
+        FrameBuffer = new FrameBuffer(name);
         FrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, ColorBuffer);
         
         if (useDepth)
         {
-            DepthBuffer = new Renderbuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f, samples);
+            DepthBuffer = new RenderBuffer($"{name}-depth", width, height, RenderbufferStorage.DepthComponent32f, samples);
             FrameBuffer.Renderbuffer(FramebufferAttachment.DepthAttachment, DepthBuffer);
         }
     }

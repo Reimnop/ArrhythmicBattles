@@ -76,8 +76,8 @@ public class SkinnedModelEntity : Entity, IRenderable
         {
             var material = model.Materials[modelMesh.MaterialIndex];
 
-            Renderer renderer = args.Renderer;
-            int layerId = args.LayerId;
+            CommandList commandList = args.CommandList;
+            LayerType layerType = args.LayerType;
             CameraData cameraData = args.CameraData;
             
             MaterialData materialData = new MaterialData()
@@ -98,7 +98,7 @@ public class SkinnedModelEntity : Entity, IRenderable
                 material.AlbedoTexture?.ReadOnly, material.MetallicTexture?.ReadOnly, material.RoughnessTexture?.ReadOnly,
                 materialData);
         
-            renderer.EnqueueDrawData(layerId, vertexDrawData);
+            commandList.AddDrawData(layerType, vertexDrawData);
         }
 
         foreach (ImmutableNode<ModelNode> child in node.Children)

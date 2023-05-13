@@ -23,22 +23,8 @@ public class SceneManager
             disposable.Dispose();
         }
         
-        scene.InitInternal(engine);
-        scene.Init();
         CurrentScene = scene;
 
         return scene;
-    }
-
-    public T LoadScene<T>(params object?[]? args) where T : Scene
-    {
-        T? scene = (T?) Activator.CreateInstance(typeof(T), args);
-
-        if (scene == null)
-        {
-            throw new LoadSceneException(typeof(T));
-        }
-
-        return (T) LoadScene(scene);
     }
 }

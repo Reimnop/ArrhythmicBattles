@@ -4,15 +4,15 @@ namespace FlexFramework.Core;
 
 public struct RenderArgs
 {
-    public Renderer Renderer { get; }
-    public int LayerId { get; }
+    public CommandList CommandList { get; }
+    public LayerType LayerType { get; }
     public MatrixStack MatrixStack { get; }
     public CameraData CameraData { get; }
     
-    public RenderArgs(Renderer renderer, int layerId, MatrixStack matrixStack, CameraData cameraData)
+    public RenderArgs(CommandList commandList, LayerType layerType, MatrixStack matrixStack, CameraData cameraData)
     {
-        Renderer = renderer;
-        LayerId = layerId;
+        CommandList = commandList;
+        LayerType = layerType;
         MatrixStack = matrixStack;
         CameraData = cameraData;
     }
