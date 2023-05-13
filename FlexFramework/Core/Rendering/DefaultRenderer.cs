@@ -134,6 +134,9 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetDepthMask(false);
             RenderLayer(transparentLayer);
         }
+        
+        // Unbind
+        stateManager.BindFramebuffer(null);
 
         // Post-process world framebuffer
         if (commandList.TryGetPostProcessors(out var postProcessors))
@@ -146,7 +149,8 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         // Blit world framebuffer to gui framebuffer
         GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);
-        GL.BlitNamedFramebuffer(drb.WorldCapturer.FrameBuffer.Handle, drb.GuiCapturer.FrameBuffer.Handle, 
+        GL.BlitNamedFramebuffer(
+            drb.WorldCapturer.FrameBuffer.Handle, drb.GuiCapturer.FrameBuffer.Handle, 
             0, 0, drb.Size.X, drb.Size.Y, 
             0, 0, drb.Size.X, drb.Size.Y, 
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
@@ -161,9 +165,12 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetDepthMask(true);
             RenderLayer(guiLayer);
         }
+        
+        // Unbind
+        stateManager.BindFramebuffer(null);
     }
 
-    private void RunPostProcessors(IEnumerable<PostProcessor> postProcessors, Texture2D texture)
+    private void RunPostProcessors(IReadOnlyList<PostProcessor> postProcessors, Texture2D texture)
     {
         Vector2i size = new Vector2i(texture.Width, texture.Height);
         
@@ -189,7 +196,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         }
     }
 
-    private void RenderLayer(IEnumerable<IDrawData> layer)
+    private void RenderLayer(IReadOnlyList<IDrawData> layer)
     {
         foreach (var drawData in layer)
         {

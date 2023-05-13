@@ -12,8 +12,8 @@ public class DefaultRenderBuffer : IRenderBuffer, IDisposable
 
     public DefaultRenderBuffer(Vector2i size)
     {
-        WorldCapturer = new ScreenCapturer("world", size.X, size.Y, samples: 4);
-        GuiCapturer = new ScreenCapturer("gui", size.X, size.Y, false);
+        WorldCapturer = new ScreenCapturer("world", size.X, size.Y);
+        GuiCapturer = new ScreenCapturer("gui", size.X, size.Y, false, 4);
     }
 
     public void Resize(Vector2i size)
@@ -24,8 +24,8 @@ public class DefaultRenderBuffer : IRenderBuffer, IDisposable
 
             WorldCapturer.Dispose();
             GuiCapturer.Dispose();
-            WorldCapturer = new ScreenCapturer("world", size.X, size.Y, samples: 4);
-            GuiCapturer = new ScreenCapturer("gui", size.X, size.Y, false);
+            WorldCapturer = new ScreenCapturer("world", size.X, size.Y);
+            GuiCapturer = new ScreenCapturer("gui", size.X, size.Y, false, 4);
         }
     }
 
