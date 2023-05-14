@@ -3,6 +3,7 @@ using ArrhythmicBattles.Core;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using FlexFramework.Core;
+using FlexFramework.Core.Audio;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
@@ -23,6 +24,9 @@ public class GameScene : ABScene
     private readonly ModelEntity envModelEntity;
     
     // Other things
+    private readonly AudioStream musicAudioStream;
+    private readonly AudioSource musicAudioSource;
+    
     private readonly PerspectiveCamera camera;
     private readonly PhysicsWorld physicsWorld;
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
@@ -55,15 +59,28 @@ public class GameScene : ABScene
         }
         
         envModel = new Model(@"Assets/Models/Map01.dae");
-        inputProvider = Context.InputSystem.AcquireInputProvider();
-        physicsWorld = new PhysicsWorld(Engine);
-        skyboxRenderer = new ProceduralSkyboxRenderer();
+        
+        // Init audio
+        // TODO: Listen for settings changes
+        var settings = Context.Settings;
+        
+        musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic_Creating_Something_New.ogg");
+        musicAudioSource = new AudioSource();
+        musicAudioSource.Gain = settings.MusicVolume;
+        musicAudioSource.AudioStream = musicAudioStream;
+        musicAudioSource.Play();
         
         // Init entities
         envModelEntity = CreateEntity(() => new ModelEntity(envModel));
+        
+        // We init these here because player entity depends on them
+        inputProvider = Context.InputSystem.AcquireInputProvider();
+        physicsWorld = new PhysicsWorld(Engine);
         playerEntity = CreateEntity(() => new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f));
         
         // Init other things
+        skyboxRenderer = new ProceduralSkyboxRenderer();
+        
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
 
@@ -216,6 +233,8 @@ public class GameScene : ABScene
     {
         base.Dispose();
         
+        musicAudioSource.Dispose();
+        musicAudioStream.Dispose();
         envModel.Dispose();
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();

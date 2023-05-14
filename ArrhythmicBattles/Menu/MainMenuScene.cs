@@ -27,8 +27,8 @@ public class MainMenuScene : ABScene
     private readonly MeshEntity border;
     
     // Other things
-    private readonly AudioStream menuAudioStream;
-    private readonly AudioSource menuAudioSource;
+    private readonly AudioStream musicAudioStream;
+    private readonly AudioSource musicAudioSource;
     private readonly AudioStream sfxAudioStream;
     private readonly AudioSource sfxAudioSource;
     private readonly ScopedInputProvider inputProvider;
@@ -46,33 +46,20 @@ public class MainMenuScene : ABScene
         }
         
         // Init audio
-        // TODO: Make it less imperative
+        // TODO: Listen for settings changes
         var settings = Context.Settings;
         
-        menuAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic.ogg");
-        menuAudioSource = new AudioSource();
-        menuAudioSource.Gain = settings.MusicVolume;
-        menuAudioSource.AudioStream = menuAudioStream;
-        menuAudioSource.Play();
+        musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic.ogg");
+        musicAudioSource = new AudioSource();
+        musicAudioSource.Gain = settings.MusicVolume;
+        musicAudioSource.AudioStream = musicAudioStream;
+        musicAudioSource.Play();
 
         sfxAudioStream = new VorbisAudioStream("Assets/Audio/Select.ogg");
         sfxAudioSource = new AudioSource();
         sfxAudioSource.Gain = settings.SfxVolume;
         sfxAudioSource.Looping = false;
         sfxAudioSource.AudioStream = sfxAudioStream;
-        
-        settings.PropertyChanged += (sender, args) =>
-        {
-            if (args.PropertyName == nameof(ISettings.MusicVolume))
-            {
-                menuAudioSource.Gain = settings.MusicVolume;
-            }
-
-            if (args.PropertyName == nameof(ISettings.SfxVolume))
-            {
-                sfxAudioSource.Gain = settings.SfxVolume;
-            }
-        };
 
         // Init resources
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
@@ -167,8 +154,8 @@ public class MainMenuScene : ABScene
         
         inputProvider.Dispose();
         // Context.Sound.MenuBackgroundMusic.Stop();
-        menuAudioSource.Dispose();
-        menuAudioStream.Dispose();
+        musicAudioSource.Dispose();
+        musicAudioStream.Dispose();
         sfxAudioSource.Dispose();
         sfxAudioStream.Dispose();
     }
