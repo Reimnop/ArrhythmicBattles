@@ -1,7 +1,9 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
+using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
@@ -25,6 +27,10 @@ public class MainMenuScene : ABScene
     private readonly MeshEntity border;
     
     // Other things
+    private readonly AudioStream menuAudioStream;
+    private readonly AudioSource menuAudioSource;
+    private readonly AudioStream sfxAudioStream;
+    private readonly AudioSource sfxAudioSource;
     private readonly ScopedInputProvider inputProvider;
 
     private readonly CommandList commandList = new();
@@ -40,8 +46,34 @@ public class MainMenuScene : ABScene
         }
         
         // Init audio
-        Context.Sound.MenuBackgroundMusic.Play();
+        // TODO: Make it less imperative
+        var settings = Context.Settings;
         
+        menuAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic.ogg");
+        menuAudioSource = new AudioSource();
+        menuAudioSource.Gain = settings.MusicVolume;
+        menuAudioSource.AudioStream = menuAudioStream;
+        menuAudioSource.Play();
+
+        sfxAudioStream = new VorbisAudioStream("Assets/Audio/Select.ogg");
+        sfxAudioSource = new AudioSource();
+        sfxAudioSource.Gain = settings.SfxVolume;
+        sfxAudioSource.Looping = false;
+        sfxAudioSource.AudioStream = sfxAudioStream;
+        
+        settings.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(ISettings.MusicVolume))
+            {
+                menuAudioSource.Gain = settings.MusicVolume;
+            }
+
+            if (args.PropertyName == nameof(ISettings.SfxVolume))
+            {
+                sfxAudioSource.Gain = settings.SfxVolume;
+            }
+        };
+
         // Init resources
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
         bannerTexture = Texture.FromFile("banner", bannerPath);
@@ -82,7 +114,7 @@ public class MainMenuScene : ABScene
     {
         base.SwitchScreen(before, after);
         
-        Context.Sound.SelectSfx.Play();
+        sfxAudioSource.Play();
     }
 
     public override void CloseScreen(Screen screen)
@@ -134,6 +166,10 @@ public class MainMenuScene : ABScene
         base.Dispose();
         
         inputProvider.Dispose();
-        Context.Sound.MenuBackgroundMusic.Stop();
+        // Context.Sound.MenuBackgroundMusic.Stop();
+        menuAudioSource.Dispose();
+        menuAudioStream.Dispose();
+        sfxAudioSource.Dispose();
+        sfxAudioStream.Dispose();
     }
 }

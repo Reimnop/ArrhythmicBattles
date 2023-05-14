@@ -29,20 +29,22 @@ public class AudioSettingsScreen : Screen, IDisposable
 
     private Element BuildInterface()
     {
+        var settings = scene.Context.Settings;
+
         return new StackLayoutElement(
             Direction.Vertical,
             new ABSliderElement(engine, inputProvider, "SFX VOLUME")  
             {
-                Value = scene.Context.Sound.SfxVolumeLevel,
-                ValueChanged = value => scene.Context.Sound.SfxVolumeLevel = value,
+                Value = settings.SfxVolume,
+                ValueChanged = value => settings.SfxVolume = value,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
             new ABSliderElement(engine, inputProvider, "MUSIC VOLUME")
             {
-                Value = scene.Context.Sound.MusicVolumeLevel,
-                ValueChanged = value => scene.Context.Sound.MusicVolumeLevel = value,
+                Value = settings.MusicVolume,
+                ValueChanged = value => settings.MusicVolume = value,
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
