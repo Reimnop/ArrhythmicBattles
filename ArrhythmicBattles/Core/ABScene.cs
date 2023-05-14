@@ -1,5 +1,4 @@
 ﻿using ArrhythmicBattles.UserInterface;
-using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
