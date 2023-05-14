@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Core;
 
-public abstract class ABScene : Scene, IDisposable
+public abstract class ABScene : InteractiveScene
 {
     public Bounds ScreenBounds { get; protected set; }
 
@@ -17,9 +17,6 @@ public abstract class ABScene : Scene, IDisposable
     protected GuiCamera GuiCamera { get; }
 
     protected LayeredScreenHandler ScreenHandler { get; } = new LayeredScreenHandler();
-    
-    private List<IUpdateable> updateables = new List<IUpdateable>();
-    private List<IDisposable> disposables = new List<IDisposable>();
 
     public ABScene(ABContext context) : base(context.Engine)
     {
@@ -30,27 +27,11 @@ public abstract class ABScene : Scene, IDisposable
         GuiCamera = new GuiCamera(Engine);
     }
 
-    protected void RegisterObject(object obj)
-    {
-        if (obj is IUpdateable updateable)
-        {
-            updateables.Add(updateable);
-        }
-        
-        if (obj is IDisposable disposable)
-        {
-            disposables.Add(disposable);
-        }
-    }
-
     public override void Update(UpdateArgs args)
     {
-        ScreenHandler.Update(args);
+        base.Update(args);
         
-        foreach (IUpdateable updateable in updateables)
-        {
-            updateable.Update(args);
-        }
+        ScreenHandler.Update(args);
     }
 
     public virtual void OpenScreen(Screen screen)
@@ -68,13 +49,10 @@ public abstract class ABScene : Scene, IDisposable
         ScreenHandler.SwitchScreen(before, after);
     }
 
-    public virtual void Dispose()
+    public override void Dispose()
     {
-        ScreenHandler.Dispose();
+        base.Dispose();
         
-        foreach (IDisposable disposable in disposables)
-        {
-            disposable.Dispose();
-        }
+        ScreenHandler.Dispose();
     }
 }

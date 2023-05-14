@@ -85,8 +85,14 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         return program;
     }
 
-    public override void Render(CommandList commandList, IRenderBuffer renderBuffer)
+    public override void Render(Vector2i size, CommandList commandList, IRenderBuffer renderBuffer)
     {
+        // Ensure sizes always match
+        if (renderBuffer.Size != size)
+        {
+            renderBuffer.Resize(size);
+        }
+        
         DefaultRenderBuffer drb = (DefaultRenderBuffer) renderBuffer;
 
         stateManager.BindFramebuffer(drb.WorldCapturer.FrameBuffer); // Bind world framebuffer

@@ -67,11 +67,6 @@ public class ABContext : IDisposable
     {
         DiscordRpcClient.Invoke();
         InputSystem.Update();
-
-        if (RenderBuffer.Size != Engine.Size)
-        {
-            RenderBuffer.Resize(Engine.Size);
-        }
     }
 
     public void Dispose()

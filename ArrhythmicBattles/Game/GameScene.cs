@@ -2,7 +2,6 @@
 using ArrhythmicBattles.Core;
 using BepuPhysics;
 using BepuPhysics.Collidables;
-using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
@@ -16,23 +15,21 @@ namespace ArrhythmicBattles.Game;
 
 public class GameScene : ABScene
 {
-    private readonly PlayerEntity playerEntity;
-    
-    private readonly PerspectiveCamera camera;
-    private readonly ModelEntity envModelEntity;
+    // Resources
     private readonly Model envModel;
-
-    private readonly PhysicsWorld physicsWorld;
-
-    private readonly ProceduralSkyboxRenderer skyboxRenderer;
     
+    // Entities
+    private readonly PlayerEntity playerEntity;
+    private readonly ModelEntity envModelEntity;
+    
+    // Other things
+    private readonly PerspectiveCamera camera;
+    private readonly PhysicsWorld physicsWorld;
+    private readonly ProceduralSkyboxRenderer skyboxRenderer;
     private readonly Bloom bloom;
     private readonly Exposure tonemapper;
-    
     private readonly ScopedInputProvider inputProvider;
-
     private DebugScreen? debugScreen;
-
     private CommandList commandList = new();
 
 #if DEBUG
@@ -47,52 +44,28 @@ public class GameScene : ABScene
     public GameScene(ABContext context) : base(context)
     {
         Engine.CursorState = CursorState.Grabbed;
-
-        inputProvider = Context.InputSystem.AcquireInputProvider();
-        RegisterObject(inputProvider);
-
-        physicsWorld = new PhysicsWorld(Engine);
-        RegisterObject(physicsWorld);
-
-        skyboxRenderer = new ProceduralSkyboxRenderer();
-        RegisterObject(skyboxRenderer);
-
-        Renderer renderer = Engine.Renderer;
-
+        
+        // Init resources
+        var renderer = Engine.Renderer;
         renderer.ClearColor = Color4.Black;
         if (renderer is ILighting lighting)
         {
             lighting.DirectionalLight =
                 new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
-
+        
         envModel = new Model(@"Assets/Models/Map01.dae");
-        RegisterObject(envModel);
-
-        envModelEntity = new ModelEntity(envModel);
-        RegisterObject(envModelEntity);
-
-#if DEBUG
-        const string testModelPath = @"Assets/Test/test.fbx";
-
-        if (File.Exists(testModelPath))
-        {
-            testModel = new Model(testModelPath);
-            RegisterObject(testModel);
-
-            ModelAnimation testAnimation = testModel.Animations[0];
-
-            testModelEntity = new SkinnedModelEntity(testModel);
-            testModelEntity.AnimationHandler.Transition(testAnimation);
-            RegisterObject(testModelEntity);
-        }
-#endif
-
+        inputProvider = Context.InputSystem.AcquireInputProvider();
+        physicsWorld = new PhysicsWorld(Engine);
+        skyboxRenderer = new ProceduralSkyboxRenderer();
+        
+        // Init entities
+        envModelEntity = CreateEntity(() => new ModelEntity(envModel));
+        playerEntity = CreateEntity(() => new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f));
+        
+        // Init other things
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
-
-        playerEntity = new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f);
-        RegisterObject(playerEntity);
 
         // Create floor
         {
@@ -105,16 +78,30 @@ public class GameScene : ABScene
 
         // Init post processing
         bloom = new Bloom();
-        RegisterObject(bloom);
 
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
-        RegisterObject(tonemapper);
+
+#if DEBUG
+        const string testModelPath = @"Assets/Test/test.fbx";
+
+        if (File.Exists(testModelPath))
+        {
+            testModel = new Model(testModelPath);
+            ModelAnimation testAnimation = testModel.Animations[0];
+
+            testModelEntity = CreateEntity(() => new SkinnedModelEntity(testModel));
+            testModelEntity.AnimationHandler.Transition(testAnimation);
+        }
+#endif
     }
 
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
+        
+        // Update physics
+        physicsWorld.Update(args);
 
         if (inputProvider.GetKeyDown(Keys.F3))
         {
@@ -196,18 +183,18 @@ public class GameScene : ABScene
         RenderArgs opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
         
         // render player
-        playerEntity.Render(opaqueArgs);
+        EntityCall(playerEntity, entity => entity.Render(opaqueArgs));
 
         // render environment
         MatrixStack.Push();
-        envModelEntity.Render(alphaClipArgs);
+        EntityCall(envModelEntity, entity => entity.Render(alphaClipArgs));
 
 #if DEBUG
         if (testModelEntity != null)
         {
             // render test model
             MatrixStack.Push();
-            testModelEntity.Render(alphaClipArgs);
+            EntityCall(testModelEntity, entity => entity.Render(alphaClipArgs));
             MatrixStack.Pop();
         }
 #endif
@@ -221,7 +208,19 @@ public class GameScene : ABScene
         ScreenHandler.Render(guiArgs);
         
         // Render scene
-        renderer.Render(commandList, Context.RenderBuffer);
+        renderer.Render(Engine.ClientSize, commandList, Context.RenderBuffer);
         Engine.Present(Context.RenderBuffer);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        
+        envModel.Dispose();
+        physicsWorld.Dispose();
+        skyboxRenderer.Dispose();
+        bloom.Dispose();
+        tonemapper.Dispose();
+        inputProvider.Dispose();
     }
 }

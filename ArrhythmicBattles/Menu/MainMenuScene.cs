@@ -16,13 +16,16 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
+    // Resources
+    private readonly Texture bannerTexture;
+    
+    // Entities
     private readonly ImageEntity bannerEntity;
     private readonly TextEntity copyrightText;
-
     private readonly MeshEntity border;
     
+    // Other things
     private readonly ScopedInputProvider inputProvider;
-    private readonly Texture bannerTexture;
 
     private readonly CommandList commandList = new();
 
@@ -38,43 +41,38 @@ public class MainMenuScene : ABScene
         
         // Init audio
         Context.Sound.MenuBackgroundMusic.Play();
+        
+        // Init resources
+        string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
+        bannerTexture = Texture.FromFile("banner", bannerPath);
+        
+        var assets = Engine.DefaultAssets;
+        var quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
 
         // Init entities
-        string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
-        
-        bannerTexture = Texture.FromFile("banner", bannerPath);
-        RegisterObject(bannerTexture);
-        
-        bannerEntity = new ImageEntity(Engine);
+        bannerEntity = CreateEntity(() => new ImageEntity(Engine));
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
-        RegisterObject(bannerEntity);
 
         var textAssetsLocation = Engine.DefaultAssets.TextAssets;
         var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
         Font font = textAssets[Constants.DefaultFontName];
         
-        copyrightText = new TextEntity(Engine, font);
+        copyrightText = CreateEntity(() => new TextEntity(Engine, font));
         copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles";
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
-        RegisterObject(copyrightText);
-        
-        EngineAssets assets = Engine.DefaultAssets;
-        Mesh<Vertex> quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
 
-        border = new MeshEntity();
+        border = CreateEntity(() => new MeshEntity());
         border.Color = new Color4(24, 24, 24, 255);
         border.Mesh = quadMesh;
-        RegisterObject(border);
 
         // Init input
         inputProvider = Context.InputSystem.AcquireInputProvider();
-        RegisterObject(inputProvider);
-        
+
         // Init UI
         ScreenBounds = new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
@@ -110,9 +108,9 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
-        border.Render(args);
+        EntityCall(border, entity => entity.Render(args));
         MatrixStack.Pop();
-        bannerEntity.Render(args);
+        EntityCall(bannerEntity, entity => entity.Render(args));
         MatrixStack.Pop();
         
         MatrixStack.Push();
@@ -120,14 +118,14 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);
-        border.Render(args);
+        EntityCall(border, entity => entity.Render(args));
         MatrixStack.Pop();
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
-        copyrightText.Render(args);
+        EntityCall(copyrightText, entity => entity.Render(args));
         MatrixStack.Pop();
         
         // Render scene
-        renderer.Render(commandList, Context.RenderBuffer);
+        renderer.Render(Engine.ClientSize, commandList, Context.RenderBuffer);
         Engine.Present(Context.RenderBuffer);
     }
 
@@ -135,6 +133,7 @@ public class MainMenuScene : ABScene
     {
         base.Dispose();
         
+        inputProvider.Dispose();
         Context.Sound.MenuBackgroundMusic.Stop();
     }
 }

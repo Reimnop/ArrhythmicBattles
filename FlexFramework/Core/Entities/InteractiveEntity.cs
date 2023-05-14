@@ -26,7 +26,7 @@ public class InteractiveEntity : Entity
     {
         TaskRunner.StartImmediately(task);
     }
-    
+
     protected GameTaskYieldAwaitable WaitUntilNextFrame() => TaskRunner.Next();
     protected GameTaskYieldAwaitable DelayFrames(int frames) => TaskRunner.Delay(frames);
     protected ExternalTaskAwaitable RunTask(Func<Task> task) => TaskRunner.RunTask(task);
