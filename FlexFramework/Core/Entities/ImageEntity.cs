@@ -33,7 +33,6 @@ public class ImageEntity : UIElement, IRenderable
     {
         EngineAssets assets = engine.DefaultAssets;
         quadMesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
-        
     }
 
     public void Render(RenderArgs args)
@@ -43,8 +42,8 @@ public class ImageEntity : UIElement, IRenderable
             return;
         }
         
-        Renderer renderer = args.Renderer;
-        int layerId = args.LayerId;
+        CommandList commandList = args.CommandList;
+        LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
 
@@ -81,7 +80,7 @@ public class ImageEntity : UIElement, IRenderable
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
 
-        renderer.EnqueueDrawData(layerId, vertexDrawData);
+        commandList.AddDrawData(layerType, vertexDrawData);
         matrixStack.Pop();
     }
 }

@@ -109,27 +109,10 @@ public class FlexFrameworkMain : NativeWindow
         Renderer = renderer;
         return renderer;
     }
-    
-    public T UseRenderer<T>(params object?[]? args) where T : Renderer
-    {
-        T? renderer = (T?) Activator.CreateInstance(typeof(T), args);
-
-        if (renderer == null)
-        {
-            throw new LoadRendererException(typeof(T));
-        }
-
-        return (T) UseRenderer(renderer);
-    }
 
     public Scene LoadScene(Scene scene)
     {
         return SceneManager.LoadScene(scene);
-    }
-
-    public T LoadScene<T>(params object?[]? args) where T : Scene
-    {
-        return SceneManager.LoadScene<T>(args);
     }
 
     public void Update()
@@ -160,8 +143,7 @@ public class FlexFrameworkMain : NativeWindow
         UpdateArgs args = new UpdateArgs(time, deltaTime);
         
         SceneManager.CurrentScene.Update(args);
-        SceneManager.CurrentScene.UpdateInternal(args);
-        
+
         Renderer.Update(args);
     }
 
@@ -173,8 +155,11 @@ public class FlexFrameworkMain : NativeWindow
         }
         
         SceneManager.CurrentScene.Render(Renderer);
-        Renderer.Render();
-        
+    }
+
+    public unsafe void Present(IRenderBuffer buffer)
+    {
+        buffer.BlitToBackBuffer(ClientSize);
         GLFW.SwapBuffers(WindowPtr);
     }
 

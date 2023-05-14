@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class ShaderProgram : GpuObject, IDisposable
+public class ShaderProgram : IGpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }

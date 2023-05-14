@@ -17,6 +17,8 @@
 
     <ItemGroup>
         <PackageReference Include="BepuPhysics" Version="2.4.0" />
+        <PackageReference Include="HalfMaid.Async" Version="0.9.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="NVorbis" Version="0.10.4" />
         <PackageReference Include="OpenTK" Version="4.7.7" />
         <PackageReference Include="SharpEXR" Version="1.0.0.19" />

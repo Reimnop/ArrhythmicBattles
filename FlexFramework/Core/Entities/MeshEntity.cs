@@ -22,14 +22,14 @@ public class MeshEntity : Entity, IRenderable
             return;
         }
         
-        Renderer renderer = args.Renderer;
-        int layerId = args.LayerId;
+        CommandList commandList = args.CommandList;
+        LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
 
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         VertexDrawData vertexDrawData = new VertexDrawData(Mesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType);
         
-        renderer.EnqueueDrawData(layerId, vertexDrawData);
+        commandList.AddDrawData(layerType, vertexDrawData);
     }
 }

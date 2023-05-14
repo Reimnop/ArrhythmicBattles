@@ -3,14 +3,14 @@ using NVorbis;
 
 namespace FlexFramework.Core.Audio;
 
-public class VorbisAudioStream : AudioStream, IDisposable
+public class VorbisAudioStream : AudioStream
 {
     public override float Length => vorbis.TotalTime.Seconds;
     public override int Channels => vorbis.Channels;
     public override int BytesPerSample => 4;
     public override int SampleRate => vorbis.SampleRate;
+    public override long SampleCount => vorbis.TotalSamples;
     public override long SamplePosition => vorbis.SamplePosition;
-    public override bool Looping { get; set; }
 
     private readonly VorbisReader vorbis;
     private readonly float[] readBuffer;
@@ -29,27 +29,19 @@ public class VorbisAudioStream : AudioStream, IDisposable
         copyBuffer = new byte[vorbis.Channels * vorbis.SampleRate * sizeof(float)];
     }
 
-    public override void Restart()
+    public override void Seek(long position, SeekOrigin seekOrigin = SeekOrigin.Begin)
     {
-        vorbis.SeekTo(0L);
+        vorbis.SeekTo(position, seekOrigin);
     }
 
-    private int ReadSamples(Span<float> buffer)
+    public override bool ShouldQueueBuffers()
     {
-        int readLength = vorbis.ReadSamples(buffer);
-        
-        if (readLength == 0 && Looping)
-        {
-            vorbis.SeekTo(0L);
-            return vorbis.ReadSamples(buffer);
-        }
-
-        return readLength;
+        return SamplePosition < SampleCount;
     }
 
     public override bool NextBuffer(out Span<byte> data)
     {
-        int readLength = ReadSamples(readBuffer);
+        int readLength = vorbis.ReadSamples(readBuffer);
         
         if (readLength == 0)
         {
@@ -65,7 +57,7 @@ public class VorbisAudioStream : AudioStream, IDisposable
         return true;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         vorbis.Dispose();
     }

@@ -2,12 +2,12 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public class Renderbuffer : GpuObject, IDisposable
+public class RenderBuffer : IGpuObject, IDisposable
 {
     public int Handle { get; }
     public string Name { get; }
 
-    public Renderbuffer(string name, int width, int height, RenderbufferStorage format, int samples = 0)
+    public RenderBuffer(string name, int width, int height, RenderbufferStorage format, int samples = 0)
     {
         Name = name;
         

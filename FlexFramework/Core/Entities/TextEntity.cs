@@ -128,8 +128,8 @@ public class TextEntity : Entity, IRenderable
             GenerateMesh();
         }
 
-        Renderer renderer = args.Renderer;
-        int layerId = args.LayerId;
+        CommandList commandList = args.CommandList;
+        LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
         
@@ -139,8 +139,7 @@ public class TextEntity : Entity, IRenderable
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         TextDrawData textDrawData = new TextDrawData(mesh.ReadOnly, transformation, Color, 4.0f * EmSize);
         
-        renderer.EnqueueDrawData(layerId, textDrawData);
-        
+        commandList.AddDrawData(layerType, textDrawData);
         matrixStack.Pop();
     }
 }

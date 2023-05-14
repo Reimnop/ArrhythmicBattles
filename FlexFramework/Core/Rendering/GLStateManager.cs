@@ -5,7 +5,7 @@ namespace FlexFramework.Core.Rendering;
 
 public class GLStateManager
 {
-    private Framebuffer? currentFramebuffer = null;
+    private FrameBuffer? currentFramebuffer = null;
     private ShaderProgram? currentProgram = null;
     private VertexArray? currentVertexArray = null;
     private Texture2D?[] currentTextureUnits = new Texture2D?[16];
@@ -53,7 +53,7 @@ public class GLStateManager
         }
     }
 
-    public void BindFramebuffer(Framebuffer? framebuffer)
+    public void BindFramebuffer(FrameBuffer? framebuffer)
     {
         if (currentFramebuffer == framebuffer)
         {

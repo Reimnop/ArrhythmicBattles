@@ -25,6 +25,8 @@ public class AudioSource : IDisposable
         }
     }
     public bool Playing => AL.GetSourceState(Handle) == ALSourceState.Playing;
+    public bool Looping { get; set; } = true;
+
     public Vector3 Position
     {
         get
@@ -42,7 +44,7 @@ public class AudioSource : IDisposable
     private float gain = 1.0f;
     private float pitch = 1.0f;
 
-    private readonly Task audioUpdateTask;
+    private readonly Thread thread;
     private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public AudioStream? AudioStream
@@ -63,11 +65,16 @@ public class AudioSource : IDisposable
         AL.Source(Handle, ALSourcef.Gain, gain);
         AL.Source(Handle, ALSourcef.Pitch, pitch);
         AL.Source(Handle, ALSourcei.SourceType, (int) ALSourceType.Streaming);
-
-        audioUpdateTask = Task.Run(UpdateLoopAsync);
+        
+        thread = new Thread(UpdateLoop)
+        {
+            IsBackground = true
+        };
+        thread.Start();
     }
 
-    private async Task UpdateLoopAsync()
+    // Update loop in a background thread
+    private void UpdateLoop()
     {
         while (!cancellationTokenSource.IsCancellationRequested)
         {
@@ -75,18 +82,27 @@ public class AudioSource : IDisposable
             {
                 continue;
             }
-        
+
             lock (audioStream)
             {
                 if (!Playing)
                 {
                     continue;
                 }
-
-                QueueBuffers(audioStream);
+                
+                if (audioStream.ShouldQueueBuffers())
+                {
+                    QueueBuffers(audioStream);
+                }
+                
+                // If it's looping, restart when we reached end
+                if (Looping && audioStream.SamplePosition >= audioStream.SampleCount)
+                {
+                    audioStream.Seek(0L);
+                }
             }
             
-            await Task.Delay(2, cancellationTokenSource.Token);
+            Thread.Sleep(10);
         }
     }
 
@@ -107,7 +123,7 @@ public class AudioSource : IDisposable
         int buffersToQueue = numBuffers - buffersQueued;
         for (int i = 0; i < buffersToQueue; i++)
         {
-            if (!stream.NextBuffer(out Span<byte> data))
+            if (!stream.NextBuffer(out var data))
             {
                 break;
             }
@@ -157,7 +173,7 @@ public class AudioSource : IDisposable
         {
             if (audioStream.SamplePosition > 0)
             {
-                audioStream.Restart();
+                audioStream.Seek(0L);
             }
         
             CleanAllBuffers();

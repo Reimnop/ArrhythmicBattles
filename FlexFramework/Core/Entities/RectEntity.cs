@@ -1,4 +1,5 @@
 ﻿using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
@@ -106,14 +107,15 @@ public class RectEntity : Entity, IRenderable
             GenerateMesh();
         }
 
+        CommandList commandList = args.CommandList;
+        LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
-        int layerId = args.LayerId;
-        
+
         matrixStack.Push();
         matrixStack.Translate(Min.X, Min.Y, 0.0f);
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
-        args.Renderer.EnqueueDrawData(layerId, vertexDrawData);
+        commandList.AddDrawData(layerType, vertexDrawData);
         matrixStack.Pop();
     }
 }

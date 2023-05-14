@@ -23,8 +23,8 @@ public class LitMeshEntity : Entity, IRenderable
             return;
         }
         
-        Renderer renderer = args.Renderer;
-        int layerId = args.LayerId;
+        CommandList commandList = args.CommandList;
+        LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;
         CameraData cameraData = args.CameraData;
 
@@ -44,6 +44,6 @@ public class LitMeshEntity : Entity, IRenderable
             AlbedoTexture?.ReadOnly, MetallicTexture?.ReadOnly, RoughnessTexture?.ReadOnly,
             materialData);
 
-        renderer.EnqueueDrawData(layerId, vertexDrawData);
+        commandList.AddDrawData(layerType, vertexDrawData);
     }
 }
