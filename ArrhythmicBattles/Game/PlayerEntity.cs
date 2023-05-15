@@ -1,12 +1,11 @@
-﻿using ArrhythmicBattles.Modelling;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.Trees;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
+using FlexFramework.Modelling;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace ArrhythmicBattles.Core.Animation;
+namespace FlexFramework.Modelling.Animation;
 
 public class NoKeyException : Exception
 {

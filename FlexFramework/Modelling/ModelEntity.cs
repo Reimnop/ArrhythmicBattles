@@ -1,11 +1,8 @@
-﻿using System.Diagnostics;
-using ArrhythmicBattles.Core;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Util;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 public class ModelEntity : Entity, IRenderable
 {

@@ -1,4 +1,4 @@
-﻿namespace ArrhythmicBattles.Core;
+﻿namespace FlexFramework.Modelling;
 
 public class TreeBuilder<T>
 {

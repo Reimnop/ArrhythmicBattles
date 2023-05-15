@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ArrhythmicBattles.Core;
+namespace FlexFramework.Modelling;
 
 public class ImmutableNode<T> : IEnumerable<ImmutableNode<T>>
 {

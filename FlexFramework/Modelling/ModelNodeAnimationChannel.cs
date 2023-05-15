@@ -1,7 +1,7 @@
-﻿using ArrhythmicBattles.Core.Animation;
+﻿using FlexFramework.Modelling.Animation;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 public class ModelNodeAnimationChannel
 {

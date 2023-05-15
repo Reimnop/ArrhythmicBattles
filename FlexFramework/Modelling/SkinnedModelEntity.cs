@@ -1,12 +1,11 @@
-﻿using ArrhythmicBattles.Core;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 // TODO: Implement support for non-zero mesh origins
 // Alright, I can't fix this

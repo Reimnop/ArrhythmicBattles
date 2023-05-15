@@ -1,10 +1,9 @@
-﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Core.Animation;
+﻿using FlexFramework.Modelling.Animation;
 using Assimp;
 using OpenTK.Mathematics;
 using Quaternion = OpenTK.Mathematics.Quaternion;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 public class AnimationHandler
 {

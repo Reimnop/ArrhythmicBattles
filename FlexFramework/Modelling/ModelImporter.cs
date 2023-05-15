@@ -1,13 +1,10 @@
-﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Core.Animation;
+﻿using FlexFramework.Modelling.Animation;
 using Assimp;
 using FlexFramework.Core.Data;
 using OpenTK.Mathematics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using Quaternion = OpenTK.Mathematics.Quaternion;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 public class ModelImporter : IDisposable
 {

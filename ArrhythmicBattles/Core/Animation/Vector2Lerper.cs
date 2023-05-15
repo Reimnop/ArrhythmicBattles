@@ -1,7 +1,7 @@
 ﻿using Glide;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Core.Animation;
+namespace FlexFramework.Modelling.Animation;
 
 public class Vector2Lerper : MemberLerper
 {

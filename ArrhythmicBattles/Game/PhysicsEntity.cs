@@ -1,11 +1,9 @@
-﻿using ArrhythmicBattles.Modelling;
-using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
-using FlexFramework.Physics;
+using FlexFramework.Modelling;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Game;

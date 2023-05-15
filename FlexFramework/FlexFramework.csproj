@@ -16,6 +16,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="BepuPhysics" Version="2.4.0" />
         <PackageReference Include="HalfMaid.Async" Version="0.9.2" />
         <PackageReference Include="NVorbis" Version="0.10.4" />

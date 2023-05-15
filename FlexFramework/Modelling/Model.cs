@@ -1,11 +1,7 @@
-﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Core.Animation;
-using FlexFramework.Core.Data;
-using FlexFramework.Core.Rendering.Data;
-using OpenTK.Graphics.OpenGL4;
+﻿using FlexFramework.Core.Data;
 using OpenTK.Mathematics;
 
-namespace ArrhythmicBattles.Modelling;
+namespace FlexFramework.Modelling;
 
 public class ModelMaterial
 {

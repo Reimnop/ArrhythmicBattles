@@ -1,4 +1,4 @@
-﻿namespace ArrhythmicBattles.Modelling;
+﻿namespace FlexFramework.Modelling;
 
 public class ModelAnimation
 {
