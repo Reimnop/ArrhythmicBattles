@@ -1,6 +1,7 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
@@ -30,6 +31,9 @@ public class MainMenuScene : ABScene
     private readonly AudioStream sfxAudioStream;
     private readonly AudioSource sfxAudioSource;
     private readonly ScopedInputProvider inputProvider;
+    
+    private readonly Binding<float> musicVolumeBinding;
+    private readonly Binding<float> sfxVolumeBinding;
 
     private readonly CommandList commandList = new();
 
@@ -44,7 +48,6 @@ public class MainMenuScene : ABScene
         }
         
         // Init audio
-        // TODO: Listen for settings changes
         var settings = Context.Settings;
         
         musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic.ogg");
@@ -58,6 +61,10 @@ public class MainMenuScene : ABScene
         sfxAudioSource.Gain = settings.SfxVolume;
         sfxAudioSource.Looping = false;
         sfxAudioSource.AudioStream = sfxAudioStream;
+        
+        // Init bindings
+        musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
+        sfxVolumeBinding = new Binding<float>(settings, nameof(ISettings.SfxVolume), sfxAudioSource, nameof(AudioSource.Gain));
 
         // Init resources
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
@@ -150,8 +157,10 @@ public class MainMenuScene : ABScene
     {
         base.Dispose();
         
+        musicVolumeBinding.Dispose();
+        sfxVolumeBinding.Dispose();
+        
         inputProvider.Dispose();
-        // Context.Sound.MenuBackgroundMusic.Stop();
         musicAudioSource.Dispose();
         musicAudioStream.Dispose();
         sfxAudioSource.Dispose();
