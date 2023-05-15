@@ -76,7 +76,8 @@ public class GameScene : ABScene
         // We init these here because player entity depends on them
         inputProvider = Context.InputSystem.AcquireInputProvider();
         physicsWorld = new PhysicsWorld(Engine);
-        playerEntity = CreateEntity(() => new PlayerEntity(inputProvider, physicsWorld, Vector3.UnitY * 4.0f, 0.0f, 0.0f));
+        playerEntity = CreateEntity(() => new PlayerEntity(inputProvider, physicsWorld, 0.0f, 0.0f));
+        playerEntity.Position = Vector3.UnitY * 4.0f;
         
         // Init other things
         skyboxRenderer = new ProceduralSkyboxRenderer();
@@ -137,6 +138,12 @@ public class GameScene : ABScene
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
             OpenScreen(new PauseScreen(Engine, this));
+        }
+        
+        // Teleport player to origin if they fall off the map
+        if (playerEntity.Position.Y < -10.0f)
+        {
+            playerEntity.Position = Vector3.UnitY * 4.0f;
         }
 
 #if DEBUG

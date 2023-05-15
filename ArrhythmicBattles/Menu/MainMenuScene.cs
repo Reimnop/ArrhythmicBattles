@@ -1,13 +1,11 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;

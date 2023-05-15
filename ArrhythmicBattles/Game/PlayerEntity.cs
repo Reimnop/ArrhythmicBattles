@@ -40,12 +40,23 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
             Hit = collidable;
         }
     }
-    
-    public Vector3 Position => position;
+
+    public Vector3 Position
+    {
+        get
+        {
+            BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
+            return bodyReference.Pose.Position.ToOpenTK();
+        }
+        set
+        {
+            BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
+            bodyReference.Pose.Position = value.ToSystem();
+        }
+    }
     public float Yaw => yaw;
     public float Pitch => pitch;
     
-    private Vector3 position = Vector3.Zero;
     private float yaw = 0.0f;
     private float pitch = 0.0f;
 
@@ -62,11 +73,10 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
     private float movementX = 0.0f;
     private bool jump = false;
 
-    public PlayerEntity(IInputProvider inputProvider, PhysicsWorld physicsWorld, Vector3 position, float yaw, float pitch)
+    public PlayerEntity(IInputProvider inputProvider, PhysicsWorld physicsWorld, float yaw, float pitch)
     {
         this.inputProvider = inputProvider;
         this.physicsWorld = physicsWorld;
-        this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
         
@@ -76,7 +86,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         // create shape
         Capsule capsule = new Capsule(0.5f, 1.0f);
         TypedIndex capsuleIndex = physicsWorld.Simulation.Shapes.Add(capsule);
-        RigidPose rigidPose = new RigidPose(position.ToSystem(), Quaternion.FromAxisAngle(Vector3.UnitY, yaw).ToSystem());
+        RigidPose rigidPose = new RigidPose(System.Numerics.Vector3.Zero, Quaternion.FromAxisAngle(Vector3.UnitY, yaw).ToSystem());
         BodyDescription bodyDescription = BodyDescription.CreateDynamic(
             rigidPose, 
             new BodyInertia { InverseMass = 1.0f / 40.0f },
@@ -94,7 +104,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         
         // raycast to check if player is grounded
         RayHitHandler handler = new RayHitHandler(bodyReference.CollidableReference);
-        Vector3 rayStart = new Vector3(position.X, position.Y, position.Z);
+        Vector3 rayStart = new Vector3(Position.X, Position.Y, Position.Z);
         physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 1.0f, ref handler);
         grounded = handler.Hit != null;
 
@@ -130,9 +140,6 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         
         // reset jump
         jump = false;
-        
-        // update position
-        position = bodyReference.Pose.Position.ToOpenTK();
     }
 
     public override void Update(UpdateArgs args)
@@ -159,7 +166,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         MatrixStack matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(position);
+        matrixStack.Translate(Position);
         modelEntity.Render(args);
         matrixStack.Pop();
     }
