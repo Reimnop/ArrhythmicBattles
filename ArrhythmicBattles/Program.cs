@@ -6,7 +6,6 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using FlexFramework.Logging;
-using FlexFramework.Modelling.Animation;
 using Glide;
 using OpenTK.Windowing.Common.Input;
 using SixLabors.ImageSharp.PixelFormats;
