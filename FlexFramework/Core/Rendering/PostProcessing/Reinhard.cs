@@ -32,7 +32,8 @@ public class Reinhard : PostProcessor, IDisposable
         tonemappedTexture = new Texture2D("reinhard", size.X, size.Y, SizedInternalFormat.Rgba16f);
     }
     
-    public override void Process(GLStateManager stateManager, Texture2D texture)
+    // We don't need the render buffer here
+    public override void Process(GLStateManager stateManager, IRenderBuffer renderBuffer, Texture2D texture)
     {
         stateManager.UseProgram(program);
         stateManager.BindTextureUnit(0, texture);

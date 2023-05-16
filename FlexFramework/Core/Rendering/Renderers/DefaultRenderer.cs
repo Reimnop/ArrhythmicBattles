@@ -95,9 +95,9 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         
         DefaultRenderBuffer drb = (DefaultRenderBuffer) renderBuffer;
 
-        stateManager.BindFramebuffer(drb.WorldCapturer.FrameBuffer); // Bind world framebuffer
+        stateManager.BindFramebuffer(drb.WorldFrameBuffer); // Bind world framebuffer
 
-        GL.Viewport(0, 0, drb.WorldCapturer.Width, drb.WorldCapturer.Height);
+        GL.Viewport(0, 0, drb.Size.X, drb.Size.Y);
         
         GL.ClearColor(ClearColor);
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -105,7 +105,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         // Render background
         if (commandList.TryGetBackgroundRenderer(out var backgroundRenderer, out var backgroundCameraData))
         {
-            backgroundRenderer.Render(this, stateManager, drb.WorldCapturer.ColorBuffer, backgroundCameraData);
+            backgroundRenderer.Render(this, stateManager, drb, backgroundCameraData);
         }
         
         // Opaque
@@ -147,16 +147,16 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         // Post-process world framebuffer
         if (commandList.TryGetPostProcessors(out var postProcessors))
         {
-            RunPostProcessors(postProcessors, drb.WorldCapturer.ColorBuffer);
+            RunPostProcessors(postProcessors, drb, drb.WorldColor);
         }
 
-        stateManager.BindFramebuffer(drb.GuiCapturer.FrameBuffer); // Finish rendering world, bind gui framebuffer
+        stateManager.BindFramebuffer(drb.GuiFrameBuffer); // Finish rendering world, bind gui framebuffer
         
         // Blit world framebuffer to gui framebuffer
         GL.ClearColor(Color.Black);
         GL.Clear(ClearBufferMask.ColorBufferBit);
         GL.BlitNamedFramebuffer(
-            drb.WorldCapturer.FrameBuffer.Handle, drb.GuiCapturer.FrameBuffer.Handle, 
+            drb.WorldFrameBuffer.Handle, drb.GuiFrameBuffer.Handle, 
             0, 0, drb.Size.X, drb.Size.Y, 
             0, 0, drb.Size.X, drb.Size.Y, 
             ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
@@ -176,7 +176,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         stateManager.BindFramebuffer(null);
     }
 
-    private void RunPostProcessors(IReadOnlyList<PostProcessor> postProcessors, Texture2D texture)
+    private void RunPostProcessors(IReadOnlyList<PostProcessor> postProcessors, IRenderBuffer renderBuffer, Texture2D texture)
     {
         Vector2i size = new Vector2i(texture.Width, texture.Height);
         
@@ -198,7 +198,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
 
         foreach (var processor in postProcessors)
         {
-            processor.Process(stateManager, texture);
+            processor.Process(stateManager, renderBuffer, texture);
         }
     }
 

@@ -1,4 +1,6 @@
 ﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Settings;
+using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using FlexFramework.Core;
@@ -27,13 +29,16 @@ public class GameScene : ABScene
     private readonly AudioStream musicAudioStream;
     private readonly AudioSource musicAudioSource;
     
+    private readonly Bloom bloom;
+    private readonly Exposure tonemapper;
+
     private readonly PerspectiveCamera camera;
     private readonly PhysicsWorld physicsWorld;
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
-    private readonly Bloom bloom;
-    private readonly Exposure tonemapper;
     private readonly ScopedInputProvider inputProvider;
     private DebugScreen? debugScreen;
+    
+    private readonly Binding<float> musicVolumeBinding;
 
 #if DEBUG
     private SkinnedModelEntity? testModelEntity;
@@ -60,15 +65,15 @@ public class GameScene : ABScene
         envModel = new Model(@"Assets/Models/Map01.dae");
         
         // Init audio
-        // TODO: Listen for settings changes
-        var settings = Context.Settings;
-        
         musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic_Creating_Something_New.ogg");
         musicAudioSource = new AudioSource();
-        musicAudioSource.Gain = settings.MusicVolume;
         musicAudioSource.AudioStream = musicAudioStream;
         musicAudioSource.Play();
         
+        // Init bindings
+        var settings = Context.Settings;
+        musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
+
         // Init entities
         envModelEntity = CreateEntity(() => new ModelEntity(envModel));
         
@@ -95,7 +100,6 @@ public class GameScene : ABScene
 
         // Init post processing
         bloom = new Bloom();
-
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
 
@@ -235,11 +239,12 @@ public class GameScene : ABScene
         
         musicAudioSource.Dispose();
         musicAudioStream.Dispose();
+        bloom.Dispose();
+        tonemapper.Dispose();
         envModel.Dispose();
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
-        bloom.Dispose();
-        tonemapper.Dispose();
         inputProvider.Dispose();
+        musicVolumeBinding.Dispose();
     }
 }

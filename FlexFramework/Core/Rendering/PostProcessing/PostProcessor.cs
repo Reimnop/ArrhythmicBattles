@@ -15,5 +15,5 @@ public abstract class PostProcessor
     {
         CurrentSize = size;
     }
-    public abstract void Process(GLStateManager stateManager, Texture2D texture);
+    public abstract void Process(GLStateManager stateManager, IRenderBuffer renderBuffer, Texture2D texture);
 }

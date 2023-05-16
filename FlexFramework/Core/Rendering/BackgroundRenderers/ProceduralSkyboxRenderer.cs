@@ -17,9 +17,14 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
         program.LinkShaders(shader);
     }
     
-    public override void Render(Renderer renderer, GLStateManager stateManager, Texture2D renderTarget, CameraData cameraData)
+    public override void Render(Renderer renderer, GLStateManager stateManager, IRenderBuffer renderBuffer, CameraData cameraData)
     {
         if (renderer is not ILighting lighting)
+        {
+            return;
+        }
+        
+        if (renderBuffer is not IGBuffer gBuffer)
         {
             return;
         }
@@ -39,9 +44,10 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
         GL.Uniform3(2, lighting.DirectionalLight.Value.Direction);
         GL.Uniform3(3, (lighting.DirectionalLight.Value.Color * lighting.DirectionalLight.Value.Intensity + lighting.AmbientLight) * 2.0f);
 
-        GL.BindImageTexture(0, renderTarget.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
+        GL.BindImageTexture(0, gBuffer.WorldColor.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
+        GL.BindImageTexture(1, gBuffer.WorldNormal.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-        GL.DispatchCompute(MathUtil.DivideIntCeil(renderTarget.Width, 8), MathUtil.DivideIntCeil(renderTarget.Height, 8), 1);
+        GL.DispatchCompute(MathUtil.DivideIntCeil(renderBuffer.Size.X, 8), MathUtil.DivideIntCeil(renderBuffer.Size.Y, 8), 1);
     }
 
     public void Dispose()

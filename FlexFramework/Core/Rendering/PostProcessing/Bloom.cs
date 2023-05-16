@@ -87,7 +87,7 @@ public class Bloom : PostProcessor, IDisposable
         return program;
     }
 
-    public override void Process(GLStateManager stateManager, Texture2D texture)
+    public override void Process(GLStateManager stateManager, IRenderBuffer renderBuffer, Texture2D texture)
     {
         stateManager.UseProgram(prefilterShader);
         GL.Uniform1(1, HardThreshold);

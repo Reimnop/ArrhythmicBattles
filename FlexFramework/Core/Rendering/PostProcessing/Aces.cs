@@ -32,7 +32,7 @@ public class Aces : PostProcessor, IDisposable
         tonemappedTexture = new Texture2D("aces", size.X, size.Y, SizedInternalFormat.Rgba16f);
     }
     
-    public override void Process(GLStateManager stateManager, Texture2D texture)
+    public override void Process(GLStateManager stateManager, IRenderBuffer renderBuffer, Texture2D texture)
     {
         stateManager.UseProgram(program);
         stateManager.BindTextureUnit(0, texture);

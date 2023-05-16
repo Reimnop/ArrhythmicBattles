@@ -34,7 +34,7 @@ public class Exposure : PostProcessor, IDisposable
         tonemappedTexture = new Texture2D("exposure", size.X, size.Y, SizedInternalFormat.Rgba16f);
     }
     
-    public override void Process(GLStateManager stateManager, Texture2D texture)
+    public override void Process(GLStateManager stateManager, IRenderBuffer renderBuffer, Texture2D texture)
     {
         stateManager.UseProgram(program);
         GL.Uniform1(1, ExposureValue);

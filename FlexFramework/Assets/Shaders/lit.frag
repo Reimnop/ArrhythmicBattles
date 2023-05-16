@@ -2,6 +2,7 @@
 const float PI = 3.14159265359;
 
 layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 fragNormal;
 
 layout(location = 2) uniform sampler2D albedoTex;
 layout(location = 3) uniform sampler2D metallicTex;
@@ -119,4 +120,5 @@ void main() {
     vec3 finalColor = (kD * diffuse + specularLight) * albedo + specular;
 
     fragColor = vec4(finalColor + ambient, 1.0);
+    fragNormal = vec4(normal, 1.0);
 }
