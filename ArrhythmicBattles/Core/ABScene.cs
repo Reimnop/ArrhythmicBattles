@@ -12,10 +12,13 @@ public abstract class ABScene : InteractiveScene
 
     public ABContext Context { get; }
     
-    protected MatrixStack MatrixStack { get; } = new MatrixStack();
+    protected MatrixStack MatrixStack { get; } = new();
     protected GuiCamera GuiCamera { get; }
 
-    protected LayeredScreenHandler ScreenHandler { get; } = new LayeredScreenHandler();
+    protected LayeredScreenHandler ScreenHandler { get; } = new();
+    
+    // Rendering stuff
+    private CommandList commandList = new();
 
     public ABScene(ABContext context) : base(context.Engine)
     {
@@ -47,6 +50,21 @@ public abstract class ABScene : InteractiveScene
     {
         ScreenHandler.SwitchScreen(before, after);
     }
+
+    public override void Render(Renderer renderer)
+    {
+        // Clear command list
+        commandList.Clear();
+        
+        // Queue render commands
+        RenderScene(commandList);
+        
+        // Render and present
+        renderer.Render(Engine.ClientSize, commandList, Context.RenderBuffer);
+        Engine.Present(Context.RenderBuffer);
+    }
+    
+    protected abstract void RenderScene(CommandList commandList);
 
     public override void Dispose()
     {

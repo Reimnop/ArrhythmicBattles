@@ -35,8 +35,6 @@ public class MainMenuScene : ABScene
     private readonly Binding<float> musicVolumeBinding;
     private readonly Binding<float> sfxVolumeBinding;
 
-    private readonly CommandList commandList = new();
-
     public MainMenuScene(ABContext context) : base(context)
     {
         Engine.CursorState = CursorState.Normal;
@@ -119,10 +117,8 @@ public class MainMenuScene : ABScene
         }
     }
 
-    public override void Render(Renderer renderer)
+    protected override void RenderScene(CommandList commandList)
     {
-        commandList.Clear();
-        
         CameraData cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         RenderArgs args = new RenderArgs(commandList, LayerType.Gui, MatrixStack, cameraData);
         
@@ -147,10 +143,6 @@ public class MainMenuScene : ABScene
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
         EntityCall(copyrightText, entity => entity.Render(args));
         MatrixStack.Pop();
-        
-        // Render scene
-        renderer.Render(Engine.ClientSize, commandList, Context.RenderBuffer);
-        Engine.Present(Context.RenderBuffer);
     }
 
     public override void Dispose()

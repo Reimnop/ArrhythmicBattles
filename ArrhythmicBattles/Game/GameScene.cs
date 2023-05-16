@@ -34,7 +34,6 @@ public class GameScene : ABScene
     private readonly Exposure tonemapper;
     private readonly ScopedInputProvider inputProvider;
     private DebugScreen? debugScreen;
-    private CommandList commandList = new();
 
 #if DEBUG
     private SkinnedModelEntity? testModelEntity;
@@ -193,10 +192,8 @@ public class GameScene : ABScene
 #endif
     }
 
-    public override void Render(Renderer renderer)
+    protected override void RenderScene(CommandList commandList)
     {
-        commandList.Clear();
-        
         commandList.AddPostProcessor(bloom);
         commandList.AddPostProcessor(tonemapper);
 
@@ -230,10 +227,6 @@ public class GameScene : ABScene
         RenderArgs guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
         
         ScreenHandler.Render(guiArgs);
-        
-        // Render scene
-        renderer.Render(Engine.ClientSize, commandList, Context.RenderBuffer);
-        Engine.Present(Context.RenderBuffer);
     }
 
     public override void Dispose()
