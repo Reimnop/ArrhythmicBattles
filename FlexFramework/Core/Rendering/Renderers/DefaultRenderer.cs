@@ -23,7 +23,8 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     private Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
 
     private GLStateManager stateManager;
-    private ShaderProgram skyboxShader;
+    private FrameBuffer readFrameBuffer;
+    private FrameBuffer drawFrameBuffer;
 
     private int opaqueLayerId;
     private int alphaClipLayerId;
@@ -40,8 +41,9 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         string version = GL.GetString(StringName.Version);
         gpuInfo = new GpuInfo(name, vendor, version);
         
-        // Init GL objects
-        skyboxShader = LoadComputeProgram("skybox", "Assets/Shaders/Compute/skybox");
+        // Create framebuffers
+        readFrameBuffer = new FrameBuffer("read");
+        drawFrameBuffer = new FrameBuffer("draw");
 
         // Register render strategies
         RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
@@ -73,16 +75,6 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     {
         Engine.LogMessage(this, Severity.Info, null, $"Initializing render strategy [{strategy.GetType().Name}] for [{typeof(TDrawData).Name}]");
         renderStrategies.Add(typeof(TDrawData), strategy);
-    }
-
-    private ShaderProgram LoadComputeProgram(string name, string path)
-    {
-        using Shader shader = new Shader($"{name}-vs", File.ReadAllText($"{path}.comp"), ShaderType.ComputeShader);
-
-        ShaderProgram program = new ShaderProgram(name);
-        program.LinkShaders(shader);
-
-        return program;
     }
 
     public override void Render(Vector2i size, CommandList commandList, IRenderBuffer renderBuffer)
@@ -143,23 +135,23 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         
         // Unbind
         stateManager.BindFramebuffer(null);
+        
+        // Copy world color to world final
+        GL.CopyImageSubData(
+            drb.WorldColor.Handle, ImageTarget.Texture2D, 0, 0, 0, 0,
+            drb.WorldFinal.Handle, ImageTarget.Texture2D, 0, 0, 0, 0,
+            drb.Size.X, drb.Size.Y, 1);
 
         // Post-process world framebuffer
         if (commandList.TryGetPostProcessors(out var postProcessors))
         {
-            RunPostProcessors(postProcessors, drb, drb.WorldColor);
+            RunPostProcessors(postProcessors, drb, drb.WorldFinal);
         }
-
-        stateManager.BindFramebuffer(drb.GuiFrameBuffer); // Finish rendering world, bind gui framebuffer
         
-        // Blit world framebuffer to gui framebuffer
-        GL.ClearColor(Color.Black);
-        GL.Clear(ClearBufferMask.ColorBufferBit);
-        GL.BlitNamedFramebuffer(
-            drb.WorldFrameBuffer.Handle, drb.GuiFrameBuffer.Handle, 
-            0, 0, drb.Size.X, drb.Size.Y, 
-            0, 0, drb.Size.X, drb.Size.Y, 
-            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+        // Copy world final to gui color
+        CopyImageFbo(drb.WorldFinal, drb.GuiColor, drb.Size);
+
+        stateManager.BindFramebuffer(drb.GuiFrameBuffer); // Bind gui framebuffer
 
         // GUI
         if (commandList.TryGetLayer(LayerType.Gui, out var guiLayer))
@@ -210,14 +202,29 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             strategy.Draw(stateManager, drawData);
         }
     }
+    
+    private void CopyImageFbo(Texture2D source, Texture2D destination, Vector2i size)
+    {
+        // Bind source and destination
+        readFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, source);
+        drawFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, destination);
+        
+        // Copy image
+        GL.BlitNamedFramebuffer(
+            readFrameBuffer.Handle, drawFrameBuffer.Handle, 
+            0, 0, size.X, size.Y, 
+            0, 0, size.X, size.Y, 
+            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+    }
 
     public void Dispose()
     {
-        skyboxShader.Dispose();
-
         foreach (IDisposable strategy in renderStrategies.Values.OfType<IDisposable>())
         {
             strategy.Dispose();
         }
+        
+        readFrameBuffer.Dispose();
+        drawFrameBuffer.Dispose();
     }
 }

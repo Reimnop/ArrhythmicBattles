@@ -31,6 +31,7 @@ public class GameScene : ABScene
     
     private readonly Bloom bloom;
     private readonly Exposure tonemapper;
+    private readonly EdgeDetect edgeDetect;
 
     private readonly PerspectiveCamera camera;
     private readonly PhysicsWorld physicsWorld;
@@ -102,6 +103,7 @@ public class GameScene : ABScene
         bloom = new Bloom();
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
+        edgeDetect = new EdgeDetect();
 
 #if DEBUG
         const string testModelPath = @"Assets/Test/test.fbx";
@@ -200,6 +202,7 @@ public class GameScene : ABScene
     {
         commandList.AddPostProcessor(bloom);
         commandList.AddPostProcessor(tonemapper);
+        commandList.AddPostProcessor(edgeDetect);
 
         CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
@@ -237,10 +240,11 @@ public class GameScene : ABScene
     {
         base.Dispose();
         
-        musicAudioSource.Dispose();
-        musicAudioStream.Dispose();
         bloom.Dispose();
         tonemapper.Dispose();
+        edgeDetect.Dispose();
+        musicAudioSource.Dispose();
+        musicAudioStream.Dispose();
         envModel.Dispose();
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
