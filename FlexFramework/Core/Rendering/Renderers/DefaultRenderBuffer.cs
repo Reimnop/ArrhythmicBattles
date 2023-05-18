@@ -15,12 +15,14 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
     public Texture2D WorldFinal => worldFinal;
     public Texture2D WorldColor => worldColor;
     public Texture2D WorldNormal => worldNormal;
+    public Texture2D WorldPosition => worldPosition;
     public Texture2D WorldDepth => worldDepth;
     public Texture2D GuiColor => guiColor;
     
     private Texture2D worldFinal;
     private Texture2D worldColor;
     private Texture2D worldNormal;
+    private Texture2D worldPosition;
     private Texture2D worldDepth;
     private Texture2D guiColor;
 
@@ -28,12 +30,12 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
     {
         // Initialize framebuffers
         WorldFrameBuffer = new FrameBuffer("world");
-        WorldFrameBuffer.DrawBuffers(DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1);
+        WorldFrameBuffer.DrawBuffers(DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1, DrawBuffersEnum.ColorAttachment2);
         
         GuiFrameBuffer = new FrameBuffer("gui");
         
         // Initialize textures
-        CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldDepth, out guiColor);
+        CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldPosition, out worldDepth, out guiColor);
         
         // Attach textures to framebuffers
         WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, worldColor);
@@ -55,21 +57,29 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
             guiColor.Dispose();
             
             // Initialize textures
-            CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldDepth, out guiColor);
+            CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldPosition, out worldDepth, out guiColor);
         
             // Attach textures to framebuffers
             WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, worldColor);
             WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment1, worldNormal);
+            WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment2, worldPosition);
             WorldFrameBuffer.Texture(FramebufferAttachment.DepthAttachment, worldDepth);
             GuiFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, guiColor);
         }
     }
 
-    private static void CreateTextures(Vector2i size, out Texture2D worldFinal, out Texture2D worldColor, out Texture2D worldNormal, out Texture2D worldDepth, out Texture2D guiColor)
+    private static void CreateTextures(Vector2i size, 
+        out Texture2D worldFinal, 
+        out Texture2D worldColor, 
+        out Texture2D worldNormal, 
+        out Texture2D worldPosition, 
+        out Texture2D worldDepth, 
+        out Texture2D guiColor)
     {
         worldFinal = new Texture2D("world_final", size.X, size.Y, SizedInternalFormat.Rgba16f);
         worldColor = new Texture2D("world_color", size.X, size.Y, SizedInternalFormat.Rgba16f);
         worldNormal = new Texture2D("world_normal", size.X, size.Y, SizedInternalFormat.Rgba16f);
+        worldPosition = new Texture2D("world_position", size.X, size.Y, SizedInternalFormat.Rgba16f);
         worldDepth = new Texture2D("world_depth", size.X, size.Y, SizedInternalFormat.DepthComponent32f);
         guiColor = new Texture2D("gui_color", size.X, size.Y, SizedInternalFormat.Rgba16f, samples: 4);
     }
@@ -88,6 +98,7 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
         GuiFrameBuffer.Dispose();
         worldColor.Dispose();
         worldNormal.Dispose();
+        worldPosition.Dispose();
         worldDepth.Dispose();
         guiColor.Dispose();
     }

@@ -46,6 +46,7 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
 
         GL.BindImageTexture(0, gBuffer.WorldColor.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.BindImageTexture(1, gBuffer.WorldNormal.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
+        GL.BindImageTexture(2, gBuffer.WorldPosition.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(MathUtil.DivideIntCeil(renderBuffer.Size.X, 8), MathUtil.DivideIntCeil(renderBuffer.Size.Y, 8), 1);
     }

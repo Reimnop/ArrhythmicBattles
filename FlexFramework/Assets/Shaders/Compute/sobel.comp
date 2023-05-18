@@ -46,6 +46,6 @@ void main() {
 
     vec3 color = sobel(normalTexture, texCoord, pixelStep);
     float intensity = length(color);
-    float result = 1.0 - smoothstep(1.0, 1.2, intensity);
+    float result = 1.0 - smoothstep(0.6, 0.8, intensity);
     imageStore(outputImage, pixelCoord, vec4(result * texture(colorTexture, texCoord).rgb, 1.0));
 }
