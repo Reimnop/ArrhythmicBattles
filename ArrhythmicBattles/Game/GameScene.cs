@@ -42,7 +42,7 @@ public class GameScene : ABScene
     private readonly Binding<float> musicVolumeBinding;
 
 #if DEBUG
-    private SkinnedModelEntity? testModelEntity;
+    private ModelEntity? testModelEntity;
     private Model? testModel;
     
     private ScopedInputProvider? freeCamInputProvider;
@@ -111,10 +111,8 @@ public class GameScene : ABScene
         if (File.Exists(testModelPath))
         {
             testModel = new Model(testModelPath);
-            ModelAnimation testAnimation = testModel.Animations[0];
 
-            testModelEntity = CreateEntity(() => new SkinnedModelEntity(testModel));
-            testModelEntity.AnimationHandler.Transition(testAnimation);
+            testModelEntity = CreateEntity(() => new ModelEntity(testModel));
         }
 #endif
     }
@@ -222,6 +220,7 @@ public class GameScene : ABScene
         {
             // render test model
             MatrixStack.Push();
+            MatrixStack.Translate(0.0f, 5.0f, 0.0f);
             EntityCall(testModelEntity, entity => entity.Render(alphaClipArgs));
             MatrixStack.Pop();
         }

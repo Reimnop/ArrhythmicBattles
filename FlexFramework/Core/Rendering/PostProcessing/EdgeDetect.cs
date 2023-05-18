@@ -42,7 +42,7 @@ public class EdgeDetect : PostProcessor
         stateManager.UseProgram(program);
         GL.Uniform1(0, 0);
         GL.Uniform1(1, 1);
-        
+
         stateManager.BindTextureUnit(0, gBuffer.WorldNormal);
         stateManager.BindTextureUnit(1, texture);
         GL.BindImageTexture(0, outputTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
