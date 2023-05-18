@@ -42,9 +42,6 @@ public class GameScene : ABScene
     private readonly Binding<float> musicVolumeBinding;
 
 #if DEBUG
-    private ModelEntity? testModelEntity;
-    private Model? testModel;
-    
     private ScopedInputProvider? freeCamInputProvider;
     private float freeCamYaw;
     private float freeCamPitch;
@@ -104,17 +101,6 @@ public class GameScene : ABScene
         tonemapper = new Exposure();
         tonemapper.ExposureValue = 1.2f;
         edgeDetect = new EdgeDetect();
-
-#if DEBUG
-        const string testModelPath = @"Assets/Test/test.fbx";
-
-        if (File.Exists(testModelPath))
-        {
-            testModel = new Model(testModelPath);
-
-            testModelEntity = CreateEntity(() => new ModelEntity(testModel));
-        }
-#endif
     }
 
     public override void Update(UpdateArgs args)
@@ -214,17 +200,6 @@ public class GameScene : ABScene
         // render environment
         MatrixStack.Push();
         EntityCall(envModelEntity, entity => entity.Render(alphaClipArgs));
-
-#if DEBUG
-        if (testModelEntity != null)
-        {
-            // render test model
-            MatrixStack.Push();
-            MatrixStack.Translate(0.0f, 5.0f, 0.0f);
-            EntityCall(testModelEntity, entity => entity.Render(alphaClipArgs));
-            MatrixStack.Pop();
-        }
-#endif
 
         MatrixStack.Pop();
 
