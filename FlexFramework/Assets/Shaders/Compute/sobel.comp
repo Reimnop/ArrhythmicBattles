@@ -1,8 +1,9 @@
 ﻿#version 430
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
-layout(location = 0) uniform sampler2D normalTexture;
-layout(location = 1) uniform sampler2D colorTexture;
+layout(location = 0) uniform sampler2D positionTexture;
+layout(location = 1) uniform sampler2D normalTexture;
+layout(location = 2) uniform sampler2D colorTexture;
 layout(rgba16f, binding = 0) uniform image2D outputImage;
 
 const float kernelX[] = {
@@ -44,8 +45,9 @@ void main() {
     vec2 pixelStep = 1.0 / vec2(size);
     vec2 texCoord = pixelCoord / vec2(size) + pixelStep * 0.5;
 
-    vec3 color = sobel(normalTexture, texCoord, pixelStep);
-    float intensity = length(color);
-    float result = 1.0 - smoothstep(0.6, 0.8, intensity);
+    vec3 positionSobel = sobel(positionTexture, texCoord, pixelStep);
+    vec3 normalSobel = sobel(normalTexture, texCoord, pixelStep);
+    float intensity = min(length(positionSobel), length(normalSobel));
+    float result = 1.0 - clamp(intensity, 0.0, 1.0);
     imageStore(outputImage, pixelCoord, vec4(result * texture(colorTexture, texCoord).rgb, 1.0));
 }
