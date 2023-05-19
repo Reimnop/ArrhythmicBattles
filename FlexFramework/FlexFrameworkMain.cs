@@ -11,14 +11,33 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FlexFramework;
 
+/// <summary>
+/// Main class for the FlexFramework
+/// </summary>
 public class FlexFrameworkMain : NativeWindow
 {
-    public SceneManager SceneManager { get; }
+    /// <summary>
+    /// Global registry for registered resources
+    /// </summary>
     public ResourceRegistry ResourceRegistry { get; }
+    
+    /// <summary>
+    /// Default assets for the engine
+    /// </summary>
     public EngineAssets DefaultAssets { get; }
-    public AudioManager AudioManager { get; }
+
+    /// <summary>
+    /// Input manager for the engine
+    /// </summary>
     public Input Input { get; }
+    
+    /// <summary>
+    /// Current renderer for rendering objects
+    /// </summary>
     public Renderer Renderer { get; private set; } = null!;
+    
+    private readonly SceneManager sceneManager;
+    private readonly AudioManager audioManager;
 
     public event LogEventHandler? Log;
 
@@ -41,10 +60,10 @@ public class FlexFrameworkMain : NativeWindow
         GL.DebugMessageCallback(debugProc, IntPtr.Zero);
 #endif
 
-        SceneManager = new SceneManager(this);
+        sceneManager = new SceneManager(this);
         ResourceRegistry = new ResourceRegistry();
         DefaultAssets = new EngineAssets(this, ResourceRegistry);
-        AudioManager = new AudioManager();
+        audioManager = new AudioManager();
         Input = new Input(this);
     }
 
@@ -112,7 +131,7 @@ public class FlexFrameworkMain : NativeWindow
 
     public Scene LoadScene(Scene scene)
     {
-        return SceneManager.LoadScene(scene);
+        return sceneManager.LoadScene(scene);
     }
 
     public void Update()
@@ -135,14 +154,14 @@ public class FlexFrameworkMain : NativeWindow
 
     private void Tick(float deltaTime)
     {
-        if (SceneManager.CurrentScene == null)
+        if (sceneManager.CurrentScene == null)
         {
             throw new NoSceneException();
         }
 
         UpdateArgs args = new UpdateArgs(time, deltaTime);
         
-        SceneManager.CurrentScene.Update(args);
+        sceneManager.CurrentScene.Update(args);
 
         Renderer.Update(args);
     }
@@ -154,7 +173,7 @@ public class FlexFrameworkMain : NativeWindow
             throw new NoRendererException();
         }
         
-        SceneManager.CurrentScene.Render(Renderer);
+        sceneManager.CurrentScene.Render(Renderer);
     }
 
     public unsafe void Present(IRenderBuffer buffer)
@@ -182,7 +201,7 @@ public class FlexFrameworkMain : NativeWindow
     {
         base.Dispose(disposing);
         
-        AudioManager.Dispose();
+        audioManager.Dispose();
         ResourceRegistry.Dispose();
         if (Renderer is IDisposable disposable)
         {

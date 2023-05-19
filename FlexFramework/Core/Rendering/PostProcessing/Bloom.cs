@@ -4,9 +4,10 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.PostProcessing;
 
-// TODO: Make mip count a const
 public class Bloom : PostProcessor, IDisposable
 {
+    private const int MipCount = 6;
+    
     public float HardThreshold { get; set; } = 0.85f;
     public float SoftThreshold { get; set; } = 0.75f;
     public float Strength { get; set; } = 0.8f;
@@ -24,10 +25,10 @@ public class Bloom : PostProcessor, IDisposable
     
     public Bloom()
     {
-        prefilterShader = LoadComputeShader("bloom-prefilter", "Assets/Shaders/Compute/bloom_prefilter.comp");
-        downsampleShader = LoadComputeShader("bloom-downsample", "Assets/Shaders/Compute/bloom_downsample.comp");
-        upsampleShader = LoadComputeShader("bloom-upsample", "Assets/Shaders/Compute/bloom_upsample.comp");
-        combineShader = LoadComputeShader("bloom-combine", "Assets/Shaders/Compute/bloom_combine.comp");
+        prefilterShader = LoadComputeShader("bloom_prefilter", "Assets/Shaders/Compute/bloom_prefilter.comp");
+        downsampleShader = LoadComputeShader("bloom_downsample", "Assets/Shaders/Compute/bloom_downsample.comp");
+        upsampleShader = LoadComputeShader("bloom_upsample", "Assets/Shaders/Compute/bloom_upsample.comp");
+        combineShader = LoadComputeShader("bloom_combine", "Assets/Shaders/Compute/bloom_combine.comp");
     }
     
     public override void Resize(Vector2i size)
@@ -46,14 +47,14 @@ public class Bloom : PostProcessor, IDisposable
 
     private void InitSize(Vector2i size)
     {
-        prefilteredTexture = InitNewTexture("bloom-prefiltered", size.X, size.Y);
+        prefilteredTexture = InitNewTexture("bloom_prefiltered", size.X, size.Y);
         downsampleMipChain = InitMipChain(size / 2, 0.5f, 5);
-        smallestTexture = InitNewTexture("bloom-smallest", downsampleMipChain[^1].Width / 2, downsampleMipChain[^1].Height / 2);
+        smallestTexture = InitNewTexture("bloom_smallest", downsampleMipChain[^1].Width / 2, downsampleMipChain[^1].Height / 2);
         upsampleMipChain = InitMipChain(new Vector2i(smallestTexture.Width, smallestTexture.Height) * 2, 2.0f, 5);
-        finalTexture = InitNewTexture("bloom-final", size.X, size.Y);
+        finalTexture = InitNewTexture("bloom_final", size.X, size.Y);
     }
 
-    private Texture2D[] InitMipChain(Vector2i initialSize, float factor, int mipCount)
+    private static Texture2D[] InitMipChain(Vector2i initialSize, float factor, int mipCount)
     {
         Texture2D[] mipChain = new Texture2D[mipCount];
         for (int i = 0; i < mipCount; i++)
@@ -62,13 +63,13 @@ public class Bloom : PostProcessor, IDisposable
             Vector2i size = new Vector2i(
                 (int) MathF.Ceiling(initialSize.X * multiplier), 
                 (int) MathF.Ceiling(initialSize.Y * multiplier));
-            mipChain[i] = InitNewTexture($"bloom-mipchain-{i}", size.X, size.Y);
+            mipChain[i] = InitNewTexture($"bloom_mipchain[{i}]", size.X, size.Y);
         }
 
         return mipChain;
     }
 
-    private Texture2D InitNewTexture(string name, int width, int height)
+    private static Texture2D InitNewTexture(string name, int width, int height)
     {
         Texture2D texture = new Texture2D(name, width, height, SizedInternalFormat.Rgba16f);
         texture.SetMinFilter(TextureMinFilter.Linear);
@@ -100,10 +101,10 @@ public class Bloom : PostProcessor, IDisposable
         stateManager.UseProgram(downsampleShader);
         GL.Uniform1(2, 0);
         
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < MipCount; i++)
         {
             Texture2D inputTexture = i == 0 ? prefilteredTexture : downsampleMipChain[i - 1];
-            Texture2D outputTexture = i == 5 ? smallestTexture : downsampleMipChain[i];
+            Texture2D outputTexture = i == MipCount - 1 ? smallestTexture : downsampleMipChain[i];
             
             stateManager.BindTextureUnit(0, inputTexture);
             GL.Uniform2(1, 1.0f / inputTexture.Width, 1.0f / inputTexture.Height); // input texture pixel size
@@ -117,7 +118,7 @@ public class Bloom : PostProcessor, IDisposable
         GL.Uniform1(1, 1);
         GL.Uniform1(2, Strength);
         
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < MipCount - 1; i++)
         {
             Texture2D inputTexture1 = i == 0 ? smallestTexture : upsampleMipChain[i - 1];
             Texture2D inputTexture2 = downsampleMipChain[^(i + 1)];
