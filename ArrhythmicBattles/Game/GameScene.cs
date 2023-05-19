@@ -1,4 +1,5 @@
 ﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.Util;
 using BepuPhysics;
@@ -8,7 +9,6 @@ using FlexFramework.Core.Audio;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
-using FlexFramework.Modelling;
 using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -18,17 +18,13 @@ namespace ArrhythmicBattles.Game;
 
 public class GameScene : ABScene
 {
-    // Resources
-    private readonly Model envModel;
-    
     // Entities
+    private readonly MapEntity mapEntity;
     private readonly PlayerEntity playerEntity;
-    private readonly ModelEntity envModelEntity;
-    
+
     // Other things
-    private readonly AudioStream musicAudioStream;
-    private readonly AudioSource musicAudioSource;
-    
+    private readonly PropContent mapPropContent;
+
     private readonly Bloom bloom;
     private readonly Exposure tonemapper;
     private readonly EdgeDetect edgeDetect;
@@ -39,7 +35,8 @@ public class GameScene : ABScene
     private readonly ScopedInputProvider inputProvider;
     private DebugScreen? debugScreen;
     
-    private readonly Binding<float> musicVolumeBinding;
+    // TODO: Damn...
+    // private readonly Binding<float> musicVolumeBinding;
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
@@ -59,21 +56,15 @@ public class GameScene : ABScene
             lighting.DirectionalLight =
                 new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
-        
-        envModel = new Model(@"Assets/Models/Map01.dae");
-        
-        // Init audio
-        musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic_Creating_Something_New.ogg");
-        musicAudioSource = new AudioSource();
-        musicAudioSource.AudioStream = musicAudioStream;
-        musicAudioSource.Play();
-        
+
         // Init bindings
-        var settings = Context.Settings;
-        musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
+        // TODO: Damn...
+        // var settings = Context.Settings;
+        // musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
 
         // Init entities
-        envModelEntity = CreateEntity(() => new ModelEntity(envModel));
+        mapPropContent = new PropContent();
+        mapEntity = CreateEntity(() => new MapEntity("Assets/Maps/Playground", mapPropContent));
         
         // We init these here because player entity depends on them
         inputProvider = Context.InputSystem.AcquireInputProvider();
@@ -88,6 +79,7 @@ public class GameScene : ABScene
         camera.DepthFar = 1000.0f;
 
         // Create floor
+        // TODO: Don't hardcode this
         {
             Box floorBox = new Box(20.0f, 0.1f, 20.0f);
             TypedIndex floorShapeIndex = physicsWorld.Simulation.Shapes.Add(floorBox);
@@ -196,12 +188,9 @@ public class GameScene : ABScene
         
         // render player
         EntityCall(playerEntity, entity => entity.Render(opaqueArgs));
-
-        // render environment
-        MatrixStack.Push();
-        EntityCall(envModelEntity, entity => entity.Render(alphaClipArgs));
-
-        MatrixStack.Pop();
+        
+        // render map
+        EntityCall(mapEntity, entity => entity.Render(opaqueArgs));
 
         // render gui
         CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
@@ -217,12 +206,11 @@ public class GameScene : ABScene
         bloom.Dispose();
         tonemapper.Dispose();
         edgeDetect.Dispose();
-        musicAudioSource.Dispose();
-        musicAudioStream.Dispose();
-        envModel.Dispose();
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
         inputProvider.Dispose();
-        musicVolumeBinding.Dispose();
+        
+        // TODO: Damn...
+        // musicVolumeBinding.Dispose();
     }
 }

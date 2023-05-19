@@ -10,6 +10,12 @@ public struct Identifier
         Namespace = @namespace;
         Name = name;
     }
+
+    internal Identifier(string name)
+    {
+        Namespace = Constants.DefaultNamespace;
+        Name = name;
+    }
     
     public override string ToString()
     {

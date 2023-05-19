@@ -14,7 +14,7 @@ public class ContentLoader : IDisposable
             var extension = Path.GetExtension(path);
             switch (extension)
             {
-                case "ogg":
+                case ".ogg":
                     return new VorbisAudioStream(path);
                 default:
                     throw new NotSupportedException($"Audio format '{extension}' is not supported!");

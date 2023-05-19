@@ -4,7 +4,16 @@ namespace ArrhythmicBattles.Game.Content;
 
 public abstract class Prop
 {
-    public abstract Vector3 Position { get; set; }
-    public abstract Vector3 Scale { get; set; }
-    public abstract Quaternion Rotation { get; set; }
+    protected ContentLoader ContentLoader { get; }
+    protected Vector3 InitialPosition { get; }
+    protected Vector3 InitialScale { get; }
+    protected Quaternion InitialRotation { get; }
+
+    protected Prop(ContentLoader contentLoader, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation)
+    {
+        ContentLoader = contentLoader;
+        InitialPosition = initialPosition;
+        InitialScale = initialScale;
+        InitialRotation = initialRotation;
+    }
 }

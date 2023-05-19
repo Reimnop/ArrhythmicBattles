@@ -1,0 +1,18 @@
+﻿{
+  "name": "Playground",
+  "music": "Arrhythmic_Creating_Something_New.ogg",
+  "props": [
+    {
+      "identifier": "arrhythmicbattles:grid",
+      "position": [0, 0, 0],
+      "scale": [1, 1, 1],
+      "rotation": [0, 0, 0, 1]
+    },
+    {
+      "identifier": "arrhythmicbattles:grid",
+      "position": [0, 2, 0],
+      "scale": [0.5, 1, 1],
+      "rotation": [0.061, 0.821, 0.245, -0.513]
+    }
+  ]
+}
