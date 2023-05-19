@@ -1,8 +1,6 @@
-﻿using System.Collections;
+﻿namespace ArrhythmicBattles.Util;
 
-namespace ArrhythmicBattles.Util;
-
-public class Registry<T> where T : class
+public class Registry<T> : IDisposable where T : class
 {
     public int Count => items.Count;
     public IEnumerable<Identifier> Identifiers => locations.Keys;
@@ -43,6 +41,14 @@ public class Registry<T> where T : class
             }
             
             return items[location.Index];
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var disposable in items.OfType<IDisposable>())
+        {
+            disposable.Dispose();
         }
     }
 }
