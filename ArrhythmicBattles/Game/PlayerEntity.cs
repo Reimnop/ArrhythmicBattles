@@ -43,17 +43,10 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
 
     public Vector3 Position
     {
-        get
-        {
-            BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
-            return bodyReference.Pose.Position.ToOpenTK();
-        }
-        set
-        {
-            BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
-            bodyReference.Pose.Position = value.ToSystem();
-        }
+        get => physicsEntity.Position;
+        set => physicsEntity.Position = value;
     }
+    
     public float Yaw => yaw;
     public float Pitch => pitch;
     
@@ -62,12 +55,13 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
 
     private readonly Model model;
     private readonly ModelEntity modelEntity;
-
+    private readonly PhysicsEntity physicsEntity;
+    
     private readonly IInputProvider inputProvider;
     private readonly PhysicsWorld physicsWorld;
 
-    private readonly BodyHandle bodyHandle;
-    
+    private readonly EntityManager entityManager = new();
+
     private bool grounded = false;
     
     private float movementX = 0.0f;
@@ -81,7 +75,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         this.pitch = pitch;
         
         model = new Model("Assets/Models/Capsule.dae");
-        modelEntity = new ModelEntity(model);
+        modelEntity = entityManager.Create(() => new ModelEntity(model));
 
         // create shape
         Capsule capsule = new Capsule(0.5f, 1.0f);
@@ -92,7 +86,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
             new BodyInertia { InverseMass = 1.0f / 40.0f },
             new CollidableDescription(capsuleIndex, 0.1f, float.MaxValue, ContinuousDetection.Passive),
             0.01f);
-        bodyHandle = physicsWorld.Simulation.Bodies.Add(bodyDescription);
+        physicsEntity = entityManager.Create(() => new PhysicsEntity(physicsWorld, bodyDescription));
 
         // add to physics manager
         physicsWorld.Step += OnStep;
@@ -100,7 +94,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
 
     private void OnStep()
     {
-        BodyReference bodyReference = physicsWorld.Simulation.Bodies.GetBodyReference(bodyHandle);
+        var bodyReference = physicsEntity.Reference;
         
         // raycast to check if player is grounded
         RayHitHandler handler = new RayHitHandler(bodyReference.CollidableReference);
@@ -174,5 +168,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
     public void Dispose()
     {
         physicsWorld.Step -= OnStep;
+        model.Dispose();
+        entityManager.Dispose();
     }
 }

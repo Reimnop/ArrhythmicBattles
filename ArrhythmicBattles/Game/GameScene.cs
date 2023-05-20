@@ -1,8 +1,6 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Game.Content;
-using BepuPhysics;
-using BepuPhysics.Collidables;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
@@ -48,13 +46,13 @@ public class GameScene : ABScene
             lighting.DirectionalLight =
                 new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
+        
+        // Init physics and input
+        inputProvider = Context.InputSystem.AcquireInputProvider();
+        physicsWorld = new PhysicsWorld();
 
         // Init entities
-        mapEntity = EntityManager.Create(() => new MapEntity("Assets/Maps/Playground", Context.Settings));
-        
-        // We init these here because player entity depends on them
-        inputProvider = Context.InputSystem.AcquireInputProvider();
-        physicsWorld = new PhysicsWorld(Engine);
+        mapEntity = EntityManager.Create(() => new MapEntity(Context.Settings, physicsWorld, "Assets/Maps/Playground"));
         playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, physicsWorld, 0.0f, 0.0f));
         playerEntity.Position = Vector3.UnitY * 4.0f;
         
@@ -63,16 +61,6 @@ public class GameScene : ABScene
         
         camera = new PerspectiveCamera();
         camera.DepthFar = 1000.0f;
-
-        // Create floor
-        // TODO: Don't hardcode this
-        {
-            Box floorBox = new Box(20.0f, 0.1f, 20.0f);
-            TypedIndex floorShapeIndex = physicsWorld.Simulation.Shapes.Add(floorBox);
-            RigidPose floorPose = RigidPose.Identity;
-            BodyDescription floorBodyDescription = BodyDescription.CreateKinematic(floorPose, floorShapeIndex, 0.01f);
-            physicsWorld.Simulation.Bodies.Add(floorBodyDescription);
-        }
 
         // Init post processing
         bloom = new Bloom();

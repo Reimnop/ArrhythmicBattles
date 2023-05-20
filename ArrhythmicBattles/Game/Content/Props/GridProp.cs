@@ -1,24 +1,46 @@
-﻿using FlexFramework.Core;
+﻿using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Util;
+using BepuPhysics;
+using BepuPhysics.Collidables;
+using FlexFramework.Core;
 using FlexFramework.Modelling;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Game.Content.Props;
 
-public class GridProp : Prop, IUpdateable, IRenderable
+public class GridProp : Prop, IUpdateable, IRenderable, IDisposable
 {
-    private readonly ModelEntity entity;
+    private readonly Simulation simulation;
+    
+    private readonly EntityManager entityManager = new();
+    private readonly ModelEntity modelEntity;
 
-    public GridProp(ContentLoader contentLoader, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation) 
-        : base(contentLoader, initialPosition, initialScale, initialRotation)
+    private readonly TypedIndex shapeIndex;
+
+    public GridProp(ContentLoader contentLoader, PhysicsWorld physicsWorld, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation) 
+        : base(contentLoader, physicsWorld, initialPosition, initialScale, initialRotation)
     {
+        simulation = physicsWorld.Simulation;
+        
         // We don't need to dispose of the model because it's managed by the ContentLoader
         var model = contentLoader.Load<Model>("Grid.dae");
-        entity = new ModelEntity(model);
+        modelEntity = entityManager.Create(() => new ModelEntity(model));
+        
+        // Create the physics body
+        var shape = new Box(20.0f * initialScale.X, 0.1f * initialScale.Y, 20.0f * initialScale.Z);
+        shapeIndex = simulation.Shapes.Add(shape);
+        var collidableDescription = new CollidableDescription(shapeIndex, 0.1f);
+        var bodyDescription = BodyDescription.CreateKinematic(
+            new RigidPose(initialPosition.ToSystem(), initialRotation.ToSystem()),
+            collidableDescription,
+            new BodyActivityDescription(0.01f));
+
+        entityManager.Create(() => new PhysicsEntity(physicsWorld, bodyDescription));
     }
     
     public void Update(UpdateArgs args)
     {
-        entity.Update(args);
+        entityManager.Update(args);
     }
 
     public void Render(RenderArgs args)
@@ -29,7 +51,12 @@ public class GridProp : Prop, IUpdateable, IRenderable
         matrixStack.Scale(InitialScale);
         matrixStack.Translate(InitialPosition);
         matrixStack.Rotate(InitialRotation);
-        entity.Render(args);
+        modelEntity.Render(args);
         matrixStack.Pop();
+    }
+
+    public void Dispose()
+    {
+        entityManager.Dispose();
     }
 }

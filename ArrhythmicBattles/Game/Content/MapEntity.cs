@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Settings;
+﻿using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
@@ -21,7 +22,7 @@ public class MapEntity : Entity, IRenderable, IDisposable
 
     private readonly Binding<float> musicVolumeBinding;
     
-    public MapEntity(string path, ISettings settings)
+    public MapEntity(ISettings settings, PhysicsWorld physicsWorld, string path)
     {
         var fullPath = Path.GetFullPath(path);
         
@@ -47,7 +48,7 @@ public class MapEntity : Entity, IRenderable, IDisposable
         foreach (var propInfo in Meta.Props)
         {
             var location = propContent.Registry[propInfo.Identifier];
-            var prop = propContent.Registry[location](propContentLoader, propInfo.Position, propInfo.Scale, propInfo.Rotation);
+            var prop = propContent.Registry[location](propContentLoader, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
             props.Add(prop);
         }
     }
