@@ -22,7 +22,7 @@ public class GameScene : ABScene
     private readonly Exposure tonemapper;
     private readonly EdgeDetect edgeDetect;
 
-    private readonly PerspectiveCamera camera;
+    private readonly OrthographicCamera camera;
     private readonly PhysicsWorld physicsWorld;
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
     private readonly ScopedInputProvider inputProvider;
@@ -30,6 +30,7 @@ public class GameScene : ABScene
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
+    private PerspectiveCamera freeCamCamera = new();
     private float freeCamYaw;
     private float freeCamPitch;
 #endif
@@ -59,7 +60,9 @@ public class GameScene : ABScene
         // Init other things
         skyboxRenderer = new ProceduralSkyboxRenderer();
         
-        camera = new PerspectiveCamera();
+        camera = new OrthographicCamera();
+        camera.Size = 10.0f;
+        camera.DepthNear = 0.1f;
         camera.DepthFar = 1000.0f;
 
         // Init post processing
@@ -125,7 +128,7 @@ public class GameScene : ABScene
             // camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
             // camera.Rotation = rotation;
 
-            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 4.0f);
+            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 500.0f);
             camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
             camera.Rotation = rotation;
 #if DEBUG
@@ -133,17 +136,17 @@ public class GameScene : ABScene
         else
         {
             // Free cam
-            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, camera.Rotation);
-            Vector3 right = Vector3.Transform(Vector3.UnitX, camera.Rotation);
+            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, freeCamCamera.Rotation);
+            Vector3 right = Vector3.Transform(Vector3.UnitX, freeCamCamera.Rotation);
             Vector2 move = freeCamInputProvider.Movement;
             
             Vector3 moveDir = (forward * move.Y + right * move.X) * 5.0f;
-            camera.Position += moveDir * args.DeltaTime;
+            freeCamCamera.Position += moveDir * args.DeltaTime;
             
             freeCamYaw -= freeCamInputProvider.MouseDelta.X / 480.0f;
             freeCamPitch -= freeCamInputProvider.MouseDelta.Y / 480.0f;
             freeCamPitch = Math.Clamp(freeCamPitch, -MathF.PI * 0.5f, MathF.PI * 0.5f);
-            camera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, freeCamYaw) * Quaternion.FromAxisAngle(Vector3.UnitX, freeCamPitch);
+            freeCamCamera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, freeCamYaw) * Quaternion.FromAxisAngle(Vector3.UnitX, freeCamPitch);
         }
 #endif
     }
@@ -154,7 +157,20 @@ public class GameScene : ABScene
         commandList.AddPostProcessor(tonemapper);
         commandList.AddPostProcessor(edgeDetect);
 
-        CameraData cameraData = camera.GetCameraData(Engine.ClientSize);
+        CameraData cameraData;
+#if DEBUG
+        if (freeCamInputProvider != null)
+        {
+            cameraData = freeCamCamera.GetCameraData(Engine.ClientSize);
+        }
+        else
+        {
+#endif
+            cameraData = camera.GetCameraData(Engine.ClientSize);
+#if DEBUG
+        }
+#endif
+
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
         
         RenderArgs alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);

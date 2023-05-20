@@ -29,7 +29,7 @@ public class PhysicsWorld : IDisposable, IUpdateable
         
         simulation = Simulation.Create(bufferPool, 
             new NarrowPhaseCallbacks(new SpringSettings(30.0f, 1.0f)), 
-            new PoseIntegratorCallbacks(new Vector3(0.0f, -9.81f, 0.0f), 0.1f, 0.1f), 
+            new PoseIntegratorCallbacks(new Vector3(0.0f, -19.62f, 0.0f), 0.1f, 0.1f), 
             new SolveDescription(8, 1));
     }
 

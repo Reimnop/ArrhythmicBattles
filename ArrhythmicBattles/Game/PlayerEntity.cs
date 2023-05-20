@@ -109,7 +109,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
             Vector3 right = Vector3.Transform(Vector3.UnitX, rotation);
             Vector3 direction = right * movementX;
             Vector2 move = new Vector2(direction.X, direction.Z).Normalized();
-            Vector3 force = new Vector3(move.X, 0.0f, move.Y) * (grounded ? 15.0f : 8.0f);
+            Vector3 force = new Vector3(move.X, 0.0f, move.Y) * (grounded ? 30.0f : 16.0f);
             
             bodyReference.Awake = true;
             bodyReference.ApplyLinearImpulse(force.ToSystem()); // why does this not wake the body?
@@ -119,7 +119,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         if (grounded && jump)
         {
             bodyReference.Awake = true; 
-            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 250.0f, 0.0f));
+            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 500.0f, 0.0f));
         }
         
         Vector3 velocity = bodyReference.Velocity.Linear.ToOpenTK();
