@@ -51,7 +51,7 @@ public class GridProp : Prop, IUpdateable, IRenderable, IDisposable
         matrixStack.Scale(InitialScale);
         matrixStack.Translate(InitialPosition);
         matrixStack.Rotate(InitialRotation);
-        modelEntity.Render(args);
+        entityManager.Invoke(modelEntity, entity => entity.Render(args));
         matrixStack.Pop();
     }
 

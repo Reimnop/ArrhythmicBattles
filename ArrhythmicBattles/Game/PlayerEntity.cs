@@ -161,7 +161,7 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         
         matrixStack.Push();
         matrixStack.Translate(Position);
-        modelEntity.Render(args);
+        entityManager.Invoke(modelEntity, entity => entity.Render(args));
         matrixStack.Pop();
     }
     
