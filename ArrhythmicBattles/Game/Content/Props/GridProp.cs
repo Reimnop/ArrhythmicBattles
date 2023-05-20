@@ -12,7 +12,7 @@ public class GridProp : Prop, IUpdateable, IRenderable
         : base(contentLoader, initialPosition, initialScale, initialRotation)
     {
         // We don't need to dispose of the model because it's managed by the ContentLoader
-        var model = contentLoader.Load<Model>("Map01.dae");
+        var model = contentLoader.Load<Model>("Grid.dae");
         entity = new ModelEntity(model);
     }
     
