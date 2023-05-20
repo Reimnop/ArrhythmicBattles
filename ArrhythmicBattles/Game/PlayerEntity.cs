@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Util;
+﻿using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.Trees;
@@ -6,7 +7,6 @@ using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Modelling;
-using FlexFramework.Physics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 

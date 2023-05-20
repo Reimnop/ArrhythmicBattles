@@ -4,7 +4,7 @@ using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
 
-namespace FlexFramework.Physics;
+namespace ArrhythmicBattles.Core.Physics;
 
 // shamelessly stolen from BepuPhysics demo
 // please don't sue me

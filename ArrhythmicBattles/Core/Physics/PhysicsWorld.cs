@@ -4,10 +4,10 @@ using BepuPhysics.Collidables;
 using BepuPhysics.Constraints;
 using BepuUtilities;
 using BepuUtilities.Memory;
+using FlexFramework;
 using FlexFramework.Core;
-using FlexFramework.Logging;
 
-namespace FlexFramework.Physics;
+namespace ArrhythmicBattles.Core.Physics;
 
 public class PhysicsWorld : IDisposable, IUpdateable
 {
@@ -71,7 +71,8 @@ public class PhysicsWorld : IDisposable, IUpdateable
 
         if (i == maxSteps)
         {
-            engine.LogMessage(this, Severity.Warning, null, $"Physics simulation is running {t * 1000.0f:0.0}ms behind!");
+            // TODO: log this
+            // engine.LogMessage(this, Severity.Warning, null, $"Physics simulation is running {t * 1000.0f:0.0}ms behind!");
             t = 0.0f;
         }
     }

@@ -2,7 +2,7 @@
 using BepuPhysics;
 using BepuUtilities;
 
-namespace FlexFramework.Physics;
+namespace ArrhythmicBattles.Core.Physics;
 
 // again, stolen from the BepuPhysics samples
 // don't sue me
