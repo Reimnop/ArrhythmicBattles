@@ -10,25 +10,25 @@
     },
     {
       "identifier": "arrhythmicbattles:grid",
-      "position": [-5, 1, 0],
+      "position": [-10, 1.5, 0],
       "scale": [0.25, 1, 0.25],
       "rotation": [0, 0, 0, 1]
     },
     {
       "identifier": "arrhythmicbattles:grid",
-      "position": [5, 1, 0],
+      "position": [10, 1.5, 0],
       "scale": [0.25, 1, 0.25],
       "rotation": [0, 0, 0, 1]
     },
     {
       "identifier": "arrhythmicbattles:grid",
-      "position": [-10, 2, 0],
+      "position": [-15, 3, 0],
       "scale": [0.25, 1, 0.25],
       "rotation": [0, 0, 0, 1]
     },
     {
       "identifier": "arrhythmicbattles:grid",
-      "position": [10, 2, 0],
+      "position": [15, 3, 0],
       "scale": [0.25, 1, 0.25],
       "rotation": [0, 0, 0, 1]
     }
