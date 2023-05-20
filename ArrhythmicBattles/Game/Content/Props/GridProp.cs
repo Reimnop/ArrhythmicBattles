@@ -7,7 +7,7 @@ namespace ArrhythmicBattles.Game.Content.Props;
 public class GridProp : Prop, IUpdateable, IRenderable
 {
     private readonly ModelEntity entity;
-    
+
     public GridProp(ContentLoader contentLoader, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation) 
         : base(contentLoader, initialPosition, initialScale, initialRotation)
     {

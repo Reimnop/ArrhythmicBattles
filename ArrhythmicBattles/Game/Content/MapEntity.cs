@@ -1,4 +1,6 @@
-﻿using FlexFramework.Core;
+﻿using ArrhythmicBattles.Settings;
+using ArrhythmicBattles.Util;
+using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Entities;
 using Newtonsoft.Json.Linq;
@@ -11,32 +13,41 @@ public class MapEntity : Entity, IRenderable, IDisposable
     public MapMeta Meta { get; }
     
     private readonly AudioSource source;
-    private readonly ContentLoader content;
+    private readonly ContentLoader contentLoader;
+    private readonly ContentLoader propContentLoader;
     
     private readonly AudioStream music;
     private readonly List<Prop> props = new();
+
+    private readonly Binding<float> musicVolumeBinding;
     
-    public MapEntity(string path, PropContent propContent)
+    public MapEntity(string path, ISettings settings)
     {
-        string fullPath = Path.GetFullPath(path);
+        var fullPath = Path.GetFullPath(path);
         
+        // Initialize resources
         source = new AudioSource();
-        content = new ContentLoader(fullPath);
+        contentLoader = new ContentLoader(fullPath);
+        propContentLoader = new ContentLoader(Path.GetFullPath("Assets/Props"));
         
         // Read the map file
         string json = File.ReadAllText(Path.Combine(fullPath, "map.json"));
         Meta = MapMeta.FromJson(JObject.Parse(json));
         
         // Load the music
-        music = content.Load<AudioStream>(Meta.Music);
+        music = contentLoader.Load<AudioStream>(Meta.Music);
         source.AudioStream = music;
         source.Play();
         
+        // Bind the music volume to the settings to automatically update volume when changed
+        musicVolumeBinding = new Binding<float>(settings, nameof(settings.MusicVolume), source, nameof(AudioSource.Gain));
+        
         // Load the props
+        var propContent = new PropContent();
         foreach (var propInfo in Meta.Props)
         {
             var location = propContent.Registry[propInfo.Identifier];
-            var prop = propContent.Registry[location](content, propInfo.Position, propInfo.Scale, propInfo.Rotation);
+            var prop = propContent.Registry[location](propContentLoader, propInfo.Position, propInfo.Scale, propInfo.Rotation);
             props.Add(prop);
         }
     }
@@ -61,13 +72,15 @@ public class MapEntity : Entity, IRenderable, IDisposable
 
     public void Dispose()
     {
-        content.Dispose();
+        contentLoader.Dispose();
+        propContentLoader.Dispose();
         source.Dispose();
-        music.Dispose();
-        
+
         foreach (var disposable in props.OfType<IDisposable>())
         {
             disposable.Dispose();
         }
+        
+        musicVolumeBinding.Dispose();
     }
 }

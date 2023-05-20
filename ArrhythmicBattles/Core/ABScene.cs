@@ -1,4 +1,5 @@
 ﻿using ArrhythmicBattles.UserInterface;
+using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
@@ -6,12 +7,12 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Core;
 
-public abstract class ABScene : InteractiveScene
+public abstract class ABScene : Scene, IDisposable
 {
     public Bounds ScreenBounds { get; protected set; }
 
     public ABContext Context { get; }
-    
+    protected EntityManager EntityManager { get; } = new();
     protected MatrixStack MatrixStack { get; } = new();
     protected GuiCamera GuiCamera { get; }
 
@@ -23,7 +24,7 @@ public abstract class ABScene : InteractiveScene
     public ABScene(ABContext context) : base(context.Engine)
     {
         Context = context;
-        
+
         Renderer renderer = Engine.Renderer;
         renderer.ClearColor = new Color4(33, 33, 33, 255);
         GuiCamera = new GuiCamera(Engine);
@@ -31,8 +32,7 @@ public abstract class ABScene : InteractiveScene
 
     public override void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
+        EntityManager.Update(args);
         ScreenHandler.Update(args);
     }
 
@@ -66,10 +66,9 @@ public abstract class ABScene : InteractiveScene
     
     protected abstract void RenderScene(CommandList commandList);
 
-    public override void Dispose()
+    public virtual void Dispose()
     {
-        base.Dispose();
-        
+        EntityManager.Dispose();
         ScreenHandler.Dispose();
     }
 }

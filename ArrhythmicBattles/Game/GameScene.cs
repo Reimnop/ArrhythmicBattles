@@ -1,11 +1,8 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Game.Content;
-using ArrhythmicBattles.Settings;
-using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using FlexFramework.Core;
-using FlexFramework.Core.Audio;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
@@ -23,8 +20,6 @@ public class GameScene : ABScene
     private readonly PlayerEntity playerEntity;
 
     // Other things
-    private readonly PropContent mapPropContent;
-
     private readonly Bloom bloom;
     private readonly Exposure tonemapper;
     private readonly EdgeDetect edgeDetect;
@@ -34,9 +29,6 @@ public class GameScene : ABScene
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
     private readonly ScopedInputProvider inputProvider;
     private DebugScreen? debugScreen;
-    
-    // TODO: Damn...
-    // private readonly Binding<float> musicVolumeBinding;
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
@@ -57,19 +49,13 @@ public class GameScene : ABScene
                 new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
 
-        // Init bindings
-        // TODO: Damn...
-        // var settings = Context.Settings;
-        // musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
-
         // Init entities
-        mapPropContent = new PropContent();
-        mapEntity = CreateEntity(() => new MapEntity("Assets/Maps/Playground", mapPropContent));
+        mapEntity = EntityManager.Create(() => new MapEntity("Assets/Maps/Playground", Context.Settings));
         
         // We init these here because player entity depends on them
         inputProvider = Context.InputSystem.AcquireInputProvider();
         physicsWorld = new PhysicsWorld(Engine);
-        playerEntity = CreateEntity(() => new PlayerEntity(inputProvider, physicsWorld, 0.0f, 0.0f));
+        playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, physicsWorld, 0.0f, 0.0f));
         playerEntity.Position = Vector3.UnitY * 4.0f;
         
         // Init other things
@@ -187,10 +173,10 @@ public class GameScene : ABScene
         RenderArgs opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
         
         // render player
-        EntityCall(playerEntity, entity => entity.Render(opaqueArgs));
+        EntityManager.Invoke(playerEntity, entity => entity.Render(opaqueArgs));
         
         // render map
-        EntityCall(mapEntity, entity => entity.Render(opaqueArgs));
+        EntityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
 
         // render gui
         CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
@@ -209,8 +195,5 @@ public class GameScene : ABScene
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
         inputProvider.Dispose();
-        
-        // TODO: Damn...
-        // musicVolumeBinding.Dispose();
     }
 }

@@ -72,7 +72,7 @@ public class MainMenuScene : ABScene
         var quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
 
         // Init entities
-        bannerEntity = CreateEntity(() => new ImageEntity(Engine));
+        bannerEntity = EntityManager.Create(() => new ImageEntity(Engine));
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.Texture = bannerTexture;
@@ -82,13 +82,13 @@ public class MainMenuScene : ABScene
         var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
         Font font = textAssets[Constants.DefaultFontName];
         
-        copyrightText = CreateEntity(() => new TextEntity(Engine, font));
+        copyrightText = EntityManager.Create(() => new TextEntity(Engine, font));
         copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles";
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
 
-        border = CreateEntity(() => new MeshEntity());
+        border = EntityManager.Create(() => new MeshEntity());
         border.Color = new Color4(24, 24, 24, 255);
         border.Mesh = quadMesh;
 
@@ -128,9 +128,9 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
-        EntityCall(border, entity => entity.Render(args));
+        EntityManager.Invoke(border, entity => entity.Render(args));
         MatrixStack.Pop();
-        EntityCall(bannerEntity, entity => entity.Render(args));
+        EntityManager.Invoke(bannerEntity, entity => entity.Render(args));
         MatrixStack.Pop();
         
         MatrixStack.Push();
@@ -138,10 +138,10 @@ public class MainMenuScene : ABScene
         MatrixStack.Push();
         MatrixStack.Translate(0.5f, 0.5f, 0.0f);
         MatrixStack.Scale(Engine.ClientSize.X, 64.0f, 1.0f);
-        EntityCall(border, entity => entity.Render(args));
+        EntityManager.Invoke(border, entity => entity.Render(args));
         MatrixStack.Pop();
         MatrixStack.Translate(Engine.ClientSize.X - 16.0f, 24.0f, 0.0f);
-        EntityCall(copyrightText, entity => entity.Render(args));
+        EntityManager.Invoke(copyrightText, entity => entity.Render(args));
         MatrixStack.Pop();
     }
 

@@ -3,17 +3,13 @@ using FlexFramework.Core.Entities;
 
 namespace FlexFramework.Core;
 
-public abstract class InteractiveScene : Scene, IDisposable
+public class EntityManager : IUpdateable, IDisposable
 {
     private readonly Dictionary<Entity, int> entityIndex = new();
     private readonly List<Entity> entities = new();
     private readonly List<bool> states = new();
     
-    protected InteractiveScene(FlexFrameworkMain engine) : base(engine)
-    {
-    }
-    
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
         Debug.Assert(entities.Count == states.Count);
 
@@ -28,12 +24,12 @@ public abstract class InteractiveScene : Scene, IDisposable
         }
     }
 
-    protected T CreateEntity<T>(Func<T> factory) where T : Entity
+    public T Create<T>(Func<T> factory) where T : Entity
     {
-        return (T) CreateEntity(() => (Entity) factory());
+        return (T) Create(() => (Entity) factory());
     }
 
-    protected Entity CreateEntity(Func<Entity> factory)
+    public Entity Create(Func<Entity> factory)
     {
         var entity = factory();
         var index = entities.Count;
@@ -43,11 +39,11 @@ public abstract class InteractiveScene : Scene, IDisposable
         return entity;
     }
 
-    protected void DestroyEntity(Entity entity)
+    public void Destroy(Entity entity)
     {
         if (!entityIndex.TryGetValue(entity, out var index))
         {
-            throw new ArgumentException("The provided entity is not a member of this scene!", nameof(entity));
+            throw new ArgumentException($"The provided entity is not a member of this {nameof(EntityManager)}!", nameof(entity));
         }
 
         entityIndex.Remove(entity);
@@ -67,31 +63,31 @@ public abstract class InteractiveScene : Scene, IDisposable
         }
     }
 
-    protected void SetEntityState(Entity entity, bool enabled)
+    public void SetState(Entity entity, bool enabled)
     {
         if (!entityIndex.TryGetValue(entity, out var index))
         {
-            throw new ArgumentException("The provided entity is not a member of this scene!", nameof(entity));
+            throw new ArgumentException($"The provided entity is not a member of this {nameof(EntityManager)}!", nameof(entity));
         }
 
         states[index] = enabled;
     }
     
-    protected bool GetEntityState(Entity entity)
+    public bool GetState(Entity entity)
     {
         if (!entityIndex.TryGetValue(entity, out var index))
         {
-            throw new ArgumentException("The provided entity is not a member of this scene!", nameof(entity));
+            throw new ArgumentException($"The provided entity is not a member of this {nameof(EntityManager)}!", nameof(entity));
         }
 
         return states[index];
     }
 
-    protected void EntityCall<T>(T entity, Action<T> action) where T : Entity
+    public void Invoke<T>(T entity, Action<T> action) where T : Entity
     {
         if (!entityIndex.TryGetValue(entity, out var index))
         {
-            throw new ArgumentException("The provided entity is not a member of this scene!", nameof(entity));
+            throw new ArgumentException($"The provided entity is not a member of this {nameof(EntityManager)}!", nameof(entity));
         }
 
         if (states[index])

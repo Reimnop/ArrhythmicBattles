@@ -30,6 +30,15 @@ public class ContentLoader : IDisposable
         this.basePath = basePath;
     }
     
+    /// <summary>
+    /// Loads content from the specified path.
+    /// The content loader owns the content and will dispose of it when it is disposed.
+    /// DO NOT dispose of the content yourself.
+    /// </summary>
+    /// <param name="path">The path to load from</param>
+    /// <typeparam name="T">The type of the content</typeparam>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException">Thrown when the type of the content isn't supported</exception>
     public T Load<T>(string path) where T : class
     {
         var fullPath = Path.GetFullPath(path, basePath);
