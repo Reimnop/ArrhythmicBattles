@@ -156,19 +156,11 @@ public class GameScene : ABScene
         commandList.AddPostProcessor(bloom);
         commandList.AddPostProcessor(tonemapper);
         commandList.AddPostProcessor(edgeDetect);
-
-        CameraData cameraData;
+        
 #if DEBUG
-        if (freeCamInputProvider != null)
-        {
-            cameraData = freeCamCamera.GetCameraData(Engine.ClientSize);
-        }
-        else
-        {
-#endif
-            cameraData = camera.GetCameraData(Engine.ClientSize);
-#if DEBUG
-        }
+        var cameraData = freeCamInputProvider != null ? freeCamCamera.GetCameraData(Engine.ClientSize) : camera.GetCameraData(Engine.ClientSize);
+#else
+        var cameraData = camera.GetCameraData(Engine.ClientSize);
 #endif
 
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
