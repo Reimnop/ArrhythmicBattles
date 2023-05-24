@@ -69,11 +69,7 @@ public class FlexFrameworkMain : NativeWindow
 
     internal void LogMessage(object? sender, Severity severity, string? type, string message)
     {
-        if (sender == null)
-        {
-            sender = this;
-        }
-        
+        sender ??= this;
         Log?.Invoke(sender, new LogEventArgs(severity, type, message));
     }
 

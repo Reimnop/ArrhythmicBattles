@@ -66,22 +66,24 @@ public class Program
     
     private static void OnLog(object sender, LogEventArgs eventArgs)
     {
+        string msg = $"[FlexFramework -> {sender.GetType().Name}] {eventArgs.Message}";
+
         switch (eventArgs.Severity)
         {
             case Severity.Debug:
-                Log("DEBUG", $"[FlexFramework] {eventArgs.Message}");
+                Log("DEBUG", msg);
                 break;
             case Severity.Info:
-                Log("INFO", $"[FlexFramework] {eventArgs.Message}");
+                Log("INFO", msg);
                 break;
             case Severity.Warning:
-                Log("WARN", $"[FlexFramework] {eventArgs.Message}");
+                Log("WARN", msg);
                 break;
             case Severity.Error:
-                Log("ERROR", $"[FlexFramework] {eventArgs.Message}");
+                Log("ERROR", msg);
                 break;
             case Severity.Fatal:
-                Log("FATAL", $"[FlexFramework] {eventArgs.Message}");
+                Log("FATAL", msg);
                 break;
         }
     }
