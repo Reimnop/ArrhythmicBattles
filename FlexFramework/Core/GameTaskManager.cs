@@ -22,13 +22,24 @@ public class GameTaskManager : IUpdateable
     public GameTaskYieldAwaitable DelayFrames(int frames) => runner.Delay(frames);
     public ExternalTaskAwaitable RunTask(Func<Task> task) => runner.RunTask(task);
 
-    protected async GameTask WaitSeconds(float seconds)
+    public async GameTask WaitSeconds(float seconds)
     {
         float t = 0;
         while (t < seconds)
         {
             t += deltaTime;
             await WaitUntilNextFrame();
+        }
+    }
+    
+    public async GameTask RunForSeconds(float seconds, Func<GameTask> task)
+    {
+        float t = 0;
+        while (t < seconds)
+        {
+            t += deltaTime;
+            await task();
+            await WaitUntilNextFrame(); // Prevents infinite loop
         }
     }
 }
