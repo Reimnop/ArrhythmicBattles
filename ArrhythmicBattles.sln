@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsdfGenNet", "MsdfGenNet\Ms
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexFramework.Text", "FlexFramework.Text\FlexFramework.Text.csproj", "{1DB8EBE2-C56D-4E4F-B255-FE37FD00564B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FtFontGenerator", "FtFontGenerator\FtFontGenerator.csproj", "{0C913D32-0A28-479A-8BA3-89D2FCAA63A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexFramework.Text.Generator", "FlexFramework.Text.Generator\FlexFramework.Text.Generator.csproj", "{0C913D32-0A28-479A-8BA3-89D2FCAA63A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

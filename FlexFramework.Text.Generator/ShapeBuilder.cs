@@ -2,7 +2,7 @@
 using MsdfGenNet;
 using SharpFont;
 
-namespace FtFontGenerator;
+namespace FlexFramework.Text.Generator;
 
 public class ShapeBuilder
 {

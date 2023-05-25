@@ -3,7 +3,7 @@ using MsdfGenNet;
 using FlexFramework.Text;
 using GlyphMetrics = FlexFramework.Text.GlyphMetrics;
 
-namespace FtFontGenerator;
+namespace FlexFramework.Text.Generator;
 
 public class Program
 {
@@ -15,14 +15,12 @@ public class Program
         Console.WriteLine("Scanning for fonts");
         foreach (var fontPath in Directory.EnumerateFiles("Fonts", "*.ttf", SearchOption.AllDirectories))
         {
-            Console.WriteLine($"Found font: {fontPath}");
             fontPaths.Add(fontPath);
         }
-        Console.WriteLine($"Total: {fontPaths.Count} fonts");
+        Console.WriteLine($"Found {fontPaths.Count} fonts");
         
-        Console.WriteLine($"Generating {fontPaths.Count} fonts");
-        int successCount = 0;
-        int failureCount = 0;
+        var successCount = 0;
+        var failureCount = 0;
         foreach (var fontPath in fontPaths)
         {
             Console.WriteLine($"Generating font: {fontPath}");
@@ -46,8 +44,7 @@ public class Program
             }
         }
         
-        Console.WriteLine($"Generated {successCount} fonts");
-        Console.WriteLine($"Failed to generate {failureCount} fonts");
+        Console.WriteLine($"Generated {successCount} fonts (failed: {failureCount})");
     }
 
     private static Font GenerateFont(string fontPath)
