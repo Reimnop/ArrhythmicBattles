@@ -61,7 +61,7 @@ public static class TextShaper
                 case HorizontalAlignment.Left:
                     break;
                 case HorizontalAlignment.Center:
-                    offsetX = -CalculateLineWidth(font, line) >> 1; // Divide by 2.
+                    offsetX = -(CalculateLineWidth(font, line) >> 1); // Divide by 2.
                     break;
                 case HorizontalAlignment.Right:
                     offsetX = -CalculateLineWidth(font, line);
