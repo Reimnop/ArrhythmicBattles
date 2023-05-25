@@ -36,7 +36,11 @@ public static class TextShaper
             minTexX, minTexY, maxTexX, maxTexY);
     }
 
-    public static ShapedText ShapeText(Font font, string text, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, VerticalAlignment verticalAlignment = VerticalAlignment.Top)
+    public static ShapedText ShapeText(
+        Font font, 
+        string text, 
+        HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, 
+        VerticalAlignment verticalAlignment = VerticalAlignment.Top)
     {
         var textHeight = CalculateTextHeight(font, text);
         var offsetY = 0;
@@ -73,6 +77,72 @@ public static class TextShaper
         }
         
         return new ShapedText(font, lines);
+    }
+
+    public static SelectionText GetSelectionText(
+        Font font,
+        string text,
+        HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment verticalAlignment = VerticalAlignment.Top)
+    {
+        var textHeight = CalculateTextHeight(font, text);
+        var offsetY = 0;
+        switch (verticalAlignment)
+        {
+            case VerticalAlignment.Bottom:
+                offsetY -= textHeight;
+                break;
+            case VerticalAlignment.Center:
+                offsetY -= textHeight >> 1; // Divide by 2.
+                break;
+            case VerticalAlignment.Top:
+                break;
+        }
+        
+        var lines = new List<SelectionLine>();
+        foreach (var line in text.Split('\n'))
+        {
+            var offsetX = 0;
+            switch (horizontalAlignment)
+            {
+                case HorizontalAlignment.Left:
+                    break;
+                case HorizontalAlignment.Center:
+                    offsetX = -(CalculateLineWidth(font, line) >> 1); // Divide by 2.
+                    break;
+                case HorizontalAlignment.Right:
+                    offsetX = -CalculateLineWidth(font, line);
+                    break;
+            }
+            
+            lines.Add(GetSelectionLine(font, line, offsetX, offsetY));
+            offsetY += font.Metrics.Height;
+        }
+        
+        return new SelectionText(lines);
+    }
+
+    private static SelectionLine GetSelectionLine(Font font, string line, int offsetX, int offsetY)
+    {
+        var top = offsetY - font.Metrics.Ascent;
+        var bottom = offsetY + font.Metrics.Descent;
+
+        if (line.Length == 0)
+            return new SelectionLine(top, bottom, Enumerable.Empty<float>().Append(offsetX));
+
+        var selectablePositions = new List<float> {offsetX};
+        var currentX = offsetX;
+        for (int i = 0; i < line.Length - 1; i++)
+        {
+            var left = line[i];
+            var right = line[i + 1];
+            var glyph = font.GetGlyph(left);
+            currentX += glyph.Metrics.AdvanceX + font.GetKerning(left, right);
+            selectablePositions.Add(currentX);
+        }
+
+        selectablePositions.Add(currentX + font.GetGlyph(line[^1]).Metrics.AdvanceX);
+        return new SelectionLine(top, bottom, selectablePositions);
     }
 
     public static GlyphLine ShapeLine(Font font, string line, int x, int y)
