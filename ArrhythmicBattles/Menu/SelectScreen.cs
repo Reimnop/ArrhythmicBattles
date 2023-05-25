@@ -29,37 +29,39 @@ public class SelectScreen : Screen, IDisposable
 
     private Element BuildInterface()
     {
+        var font = scene.Context.Font;
+        
         return new StackLayoutElement(
             Direction.Vertical,
-            new ABButtonElement(engine, inputProvider, "SINGLEPLAYER")  
+            new ABButtonElement(font, inputProvider, "SINGLEPLAYER")  
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 Click = () => engine.LoadScene(new GameScene(scene.Context))
             },
-            new ABButtonElement(engine, inputProvider, "MULTIPLAYER")
+            new ABButtonElement(font, inputProvider, "MULTIPLAYER")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 Click = () => scene.SwitchScreen(this, new MultiplayerScreen(engine, scene, inputProvider))
             },
-            new ABButtonElement(engine, inputProvider, "SETTINGS")
+            new ABButtonElement(font, inputProvider, "SETTINGS")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 Click = () => scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider))
             },
-            new ABButtonElement(engine, inputProvider, "CREDITS")
+            new ABButtonElement(font, inputProvider, "CREDITS")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 Click = () => scene.SwitchScreen(this, new CreditsScreen(engine, scene, inputProvider))
             },
-            new ABButtonElement(engine, inputProvider, "EXIT")
+            new ABButtonElement(font, inputProvider, "EXIT")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),

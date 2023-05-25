@@ -4,7 +4,7 @@ using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core;
-using Textwriter;
+using FlexFramework.Text;
 
 namespace ArrhythmicBattles.Game;
 
@@ -14,8 +14,7 @@ public class DebugScreen : Screen
     private readonly TextEntity rightTextEntity;
     
     private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    
+
     private float time = 0.0f;
     
     private int fps = 0;
@@ -24,19 +23,13 @@ public class DebugScreen : Screen
     public DebugScreen(FlexFrameworkMain engine, ABScene scene)
     {
         this.engine = engine;
-        this.scene = scene;
-
         GpuInfo gpuInfo = engine.Renderer.GpuInfo;
 
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
-
-        leftTextEntity = new TextEntity(engine, font);
-        leftTextEntity.BaselineOffset = font.Height;
+        leftTextEntity = new TextEntity(scene.Context.Font);
+        leftTextEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
         
-        rightTextEntity = new TextEntity(engine, font);
-        rightTextEntity.BaselineOffset = font.Height;
+        rightTextEntity = new TextEntity(scene.Context.Font);
+        rightTextEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +

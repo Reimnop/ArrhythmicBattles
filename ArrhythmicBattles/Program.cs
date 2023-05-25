@@ -40,16 +40,12 @@ public class Program
             Icon = icon
         };
 
-        using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
+        using var flexFramework = new FlexFrameworkMain(nws);
         flexFramework.Log += OnLog;
         flexFramework.VSync = VSyncMode.On;
         flexFramework.UseRenderer(new DefaultRenderer());
 
-        using ABContext context = new ABContext(flexFramework);
-
-        var textAssetsLocation = flexFramework.DefaultAssets.TextAssets;
-        var textAssets = flexFramework.ResourceRegistry.GetResource(textAssetsLocation);
-        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", Constants.DefaultFontName, 24);
+        using var context = new ABContext(flexFramework);
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));

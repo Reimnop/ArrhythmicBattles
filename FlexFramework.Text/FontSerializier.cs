@@ -7,7 +7,7 @@ namespace FlexFramework.Text;
 /// </summary>
 public static class FontSerializier
 {
-    public static void SerializeFont(Font font, Stream stream)
+    public static void Serialize(Font font, Stream stream)
     {
         using var writer = new BinaryWriter(stream, Encoding.UTF8, true);
         
@@ -16,7 +16,6 @@ public static class FontSerializier
         WriteTexture(font.Texture, writer);
 
         // Write glyphs
-        WriteGlyphInfo(font.TofuGlyph, writer); // Write tofu glyph
         writer.Write(font.GlyphCount);
         foreach (var (c, glyph) in font.GetGlyphs())
         {
@@ -42,14 +41,14 @@ public static class FontSerializier
         writer.Write(metrics.Descent);
     }
     
-    private static unsafe void WriteTexture(Texture<Rgba8> texture, BinaryWriter writer)
+    private static unsafe void WriteTexture(Texture<Rgb32f> texture, BinaryWriter writer)
     {
         writer.Write(texture.Width);
         writer.Write(texture.Height);
         
-        fixed (Rgba8* pixels = texture.Pixels)
+        fixed (Rgb32f* pixels = texture.Pixels)
         {
-            var span = new ReadOnlySpan<byte>(pixels, texture.Pixels.Length * sizeof(Rgba8));
+            var span = new ReadOnlySpan<byte>(pixels, texture.Pixels.Length * sizeof(Rgb32f));
             writer.Write(span);
         }
     }

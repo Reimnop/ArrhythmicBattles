@@ -38,6 +38,8 @@ public class TextureHandler
         SizedInternalFormat internalFormat = ConvertToSizedInternalFormat(texture.Format);
         Texture2D tex = new("texture", texture.Width, texture.Height, internalFormat);
         tex.SetData(texture.Data.Data, ConvertToPixelFormat(texture.Format), ConvertToPixelType(texture.Format));
+        tex.SetMinFilter(TextureMinFilter.Linear);
+        tex.SetMagFilter(TextureMagFilter.Linear);
         
         return tex;
     }

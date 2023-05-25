@@ -5,36 +5,43 @@
 /// </summary>
 public class Font
 {
+    private const char Tofu = (char) 0xFFFD;
+    
     public int GlyphCount => glyphs.Count;
     public int KerningCount => kernings.Count;
     
     public string Name { get; }
     public FontMetrics Metrics { get; }
-    public Texture<Rgba8> Texture { get; }
-    public GlyphInfo TofuGlyph { get; }
-    
+    public Texture<Rgb32f> Texture { get; }
+
     private readonly Dictionary<char, GlyphInfo> glyphs = new();
     private readonly Dictionary<(char, char), int> kernings = new();
 
     public Font(
         string name, 
         FontMetrics metrics, 
-        Texture<Rgba8> texture,
-        GlyphInfo tofuGlyph, 
+        Texture<Rgb32f> texture,
         IDictionary<char, GlyphInfo> glyphs,
         IDictionary<(char, char), int> kernings)
     {
+        if (!glyphs.ContainsKey(Tofu))
+            throw new ArgumentException("Glyphs must contain a tofu glyph.", nameof(glyphs));
+        
         Name = name;
         Metrics = metrics;
         Texture = texture.Clone();
-        this.TofuGlyph = tofuGlyph;
         this.glyphs = glyphs.ToDictionary(x => x.Key, x => x.Value);
         this.kernings = kernings.ToDictionary(x => x.Key, x => x.Value);
     }
     
+    /// <summary>
+    /// Provides a glyph for the specified character.
+    /// </summary>
+    /// <param name="c">The character.</param>
+    /// <returns></returns>
     public GlyphInfo GetGlyph(char c)
     {
-        return glyphs.TryGetValue(c, out GlyphInfo glyph) ? glyph : TofuGlyph;
+        return glyphs.TryGetValue(c, out GlyphInfo glyph) ? glyph : glyphs[Tofu];
     }
     
     public int GetKerning(char left, char right)

@@ -6,7 +6,6 @@ public class EngineAssets
 {
     public ResourceLocation<Mesh<Vertex>> QuadMesh { get; }
     public ResourceLocation<Mesh<Vertex>> QuadWireframeMesh { get; }
-    public ResourceLocation<TextAssets> TextAssets { get; }
 
     private readonly FlexFrameworkMain engine;
     private readonly ResourceRegistry registry;
@@ -18,13 +17,6 @@ public class EngineAssets
         
         QuadMesh = CreateQuadMesh();
         QuadWireframeMesh = CreateQuadWireframeMesh();
-        TextAssets = CreateTextAssets();
-    }
-
-    private ResourceLocation<TextAssets> CreateTextAssets()
-    {
-        TextAssets assets = new TextAssets(engine);
-        return registry.Register(assets);
     }
 
     private ResourceLocation<Mesh<Vertex>> CreateQuadWireframeMesh()

@@ -1,13 +1,11 @@
-﻿using ArrhythmicBattles.Util;
-using FlexFramework;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
 using Glide;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.UserInterface;
 
@@ -16,8 +14,7 @@ public class ABButtonElement : VisualElement, IUpdateable
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
-
-    private readonly FlexFrameworkMain engine;
+    
     private readonly Interactivity interactivity;
     
     private readonly RectEntity rectEntity = new RectEntity()
@@ -29,21 +26,15 @@ public class ABButtonElement : VisualElement, IUpdateable
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
 
-    public ABButtonElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text, params Element[] children) : base(children)
+    public ABButtonElement(Font font, IInputProvider inputProvider, string text, params Element[] children) : base(children)
     {
-        this.engine = engine;
-        
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonUp += OnMouseButtonUp;
         interactivity.MouseEnter += OnMouseEnter;
         interactivity.MouseLeave += OnMouseLeave;
-        
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
 
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
+        textEntity = new TextEntity(font);
+        textEntity.BaselineOffset = font.Metrics.Height;
         textEntity.Text = text;
     }
 

@@ -39,14 +39,14 @@ public class MeshGenerator
                 var maxTexY = shapedGlyph.MaxTextureCoordinateY;
                 
                 // Triangle 1
-                AddVertex(new TextVertex(minPosX, minPosY, minTexX, minTexY));
-                AddVertex(new TextVertex(maxPosX, minPosY, maxTexX, minTexY));
-                AddVertex(new TextVertex(minPosX, maxPosY, minTexX, maxTexY));
+                AddVertex(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
+                AddVertex(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
+                AddVertex(new TextVertex(minPosX, maxPosY, minTexX, minTexY));
                 
                 // Triangle 2
-                AddVertex(new TextVertex(maxPosX, minPosY, maxTexX, minTexY));
-                AddVertex(new TextVertex(maxPosX, maxPosY, maxTexX, maxTexY));
-                AddVertex(new TextVertex(minPosX, maxPosY, minTexX, maxTexY));
+                AddVertex(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
+                AddVertex(new TextVertex(maxPosX, minPosY, maxTexX, maxTexY));
+                AddVertex(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
             }
         }
         

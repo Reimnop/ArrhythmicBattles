@@ -29,22 +29,24 @@ public class SettingsScreen : Screen, IDisposable
 
     private Element BuildInterface()
     {
+        var font = scene.Context.Font;
+        
         return new StackLayoutElement(
             Direction.Vertical,
-            new ABButtonElement(engine, inputProvider, "VIDEO")  
+            new ABButtonElement(font, inputProvider, "VIDEO")  
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
-            new ABButtonElement(engine, inputProvider, "AUDIO")
+            new ABButtonElement(font, inputProvider, "AUDIO")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel),
                 Click = () => scene.SwitchScreen(this, new AudioSettingsScreen(engine, scene, inputProvider))
             },
-            new ABButtonElement(engine, inputProvider, "BACK")
+            new ABButtonElement(font, inputProvider, "BACK")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),

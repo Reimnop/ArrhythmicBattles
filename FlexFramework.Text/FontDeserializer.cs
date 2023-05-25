@@ -8,7 +8,7 @@ namespace FlexFramework.Text;
 /// </summary>
 public static class FontDeserializer
 {
-    public static Font DeserializeFont(Stream stream)
+    public static Font Deserialize(Stream stream)
     {
         using var reader = new BinaryReader(stream, Encoding.UTF8, true);
         
@@ -17,7 +17,6 @@ public static class FontDeserializer
         var texture = ReadTexture(reader);
 
         // Read glyphs
-        var tofuGlyph = ReadGlyphInfo(reader); // Read tofu glyph
         var glyphCount = reader.ReadInt32();
         var glyphs = new Dictionary<char, GlyphInfo>(glyphCount);
         for (var i = 0; i < glyphCount; i++)
@@ -38,7 +37,7 @@ public static class FontDeserializer
             kernings.Add((left, right), kerning);
         }
         
-        return new Font(name, metrics, texture, tofuGlyph, glyphs, kernings);
+        return new Font(name, metrics, texture, glyphs, kernings);
     }
 
     private static FontMetrics ReadFontMetrics(BinaryReader reader)
@@ -50,9 +49,9 @@ public static class FontDeserializer
         return new FontMetrics(size, height, ascent, descent);
     }
     
-    private static unsafe Texture<Rgba8> ReadTexture(BinaryReader reader)
+    private static unsafe Texture<Rgb32f> ReadTexture(BinaryReader reader)
     {
-        var pixelSize = Unsafe.SizeOf<Rgba8>();
+        var pixelSize = Unsafe.SizeOf<Rgb32f>();
         
         var width = reader.ReadInt32();
         var height = reader.ReadInt32();
@@ -60,8 +59,8 @@ public static class FontDeserializer
         
         fixed (byte* p = pixels)
         {
-            var span = new Span<Rgba8>(p, pixels.Length / pixelSize);
-            return new Texture<Rgba8>(width, height, span);
+            var span = new Span<Rgb32f>(p, pixels.Length / pixelSize);
+            return new Texture<Rgb32f>(width, height, span);
         }
     }
     

@@ -5,6 +5,7 @@ using Config.Net.Stores;
 using DiscordRPC;
 using FlexFramework;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Text;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles;
@@ -16,6 +17,7 @@ public class ABContext : IDisposable
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
     public InputSystem InputSystem { get; }
+    public Font Font { get; }
     public ISettings Settings { get; }
 
     public ABContext(FlexFrameworkMain engine)
@@ -25,9 +27,13 @@ public class ABContext : IDisposable
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
+        
+        using (var stream = File.OpenRead("Assets/Fonts/Inconsolata-Regular.flexfont"))
+        {
+            Font = FontDeserializer.Deserialize(stream);
+        }
 
         var configStore = new JsonConfigStore("settings.json", true);
-
         Settings = new ConfigurationBuilder<ISettings>()
             .UseConfigStore(configStore)
             .Build();

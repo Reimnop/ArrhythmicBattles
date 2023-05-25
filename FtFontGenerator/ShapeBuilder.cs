@@ -2,7 +2,7 @@
 using MsdfGenNet;
 using SharpFont;
 
-namespace Textwriter;
+namespace FtFontGenerator;
 
 public class ShapeBuilder
 {

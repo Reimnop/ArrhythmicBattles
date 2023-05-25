@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Textwriter\Textwriter.csproj" />
+        <ProjectReference Include="..\FlexFramework.Text\FlexFramework.Text.csproj" />
     </ItemGroup>
 
     <ItemGroup>

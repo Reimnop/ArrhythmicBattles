@@ -5,7 +5,6 @@ using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.Game;
 
@@ -31,12 +30,8 @@ public class PauseScreen : Screen, IDisposable
         background.Mesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
 
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
-        
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
+        textEntity = new TextEntity(scene.Context.Font);
+        textEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
         textEntity.Text = "Game paused!\n\nPress [Esc] to return";
     }
     

@@ -29,14 +29,16 @@ public class CreditsScreen : Screen, IDisposable
 
     private Element BuildInterface()
     {
+        var font = scene.Context.Font;
+        
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(engine, Constants.DefaultFontName)
+            new TextElement(font)
             {
                 Text = "Windows.\nWindows, what the fuck.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce of muck\nLuce, your status.\n\nmusic made by LemmieDot btw",
                 Width = Length.Full
             },
-            new ABButtonElement(engine, inputProvider, "BACK")
+            new ABButtonElement(font, inputProvider, "BACK")
             {
                 Width = Length.Full,
                 Height = 64.0f,

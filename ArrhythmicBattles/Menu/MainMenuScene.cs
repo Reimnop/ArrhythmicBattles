@@ -8,10 +8,9 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
+using FlexFramework.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using Textwriter;
-using Renderer = FlexFramework.Core.Rendering.Renderer;
 
 namespace ArrhythmicBattles.Menu;
 
@@ -78,11 +77,9 @@ public class MainMenuScene : ABScene
         bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
 
-        var textAssetsLocation = Engine.DefaultAssets.TextAssets;
-        var textAssets = Engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
+        var font = Context.Font;
         
-        copyrightText = EntityManager.Create(() => new TextEntity(Engine, font));
+        copyrightText = EntityManager.Create(() => new TextEntity(font));
         copyrightText.EmSize = 18.0f / 24.0f;
         copyrightText.HorizontalAlignment = HorizontalAlignment.Right;
         copyrightText.Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles";

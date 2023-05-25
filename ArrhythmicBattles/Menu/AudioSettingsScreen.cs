@@ -30,10 +30,11 @@ public class AudioSettingsScreen : Screen, IDisposable
     private Element BuildInterface()
     {
         var settings = scene.Context.Settings;
+        var font = scene.Context.Font;
 
         return new StackLayoutElement(
             Direction.Vertical,
-            new ABSliderElement(engine, inputProvider, "SFX VOLUME")  
+            new ABSliderElement(font, inputProvider, "SFX VOLUME")  
             {
                 Value = settings.SfxVolume,
                 ValueChanged = value => settings.SfxVolume = value,
@@ -41,7 +42,7 @@ public class AudioSettingsScreen : Screen, IDisposable
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
-            new ABSliderElement(engine, inputProvider, "MUSIC VOLUME")
+            new ABSliderElement(font, inputProvider, "MUSIC VOLUME")
             {
                 Value = settings.MusicVolume,
                 ValueChanged = value => settings.MusicVolume = value,
@@ -49,7 +50,7 @@ public class AudioSettingsScreen : Screen, IDisposable
                 Height = new Length(64.0f, Unit.Pixel),
                 Padding = new Length(16.0f, Unit.Pixel)
             },
-            new ABButtonElement(engine, inputProvider, "BACK")
+            new ABButtonElement(font, inputProvider, "BACK")
             {
                 Width = Length.Full,
                 Height = new Length(64.0f, Unit.Pixel),

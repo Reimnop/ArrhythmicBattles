@@ -1,6 +1,6 @@
 ﻿using FlexFramework.Core.Entities;
+using FlexFramework.Text;
 using OpenTK.Mathematics;
-using Textwriter;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
@@ -15,8 +15,8 @@ public class TextElement : VisualElement, IRenderable
 
             if (autoHeight)
             {
-                int lines = value.Split('\n').Length;
-                float height = lines * (font.Height / 64) * textEntity.EmSize;
+                var lines = value.Split('\n').Length;
+                var height = lines * (font.Metrics.Height >> 6) * textEntity.EmSize;
                 Height = height;
             }
         }
@@ -32,16 +32,13 @@ public class TextElement : VisualElement, IRenderable
     private readonly Font font;
     private readonly bool autoHeight;
 
-    public TextElement(FlexFrameworkMain engine, string fontName, bool autoHeight = true, params Element[] children) : base(children)
+    public TextElement(Font font, bool autoHeight = true, params Element[] children) : base(children)
     {
         this.autoHeight = autoHeight;
-        
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        font = textAssets[fontName];
-        
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
+        this.font = font;
+
+        textEntity = new TextEntity(font);
+        textEntity.BaselineOffset = font.Metrics.Height;
     }
     
     public override void UpdateLayout(Bounds constraintBounds)

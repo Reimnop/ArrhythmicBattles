@@ -29,14 +29,16 @@ public class MultiplayerScreen : Screen, IDisposable
 
     private Element BuildInterface()
     {
+        var font = scene.Context.Font;
+        
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(engine, Constants.DefaultFontName)
+            new TextElement(font)
             {
                 Text = "Feature not yet available!\nJust pretend this is a multiplayer menu.",
                 Width = Length.Full
             },
-            new ABButtonElement(engine, inputProvider, "BACK")
+            new ABButtonElement(font, inputProvider, "BACK")
             {
                 TextDefaultColor = new Color4(233, 81, 83, 255),
                 Width = Length.Full,

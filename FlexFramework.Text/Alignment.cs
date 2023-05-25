@@ -1,4 +1,4 @@
-﻿namespace Textwriter;
+﻿namespace FlexFramework.Text;
 
 public enum HorizontalAlignment
 {

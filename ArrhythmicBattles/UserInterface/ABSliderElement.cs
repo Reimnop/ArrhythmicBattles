@@ -1,13 +1,12 @@
 ﻿using ArrhythmicBattles.Core;
-using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
 using Glide;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.UserInterface;
 
@@ -44,8 +43,6 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     public Action<float>? ValueChanged { get; set; }
 
     private float value = 0.0f;
-
-    private readonly FlexFrameworkMain engine;
     private readonly Interactivity interactivity;
 
     private readonly RectEntity elementBackgroundEntity = new RectEntity()
@@ -73,10 +70,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
 
-    public ABSliderElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text,
-        params Element[] children) : base(children)
+    public ABSliderElement(Font font, IInputProvider inputProvider, string text, params Element[] children) : base(children)
     {
-        this.engine = engine;
         this.inputProvider = (ScopedInputProvider) inputProvider;
 
         interactivity = new Interactivity(inputProvider);
@@ -84,12 +79,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseEnter += AnimateHighlight;
         interactivity.MouseLeave += AnimateUnhighlight;
 
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
-
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
+        textEntity = new TextEntity(font);
+        textEntity.BaselineOffset = font.Metrics.Height;
         textEntity.Text = text;
     }
     

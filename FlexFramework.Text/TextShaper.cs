@@ -19,7 +19,7 @@ public static class TextShaper
     private static ShapedGlyph GetShapedGlyph(GlyphInfo glyph, int x, int y)
     {
         var minPosX = glyph.Metrics.HorizontalBearingX;
-        var minPosY = glyph.Metrics.HorizontalBearingY;
+        var minPosY = -glyph.Metrics.HorizontalBearingY;
         var maxPosX = minPosX + glyph.Metrics.Width;
         var maxPosY = minPosY + glyph.Metrics.Height;
         var minTexX = glyph.TextureCoordinates.MinX;
@@ -36,13 +36,38 @@ public static class TextShaper
             minTexX, minTexY, maxTexX, maxTexY);
     }
 
-    public static ShapedText ShapeText(Font font, string text)
+    public static ShapedText ShapeText(Font font, string text, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, VerticalAlignment verticalAlignment = VerticalAlignment.Top)
     {
-        var lines = new List<GlyphLine>();
-        var offsetX = 0;
+        var textHeight = CalculateTextHeight(font, text);
         var offsetY = 0;
+        switch (verticalAlignment)
+        {
+            case VerticalAlignment.Bottom:
+                offsetY -= textHeight;
+                break;
+            case VerticalAlignment.Center:
+                offsetY -= textHeight >> 1; // Divide by 2.
+                break;
+            case VerticalAlignment.Top:
+                break;
+        }
+        
+        var lines = new List<GlyphLine>();
         foreach (var line in text.Split('\n'))
         {
+            var offsetX = 0;
+            switch (horizontalAlignment)
+            {
+                case HorizontalAlignment.Left:
+                    break;
+                case HorizontalAlignment.Center:
+                    offsetX = -CalculateLineWidth(font, line) >> 1; // Divide by 2.
+                    break;
+                case HorizontalAlignment.Right:
+                    offsetX = -CalculateLineWidth(font, line);
+                    break;
+            }
+            
             lines.Add(ShapeLine(font, line, offsetX, offsetY));
             offsetY += font.Metrics.Height;
         }
@@ -54,6 +79,9 @@ public static class TextShaper
     {
         EnsureNoLineBreaks(line);
         
+        if (line.Length == 0)
+            return new GlyphLine(Enumerable.Empty<ShapedGlyph>()); // Empty line has no glyphs.
+
         var glyphs = new List<ShapedGlyph>(line.Length);
         var offsetX = x;
         var offsetY = y;
@@ -62,13 +90,17 @@ public static class TextShaper
             var left = line[i];
             var right = line[i + 1];
             var glyph = font.GetGlyph(left);
-            glyphs.Add(GetShapedGlyph(glyph, offsetX, offsetY));
+
+            if (glyph.Metrics.Width * glyph.Metrics.Height != 0) // Skip empty glyphs (e.g. spaces).
+                glyphs.Add(GetShapedGlyph(glyph, offsetX, offsetY));
+
             offsetX += glyph.Metrics.AdvanceX + font.GetKerning(left, right);
         }
-        
+
         var lastGlyph = font.GetGlyph(line[^1]);
-        glyphs.Add(GetShapedGlyph(lastGlyph, offsetX, offsetY));
-        
+        if (lastGlyph.Metrics.Width * lastGlyph.Metrics.Height != 0) // Skip empty glyphs (e.g. spaces).
+            glyphs.Add(GetShapedGlyph(lastGlyph, offsetX, offsetY));
+
         return new GlyphLine(glyphs);
     }
 
