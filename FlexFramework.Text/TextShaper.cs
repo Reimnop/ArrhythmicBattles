@@ -131,10 +131,10 @@ public static class TextShaper
             return new SelectionLine(
                 top, 
                 bottom, 
-                Enumerable.Empty<float>().Append(offsetX), 
+                Enumerable.Empty<int>().Append(offsetX), 
                 Enumerable.Empty<int>().Append(index++));
 
-        var selectablePositions = new List<float> {offsetX};
+        var selectablePositions = new List<int> {offsetX};
         var selectableIndices = new List<int> {index};
         index++;
         var currentX = offsetX;

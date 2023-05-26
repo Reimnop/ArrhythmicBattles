@@ -9,6 +9,7 @@ using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Text;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 
@@ -25,7 +26,7 @@ public class MainMenuScene : ABScene
     private readonly ImageEntity bannerEntity;
     private readonly TextEntity copyrightText;
     private readonly MeshEntity border;
-    
+
     // Other things
     private readonly AudioStream musicAudioStream;
     private readonly AudioSource musicAudioSource;
@@ -60,7 +61,7 @@ public class MainMenuScene : ABScene
         sfxAudioSource.Gain = settings.SfxVolume;
         sfxAudioSource.Looping = false;
         sfxAudioSource.AudioStream = sfxAudioStream;
-        
+
         // Init bindings
         musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
         sfxVolumeBinding = new Binding<float>(settings, nameof(ISettings.SfxVolume), sfxAudioSource, nameof(AudioSource.Gain));
@@ -69,8 +70,8 @@ public class MainMenuScene : ABScene
         string bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
         bannerTexture = Texture.FromFile("banner", bannerPath);
         
-        var assets = Engine.DefaultAssets;
-        var quadMesh = Engine.ResourceRegistry.GetResource(assets.QuadMesh);
+        // Init input
+        inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init entities
         bannerEntity = EntityManager.Create(() => new ImageEntity(Engine));
@@ -87,12 +88,8 @@ public class MainMenuScene : ABScene
         copyrightText.Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles";
         // copyrightText.Text = "Luce, do not.\nLuce, your status.";
 
-        border = EntityManager.Create(() => new MeshEntity());
+        border = EntityManager.Create(() => new MeshEntity(DefaultAssets.QuadMesh));
         border.Color = new Color4(24, 24, 24, 255);
-        border.Mesh = quadMesh;
-
-        // Init input
-        inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init UI
         OpenScreen(new SelectScreen(Engine, this, inputProvider));

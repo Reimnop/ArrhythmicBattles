@@ -10,18 +10,18 @@ namespace FlexFramework.Core.Entities;
 
 public class MeshEntity : Entity, IRenderable
 {
-    public Mesh<Vertex>? Mesh { get; set; }
+    public Mesh<Vertex> Mesh { get; }
     public Texture? Texture { get; set; }
     public Color4 Color { get; set; } = Color4.White;
     public PrimitiveType PrimitiveType { get; set; } = PrimitiveType.Triangles;
 
+    public MeshEntity(Mesh<Vertex> mesh)
+    {
+        Mesh = mesh;
+    }
+
     public void Render(RenderArgs args)
     {
-        if (Mesh == null)
-        {
-            return;
-        }
-        
         CommandList commandList = args.CommandList;
         LayerType layerType = args.LayerType;
         MatrixStack matrixStack = args.MatrixStack;

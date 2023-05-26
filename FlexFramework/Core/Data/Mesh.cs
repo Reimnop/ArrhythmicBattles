@@ -132,6 +132,8 @@ public class Mesh<T> : DataObject where T : unmanaged
     private Buffer? indexBuffer = null;
     private int verticesCount = 0;
     private int indicesCount = 0;
+    
+    private bool readOnly = false;
 
     public Mesh(string name, VertexLayout? vertexLayout = null) : base(name)
     {
@@ -149,8 +151,11 @@ public class Mesh<T> : DataObject where T : unmanaged
         SetData(vertices, indices);
     }
 
-    public void SetData(ReadOnlySpan<T> vertices, ReadOnlySpan<int> indices)
+    public Mesh<T> SetData(ReadOnlySpan<T> vertices, ReadOnlySpan<int> indices)
     {
+        if (readOnly)
+            throw new InvalidOperationException("Cannot modify read-only mesh!");
+        
         vertexBuffer.SetData(vertices);
         verticesCount = vertices.Length;
         
@@ -164,8 +169,18 @@ public class Mesh<T> : DataObject where T : unmanaged
         {
             indexBuffer = null;
         }
+
+        return this;
     }
-    
+
+    public Mesh<T> SetReadOnly()
+    {
+        readOnly = true;
+        VertexBuffer.SetReadOnly();
+        IndexBuffer?.SetReadOnly();
+        return this;
+    }
+
     public T GetVertex(int index)
     {
         if (index < 0 || index >= verticesCount)

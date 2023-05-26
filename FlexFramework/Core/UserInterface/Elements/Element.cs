@@ -1,6 +1,7 @@
 ﻿using System.Collections;
-using FlexFramework.Core.Data;
+using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -8,24 +9,7 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class Element : IEnumerable<Element>
 {
-#if DEBUG_SHOW_BOUNDING_BOXES
-    private static readonly Mesh<Vertex> DebugMesh = new("debug");
-
-    static Element()
-    {
-        Vertex[] debugVertices =
-        {
-            new Vertex(0.5f, 0.5f, 0.0f, 1.0f, 1.0f),
-            new Vertex(-0.5f, 0.5f, 0.0f, 0.0f, 1.0f),
-            new Vertex(-0.5f, -0.5f, 0.0f, 0.0f, 0.0f),
-            new Vertex(0.5f, -0.5f, 0.0f, 1.0f, 0.0f)
-        };
-        
-        DebugMesh.SetData(debugVertices, ReadOnlySpan<int>.Empty);
-    }
-#endif
-
-    public List<Element> Children { get; } = new List<Element>();
+    public List<Element> Children { get; } = new();
 
     public Length Width { get; set; } = Length.Zero;
     public Length Height { get; set; } = Length.Zero;
@@ -186,15 +170,19 @@ public abstract class Element : IEnumerable<Element>
 
     private static void RenderBounds(Bounds bounds, Color4 color, RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
-        Vector2 size = bounds.Max - bounds.Min;
+        var matrixStack = args.MatrixStack;
+        var size = bounds.Max - bounds.Min;
         
         matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);
         matrixStack.Scale(size.X, size.Y, 1.0f);
         matrixStack.Translate(bounds.X0, bounds.Y0, 0.0f);
-        VertexDrawData vertexDrawData = new VertexDrawData(DebugMesh.VertexArray, DebugMesh.Count, matrixStack.GlobalTransformation * args.CameraData.View * args.CameraData.Projection, null, color, PrimitiveType.LineLoop);
-        args.Renderer.EnqueueDrawData(args.LayerId, vertexDrawData);
+        var vertexDrawData = new VertexDrawData(DefaultAssets.QuadWireframeMesh.ReadOnly, 
+            matrixStack.GlobalTransformation * args.CameraData.View * args.CameraData.Projection, 
+            null, 
+            color, 
+            PrimitiveType.LineLoop);
+        args.CommandList.AddDrawData(LayerType.Gui, vertexDrawData);
         matrixStack.Pop();
     }
 #endif

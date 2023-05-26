@@ -6,6 +6,7 @@ using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -28,10 +29,7 @@ public class PauseScreen : Screen, IDisposable
         
         inputProvider = scene.Context.InputSystem.AcquireInputProvider();
 
-        var assets = engine.DefaultAssets;
-
-        background = new MeshEntity();
-        background.Mesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
+        background = new MeshEntity(DefaultAssets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
         
         root = BuildInterface();

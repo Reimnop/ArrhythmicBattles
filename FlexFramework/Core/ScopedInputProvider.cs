@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.Core;
+namespace FlexFramework.Core;
 
 public class ScopedInputProvider : IInputProvider, IDisposable
 {

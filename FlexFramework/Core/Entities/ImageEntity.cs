@@ -27,12 +27,8 @@ public class ImageEntity : UIElement, IRenderable
     public ImageMode ImageMode { get; set; } = ImageMode.Fill;
     public Color4 Color { get; set; } = Color4.White;
 
-    private readonly Mesh<Vertex> quadMesh;
-
     public ImageEntity(FlexFrameworkMain engine) : base(engine)
     {
-        EngineAssets assets = engine.DefaultAssets;
-        quadMesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
     }
 
     public void Render(RenderArgs args)
@@ -78,7 +74,7 @@ public class ImageEntity : UIElement, IRenderable
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
         
         Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(quadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
+        VertexDrawData vertexDrawData = new VertexDrawData(DefaultAssets.QuadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
 
         commandList.AddDrawData(layerType, vertexDrawData);
         matrixStack.Pop();

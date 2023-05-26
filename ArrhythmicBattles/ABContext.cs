@@ -1,9 +1,9 @@
 ﻿using ArrhythmicBattles.Settings;
-using ArrhythmicBattles.Core;
 using Config.Net;
 using Config.Net.Stores;
 using DiscordRPC;
 using FlexFramework;
+using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Text;
 using OpenTK.Mathematics;

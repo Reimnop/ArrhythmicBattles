@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace FlexFramework.Core.UserInterface;
+namespace FlexFramework.Core;
 
 public interface IInputProvider
 {

@@ -1,8 +1,7 @@
-﻿using FlexFramework.Core;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace ArrhythmicBattles.Core;
+namespace FlexFramework.Core;
 
 public struct InputCapture
 {

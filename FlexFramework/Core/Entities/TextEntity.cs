@@ -17,7 +17,7 @@ public class TextEntity : Entity, IRenderable
         set
         {
             text = value;
-            InvalidateMesh();
+            InvalidateTextData();
         }
     }
 
@@ -27,7 +27,7 @@ public class TextEntity : Entity, IRenderable
         set
         {
             horizontalAlignment = value;
-            InvalidateMesh();
+            InvalidateTextData();
         }
     }
 
@@ -37,7 +37,17 @@ public class TextEntity : Entity, IRenderable
         set
         {
             verticalAlignment = value;
-            InvalidateMesh();
+            InvalidateTextData();
+        }
+    }
+
+    public Font Font
+    {
+        get => font;
+        set
+        {
+            font = value;
+            InvalidateTextData();
         }
     }
     
@@ -51,7 +61,7 @@ public class TextEntity : Entity, IRenderable
     private Font font;
     private string text = "";
 
-    private bool meshValid = false;
+    private bool dataValid = false;
     
     private readonly Mesh<TextVertex> mesh;
     private readonly Texture fontAtlas;
@@ -63,7 +73,7 @@ public class TextEntity : Entity, IRenderable
         fontAtlas = new Texture("font_atlas", font.Texture.Width, font.Texture.Height, PixelFormat.Rgb32f);
         fontAtlas.SetData<Rgb32f>(font.Texture.Pixels);
 
-        VertexLayout vertexLayout = new VertexLayout(
+        var vertexLayout = new VertexLayout(
             Unsafe.SizeOf<TextVertex>(),
             new VertexAttribute(VertexAttributeIntent.Position, VertexAttributeType.Float, 2, 0),
             new VertexAttribute(VertexAttributeIntent.TexCoord0, VertexAttributeType.Float, 2, 2 * sizeof(float))
@@ -72,12 +82,12 @@ public class TextEntity : Entity, IRenderable
         mesh = new Mesh<TextVertex>("text", vertexLayout);
     }
 
-    public void InvalidateMesh()
+    private void InvalidateTextData()
     {
-        meshValid = false;
+        dataValid = false;
     }
 
-    private void GenerateMesh()
+    private void UpdateTextData()
     {
         var shapedText = TextShaper.ShapeText(font, text, horizontalAlignment, verticalAlignment);
         var vertexSpan = meshGenerator.GenerateMesh(shapedText);
@@ -87,10 +97,10 @@ public class TextEntity : Entity, IRenderable
 
     public void Render(RenderArgs args)
     {
-        if (!meshValid)
+        if (!dataValid)
         {
-            meshValid = true;
-            GenerateMesh();
+            dataValid = true;
+            UpdateTextData();
         }
 
         CommandList commandList = args.CommandList;

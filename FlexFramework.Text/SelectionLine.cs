@@ -5,15 +5,15 @@
 /// </summary>
 public class SelectionLine
 {
-    public float Bottom { get; }
-    public float Top { get; }
-    public ReadOnlySpan<float> SelectablePositions => selectablePositions;
+    public int Bottom { get; }
+    public int Top { get; }
+    public ReadOnlySpan<int> SelectablePositions => selectablePositions;
     public ReadOnlySpan<int> SelectableIndices => selectableIndices;
 
-    private readonly float[] selectablePositions;
+    private readonly int[] selectablePositions;
     private readonly int[] selectableIndices;
     
-    public SelectionLine(float top, float bottom, IEnumerable<float> selectablePositions, IEnumerable<int> selectableIndices)
+    public SelectionLine(int top, int bottom, IEnumerable<int> selectablePositions, IEnumerable<int> selectableIndices)
     {
         Top = top;
         Bottom = bottom;
