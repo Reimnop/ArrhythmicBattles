@@ -1,6 +1,7 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Game.Content;
+using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
@@ -72,11 +73,19 @@ public class GameScene : ABScene
         edgeDetect = new EdgeDetect();
     }
 
+    public override void CloseScreen(Screen screen)
+    {
+        base.CloseScreen(screen);
+        
+        if (screen is PauseScreen)
+        {
+            Engine.CursorState = CursorState.Grabbed;
+        }
+    }
+
     public override void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
-        // Update physics
+        // Update physics before everything else
         physicsWorld.Update(args);
 
         if (inputProvider.GetKeyDown(Keys.F3))
@@ -96,6 +105,7 @@ public class GameScene : ABScene
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
             OpenScreen(new PauseScreen(Engine, this));
+            Engine.CursorState = CursorState.Normal;
         }
         
         // Teleport player to origin if they fall off the map
@@ -149,6 +159,8 @@ public class GameScene : ABScene
             freeCamCamera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, freeCamYaw) * Quaternion.FromAxisAngle(Vector3.UnitX, freeCamPitch);
         }
 #endif
+        
+        base.Update(args);
     }
 
     protected override void RenderScene(CommandList commandList)

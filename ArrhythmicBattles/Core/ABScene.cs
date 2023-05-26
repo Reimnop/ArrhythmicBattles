@@ -1,5 +1,4 @@
 ﻿using ArrhythmicBattles.UserInterface;
-using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
@@ -9,7 +8,7 @@ namespace ArrhythmicBattles.Core;
 
 public abstract class ABScene : Scene, IDisposable
 {
-    public Bounds ScreenBounds { get; protected set; }
+    public Bounds ScreenBounds => GetScreenBounds();
 
     public ABContext Context { get; }
     protected EntityManager EntityManager { get; } = new();
@@ -25,7 +24,7 @@ public abstract class ABScene : Scene, IDisposable
     {
         Context = context;
 
-        Renderer renderer = Engine.Renderer;
+        var renderer = Engine.Renderer;
         renderer.ClearColor = new Color4(33, 33, 33, 255);
         GuiCamera = new GuiCamera(Engine);
     }
@@ -34,6 +33,11 @@ public abstract class ABScene : Scene, IDisposable
     {
         EntityManager.Update(args);
         ScreenHandler.Update(args);
+    }
+    
+    protected virtual Bounds GetScreenBounds()
+    {
+        return new Bounds(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
     }
 
     public virtual void OpenScreen(Screen screen)

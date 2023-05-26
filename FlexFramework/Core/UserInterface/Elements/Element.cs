@@ -8,8 +8,8 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class Element : IEnumerable<Element>
 {
-#if DEBUG_SHOW_BOUNDING_BOXES // This will blow up if you have multiple OpenGL contexts, but it's only for debugging anyway
-    private static readonly Mesh<Vertex> DebugMesh = new Mesh<Vertex>("debug");
+#if DEBUG_SHOW_BOUNDING_BOXES
+    private static readonly Mesh<Vertex> DebugMesh = new("debug");
 
     static Element()
     {
@@ -21,10 +21,10 @@ public abstract class Element : IEnumerable<Element>
             new Vertex(0.5f, -0.5f, 0.0f, 1.0f, 0.0f)
         };
         
-        DebugMesh.SetData(debugVertices);
+        DebugMesh.SetData(debugVertices, ReadOnlySpan<int>.Empty);
     }
 #endif
-    
+
     public List<Element> Children { get; } = new List<Element>();
 
     public Length Width { get; set; } = Length.Zero;

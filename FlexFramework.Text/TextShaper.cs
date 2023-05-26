@@ -78,7 +78,7 @@ public static class TextShaper
         
         return new ShapedText(font, lines);
     }
-
+    
     public static SelectionText GetSelectionText(
         Font font,
         string text,
@@ -99,6 +99,7 @@ public static class TextShaper
                 break;
         }
         
+        var index = -1;
         var lines = new List<SelectionLine>();
         foreach (var line in text.Split('\n'))
         {
@@ -115,22 +116,27 @@ public static class TextShaper
                     break;
             }
             
-            lines.Add(GetSelectionLine(font, line, offsetX, offsetY));
+            lines.Add(GetSelectionLine(font, line, offsetX, offsetY, ref index));
             offsetY += font.Metrics.Height;
         }
         
         return new SelectionText(lines);
     }
 
-    private static SelectionLine GetSelectionLine(Font font, string line, int offsetX, int offsetY)
+    private static SelectionLine GetSelectionLine(Font font, string line, int offsetX, int offsetY, ref int index)
     {
         var top = offsetY - font.Metrics.Ascent;
         var bottom = offsetY + font.Metrics.Descent;
-
         if (line.Length == 0)
-            return new SelectionLine(top, bottom, Enumerable.Empty<float>().Append(offsetX));
+            return new SelectionLine(
+                top, 
+                bottom, 
+                Enumerable.Empty<float>().Append(offsetX), 
+                Enumerable.Empty<int>().Append(index++));
 
         var selectablePositions = new List<float> {offsetX};
+        var selectableIndices = new List<int> {index};
+        index++;
         var currentX = offsetX;
         for (int i = 0; i < line.Length - 1; i++)
         {
@@ -139,10 +145,14 @@ public static class TextShaper
             var glyph = font.GetGlyph(left);
             currentX += glyph.Metrics.AdvanceX + font.GetKerning(left, right);
             selectablePositions.Add(currentX);
+            selectableIndices.Add(index);
+            index++;
         }
 
         selectablePositions.Add(currentX + font.GetGlyph(line[^1]).Metrics.AdvanceX);
-        return new SelectionLine(top, bottom, selectablePositions);
+        selectableIndices.Add(index);
+        index++;
+        return new SelectionLine(top, bottom, selectablePositions, selectableIndices);
     }
 
     public static GlyphLine ShapeLine(Font font, string line, int x, int y)

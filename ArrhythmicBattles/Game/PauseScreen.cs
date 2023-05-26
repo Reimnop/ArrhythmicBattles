@@ -1,8 +1,11 @@
 ﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Menu;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
+using FlexFramework.Core.UserInterface;
+using FlexFramework.Core.UserInterface.Elements;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -10,12 +13,13 @@ namespace ArrhythmicBattles.Game;
 
 public class PauseScreen : Screen, IDisposable
 {
-    private readonly TextEntity textEntity;
     private readonly MeshEntity background;
 
     private readonly FlexFrameworkMain engine;
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
+
+    private Element root;
 
     public PauseScreen(FlexFrameworkMain engine, ABScene scene)
     {
@@ -23,22 +27,59 @@ public class PauseScreen : Screen, IDisposable
         this.scene = scene;
         
         inputProvider = scene.Context.InputSystem.AcquireInputProvider();
-        
-        EngineAssets assets = engine.DefaultAssets;
+
+        var assets = engine.DefaultAssets;
 
         background = new MeshEntity();
         background.Mesh = engine.ResourceRegistry.GetResource(assets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
+        
+        root = BuildInterface();
+        root.UpdateLayout(scene.ScreenBounds);
+    }
 
-        textEntity = new TextEntity(scene.Context.Font);
-        textEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
-        textEntity.Text = "Game paused!\n\nPress [Esc] to return";
+    private Element BuildInterface()
+    {
+        var font = scene.Context.Font;
+
+        return new StackLayoutElement(
+            Direction.Vertical,
+            new TextElement(font)
+            {
+                Text = "Game paused!\nPress [Esc] to return to game.",
+                Width = Length.Full
+            },
+            new StackLayoutElement(
+                Direction.Horizontal,
+                new ABButtonElement(font, inputProvider, "BACK")
+                {
+                    TextDefaultColor = new Color4(233, 81, 83, 255),
+                    Width = new Length(0.5f, Unit.Percent),
+                    Height = 64.0f,
+                    Padding = 16.0f,
+                    Click = () => scene.CloseScreen(this)
+                },
+                new ABButtonElement(font, inputProvider, "QUIT COWARDLY") // insults the player
+                {
+                    TextDefaultColor = new Color4(233, 81, 83, 255),
+                    Width = new Length(0.5f, Unit.Percent),
+                    Height = 64.0f,
+                    Padding = 16.0f,
+                    Click = () => engine.LoadScene(new MainMenuScene(scene.Context))
+                })
+            {
+                Width = 384.0f
+            })
+        {
+            Width = Length.Full,
+            Spacing = 16.0f
+        };
     }
     
     public override void Update(UpdateArgs args)
     {
         background.Update(args);
-        textEntity.Update(args);
+        root.UpdateRecursive(args);
 
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
@@ -57,12 +98,13 @@ public class PauseScreen : Screen, IDisposable
         matrixStack.Pop();
         
         matrixStack.Push();
-        textEntity.Render(args);
+        root.RenderRecursive(args);
         matrixStack.Pop();
     }
 
     public void Dispose()
     {
         inputProvider.Dispose();
+        root.DisposeRecursive();
     }
 }

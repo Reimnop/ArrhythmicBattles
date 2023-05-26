@@ -93,8 +93,12 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init UI
-        ScreenBounds = new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
+    }
+
+    protected override Bounds GetScreenBounds()
+    {
+        return new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
     }
 
     public override void SwitchScreen(Screen before, Screen after)
