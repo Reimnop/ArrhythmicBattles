@@ -16,6 +16,8 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
+    public override Bounds ScreenBounds => new(48.0f, 306.0f, 816.0f, 0.0f);
+
     // Resources
     private readonly Texture bannerTexture;
     
@@ -94,11 +96,6 @@ public class MainMenuScene : ABScene
 
         // Init UI
         OpenScreen(new SelectScreen(Engine, this, inputProvider));
-    }
-
-    protected override Bounds GetScreenBounds()
-    {
-        return new Bounds(48.0f, 306.0f, 816.0f, 0.0f);
     }
 
     public override void SwitchScreen(Screen before, Screen after)

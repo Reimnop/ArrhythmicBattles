@@ -8,7 +8,7 @@ namespace ArrhythmicBattles.Core;
 
 public abstract class ABScene : Scene, IDisposable
 {
-    public Bounds ScreenBounds => GetScreenBounds();
+    public virtual Bounds ScreenBounds => new(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
 
     public ABContext Context { get; }
     protected EntityManager EntityManager { get; } = new();
@@ -33,11 +33,6 @@ public abstract class ABScene : Scene, IDisposable
     {
         EntityManager.Update(args);
         ScreenHandler.Update(args);
-    }
-    
-    protected virtual Bounds GetScreenBounds()
-    {
-        return new Bounds(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
     }
 
     public virtual void OpenScreen(Screen screen)
