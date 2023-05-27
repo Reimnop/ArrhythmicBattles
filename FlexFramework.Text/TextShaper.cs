@@ -126,7 +126,7 @@ public static class TextShaper
     private static SelectionLine GetSelectionLine(Font font, string line, int offsetX, int offsetY, ref int index)
     {
         var top = offsetY - font.Metrics.Ascent;
-        var bottom = offsetY + font.Metrics.Descent;
+        var bottom = offsetY - font.Metrics.Descent;
         if (line.Length == 0)
             return new SelectionLine(
                 top, 

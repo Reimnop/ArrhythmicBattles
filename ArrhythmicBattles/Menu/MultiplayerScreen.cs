@@ -33,9 +33,21 @@ public class MultiplayerScreen : Screen, IDisposable
         
         return new StackLayoutElement(
             Direction.Vertical,
-            new TextElement(font)
+            new SelectableTextElement(font, inputProvider)
             {
-                Text = "Feature not yet available!\nJust pretend this is a multiplayer menu.",
+                Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor\n" +
+                       "incididunt ut labore et dolore magna aliqua. Nunc non blandit massa enim nec. Eu mi\n" +
+                       "bibendum neque egestas congue quisque egestas diam in. Id neque aliquam vestibulum\n" +
+                       "morbi blandit cursus risus at ultrices. Risus at ultrices mi tempus imperdiet. Arcu\n" +
+                       "ac tortor dignissim convallis aenean et tortor. Vel quam elementum pulvinar etiam\n" +
+                       "non quam lacus. At quis risus sed vulputate. Pulvinar sapien et ligula ullamcorper\n" +
+                       "malesuada proin libero. In ante metus dictum at tempor commodo ullamcorper. Cras semper\n" +
+                       "auctor neque vitae tempus quam pellentesque. Lectus sit amet est placerat in egestas\n" +
+                       "erat imperdiet sed. Facilisis volutpat est velit egestas. Leo vel fringilla est\n" +
+                       "ullamcorper eget nulla facilisi etiam dignissim. Enim eu turpis egestas pretium aenean\n" +
+                       "pharetra. Egestas tellus rutrum tellus pellentesque eu. Eros donec ac odio tempor orci\n" +
+                       "dapibus ultrices in iaculis. Mauris augue neque gravida in fermentum et. Quisque\n" +
+                       "sagittis purus sit amet.",
                 Width = Length.Full
             },
             new ABButtonElement(font, inputProvider, "BACK")

@@ -7,8 +7,8 @@ public class SelectionLine
 {
     public int Bottom { get; }
     public int Top { get; }
-    public ReadOnlySpan<int> SelectablePositions => selectablePositions;
-    public ReadOnlySpan<int> SelectableIndices => selectableIndices;
+    public IReadOnlyList<int> SelectablePositions => selectablePositions;
+    public IReadOnlyList<int> SelectableIndices => selectableIndices;
 
     private readonly int[] selectablePositions;
     private readonly int[] selectableIndices;
