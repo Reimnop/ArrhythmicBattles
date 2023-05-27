@@ -74,10 +74,9 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init entities
-        bannerEntity = EntityManager.Create(() => new ImageEntity(Engine));
+        bannerEntity = EntityManager.Create(() => new ImageEntity(Engine, bannerTexture));
         bannerEntity.Position = new Vector2(32.0f, 32.0f);
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
-        bannerEntity.Texture = bannerTexture;
         bannerEntity.ImageMode = ImageMode.Stretch;
 
         var font = Context.Font;

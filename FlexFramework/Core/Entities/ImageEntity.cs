@@ -23,25 +23,21 @@ public class ImageEntity : UIElement, IRenderable
     public override Vector2 Origin { get; set; } = Vector2.Zero;
     public override bool IsFocused { get; set; }
 
-    public Texture? Texture { get; set; }
+    public Texture Texture { get; set; }
     public ImageMode ImageMode { get; set; } = ImageMode.Fill;
     public Color4 Color { get; set; } = Color4.White;
 
-    public ImageEntity(FlexFrameworkMain engine) : base(engine)
+    public ImageEntity(FlexFrameworkMain engine, Texture texture) : base(engine)
     {
+        Texture = texture;
     }
 
     public void Render(RenderArgs args)
     {
-        if (Texture == null)
-        {
-            return;
-        }
-        
-        CommandList commandList = args.CommandList;
-        LayerType layerType = args.LayerType;
-        MatrixStack matrixStack = args.MatrixStack;
-        CameraData cameraData = args.CameraData;
+        var commandList = args.CommandList;
+        var layerType = args.LayerType;
+        var matrixStack = args.MatrixStack;
+        var cameraData = args.CameraData;
 
         matrixStack.Push();
         matrixStack.Translate(0.5f - Origin.X, 0.5f - Origin.Y, 0.0f);
@@ -73,8 +69,8 @@ public class ImageEntity : UIElement, IRenderable
         }
         matrixStack.Translate(Position.X, Position.Y, 0.0f);
         
-        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        VertexDrawData vertexDrawData = new VertexDrawData(DefaultAssets.QuadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
+        var transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
+        var vertexDrawData = new VertexDrawData(DefaultAssets.QuadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
 
         commandList.AddDrawData(layerType, vertexDrawData);
         matrixStack.Pop();
