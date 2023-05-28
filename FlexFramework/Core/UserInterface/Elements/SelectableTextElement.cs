@@ -40,15 +40,15 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
     }
 
     private readonly TextEntity textEntity;
-    private readonly IInputProvider inputProvider;
+    private readonly ScopedInputProvider inputProvider;
     private readonly Font font;
     private readonly bool autoHeight;
     private SelectionText? selectionText;
     
     private (int, int) selection = (-1, -1);
-    private bool dragging = false;
+    private ScopedInputProvider? dragInputProvider;
 
-    public SelectableTextElement(Font font, IInputProvider inputProvider, bool autoHeight = true, params Element[] children) : base(children)
+    public SelectableTextElement(Font font, ScopedInputProvider inputProvider, bool autoHeight = true, params Element[] children) : base(children)
     {
         this.font = font;
         this.inputProvider = inputProvider;
@@ -69,25 +69,24 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
         if (selectionText == null)
             return;
 
-        var localMousePosition = inputProvider.MousePosition - ElementBounds.Min;
-
         if (inputProvider.GetMouseDown(MouseButton.Left)) // Start drag
         {
-            var hoveredCharacter = GetHoveredCharacter(selectionText, localMousePosition, textEntity.BaselineOffset) ?? -1;
+            var hoveredCharacter = GetHoveredCharacter(selectionText, inputProvider.MousePosition - ElementBounds.Min, textEntity.BaselineOffset) ?? -1;
             selection = (hoveredCharacter, hoveredCharacter);
-            
+
             if (hoveredCharacter != -1)
-                dragging = true;
+                dragInputProvider = inputProvider.InputSystem.AcquireInputProvider();
         }
         
-        if (inputProvider.GetMouseUp(MouseButton.Left)) // End drag
+        if (dragInputProvider != null && dragInputProvider.GetMouseUp(MouseButton.Left)) // End drag
         {
-            dragging = false;
+            dragInputProvider.Dispose();
+            dragInputProvider = null;
         }
         
-        if (dragging) // Drag
+        if (dragInputProvider != null) // Drag
         {
-            var dragCharacter = GetDragCharacter(selectionText, localMousePosition, textEntity.BaselineOffset);
+            var dragCharacter = GetDragCharacter(selectionText, dragInputProvider.MousePosition - ElementBounds.Min, textEntity.BaselineOffset);
             selection = (selection.Item1, dragCharacter);
         }
         

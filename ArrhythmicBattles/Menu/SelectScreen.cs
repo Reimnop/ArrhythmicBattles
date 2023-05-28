@@ -13,11 +13,11 @@ public class SelectScreen : Screen, IDisposable
 {
     private readonly FlexFrameworkMain engine;
     private readonly ABScene scene;
-    private readonly IInputProvider inputProvider;
+    private readonly ScopedInputProvider inputProvider;
     
     private readonly Element root;
 
-    public SelectScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
+    public SelectScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
         this.engine = engine;
         this.scene = scene;
