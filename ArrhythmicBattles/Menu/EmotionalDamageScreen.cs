@@ -10,7 +10,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Menu;
 
-public class MultiplayerScreen : Screen, IDisposable
+public class EmotionalDamageScreen : Screen, IDisposable
 {
     private readonly FlexFrameworkMain engine;
     private readonly ABScene scene;
@@ -18,7 +18,7 @@ public class MultiplayerScreen : Screen, IDisposable
     
     private readonly Element root;
 
-    public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
+    public EmotionalDamageScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
         this.engine = engine;
         this.scene = scene;
@@ -36,33 +36,16 @@ public class MultiplayerScreen : Screen, IDisposable
             Direction.Vertical,
             new TextElement(font)
             {
-                Text = "bro there's no multiplayer yet\nclick the button below to go back to the main menu",
+                Text = "I can't believe you fell for that\nHow stupid are you?",
                 Width = Length.Full
             },
-            new ABButtonElement(font, inputProvider, "BACK")
+            new ABButtonElement(font, inputProvider, "BACK (for real this time)")
             {
                 TextDefaultColor = new Color4(233, 81, 83, 255),
                 Width = Length.Full,
                 Height = 64.0f,
                 Padding = 16.0f,
                 Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "BACK BUT WITH A DIFFERENT TEXT")
-            {
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Width = Length.Full,
-                Height = 64.0f,
-                Padding = 16.0f,
-                Click = () =>
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // hehe
-                        UseShellExecute = true
-                    });
-                    
-                    scene.SwitchScreen(this, new EmotionalDamageScreen(engine, scene, inputProvider));
-                }
             })
         {
             Width = Length.Full,
