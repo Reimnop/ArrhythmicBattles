@@ -68,6 +68,12 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
     {
         if (selectionText == null)
             return;
+        
+        if (dragInputProvider != null) // Drag
+        {
+            var dragCharacter = GetDragCharacter(selectionText, dragInputProvider.MousePosition - ElementBounds.Min, textEntity.BaselineOffset);
+            selection = (selection.Item1, dragCharacter);
+        }
 
         if (inputProvider.GetMouseDown(MouseButton.Left)) // Start drag
         {
@@ -83,13 +89,7 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
             dragInputProvider.Dispose();
             dragInputProvider = null;
         }
-        
-        if (dragInputProvider != null) // Drag
-        {
-            var dragCharacter = GetDragCharacter(selectionText, dragInputProvider.MousePosition - ElementBounds.Min, textEntity.BaselineOffset);
-            selection = (selection.Item1, dragCharacter);
-        }
-        
+
         if (inputProvider.GetKey(Keys.LeftControl) && inputProvider.GetKeyDown(Keys.C) && selection.Item1 != -1 && selection.Item2 != -1) // Copy
         {
             var selectionStart = Math.Min(selection.Item1, selection.Item2);
