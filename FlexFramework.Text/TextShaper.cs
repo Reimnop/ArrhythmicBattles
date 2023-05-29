@@ -42,36 +42,12 @@ public static class TextShaper
         HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, 
         VerticalAlignment verticalAlignment = VerticalAlignment.Top)
     {
-        var textHeight = CalculateTextHeight(font, text);
-        var offsetY = 0;
-        switch (verticalAlignment)
-        {
-            case VerticalAlignment.Bottom:
-                offsetY -= textHeight;
-                break;
-            case VerticalAlignment.Center:
-                offsetY -= textHeight >> 1; // Divide by 2.
-                break;
-            case VerticalAlignment.Top:
-                break;
-        }
+        var offsetY = GetTextOffsetY(font, text, verticalAlignment);
         
         var lines = new List<GlyphLine>();
         foreach (var line in text.Split('\n'))
         {
-            var offsetX = 0;
-            switch (horizontalAlignment)
-            {
-                case HorizontalAlignment.Left:
-                    break;
-                case HorizontalAlignment.Center:
-                    offsetX = -(CalculateLineWidth(font, line) >> 1); // Divide by 2.
-                    break;
-                case HorizontalAlignment.Right:
-                    offsetX = -CalculateLineWidth(font, line);
-                    break;
-            }
-            
+            var offsetX = GetLineOffsetX(font, line, horizontalAlignment);
             lines.Add(ShapeLine(font, line, offsetX, offsetY));
             offsetY += font.Metrics.Height;
         }
@@ -79,56 +55,32 @@ public static class TextShaper
         return new ShapedText(font, lines);
     }
     
-    public static SelectionText GetSelectionText(
+    public static TextBounds GetTextBounds(
         Font font,
         string text,
         HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
         VerticalAlignment verticalAlignment = VerticalAlignment.Top)
     {
-        var textHeight = CalculateTextHeight(font, text);
-        var offsetY = 0;
-        switch (verticalAlignment)
-        {
-            case VerticalAlignment.Bottom:
-                offsetY -= textHeight;
-                break;
-            case VerticalAlignment.Center:
-                offsetY -= textHeight >> 1; // Divide by 2.
-                break;
-            case VerticalAlignment.Top:
-                break;
-        }
+        var offsetY = GetTextOffsetY(font, text, verticalAlignment);
         
         var index = -1;
-        var lines = new List<SelectionLine>();
+        var lines = new List<LineBounds>();
         foreach (var line in text.Split('\n'))
         {
-            var offsetX = 0;
-            switch (horizontalAlignment)
-            {
-                case HorizontalAlignment.Left:
-                    break;
-                case HorizontalAlignment.Center:
-                    offsetX = -(CalculateLineWidth(font, line) >> 1); // Divide by 2.
-                    break;
-                case HorizontalAlignment.Right:
-                    offsetX = -CalculateLineWidth(font, line);
-                    break;
-            }
-            
-            lines.Add(GetSelectionLine(font, line, offsetX, offsetY, ref index));
+            var offsetX = GetLineOffsetX(font, line, horizontalAlignment);
+            lines.Add(GetLineBounds(font, line, offsetX, offsetY, ref index));
             offsetY += font.Metrics.Height;
         }
         
-        return new SelectionText(lines);
+        return new TextBounds(lines);
     }
 
-    private static SelectionLine GetSelectionLine(Font font, string line, int offsetX, int offsetY, ref int index)
+    public static LineBounds GetLineBounds(Font font, string line, int offsetX, int offsetY, ref int index)
     {
         var top = offsetY - font.Metrics.Ascent;
         var bottom = offsetY - font.Metrics.Descent;
         if (line.Length == 0)
-            return new SelectionLine(
+            return new LineBounds(
                 top, 
                 bottom, 
                 Enumerable.Empty<int>().Append(offsetX), 
@@ -152,7 +104,7 @@ public static class TextShaper
         selectablePositions.Add(currentX + font.GetGlyph(line[^1]).Metrics.AdvanceX);
         selectableIndices.Add(index);
         index++;
-        return new SelectionLine(top, bottom, selectablePositions, selectableIndices);
+        return new LineBounds(top, bottom, selectablePositions, selectableIndices);
     }
 
     public static GlyphLine ShapeLine(Font font, string line, int x, int y)
@@ -182,6 +134,30 @@ public static class TextShaper
             glyphs.Add(GetShapedGlyph(lastGlyph, offsetX, offsetY));
 
         return new GlyphLine(glyphs);
+    }
+
+    public static int GetLineOffsetX(Font font, string line, HorizontalAlignment horizontalAlignment)
+    {
+        EnsureNoLineBreaks(line);
+
+        return horizontalAlignment switch
+        {
+            HorizontalAlignment.Left => 0,
+            HorizontalAlignment.Center => -(CalculateLineWidth(font, line) >> 1), // Divide by 2
+            HorizontalAlignment.Right => -CalculateLineWidth(font, line),
+            _ => throw new ArgumentOutOfRangeException(nameof(horizontalAlignment), horizontalAlignment, null)
+        };
+    }
+    
+    public static int GetTextOffsetY(Font font, string line, VerticalAlignment verticalAlignment)
+    {
+        return verticalAlignment switch
+        {
+            VerticalAlignment.Bottom => -CalculateTextHeight(font, line),
+            VerticalAlignment.Center => -(CalculateTextHeight(font, line) >> 1), // Divide by 2
+            VerticalAlignment.Top => 0,
+            _ => throw new ArgumentOutOfRangeException(nameof(verticalAlignment), verticalAlignment, null)
+        };
     }
 
     public static int CalculateTextHeight(Font font, string text)

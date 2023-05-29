@@ -18,7 +18,7 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
         set
         {
             textEntity.Text = value;
-            selectionText = TextShaper.GetSelectionText(
+            selectionText = TextShaper.GetTextBounds(
                 font, 
                 value, 
                 textEntity.HorizontalAlignment,
@@ -43,7 +43,7 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
     private readonly ScopedInputProvider inputProvider;
     private readonly Font font;
     private readonly bool autoHeight;
-    private SelectionText? selectionText;
+    private TextBounds? selectionText;
     
     private (int, int) selection = (-1, -1);
     private ScopedInputProvider? dragInputProvider;
@@ -144,12 +144,12 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
         matrixStack.Pop();
     }
     
-    private static int? GetHoveredCharacter(SelectionText selectionText, Vector2 mousePosition, int baselineOffset)
+    private static int? GetHoveredCharacter(TextBounds textBounds, Vector2 mousePosition, int baselineOffset)
     {
-        if (!IsInBounds(selectionText, mousePosition, baselineOffset)) 
+        if (!IsInBounds(textBounds, mousePosition, baselineOffset)) 
             return null;
         
-        foreach (var (bounds, index) in EnumerateSelectionBoxes(selectionText, baselineOffset))
+        foreach (var (bounds, index) in EnumerateSelectionBoxes(textBounds, baselineOffset))
         {
             if (bounds.ContainsInclusive(mousePosition))
             {
@@ -160,26 +160,26 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
         return null;
     }
 
-    private static int GetDragCharacter(SelectionText selectionText, Vector2 mousePosition, int baselineOffset)
+    private static int GetDragCharacter(TextBounds textBounds, Vector2 mousePosition, int baselineOffset)
     {
         // Get the line that the mouse is on
-        var line = GetDragLine(selectionText, mousePosition, baselineOffset);
+        var line = GetDragLine(textBounds, mousePosition, baselineOffset);
         
         // Get the character that the mouse is on
         
         // If the mouse is to the left of the first character, return the first character
-        if (mousePosition.X < line.SelectablePositions[0] / 64.0f)
-            return line.SelectableIndices[0];
+        if (mousePosition.X < line.CharacterPositions[0] / 64.0f)
+            return line.CharacterIndices[0];
         
         // If the mouse is to the right of the last character, return the last character
-        if (mousePosition.X > line.SelectablePositions[^1] / 64.0f)
-            return line.SelectableIndices[^1];
+        if (mousePosition.X > line.CharacterPositions[^1] / 64.0f)
+            return line.CharacterIndices[^1];
         
         // Otherwise, find the character that the mouse is on
-        for (var i = 0; i < line.SelectablePositions.Count - 1; i++)
+        for (var i = 0; i < line.CharacterPositions.Count - 1; i++)
         {
-            var left = line.SelectablePositions[i] / 64.0f;
-            var right = line.SelectablePositions[i + 1] / 64.0f;
+            var left = line.CharacterPositions[i] / 64.0f;
+            var right = line.CharacterPositions[i + 1] / 64.0f;
             
             if (left <= mousePosition.X && mousePosition.X <= right)
             {
@@ -187,27 +187,27 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
                 var rightDistance = right - mousePosition.X;
                 
                 if (leftDistance < rightDistance)
-                    return line.SelectableIndices[i];
+                    return line.CharacterIndices[i];
                 else
-                    return line.SelectableIndices[i + 1];
+                    return line.CharacterIndices[i + 1];
             }
         }
         
         throw new Exception("THE CODE BLEW UP, THIS SHOULD NEVER HAPPEN, WTF IS GOING ON");
     }
     
-    private static SelectionLine GetDragLine(SelectionText selectionText, Vector2 mousePosition, int baselineOffset)
+    private static LineBounds GetDragLine(TextBounds textBounds, Vector2 mousePosition, int baselineOffset)
     {
         // If mouse is above the first line, return the first line
-        if (mousePosition.Y < selectionText.Lines[0].Top / 64.0f + baselineOffset / 64.0f)
-            return selectionText.Lines[0];
+        if (mousePosition.Y < textBounds.Lines[0].Top / 64.0f + baselineOffset / 64.0f)
+            return textBounds.Lines[0];
         
         // If mouse is below the last line, return the last line
-        if (mousePosition.Y > selectionText.Lines[^1].Bottom / 64.0f + baselineOffset / 64.0f)
-            return selectionText.Lines[^1];
+        if (mousePosition.Y > textBounds.Lines[^1].Bottom / 64.0f + baselineOffset / 64.0f)
+            return textBounds.Lines[^1];
         
         // Otherwise, find the line that the mouse is on
-        foreach (var line in selectionText.Lines)
+        foreach (var line in textBounds.Lines)
         {
             if (line.Top / 64.0f + baselineOffset / 64.0f <= mousePosition.Y && mousePosition.Y <= line.Bottom / 64.0f + baselineOffset / 64.0f)
                 return line;
@@ -216,29 +216,29 @@ public class SelectableTextElement : VisualElement, IUpdateable, IRenderable
         throw new Exception("THE CODE BLEW UP, THIS SHOULD NEVER HAPPEN, WTF IS GOING ON");
     }
 
-    private static bool IsInBounds(SelectionText selectionText, Vector2 mousePosition, int baselineOffset)
+    private static bool IsInBounds(TextBounds textBounds, Vector2 mousePosition, int baselineOffset)
     {
-        var x0 = selectionText.MinX / 64.0f;
-        var y0 = selectionText.MinY / 64.0f + baselineOffset / 64.0f;
-        var x1 = selectionText.MaxX / 64.0f;
-        var y1 = selectionText.MaxY / 64.0f + baselineOffset / 64.0f;
+        var x0 = textBounds.MinX / 64.0f;
+        var y0 = textBounds.MinY / 64.0f + baselineOffset / 64.0f;
+        var x1 = textBounds.MaxX / 64.0f;
+        var y1 = textBounds.MaxY / 64.0f + baselineOffset / 64.0f;
         var box = GetBox(x0, y0, x1, y1);
         
         return box.ContainsInclusive(mousePosition);
     }
 
-    private static IEnumerable<(Box2, int)> EnumerateSelectionBoxes(SelectionText selectionText, int baselineOffset)
+    private static IEnumerable<(Box2, int)> EnumerateSelectionBoxes(TextBounds textBounds, int baselineOffset)
     {
-        foreach (var line in selectionText.Lines)
+        foreach (var line in textBounds.Lines)
         {
-            for (int i = 0; i < line.SelectablePositions.Count - 1; i++)
+            for (int i = 0; i < line.CharacterPositions.Count - 1; i++)
             {
-                var x0 = line.SelectablePositions[i] / 64.0f;
+                var x0 = line.CharacterPositions[i] / 64.0f;
                 var y0 = line.Bottom / 64.0f + baselineOffset / 64.0f;
-                var x1 = line.SelectablePositions[i + 1] / 64.0f;
+                var x1 = line.CharacterPositions[i + 1] / 64.0f;
                 var y1 = line.Top / 64.0f + baselineOffset / 64.0f;
 
-                yield return (GetBox(x0, y0, x1, y1), line.SelectableIndices[i + 1]);
+                yield return (GetBox(x0, y0, x1, y1), line.CharacterIndices[i + 1]);
             }
         }
     }
