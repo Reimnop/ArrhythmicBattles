@@ -1,4 +1,4 @@
-﻿namespace FlexFramework.Modelling;
+﻿namespace FlexFramework.Util;
 
 public class TreeBuilder<T>
 {
@@ -23,16 +23,16 @@ public class TreeBuilder<T>
         return PushChild(childBuilder);
     }
 
-    public ImmutableNode<T> Build()
+    public Node<T> Build()
     {
-        return new ImmutableNode<T>(value, BuildChildren(this));
+        return new Node<T>(value, BuildChildren(this));
     }
 
-    private static IEnumerable<ImmutableNode<T>> BuildChildren(TreeBuilder<T> parent)
+    private static IEnumerable<Node<T>> BuildChildren(TreeBuilder<T> parent)
     {
         foreach (var childBuilder in parent.children)
         {
-            yield return new ImmutableNode<T>(childBuilder.value, BuildChildren(childBuilder));
+            yield return new Node<T>(childBuilder.value, BuildChildren(childBuilder));
         }
     }
 }

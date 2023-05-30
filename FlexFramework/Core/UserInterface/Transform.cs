@@ -1,5 +1,4 @@
-﻿using FlexFramework.Core;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface;
 
@@ -16,7 +15,7 @@ public struct Transform
         Rotation = rotation;
     }
     
-    internal void ApplyToMatrixStack(MatrixStack matrixStack)
+    public void ApplyToMatrixStack(MatrixStack matrixStack)
     {
         matrixStack.Scale(Scale.X, Scale.Y, 1.0f);
         matrixStack.Rotate(Vector3.UnitZ, Rotation);

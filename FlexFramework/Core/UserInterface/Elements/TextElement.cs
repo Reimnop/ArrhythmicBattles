@@ -6,19 +6,21 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class TextElement : VisualElement, IRenderable
 {
+    public override Vector2 Size => textBounds != null
+        ? new Vector2(textBounds.MaxX - textBounds.MinX, textBounds.MaxY - textBounds.MinY) / 64.0f
+        : Vector2.Zero;
+    
     public string Text
     {
         get => textEntity.Text;
         set
         {
             textEntity.Text = value;
-
-            if (autoHeight)
-            {
-                var lines = value.Split('\n').Length;
-                var height = lines * (font.Metrics.Height >> 6) * textEntity.EmSize;
-                Height = height;
-            }
+            textBounds = TextShaper.GetTextBounds(
+                textEntity.Font, 
+                Text, 
+                textEntity.HorizontalAlignment,
+                textEntity.VerticalAlignment);
         }
     }
 
@@ -29,30 +31,21 @@ public class TextElement : VisualElement, IRenderable
     }
 
     private readonly TextEntity textEntity;
-    private readonly Font font;
-    private readonly bool autoHeight;
+    private TextBounds? textBounds;
 
-    public TextElement(Font font, bool autoHeight = true, params Element[] children) : base(children)
+    public TextElement(Font font)
     {
-        this.autoHeight = autoHeight;
-        this.font = font;
-
         textEntity = new TextEntity(font);
         textEntity.BaselineOffset = font.Metrics.Height;
-    }
-    
-    public override void UpdateLayout(Bounds constraintBounds)
-    {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(ElementBounds.X0, ElementBounds.Y0, 0.0f);
+        matrixStack.Translate(Box.ContentBox.Min.X, Box.ContentBox.Min.Y, 0.0f);
+        RenderTransform.ApplyToMatrixStack(matrixStack);
         textEntity.Render(args);
         matrixStack.Pop();
     }

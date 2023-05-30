@@ -86,8 +86,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     
     private void AnimateHighlight()
     {
-        Bounds from = new Bounds(ElementBounds.X0, ElementBounds.Y0, ElementBounds.X0, ElementBounds.Y1);
-        Bounds to = ElementBounds;
+        Bounds from = new Bounds(Bounds.X0, Bounds.Y0, Bounds.X0, Bounds.Y1);
+        Bounds to = Bounds;
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -102,8 +102,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             return;
         }
         
-        Bounds from = ElementBounds;
-        Bounds to = new Bounds(ElementBounds.X1, ElementBounds.Y0, ElementBounds.X1, ElementBounds.Y1);
+        Bounds from = Bounds;
+        Bounds to = new Bounds(Bounds.X1, Bounds.Y0, Bounds.X1, Bounds.Y1);
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -128,8 +128,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             elementBackgroundEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
             
-            elementBackgroundEntity.Min = ElementBounds.Min;
-            elementBackgroundEntity.Max = ElementBounds.Max;
+            elementBackgroundEntity.Min = Bounds.Min;
+            elementBackgroundEntity.Max = Bounds.Max;
         }
 
         interactivity.Update();
@@ -170,7 +170,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         base.UpdateLayout(constraintBounds);
         UpdateChildrenLayout(ContentBounds);
 
-        interactivity.Bounds = ElementBounds;
+        interactivity.Bounds = Bounds;
 
         sliderBackgroundEntity.Min = new Vector2(ContentBounds.X1 - SliderWidth, ContentBounds.Y0);
         sliderBackgroundEntity.Max = ContentBounds.Max;

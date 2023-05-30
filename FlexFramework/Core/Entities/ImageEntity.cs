@@ -16,18 +16,15 @@ public enum ImageMode
     Stretch
 }
 
-public class ImageEntity : UIElement, IRenderable
+public class ImageEntity : Entity, IRenderable
 {
-    public override Vector2 Position { get; set; } = Vector2.Zero;
-    public override Vector2 Size { get; set; } = Vector2.One * 128.0f;
-    public override Vector2 Origin { get; set; } = Vector2.Zero;
-    public override bool IsFocused { get; set; }
+    public Vector2 Size { get; set; } = Vector2.One * 128.0f;
 
     public Texture Texture { get; set; }
     public ImageMode ImageMode { get; set; } = ImageMode.Fill;
     public Color4 Color { get; set; } = Color4.White;
 
-    public ImageEntity(FlexFrameworkMain engine, Texture texture) : base(engine)
+    public ImageEntity(Texture texture)
     {
         Texture = texture;
     }
@@ -40,7 +37,6 @@ public class ImageEntity : UIElement, IRenderable
         var cameraData = args.CameraData;
 
         matrixStack.Push();
-        matrixStack.Translate(0.5f - Origin.X, 0.5f - Origin.Y, 0.0f);
         switch (ImageMode)
         {
             case ImageMode.Fill:
@@ -67,8 +63,7 @@ public class ImageEntity : UIElement, IRenderable
                 }
                 break;
         }
-        matrixStack.Translate(Position.X, Position.Y, 0.0f);
-        
+
         var transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
         var vertexDrawData = new VertexDrawData(DefaultAssets.QuadMesh.ReadOnly, transformation, Texture?.ReadOnly, Color, PrimitiveType.Triangles);
 

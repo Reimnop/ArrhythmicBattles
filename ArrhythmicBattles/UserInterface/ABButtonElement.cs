@@ -40,8 +40,8 @@ public class ABButtonElement : VisualElement, IUpdateable
 
     private void OnMouseEnter()
     {
-        Bounds from = new Bounds(ElementBounds.X0, ElementBounds.Y0, ElementBounds.X0, ElementBounds.Y1);
-        Bounds to = ElementBounds;
+        Bounds from = new Bounds(Bounds.X0, Bounds.Y0, Bounds.X0, Bounds.Y1);
+        Bounds to = Bounds;
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -51,8 +51,8 @@ public class ABButtonElement : VisualElement, IUpdateable
     
     private void OnMouseLeave()
     {
-        Bounds from = ElementBounds;
-        Bounds to = new Bounds(ElementBounds.X1, ElementBounds.Y0, ElementBounds.X1, ElementBounds.Y1);
+        Bounds from = Bounds;
+        Bounds to = new Bounds(Bounds.X1, Bounds.Y0, Bounds.X1, Bounds.Y1);
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -77,8 +77,8 @@ public class ABButtonElement : VisualElement, IUpdateable
             rectEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = TextDefaultColor;
 
-            rectEntity.Min = ElementBounds.Min;
-            rectEntity.Max = ElementBounds.Max;
+            rectEntity.Min = Bounds.Min;
+            rectEntity.Max = Bounds.Max;
         }
         
         interactivity.Update();
@@ -90,7 +90,7 @@ public class ABButtonElement : VisualElement, IUpdateable
         base.UpdateLayout(constraintBounds);
         UpdateChildrenLayout(ContentBounds);
         
-        interactivity.Bounds = ElementBounds;
+        interactivity.Bounds = Bounds;
     }
 
     public override void Render(RenderArgs args)

@@ -1,6 +1,7 @@
 ﻿using FlexFramework.Modelling.Animation;
 using Assimp;
 using FlexFramework.Core.Data;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using Quaternion = OpenTK.Mathematics.Quaternion;
 
@@ -211,7 +212,7 @@ public class ModelImporter : IDisposable
         );
     }
 
-    public ImmutableNode<ModelNode> LoadModel()
+    public Node<ModelNode> LoadModel()
     {
         var rootNode = scene.RootNode;
         var modelTreeBuilder = GetModelTreeBuilder(rootNode);

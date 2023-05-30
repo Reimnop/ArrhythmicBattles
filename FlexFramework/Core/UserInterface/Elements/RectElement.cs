@@ -5,6 +5,8 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class RectElement : VisualElement, IRenderable
 {
+    public override Vector2 Size => Vector2.Zero;
+    
     public float Radius
     {
         get => rectEntity.Radius;
@@ -17,23 +19,23 @@ public class RectElement : VisualElement, IRenderable
         set => rectEntity.Color = value;
     }
 
-    private readonly RectEntity rectEntity = new RectEntity();
+    private readonly RectEntity rectEntity = new();
 
-    public RectElement(params Element[] children) : base(children)
+    public override void SetBox(ElementBox box)
     {
-    }
-
-    public override void UpdateLayout(Bounds constraintBounds)
-    {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
+        base.SetBox(box);
         
-        rectEntity.Min = ElementBounds.Min;
-        rectEntity.Max = ElementBounds.Max;
+        rectEntity.Min = box.BorderBox.Min;
+        rectEntity.Max = box.BorderBox.Max;
     }
 
     public override void Render(RenderArgs args)
     {
+        var matrixStack = args.MatrixStack;
+        
+        matrixStack.Push();
+        RenderTransform.ApplyToMatrixStack(matrixStack);
         rectEntity.Render(args);
+        matrixStack.Pop();
     }
 }

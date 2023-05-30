@@ -2,6 +2,7 @@
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Util;
 
 namespace FlexFramework.Modelling;
 
@@ -34,7 +35,7 @@ public class ModelEntity : Entity, IRenderable
     }
     
     // more recursion bullshit
-    private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
+    private void RenderModelRecursively(Node<ModelNode> node, RenderArgs args)
     {
         var commandList = args.CommandList;
         var layerType = args.LayerType;
@@ -71,7 +72,7 @@ public class ModelEntity : Entity, IRenderable
             commandList.AddDrawData(layerType, vertexDrawData);
         }
 
-        foreach (ImmutableNode<ModelNode> child in node.Children)
+        foreach (Node<ModelNode> child in node.Children)
         {
             RenderModelRecursively(child, args);
         }
