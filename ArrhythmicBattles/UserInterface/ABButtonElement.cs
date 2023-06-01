@@ -46,7 +46,7 @@ public class ABButtonElement : VisualElement, IUpdateable
 
     private void OnMouseEnter()
     {
-        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.X);
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.Y);
         var to = borderBox;
         
         rectEntity.Min = from.Min;

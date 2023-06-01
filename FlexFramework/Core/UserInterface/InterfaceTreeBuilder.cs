@@ -26,9 +26,9 @@ public class InterfaceTreeBuilder
         return this;
     }
     
-    public InterfaceTreeBuilder SetPadding(float left, float top, float right, float bottom)
+    public InterfaceTreeBuilder SetPadding(float top, float bottom, float left, float right)
     {
-        element.SetPadding(left, top, right, bottom);
+        element.SetPadding(top, bottom, left, right);
         return this;
     }
     
@@ -44,9 +44,9 @@ public class InterfaceTreeBuilder
         return this;
     }
     
-    public InterfaceTreeBuilder SetMargin(float left, float top, float right, float bottom)
+    public InterfaceTreeBuilder SetMargin(float top, float bottom, float left, float right)
     {
-        element.SetMargin(left, top, right, bottom);
+        element.SetMargin(top, bottom, left, right);
         return this;
     }
     

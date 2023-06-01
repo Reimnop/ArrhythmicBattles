@@ -29,11 +29,6 @@ public class RectElement : VisualElement, IRenderable
 
     public override void Render(RenderArgs args)
     {
-        var matrixStack = args.MatrixStack;
-        
-        matrixStack.Push();
-        RenderTransform.ApplyToMatrixStack(matrixStack);
         rectEntity.Render(args);
-        matrixStack.Pop();
     }
 }

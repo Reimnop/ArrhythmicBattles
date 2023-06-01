@@ -18,7 +18,7 @@ public class TextElement : VisualElement, IRenderable
             textEntity.Text = value;
             textBounds = TextShaper.GetTextBounds(
                 textEntity.Font, 
-                Text, 
+                value, 
                 textEntity.HorizontalAlignment,
                 textEntity.VerticalAlignment);
         }
@@ -52,7 +52,6 @@ public class TextElement : VisualElement, IRenderable
         
         matrixStack.Push();
         matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
-        RenderTransform.ApplyToMatrixStack(matrixStack);
         textEntity.Render(args);
         matrixStack.Pop();
     }

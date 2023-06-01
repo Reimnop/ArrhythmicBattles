@@ -27,9 +27,9 @@ public class ElementContainer
         return this;
     }
     
-    public ElementContainer SetPadding(float left, float top, float right, float bottom)
+    public ElementContainer SetPadding(float top, float bottom, float left, float right)
     {
-        return SetPadding(new Edges(left, top, right, bottom));
+        return SetPadding(new Edges(top, bottom, left, right));
     }
     
     public ElementContainer SetPadding(float value)
@@ -43,9 +43,9 @@ public class ElementContainer
         return this;
     }
     
-    public ElementContainer SetMargin(float left, float top, float right, float bottom)
+    public ElementContainer SetMargin(float top, float bottom, float left, float right)
     {
-        return SetMargin(new Edges(left, top, right, bottom));
+        return SetMargin(new Edges(top, bottom, left, right));
     }
     
     public ElementContainer SetMargin(float value)
@@ -106,13 +106,13 @@ public class ElementContainer
         };
     }
 
-    private static Box2 BlockDisplayMode(Box2 parentbounds, IEnumerable<LayoutDelegate> childLayoutDelegates)
+    private static Box2 BlockDisplayMode(Box2 parentBounds, IEnumerable<LayoutDelegate> childLayoutDelegates)
     {
-        var currentBounds = new Box2(parentbounds.Min, parentbounds.Min);
-        var currentParentBounds = parentbounds;
+        var currentBounds = new Box2(parentBounds.Min, parentBounds.Min);
+        var currentParentBounds = parentBounds;
         foreach (var childLayoutDelegate in childLayoutDelegates)
         {
-            var childBounds = childLayoutDelegate(parentbounds);
+            var childBounds = childLayoutDelegate(currentParentBounds);
             currentParentBounds.Translate(Vector2.UnitY * childBounds.Size.Y);
             currentBounds.Inflate(childBounds.Min);
             currentBounds.Inflate(childBounds.Max);

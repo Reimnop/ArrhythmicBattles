@@ -18,7 +18,6 @@ public class EmotionalDamageScreen : Screen, IDisposable
     private readonly ScopedInputProvider inputProvider;
     
     private readonly Node<ElementContainer> root;
-    private readonly LayoutEngine layoutEngine;
 
     public EmotionalDamageScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
@@ -27,73 +26,60 @@ public class EmotionalDamageScreen : Screen, IDisposable
         this.inputProvider = inputProvider;
 
         root = BuildInterface();
-        layoutEngine = new LayoutEngine(root);
-        layoutEngine.Layout(scene.ScreenBounds);
+        LayoutEngine.Layout(root, scene.ScreenBounds);
     }
 
     private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
         var treeBuilder = new InterfaceTreeBuilder()
-            .SetElement(new EmptyElement())
             .SetWidth(StretchMode.Stretch)
-            .SetHeight(StretchMode.Fit)
             .AddChild(new InterfaceTreeBuilder()
                 .SetElement(new TextElement(font)
                 {
                     Text = "I can't believe you fell for that\nHow stupid are you?"
                 })
-                .SetWidth(StretchMode.Stretch)
-                .SetHeight(StretchMode.Fit)
-                .SetPadding(16.0f))
+                .SetWidth(StretchMode.Stretch))
             .AddChild(new InterfaceTreeBuilder()
-                .SetElement(new ABButtonElement(font, inputProvider, "BACK"))
+                .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                {
+                    Click = () => engine.Close()
+                })
                 .SetWidth(StretchMode.Stretch)
-                .SetHeight(64.0f));
+                .SetPadding(16.0f)
+                .SetMargin(16.0f, 0.0f, 0.0f, 0.0f)
+                .SetHeight(80.0f));
 
         return treeBuilder.Build();
-
-
-        /*
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new TextElement(font)
-            {
-                Text = "I can't believe you fell for that\nHow stupid are you?",
-                Width = Length.Full
-            },
-            new ABButtonElement(font, inputProvider, "BACK (for real this time)")
-            {
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Width = Length.Full,
-                Height = 64.0f,
-                Padding = 16.0f,
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            })
-        {
-            Width = Length.Full,
-            Spacing = 16.0f
-        };
-        */
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
+        foreach (var updatable in root.Select(x => x.Value.Element).OfType<IUpdateable>())
         {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
+            updatable.Update(args);
         }
+        
+        // TODO: Uncomment this when SelectScreen is implemented
+        // if (inputProvider.GetKeyDown(Keys.Escape))
+        // {
+        //     scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
+        // }
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        foreach (var renderable in root.Select(x => x.Value.Element).OfType<IRenderable>())
+        {
+            renderable.Render(args);
+        }
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        foreach (var disposable in root.Select(x => x.Value.Element).OfType<IDisposable>())
+        {
+            disposable.Dispose();
+        }
     }
 }

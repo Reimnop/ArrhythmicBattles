@@ -37,6 +37,7 @@ public class ImageEntity : Entity, IRenderable
         var cameraData = args.CameraData;
 
         matrixStack.Push();
+        matrixStack.Translate(0.5f, 0.5f, 0.0f);
         switch (ImageMode)
         {
             case ImageMode.Fill:
@@ -62,6 +63,8 @@ public class ImageEntity : Entity, IRenderable
                     matrixStack.Scale(Size.Y * Texture.Width / Texture.Height, Size.Y, 1.0f);
                 }
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         var transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
