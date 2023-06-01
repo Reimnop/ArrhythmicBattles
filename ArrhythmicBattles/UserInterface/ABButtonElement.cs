@@ -11,6 +11,9 @@ namespace ArrhythmicBattles.UserInterface;
 
 public class ABButtonElement : VisualElement, IUpdateable
 {
+    // TODO: Change width to be dynamic based on text width
+    public override Vector2 Size => new(0.0f, 64.0f);
+    
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
@@ -25,8 +28,11 @@ public class ABButtonElement : VisualElement, IUpdateable
     private readonly TextEntity textEntity;
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
+    
+    private Box2 borderBox;
+    private Box2 contentBox;
 
-    public ABButtonElement(Font font, IInputProvider inputProvider, string text, params Element[] children) : base(children)
+    public ABButtonElement(Font font, IInputProvider inputProvider, string text)
     {
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonUp += OnMouseButtonUp;
@@ -40,8 +46,8 @@ public class ABButtonElement : VisualElement, IUpdateable
 
     private void OnMouseEnter()
     {
-        Bounds from = new Bounds(Bounds.X0, Bounds.Y0, Bounds.X0, Bounds.Y1);
-        Bounds to = Bounds;
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.X);
+        var to = borderBox;
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -51,8 +57,8 @@ public class ABButtonElement : VisualElement, IUpdateable
     
     private void OnMouseLeave()
     {
-        Bounds from = Bounds;
-        Bounds to = new Bounds(Bounds.X1, Bounds.Y0, Bounds.X1, Bounds.Y1);
+        var from = borderBox;
+        var to = new Box2(borderBox.Max.X, borderBox.Min.Y, borderBox.Max.X, borderBox.Max.Y);
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -77,30 +83,30 @@ public class ABButtonElement : VisualElement, IUpdateable
             rectEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = TextDefaultColor;
 
-            rectEntity.Min = Bounds.Min;
-            rectEntity.Max = Bounds.Max;
+            rectEntity.Min = borderBox.Min;
+            rectEntity.Max = borderBox.Max;
         }
         
         interactivity.Update();
         tweener.Update(args.DeltaTime);
     }
 
-    public override void UpdateLayout(Bounds constraintBounds)
+    public override void LayoutCallback(ElementBoxes boxes)
     {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
-        
-        interactivity.Bounds = Bounds;
+        borderBox = boxes.BorderBox;
+        contentBox = boxes.ContentBox;
+
+        interactivity.Bounds = boxes.BorderBox;
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
         
         rectEntity.Render(args);
         
         matrixStack.Push();
-        matrixStack.Translate(ContentBounds.X0, ContentBounds.Y0, 0.0f);
+        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
     }

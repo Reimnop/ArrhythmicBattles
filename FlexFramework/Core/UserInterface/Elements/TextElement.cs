@@ -29,6 +29,8 @@ public class TextElement : VisualElement, IRenderable
         get => textEntity.Color;
         set => textEntity.Color = value;
     }
+    
+    private Box2 contentBox;
 
     private readonly TextEntity textEntity;
     private TextBounds? textBounds;
@@ -39,12 +41,17 @@ public class TextElement : VisualElement, IRenderable
         textEntity.BaselineOffset = font.Metrics.Height;
     }
 
+    public override void LayoutCallback(ElementBoxes boxes)
+    {
+        contentBox = boxes.ContentBox;
+    }
+
     public override void Render(RenderArgs args)
     {
         var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(Box.ContentBox.Min.X, Box.ContentBox.Min.Y, 0.0f);
+        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
         RenderTransform.ApplyToMatrixStack(matrixStack);
         textEntity.Render(args);
         matrixStack.Pop();

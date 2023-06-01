@@ -21,12 +21,10 @@ public class RectElement : VisualElement, IRenderable
 
     private readonly RectEntity rectEntity = new();
 
-    public override void SetBox(ElementBox box)
+    public override void LayoutCallback(ElementBoxes boxes)
     {
-        base.SetBox(box);
-        
-        rectEntity.Min = box.BorderBox.Min;
-        rectEntity.Max = box.BorderBox.Max;
+        rectEntity.Min = boxes.BorderBox.Min;
+        rectEntity.Max = boxes.BorderBox.Max;
     }
 
     public override void Render(RenderArgs args)

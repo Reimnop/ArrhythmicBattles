@@ -5,6 +5,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -16,7 +17,8 @@ public class EmotionalDamageScreen : Screen, IDisposable
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
     
-    private readonly Element root;
+    private readonly Node<ElementContainer> root;
+    private readonly LayoutEngine layoutEngine;
 
     public EmotionalDamageScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
@@ -25,13 +27,34 @@ public class EmotionalDamageScreen : Screen, IDisposable
         this.inputProvider = inputProvider;
 
         root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
+        layoutEngine = new LayoutEngine(root);
+        layoutEngine.Layout(scene.ScreenBounds);
     }
 
-    private Element BuildInterface()
+    private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
-        
+        var treeBuilder = new InterfaceTreeBuilder()
+            .SetElement(new EmptyElement())
+            .SetWidth(StretchMode.Stretch)
+            .SetHeight(StretchMode.Fit)
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new TextElement(font)
+                {
+                    Text = "I can't believe you fell for that\nHow stupid are you?"
+                })
+                .SetWidth(StretchMode.Stretch)
+                .SetHeight(StretchMode.Fit)
+                .SetPadding(16.0f))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "BACK"))
+                .SetWidth(StretchMode.Stretch)
+                .SetHeight(64.0f));
+
+        return treeBuilder.Build();
+
+
+        /*
         return new StackLayoutElement(
             Direction.Vertical,
             new TextElement(font)
@@ -51,6 +74,7 @@ public class EmotionalDamageScreen : Screen, IDisposable
             Width = Length.Full,
             Spacing = 16.0f
         };
+        */
     }
 
     public override void Update(UpdateArgs args)

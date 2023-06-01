@@ -1,14 +1,13 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.UserInterface;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Core;
 
 public abstract class ABScene : Scene, IDisposable
 {
-    public virtual Bounds ScreenBounds => new(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
+    public virtual Box2 ScreenBounds => new(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
 
     public ABContext Context { get; }
     protected EntityManager EntityManager { get; } = new();

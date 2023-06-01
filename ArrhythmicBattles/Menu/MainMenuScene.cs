@@ -7,7 +7,6 @@ using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Core.UserInterface;
 using FlexFramework.Text;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
@@ -17,7 +16,7 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
-    public override Bounds ScreenBounds => new(48.0f, 306.0f, 816.0f, 0.0f);
+    public override Box2 ScreenBounds => new(48.0f, 306.0f, 816.0f, 0.0f);
 
     // Resources
     private readonly Texture bannerTexture;
@@ -74,8 +73,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init entities
-        bannerEntity = EntityManager.Create(() => new ImageEntity(Engine, bannerTexture));
-        bannerEntity.Position = new Vector2(32.0f, 32.0f);
+        bannerEntity = EntityManager.Create(() => new ImageEntity(bannerTexture));
         bannerEntity.Size = new Vector2(0.0f, 192.0f);
         bannerEntity.ImageMode = ImageMode.Stretch;
 
@@ -124,6 +122,7 @@ public class MainMenuScene : ABScene
         MatrixStack.Scale(Engine.ClientSize.X, 256.0f, 1.0f);
         EntityManager.Invoke(border, entity => entity.Render(args));
         MatrixStack.Pop();
+        MatrixStack.Translate(32.0f, 32.0f, 0.0f);
         EntityManager.Invoke(bannerEntity, entity => entity.Render(args));
         MatrixStack.Pop();
         

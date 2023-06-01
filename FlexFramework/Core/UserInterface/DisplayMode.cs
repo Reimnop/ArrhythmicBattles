@@ -2,5 +2,6 @@
 
 public enum DisplayMode
 {
-    
+    Block,
+    Inline
 }

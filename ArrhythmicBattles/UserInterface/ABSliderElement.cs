@@ -1,5 +1,4 @@
-﻿using ArrhythmicBattles.Core;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
@@ -14,6 +13,9 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 {
     private const float SliderWidth = 256.0f;
     
+    // TODO: Change width to be dynamic based on text width
+    public override Vector2 Size => new(0.0f, 64.0f);
+
     public Color4 DefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 HoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -45,18 +47,18 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     private float value = 0.0f;
     private readonly Interactivity interactivity;
 
-    private readonly RectEntity elementBackgroundEntity = new RectEntity()
+    private readonly RectEntity elementBackgroundEntity = new()
     {
         Radius = 8.0f
     };
 
-    private readonly RectEntity sliderBackgroundEntity = new RectEntity()
+    private readonly RectEntity sliderBackgroundEntity = new()
     {
         Radius = 4.0f,
         Color = new Color4(0.0f, 0.0f, 0.0f, 0.4f)
     };
 
-    private readonly RectEntity sliderEntity = new RectEntity()
+    private readonly RectEntity sliderEntity = new()
     {
         Radius = 4.0f,
         Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -69,8 +71,11 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
+    
+    private Box2 borderBox;
+    private Box2 contentBox;
 
-    public ABSliderElement(Font font, IInputProvider inputProvider, string text, params Element[] children) : base(children)
+    public ABSliderElement(Font font, IInputProvider inputProvider, string text)
     {
         this.inputProvider = (ScopedInputProvider) inputProvider;
 
@@ -86,8 +91,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     
     private void AnimateHighlight()
     {
-        Bounds from = new Bounds(Bounds.X0, Bounds.Y0, Bounds.X0, Bounds.Y1);
-        Bounds to = Bounds;
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.X);
+        var to = borderBox;
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -102,8 +107,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             return;
         }
         
-        Bounds from = Bounds;
-        Bounds to = new Bounds(Bounds.X1, Bounds.Y0, Bounds.X1, Bounds.Y1);
+        var from = borderBox;
+        var to = new Box2(borderBox.Max.X, borderBox.Min.Y, borderBox.Max.X, borderBox.Max.Y);
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -128,8 +133,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             elementBackgroundEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
             
-            elementBackgroundEntity.Min = Bounds.Min;
-            elementBackgroundEntity.Max = Bounds.Max;
+            elementBackgroundEntity.Min = borderBox.Min;
+            elementBackgroundEntity.Max = borderBox.Max;
         }
 
         interactivity.Update();
@@ -137,7 +142,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 
         if (interactivity.MouseOver)
         {
-            Vector2 scrollDelta = inputProvider.MouseScrollDelta;
+            var scrollDelta = inputProvider.MouseScrollDelta;
             
             if (scrollDelta.Y != 0.0f)
             {
@@ -165,40 +170,40 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         }
     }
 
-    public override void UpdateLayout(Bounds constraintBounds)
+    public override void LayoutCallback(ElementBoxes boxes)
     {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
+        borderBox = boxes.BorderBox;
+        contentBox = boxes.ContentBox;
+        
+        interactivity.Bounds = borderBox;
 
-        interactivity.Bounds = Bounds;
-
-        sliderBackgroundEntity.Min = new Vector2(ContentBounds.X1 - SliderWidth, ContentBounds.Y0);
-        sliderBackgroundEntity.Max = ContentBounds.Max;
+        sliderBackgroundEntity.Min = new Vector2(contentBox.Max.X - SliderWidth, contentBox.Min.Y);
+        sliderBackgroundEntity.Max = contentBox.Max;
         
         ResizeSlider(Value);
     }
 
     private void ResizeSlider(float value)
     {
-        Bounds scrubberBounds = new Bounds(
-            ContentBounds.X1 - SliderWidth + 4.0f, 
-            ContentBounds.Y0 + 4.0f, 
-            ContentBounds.X1 - 4.0f, 
-            ContentBounds.Y1 - 4.0f);
+        var scrubberBounds = new Box2(
+            contentBox.Max.X - SliderWidth + 4.0f, 
+            contentBox.Min.Y + 4.0f, 
+            contentBox.Max.X - 4.0f, 
+            contentBox.Max.Y - 4.0f);
         
-        float x = MathHelper.Lerp(scrubberBounds.X0, scrubberBounds.X1, value);
+        float x = MathHelper.Lerp(scrubberBounds.Min.X, scrubberBounds.Max.X, value);
         sliderEntity.Min = scrubberBounds.Min;
-        sliderEntity.Max = new Vector2(x, scrubberBounds.Y1);
+        sliderEntity.Max = new Vector2(x, scrubberBounds.Max.Y);
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
 
         elementBackgroundEntity.Render(args);
 
         matrixStack.Push();
-        matrixStack.Translate(ContentBounds.X0, ContentBounds.Y0, 0.0f);
+        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
         
