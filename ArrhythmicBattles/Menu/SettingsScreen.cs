@@ -4,6 +4,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -15,7 +16,7 @@ public class SettingsScreen : Screen, IDisposable
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
     
-    private readonly Element root;
+    private readonly Node<ElementContainer> root;
 
     public SettingsScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
@@ -24,58 +25,52 @@ public class SettingsScreen : Screen, IDisposable
         this.inputProvider = inputProvider;
 
         root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
+        LayoutEngine.Layout(root, scene.ScreenBounds);
     }
 
-    private Element BuildInterface()
+    private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
-        
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new ABButtonElement(font, inputProvider, "VIDEO")  
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
-            },
-            new ABButtonElement(font, inputProvider, "AUDIO")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => scene.SwitchScreen(this, new AudioSettingsScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "BACK")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            })
-        {
-            Width = Length.Full
-        };
+        var treeBuilder = new InterfaceTreeBuilder()
+            .SetAnchor(Anchor.FillTopEdge)
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "VIDEO")
+                {
+                    // TODO: Add video settings screen
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(0.0f, -64.0f, 0.0f, 0.0f))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "AUDIO")
+                {
+                    Click = () => scene.SwitchScreen(this, new AudioSettingsScreen(engine, scene, inputProvider))
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                {
+                    Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider)),
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 128.0f)));
+
+        return treeBuilder.Build();
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        }
+        root.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        root.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        root.DisposeRecursively();
     }
 }

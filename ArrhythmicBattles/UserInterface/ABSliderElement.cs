@@ -12,9 +12,6 @@ namespace ArrhythmicBattles.UserInterface;
 public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 {
     private const float SliderWidth = 256.0f;
-    
-    // TODO: Change width to be dynamic based on text width
-    public override Vector2 Size => new(0.0f, 64.0f);
 
     public Color4 DefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 HoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -91,7 +88,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     
     private void AnimateHighlight()
     {
-        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.X);
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.Y);
         var to = borderBox;
         
         elementBackgroundEntity.Min = from.Min;
@@ -170,10 +167,10 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         }
     }
 
-    public override void LayoutCallback(ElementBoxes boxes)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        borderBox = boxes.BorderBox;
-        contentBox = boxes.ContentBox;
+        borderBox = bounds;
+        contentBox = new Box2(bounds.Min + new Vector2(16.0f), bounds.Max - new Vector2(16.0f)); // Shrink by 16px on each side
         
         interactivity.Bounds = borderBox;
 

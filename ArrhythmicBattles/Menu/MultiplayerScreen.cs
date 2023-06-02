@@ -5,6 +5,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -16,7 +17,7 @@ public class MultiplayerScreen : Screen, IDisposable
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
     
-    private readonly Element root;
+    private readonly Node<ElementContainer> root;
 
     public MultiplayerScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
@@ -25,68 +26,62 @@ public class MultiplayerScreen : Screen, IDisposable
         this.inputProvider = inputProvider;
 
         root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
+        LayoutEngine.Layout(root, scene.ScreenBounds);
     }
 
-    private Element BuildInterface()
+    private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
-        
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new TextElement(font)
-            {
-                Text = "bro there's no multiplayer yet\nclick the button below to go back to the main menu",
-                Width = Length.Full
-            },
-            new ABButtonElement(font, inputProvider, "BACK")
-            {
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Width = Length.Full,
-                Height = 64.0f,
-                Padding = 16.0f,
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "BACK BUT WITH A DIFFERENT TEXT")
-            {
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Width = Length.Full,
-                Height = 64.0f,
-                Padding = 16.0f,
-                Click = () =>
+        var treeBuilder = new InterfaceTreeBuilder()
+            .SetAnchor(Anchor.FillTopEdge)
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new TextElement(font)
                 {
-                    Process.Start(new ProcessStartInfo
+                    Text = "Multiplayer isn't available yet!\nClick the button below to go back to the main menu."
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(0.0f, -48.0f, 0.0f, 0.0f))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                {
+                    Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider)),
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "TRY DEMO")
+                {
+                    Click = () =>
                     {
-                        FileName = "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // hehe
-                        UseShellExecute = true
-                    });
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // hehe
+                            UseShellExecute = true
+                        });
                     
-                    scene.SwitchScreen(this, new EmotionalDamageScreen(engine, scene, inputProvider));
-                }
-            })
-        {
-            Width = Length.Full,
-            Spacing = 16.0f
-        };
+                        scene.SwitchScreen(this, new EmotionalDamageScreen(engine, scene, inputProvider));
+                    },
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 128.0f)));
+
+        return treeBuilder.Build();
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        }
+        root.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        root.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        root.DisposeRecursively();
     }
 }

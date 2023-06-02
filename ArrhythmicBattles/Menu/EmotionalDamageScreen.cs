@@ -33,53 +33,38 @@ public class EmotionalDamageScreen : Screen, IDisposable
     {
         var font = scene.Context.Font;
         var treeBuilder = new InterfaceTreeBuilder()
-            .SetWidth(StretchMode.Stretch)
+            .SetAnchor(Anchor.FillTopEdge)
             .AddChild(new InterfaceTreeBuilder()
                 .SetElement(new TextElement(font)
                 {
-                    Text = "I can't believe you fell for that\nHow stupid are you?"
+                    Text = "I can't believe you fell for that...\nDid you really think a multiplayer demo existed??"
                 })
-                .SetWidth(StretchMode.Stretch))
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(0.0f, -48.0f, 0.0f, 0.0f))
             .AddChild(new InterfaceTreeBuilder()
                 .SetElement(new ABButtonElement(font, inputProvider, "BACK")
                 {
-                    Click = () => engine.Close()
+                    Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider)),
+                    TextDefaultColor = Colors.AlternateTextColor
                 })
-                .SetWidth(StretchMode.Stretch)
-                .SetPadding(16.0f)
-                .SetMargin(16.0f, 0.0f, 0.0f, 0.0f)
-                .SetHeight(80.0f));
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)));
 
         return treeBuilder.Build();
     }
 
     public override void Update(UpdateArgs args)
     {
-        foreach (var updatable in root.Select(x => x.Value.Element).OfType<IUpdateable>())
-        {
-            updatable.Update(args);
-        }
-        
-        // TODO: Uncomment this when SelectScreen is implemented
-        // if (inputProvider.GetKeyDown(Keys.Escape))
-        // {
-        //     scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        // }
+        root.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        foreach (var renderable in root.Select(x => x.Value.Element).OfType<IRenderable>())
-        {
-            renderable.Render(args);
-        }
+        root.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        foreach (var disposable in root.Select(x => x.Value.Element).OfType<IDisposable>())
-        {
-            disposable.Dispose();
-        }
+        root.DisposeRecursively();
     }
 }

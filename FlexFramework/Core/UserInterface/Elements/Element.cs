@@ -4,7 +4,13 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public abstract class Element
 {
-    public abstract Vector2 Size { get; }
+    public Box2 Bounds { get; private set; }
 
-    public abstract void LayoutCallback(ElementBoxes boxes);
+    internal void SetBounds(Box2 bounds)
+    {
+        Bounds = bounds;
+        UpdateLayout(bounds);
+    }
+    
+    protected abstract void UpdateLayout(Box2 bounds);
 }

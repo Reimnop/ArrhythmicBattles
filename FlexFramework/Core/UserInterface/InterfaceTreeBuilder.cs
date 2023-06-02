@@ -1,5 +1,6 @@
 ﻿using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Util;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface;
 
@@ -20,63 +21,39 @@ public class InterfaceTreeBuilder
         return this;
     }
 
-    public InterfaceTreeBuilder SetPadding(Edges padding)
+    public InterfaceTreeBuilder SetEdges(Edges edges)
     {
-        element.SetPadding(padding);
+        element.SetEdges(edges);
         return this;
     }
     
-    public InterfaceTreeBuilder SetPadding(float top, float bottom, float left, float right)
+    public InterfaceTreeBuilder SetEdges(float top, float bottom, float left, float right)
     {
-        element.SetPadding(top, bottom, left, right);
+        element.SetEdges(top, bottom, left, right);
         return this;
     }
     
-    public InterfaceTreeBuilder SetPadding(float value)
+    public InterfaceTreeBuilder SetEdges(float value)
     {
-        element.SetPadding(value);
+        element.SetEdges(value);
         return this;
     }
     
-    public InterfaceTreeBuilder SetMargin(Edges margin)
+    public InterfaceTreeBuilder SetAnchor(Anchor anchor)
     {
-        element.SetMargin(margin);
+        element.SetAnchor(anchor);
         return this;
     }
     
-    public InterfaceTreeBuilder SetMargin(float top, float bottom, float left, float right)
+    public InterfaceTreeBuilder SetAnchor(Vector2 min, Vector2 max)
     {
-        element.SetMargin(top, bottom, left, right);
+        element.SetAnchor(min, max);
         return this;
     }
     
-    public InterfaceTreeBuilder SetMargin(float value)
+    public InterfaceTreeBuilder SetAnchor(Vector2 position)
     {
-        element.SetMargin(value);
-        return this;
-    }
-    
-    public InterfaceTreeBuilder SetWidth(float width)
-    {
-        element.SetWidth(width);
-        return this;
-    }
-
-    public InterfaceTreeBuilder SetWidth(StretchMode mode)
-    {
-        element.SetWidth(mode);
-        return this;
-    }
-    
-    public InterfaceTreeBuilder SetHeight(float height)
-    {
-        element.SetHeight(height);
-        return this;
-    }
-    
-    public InterfaceTreeBuilder SetHeight(StretchMode mode)
-    {
-        element.SetHeight(mode);
+        element.SetAnchor(position);
         return this;
     }
 

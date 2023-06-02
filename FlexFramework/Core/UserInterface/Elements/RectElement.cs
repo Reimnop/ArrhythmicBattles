@@ -5,8 +5,6 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class RectElement : VisualElement, IRenderable
 {
-    public override Vector2 Size => Vector2.Zero;
-    
     public float Radius
     {
         get => rectEntity.Radius;
@@ -21,10 +19,10 @@ public class RectElement : VisualElement, IRenderable
 
     private readonly RectEntity rectEntity = new();
 
-    public override void LayoutCallback(ElementBoxes boxes)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        rectEntity.Min = boxes.BorderBox.Min;
-        rectEntity.Max = boxes.BorderBox.Max;
+        rectEntity.Min = bounds.Min;
+        rectEntity.Max = bounds.Max;
     }
 
     public override void Render(RenderArgs args)

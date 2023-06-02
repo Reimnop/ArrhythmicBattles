@@ -89,7 +89,7 @@ public class MainMenuScene : ABScene
         border.Color = new Color4(24, 24, 24, 255);
 
         // Init UI
-        OpenScreen(new EmotionalDamageScreen(Engine, this, inputProvider));
+        OpenScreen(new SelectScreen(Engine, this, inputProvider));
     }
 
     public override void SwitchScreen(Screen before, Screen after)

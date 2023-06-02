@@ -1,11 +1,10 @@
-﻿using ArrhythmicBattles.Game;
-using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Game;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
-using FlexFramework.Core.UserInterface.Elements;
-using OpenTK.Mathematics;
+using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Menu;
 
@@ -15,7 +14,7 @@ public class SelectScreen : Screen, IDisposable
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
     
-    private readonly Element root;
+    private readonly Node<ElementContainer> root;
 
     public SelectScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
     {
@@ -24,68 +23,66 @@ public class SelectScreen : Screen, IDisposable
         this.inputProvider = inputProvider;
 
         root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
+        LayoutEngine.Layout(root, scene.ScreenBounds);
     }
 
-    private Element BuildInterface()
+    private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
-        
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new ABButtonElement(font, inputProvider, "SINGLEPLAYER")  
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => engine.LoadScene(new GameScene(scene.Context))
-            },
-            new ABButtonElement(font, inputProvider, "MULTIPLAYER")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => scene.SwitchScreen(this, new MultiplayerScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "SETTINGS")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "CREDITS")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => scene.SwitchScreen(this, new CreditsScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(font, inputProvider, "EXIT")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.CloseScreen(this)
-            })
-        {
-            Width = Length.Full
-        };
+        var treeBuilder = new InterfaceTreeBuilder()
+            .SetAnchor(Anchor.FillTopEdge)
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "SINGLEPLAYER")
+                {
+                    Click = () => engine.LoadScene(new GameScene(scene.Context))
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(0.0f, -64.0f, 0.0f, 0.0f))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "MULTIPLAYER")
+                {
+                    Click = () => scene.SwitchScreen(this, new MultiplayerScreen(engine, scene, inputProvider))
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "SETTINGS")
+                {
+                    Click = () => scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider))
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 128.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "CREDITS")
+                {
+                    Click = () => scene.SwitchScreen(this, new CreditsScreen(engine, scene, inputProvider))
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 192.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "EXIT")
+                {
+                    Click = () => scene.CloseScreen(this),
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 256.0f)));
+
+        return treeBuilder.Build();
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
+        root.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        root.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        root.DisposeRecursively();
     }
 }

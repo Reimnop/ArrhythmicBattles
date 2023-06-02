@@ -11,9 +11,6 @@ namespace ArrhythmicBattles.UserInterface;
 
 public class ABButtonElement : VisualElement, IUpdateable
 {
-    // TODO: Change width to be dynamic based on text width
-    public override Vector2 Size => new(0.0f, 64.0f);
-    
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
@@ -91,12 +88,12 @@ public class ABButtonElement : VisualElement, IUpdateable
         tweener.Update(args.DeltaTime);
     }
 
-    public override void LayoutCallback(ElementBoxes boxes)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        borderBox = boxes.BorderBox;
-        contentBox = boxes.ContentBox;
+        borderBox = bounds;
+        contentBox = new Box2(bounds.Min + new Vector2(16.0f), bounds.Max - new Vector2(16.0f)); // Shrink by 16px on each side
 
-        interactivity.Bounds = boxes.BorderBox;
+        interactivity.Bounds = borderBox;
     }
 
     public override void Render(RenderArgs args)

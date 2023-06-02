@@ -6,22 +6,10 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class TextElement : VisualElement, IRenderable
 {
-    public override Vector2 Size => textBounds != null
-        ? new Vector2(textBounds.MaxX - textBounds.MinX, textBounds.MaxY - textBounds.MinY) / 64.0f
-        : Vector2.Zero;
-    
     public string Text
     {
         get => textEntity.Text;
-        set
-        {
-            textEntity.Text = value;
-            textBounds = TextShaper.GetTextBounds(
-                textEntity.Font, 
-                value, 
-                textEntity.HorizontalAlignment,
-                textEntity.VerticalAlignment);
-        }
+        set => textEntity.Text = value;
     }
 
     public Color4 Color
@@ -30,10 +18,9 @@ public class TextElement : VisualElement, IRenderable
         set => textEntity.Color = value;
     }
     
-    private Box2 contentBox;
+    private Box2 bounds;
 
     private readonly TextEntity textEntity;
-    private TextBounds? textBounds;
 
     public TextElement(Font font)
     {
@@ -41,9 +28,9 @@ public class TextElement : VisualElement, IRenderable
         textEntity.BaselineOffset = font.Metrics.Height;
     }
 
-    public override void LayoutCallback(ElementBoxes boxes)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        contentBox = boxes.ContentBox;
+        this.bounds = bounds;
     }
 
     public override void Render(RenderArgs args)
@@ -51,7 +38,7 @@ public class TextElement : VisualElement, IRenderable
         var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
-        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
+        matrixStack.Translate(bounds.Min.X, bounds.Min.Y, 0.0f);
         textEntity.Render(args);
         matrixStack.Pop();
     }

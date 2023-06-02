@@ -20,7 +20,7 @@ public class PauseScreen : Screen, IDisposable
     private readonly ABScene scene;
     private readonly ScopedInputProvider inputProvider;
 
-    private Element root;
+    private Node<ElementContainer> root;
 
     public PauseScreen(FlexFrameworkMain engine, ABScene scene)
     {
@@ -33,51 +33,46 @@ public class PauseScreen : Screen, IDisposable
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
         
         root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
+        LayoutEngine.Layout(root, scene.ScreenBounds);
     }
 
-    private Element BuildInterface()
+    private Node<ElementContainer> BuildInterface()
     {
         var font = scene.Context.Font;
-
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new TextElement(font)
-            {
-                Text = "Game paused!\nPress [Esc] to return to game.",
-                Width = Length.Full
-            },
-            new StackLayoutElement(
-                Direction.Horizontal,
-                new ABButtonElement(font, inputProvider, "BACK")
+        var treeBuilder = new InterfaceTreeBuilder()
+            .SetAnchor(Anchor.FillLeftEdge)
+            .SetEdges(16.0f, 0.0f, 16.0f, -512.0f)
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new TextElement(font)
                 {
-                    TextDefaultColor = new Color4(233, 81, 83, 255),
-                    Width = new Length(0.5f, Unit.Percent),
-                    Height = 64.0f,
-                    Padding = 16.0f,
-                    Click = () => scene.CloseScreen(this)
-                },
-                new ABButtonElement(font, inputProvider, "QUIT COWARDLY") // insults the player
-                {
-                    TextDefaultColor = new Color4(233, 81, 83, 255),
-                    Width = new Length(0.5f, Unit.Percent),
-                    Height = 64.0f,
-                    Padding = 16.0f,
-                    Click = () => engine.LoadScene(new MainMenuScene(scene.Context))
+                    Text = "Game paused!\nPress [Esc] to return to game.\n// or quit like a coward",
                 })
-            {
-                Width = 384.0f
-            })
-        {
-            Width = Length.Full,
-            Spacing = 16.0f
-        };
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(0.0f, -72.0f, 0.0f, 0.0f))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "BACK TO GAME")
+                {
+                    Click = () => scene.CloseScreen(this),
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 88.0f)))
+            .AddChild(new InterfaceTreeBuilder()
+                .SetElement(new ABButtonElement(font, inputProvider, "QUIT COWARDLY") // what a coward
+                {
+                    Click = () => engine.LoadScene(new MainMenuScene(scene.Context)),
+                    TextDefaultColor = Colors.AlternateTextColor
+                })
+                .SetAnchor(Anchor.FillTopEdge)
+                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 152.0f)));
+
+        return treeBuilder.Build();
     }
     
     public override void Update(UpdateArgs args)
     {
         background.Update(args);
-        root.UpdateRecursive(args);
+        root.UpdateRecursively(args);
 
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
@@ -96,13 +91,13 @@ public class PauseScreen : Screen, IDisposable
         matrixStack.Pop();
         
         matrixStack.Push();
-        root.RenderRecursive(args);
+        root.RenderRecursively(args);
         matrixStack.Pop();
     }
 
     public void Dispose()
     {
         inputProvider.Dispose();
-        root.DisposeRecursive();
+        root.DisposeRecursively();
     }
 }
