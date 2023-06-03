@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Core.Physics;
+﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;

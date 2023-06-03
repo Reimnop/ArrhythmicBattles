@@ -17,16 +17,6 @@ namespace FlexFramework;
 public class FlexFrameworkMain : NativeWindow
 {
     /// <summary>
-    /// Global registry for registered resources
-    /// </summary>
-    public ResourceRegistry ResourceRegistry { get; }
-    
-    /// <summary>
-    /// Default assets for the engine
-    /// </summary>
-    public EngineAssets DefaultAssets { get; }
-
-    /// <summary>
     /// Input manager for the engine
     /// </summary>
     public Input Input { get; }
@@ -61,19 +51,13 @@ public class FlexFrameworkMain : NativeWindow
 #endif
 
         sceneManager = new SceneManager(this);
-        ResourceRegistry = new ResourceRegistry();
-        DefaultAssets = new EngineAssets(this, ResourceRegistry);
         audioManager = new AudioManager();
         Input = new Input(this);
     }
 
     internal void LogMessage(object? sender, Severity severity, string? type, string message)
     {
-        if (sender == null)
-        {
-            sender = this;
-        }
-        
+        sender ??= this;
         Log?.Invoke(sender, new LogEventArgs(severity, type, message));
     }
 
@@ -202,7 +186,6 @@ public class FlexFrameworkMain : NativeWindow
         base.Dispose(disposing);
         
         audioManager.Dispose();
-        ResourceRegistry.Dispose();
         if (Renderer is IDisposable disposable)
         {
             disposable.Dispose();

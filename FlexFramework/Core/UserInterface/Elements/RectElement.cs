@@ -17,19 +17,12 @@ public class RectElement : VisualElement, IRenderable
         set => rectEntity.Color = value;
     }
 
-    private readonly RectEntity rectEntity = new RectEntity();
+    private readonly RectEntity rectEntity = new();
 
-    public RectElement(params Element[] children) : base(children)
+    protected override void UpdateLayout(Box2 bounds)
     {
-    }
-
-    public override void UpdateLayout(Bounds constraintBounds)
-    {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
-        
-        rectEntity.Min = ElementBounds.Min;
-        rectEntity.Max = ElementBounds.Max;
+        rectEntity.Min = bounds.Min;
+        rectEntity.Max = bounds.Max;
     }
 
     public override void Render(RenderArgs args)

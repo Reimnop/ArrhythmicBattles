@@ -1,84 +1,63 @@
-﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
-using FlexFramework.Core.UserInterface.Elements;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Menu;
 
 public class AudioSettingsScreen : Screen, IDisposable
 {
-    private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    private readonly IInputProvider inputProvider;
-    
-    private readonly Element root;
+    public override Node<ElementContainer> RootNode { get; }
 
-    public AudioSettingsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
+    public AudioSettingsScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
     {
-        this.engine = engine;
-        this.scene = scene;
-        this.inputProvider = inputProvider;
+        var settings = context.Settings;
+        var font = context.Font;
 
-        root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
-    }
-
-    private Element BuildInterface()
-    {
-        var settings = scene.Context.Settings;
-
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new ABSliderElement(engine, inputProvider, "SFX VOLUME")  
-            {
-                Value = settings.SfxVolume,
-                ValueChanged = value => settings.SfxVolume = value,
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
-            },
-            new ABSliderElement(engine, inputProvider, "MUSIC VOLUME")
-            {
-                Value = settings.MusicVolume,
-                ValueChanged = value => settings.MusicVolume = value,
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
-            },
-            new ABButtonElement(engine, inputProvider, "BACK")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider))
-            })
-        {
-            Width = Length.Full
-        };
+        RootNode = screenManager.BuildInterface(
+            new InterfaceTreeBuilder()
+                .SetAnchor(Anchor.Fill)
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABSliderElement(font, inputProvider, "SFX VOLUME")
+                    {
+                        Value = settings.SfxVolume,
+                        ValueChanged = value => settings.SfxVolume = value
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(0.0f, -64.0f, 0.0f, 0.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABSliderElement(font, inputProvider, "MUSIC VOLUME")
+                    {
+                        Value = settings.MusicVolume,
+                        ValueChanged = value => settings.MusicVolume = value
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                    {
+                        Click = () =>
+                            screenManager.Switch(this, new SettingsScreen(engine, screenManager, context, inputProvider)),
+                        TextDefaultColor = Colors.TextAlternate
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 128.0f)))
+        );
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SettingsScreen(engine, scene, inputProvider));
-        }
+        RootNode.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        RootNode.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        RootNode.DisposeRecursively();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Game.Content;
+using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
@@ -27,6 +28,9 @@ public class GameScene : ABScene
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
     private readonly ScopedInputProvider inputProvider;
     private DebugScreen? debugScreen;
+    
+    private ScreenManager screenManager;
+    private Box2 currentScreenBounds;
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
@@ -38,6 +42,7 @@ public class GameScene : ABScene
     public GameScene(ABContext context) : base(context)
     {
         Engine.CursorState = CursorState.Grabbed;
+        currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
         
         // Init resources
         var renderer = Engine.Renderer;
@@ -58,6 +63,7 @@ public class GameScene : ABScene
         playerEntity.Position = Vector3.UnitY * 4.0f;
         
         // Init other things
+        screenManager = new ScreenManager(currentScreenBounds, child => child);
         skyboxRenderer = new ProceduralSkyboxRenderer();
         
         camera = new OrthographicCamera();
@@ -76,7 +82,7 @@ public class GameScene : ABScene
     {
         base.Update(args);
         
-        // Update physics
+        // Update physics before everything else
         physicsWorld.Update(args);
 
         if (inputProvider.GetKeyDown(Keys.F3))
@@ -84,18 +90,17 @@ public class GameScene : ABScene
             if (debugScreen == null)
             {
                 debugScreen = new DebugScreen(Engine, this);
-                OpenScreen(debugScreen);
             }
             else
             {
-                CloseScreen(debugScreen);
                 debugScreen = null;
             }
         }
         
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
-            OpenScreen(new PauseScreen(Engine, this));
+            screenManager.Open(new PauseScreen(Engine, screenManager, Context));
+            Engine.CursorState = CursorState.Normal;
         }
         
         // Teleport player to origin if they fall off the map
@@ -149,6 +154,18 @@ public class GameScene : ABScene
             freeCamCamera.Rotation = Quaternion.FromAxisAngle(Vector3.UnitY, freeCamYaw) * Quaternion.FromAxisAngle(Vector3.UnitX, freeCamPitch);
         }
 #endif
+        
+        var screenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
+        if (screenBounds != currentScreenBounds)
+        {
+            currentScreenBounds = screenBounds;
+            screenManager.Resize(currentScreenBounds);
+        }
+        
+        screenManager.Update(args);
+        
+        // Update debug screen
+        debugScreen?.Update(args);
     }
 
     protected override void RenderScene(CommandList commandList)
@@ -165,8 +182,8 @@ public class GameScene : ABScene
 
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
         
-        RenderArgs alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);
-        RenderArgs opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
+        var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);
+        var opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
         
         // render player
         EntityManager.Invoke(playerEntity, entity => entity.Render(opaqueArgs));
@@ -175,10 +192,13 @@ public class GameScene : ABScene
         EntityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
 
         // render gui
-        CameraData guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        RenderArgs guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
+        var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
+        var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
         
-        ScreenHandler.Render(guiArgs);
+        screenManager.Render(guiArgs);
+        
+        // Render debug screen
+        debugScreen?.Render(guiArgs);
     }
 
     public override void Dispose()
@@ -191,5 +211,7 @@ public class GameScene : ABScene
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
         inputProvider.Dispose();
+        
+        screenManager.Dispose();
     }
 }

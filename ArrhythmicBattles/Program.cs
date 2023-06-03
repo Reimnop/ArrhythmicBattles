@@ -40,16 +40,12 @@ public class Program
             Icon = icon
         };
 
-        using FlexFrameworkMain flexFramework = new FlexFrameworkMain(nws);
+        using var flexFramework = new FlexFrameworkMain(nws);
         flexFramework.Log += OnLog;
         flexFramework.VSync = VSyncMode.On;
         flexFramework.UseRenderer(new DefaultRenderer());
 
-        using ABContext context = new ABContext(flexFramework);
-
-        var textAssetsLocation = flexFramework.DefaultAssets.TextAssets;
-        var textAssets = flexFramework.ResourceRegistry.GetResource(textAssetsLocation);
-        textAssets.LoadFont("Assets/Fonts/Inconsolata-Regular.ttf", Constants.DefaultFontName, 24);
+        using var context = new ABContext(flexFramework);
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
@@ -66,22 +62,24 @@ public class Program
     
     private static void OnLog(object sender, LogEventArgs eventArgs)
     {
+        string msg = $"[FlexFramework -> {sender.GetType().Name}] {eventArgs.Message}";
+
         switch (eventArgs.Severity)
         {
             case Severity.Debug:
-                Log("DEBUG", $"[FlexFramework] {eventArgs.Message}");
+                Log("DEBUG", msg);
                 break;
             case Severity.Info:
-                Log("INFO", $"[FlexFramework] {eventArgs.Message}");
+                Log("INFO", msg);
                 break;
             case Severity.Warning:
-                Log("WARN", $"[FlexFramework] {eventArgs.Message}");
+                Log("WARN", msg);
                 break;
             case Severity.Error:
-                Log("ERROR", $"[FlexFramework] {eventArgs.Message}");
+                Log("ERROR", msg);
                 break;
             case Severity.Fatal:
-                Log("FATAL", $"[FlexFramework] {eventArgs.Message}");
+                Log("FATAL", msg);
                 break;
         }
     }

@@ -1,13 +1,11 @@
-﻿using ArrhythmicBattles.Util;
-using FlexFramework;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
 using Glide;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.UserInterface;
 
@@ -16,8 +14,7 @@ public class ABButtonElement : VisualElement, IUpdateable
     public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
-
-    private readonly FlexFrameworkMain engine;
+    
     private readonly Interactivity interactivity;
     
     private readonly RectEntity rectEntity = new RectEntity()
@@ -28,29 +25,29 @@ public class ABButtonElement : VisualElement, IUpdateable
     private readonly TextEntity textEntity;
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
+    
+    private Box2 borderBox;
+    private Box2 contentBox;
 
-    public ABButtonElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text, params Element[] children) : base(children)
+    public ABButtonElement(Font font, IInputProvider inputProvider, string text)
     {
-        this.engine = engine;
-        
         interactivity = new Interactivity(inputProvider);
         interactivity.MouseButtonUp += OnMouseButtonUp;
         interactivity.MouseEnter += OnMouseEnter;
         interactivity.MouseLeave += OnMouseLeave;
-        
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
 
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
-        textEntity.Text = text;
+        textEntity = new TextEntity(font)
+        {
+            Text = text,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
 
     private void OnMouseEnter()
     {
-        Bounds from = new Bounds(ElementBounds.X0, ElementBounds.Y0, ElementBounds.X0, ElementBounds.Y1);
-        Bounds to = ElementBounds;
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.Y);
+        var to = borderBox;
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -60,8 +57,8 @@ public class ABButtonElement : VisualElement, IUpdateable
     
     private void OnMouseLeave()
     {
-        Bounds from = ElementBounds;
-        Bounds to = new Bounds(ElementBounds.X1, ElementBounds.Y0, ElementBounds.X1, ElementBounds.Y1);
+        var from = borderBox;
+        var to = new Box2(borderBox.Max.X, borderBox.Min.Y, borderBox.Max.X, borderBox.Max.Y);
         
         rectEntity.Min = from.Min;
         rectEntity.Max = from.Max;
@@ -86,31 +83,26 @@ public class ABButtonElement : VisualElement, IUpdateable
             rectEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = TextDefaultColor;
 
-            rectEntity.Min = ElementBounds.Min;
-            rectEntity.Max = ElementBounds.Max;
+            rectEntity.Min = borderBox.Min;
+            rectEntity.Max = borderBox.Max;
         }
         
         interactivity.Update();
         tweener.Update(args.DeltaTime);
     }
 
-    public override void UpdateLayout(Bounds constraintBounds)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
-        
-        interactivity.Bounds = ElementBounds;
+        borderBox = bounds;
+        contentBox = new Box2(borderBox.Min + new Vector2(16.0f), borderBox.Max - new Vector2(16.0f)); // Shrink by 16px on each side
+
+        interactivity.Bounds = borderBox;
+        textEntity.Bounds = contentBox;
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
-        
         rectEntity.Render(args);
-        
-        matrixStack.Push();
-        matrixStack.Translate(ContentBounds.X0, ContentBounds.Y0, 0.0f);
         textEntity.Render(args);
-        matrixStack.Pop();
     }
 }

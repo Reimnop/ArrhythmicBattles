@@ -3,6 +3,7 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Modelling;
@@ -40,7 +41,7 @@ public class SkinnedModelEntity : Entity, IRenderable
         CalculateBoneMatricesRecursively(model.RootNode, boneMatrixStack);
     }
     
-    private void CalculateBoneMatricesRecursively(ImmutableNode<ModelNode> node, MatrixStack matrixStack)
+    private void CalculateBoneMatricesRecursively(Node<ModelNode> node, MatrixStack matrixStack)
     {
         var modelNode = node.Value;
         
@@ -66,7 +67,7 @@ public class SkinnedModelEntity : Entity, IRenderable
     }
     
     // more recursion bullshit
-    private void RenderModelRecursively(ImmutableNode<ModelNode> node, RenderArgs args)
+    private void RenderModelRecursively(Node<ModelNode> node, RenderArgs args)
     {
         var matrixStack = args.MatrixStack;
         var modelNode = node.Value;
@@ -100,7 +101,7 @@ public class SkinnedModelEntity : Entity, IRenderable
             commandList.AddDrawData(layerType, vertexDrawData);
         }
 
-        foreach (ImmutableNode<ModelNode> child in node.Children)
+        foreach (Node<ModelNode> child in node.Children)
         {
             RenderModelRecursively(child, args);
         }

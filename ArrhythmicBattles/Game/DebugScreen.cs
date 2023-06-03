@@ -4,18 +4,19 @@ using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core;
-using Textwriter;
+using FlexFramework.Core.UserInterface;
+using FlexFramework.Text;
+using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Game;
 
-public class DebugScreen : Screen
+public class DebugScreen : IUpdateable, IRenderable
 {
     private readonly TextEntity leftTextEntity;
     private readonly TextEntity rightTextEntity;
     
     private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    
+
     private float time = 0.0f;
     
     private int fps = 0;
@@ -24,27 +25,19 @@ public class DebugScreen : Screen
     public DebugScreen(FlexFrameworkMain engine, ABScene scene)
     {
         this.engine = engine;
-        this.scene = scene;
-
-        GpuInfo gpuInfo = engine.Renderer.GpuInfo;
-
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
-
-        leftTextEntity = new TextEntity(engine, font);
-        leftTextEntity.BaselineOffset = font.Height;
+        var gpuInfo = engine.Renderer.GpuInfo;
         
-        rightTextEntity = new TextEntity(engine, font);
-        rightTextEntity.BaselineOffset = font.Height;
+        leftTextEntity = new TextEntity(scene.Context.Font);
+
+        rightTextEntity = new TextEntity(scene.Context.Font);
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +
                                $"Vendor: {gpuInfo.Vendor}\n" +
                                $"Version: {gpuInfo.Version}\n";
     }
-    
-    public override void Update(UpdateArgs args)
+
+    public void Update(UpdateArgs args)
     {
         time += args.DeltaTime;
         
@@ -66,9 +59,9 @@ public class DebugScreen : Screen
                           $"    - Windows 98, the vg moderator.";
     }
     
-    public override void Render(RenderArgs args)
+    public void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
         leftTextEntity.Render(args);

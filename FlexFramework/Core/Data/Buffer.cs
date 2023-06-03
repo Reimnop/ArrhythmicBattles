@@ -29,6 +29,8 @@ public class Buffer
     private int size = 0;
     private Hash128 hash;
     
+    private bool readOnly = false;
+    
     public Buffer(int capacity = 1024)
     {
         data = new byte[capacity];
@@ -39,9 +41,18 @@ public class Buffer
     { 
         hash = HashUtil.Hash(data);
     }
-
-    public void SetData(IntPtr ptr, int length)
+    
+    public Buffer SetReadOnly()
     {
+        readOnly = true;
+        return this;
+    }
+
+    public Buffer SetData(IntPtr ptr, int length)
+    {
+        if (readOnly)
+            throw new InvalidOperationException("Cannot modify read-only buffer!");
+        
         if (length > data.Length)
         {
             data = new byte[length];
@@ -51,9 +62,11 @@ public class Buffer
         size = length;
         
         UpdateHash();
+        
+        return this;
     }
     
-    public unsafe void SetData<T>(ReadOnlySpan<T> buffer) where T : unmanaged
+    public unsafe Buffer SetData<T>(ReadOnlySpan<T> buffer) where T : unmanaged
     {
         var length = buffer.Length * Unsafe.SizeOf<T>();
 
@@ -61,18 +74,21 @@ public class Buffer
         {
             fixed (T* ptr = buffer)
             {
-                SetData((IntPtr) ptr, length);
+                return SetData((IntPtr) ptr, length);
             }
         }
-        else
-        {
-            Clear();
-        }
+
+        return Clear();
     }
     
-    public void Clear()
+    public Buffer Clear()
     {
+        if (readOnly)
+            throw new InvalidOperationException("Cannot modify read-only buffer!");
+        
         size = 0;
         UpdateHash();
+        
+        return this;
     }
 }

@@ -23,6 +23,7 @@
         <PackageReference Include="SharpEXR" Version="1.0.0.19" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
         <PackageReference Include="System.IO.Hashing" Version="7.0.0" />
+        <PackageReference Include="TextCopy" Version="6.2.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -32,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Textwriter\Textwriter.csproj" />
+        <ProjectReference Include="..\FlexFramework.Text\FlexFramework.Text.csproj" />
     </ItemGroup>
 
     <ItemGroup>

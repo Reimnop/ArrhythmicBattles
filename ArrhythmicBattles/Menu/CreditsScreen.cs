@@ -1,72 +1,52 @@
 ﻿using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Core;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Menu;
 
 public class CreditsScreen : Screen, IDisposable
 {
-    private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    private readonly IInputProvider inputProvider;
-    
-    private readonly Element root;
+    public override Node<ElementContainer> RootNode { get; }
 
-    public CreditsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
+    public CreditsScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
     {
-        this.engine = engine;
-        this.scene = scene;
-        this.inputProvider = inputProvider;
-
-        root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
-    }
-
-    private Element BuildInterface()
-    {
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new TextElement(engine, Constants.DefaultFontName)
-            {
-                Text = "Windows.\nWindows, what the fuck.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce of muck\nLuce, your status.\n\nmusic made by LemmieDot btw",
-                Width = Length.Full
-            },
-            new ABButtonElement(engine, inputProvider, "BACK")
-            {
-                Width = Length.Full,
-                Height = 64.0f,
-                Padding = 16.0f,
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            })
-        {
-            Width = Length.Full,
-            Spacing = 16.0f
-        };
+        var font = context.Font;
+        RootNode = screenManager.BuildInterface(
+            new InterfaceTreeBuilder()
+                .SetAnchor(Anchor.FillTopEdge)
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new TextElement(font)
+                    {
+                        Text = "Windows.\nWindows, what the fuck.\nWindows, your fucking skin.\n\n\"uwaaa <3\" - Windows 98, a VG moderator.\n\nLuce of muck\nLuce, your status.\n\nmusic made by LemmieDot btw"
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(0.0f, -TextHelper.CalculateTextHeight(font, 10), 0.0f, 0.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                    {
+                        Click = () => screenManager.Switch(this, new SelectScreen(engine, screenManager, context, inputProvider)),
+                        TextDefaultColor = Colors.TextAlternate
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, TextHelper.CalculateTextHeight(font, 10) + 16.0f)))
+        );
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        }
+        RootNode.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        RootNode.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        RootNode.DisposeRecursively();
     }
 }

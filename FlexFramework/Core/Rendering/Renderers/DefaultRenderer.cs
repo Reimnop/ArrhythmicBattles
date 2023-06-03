@@ -49,7 +49,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
         RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this));
         RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
-        RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy(Engine));
+        RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy());
 
         // Set GL modes
         GL.CullFace(CullFaceMode.Back);

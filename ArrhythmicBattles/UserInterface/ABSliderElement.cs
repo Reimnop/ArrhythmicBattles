@@ -1,20 +1,18 @@
-﻿using ArrhythmicBattles.Core;
-using FlexFramework;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
 using Glide;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Textwriter;
 
 namespace ArrhythmicBattles.UserInterface;
 
 public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 {
     private const float SliderWidth = 256.0f;
-    
+
     public Color4 DefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
     public Color4 HoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -44,22 +42,20 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     public Action<float>? ValueChanged { get; set; }
 
     private float value = 0.0f;
-
-    private readonly FlexFrameworkMain engine;
     private readonly Interactivity interactivity;
 
-    private readonly RectEntity elementBackgroundEntity = new RectEntity()
+    private readonly RectEntity elementBackgroundEntity = new()
     {
         Radius = 8.0f
     };
 
-    private readonly RectEntity sliderBackgroundEntity = new RectEntity()
+    private readonly RectEntity sliderBackgroundEntity = new()
     {
         Radius = 4.0f,
         Color = new Color4(0.0f, 0.0f, 0.0f, 0.4f)
     };
 
-    private readonly RectEntity sliderEntity = new RectEntity()
+    private readonly RectEntity sliderEntity = new()
     {
         Radius = 4.0f,
         Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -72,11 +68,12 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
     
     private readonly Tweener tweener = new Tweener();
     private bool initialized = false;
+    
+    private Box2 borderBox;
+    private Box2 contentBox;
 
-    public ABSliderElement(FlexFrameworkMain engine, IInputProvider inputProvider, string text,
-        params Element[] children) : base(children)
+    public ABSliderElement(Font font, IInputProvider inputProvider, string text)
     {
-        this.engine = engine;
         this.inputProvider = (ScopedInputProvider) inputProvider;
 
         interactivity = new Interactivity(inputProvider);
@@ -84,19 +81,18 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseEnter += AnimateHighlight;
         interactivity.MouseLeave += AnimateUnhighlight;
 
-        var textAssetsLocation = engine.DefaultAssets.TextAssets;
-        var textAssets = engine.ResourceRegistry.GetResource(textAssetsLocation);
-        Font font = textAssets[Constants.DefaultFontName];
-
-        textEntity = new TextEntity(engine, font);
-        textEntity.BaselineOffset = font.Height;
-        textEntity.Text = text;
+        textEntity = new TextEntity(font)
+        {
+            Text = text,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
     
     private void AnimateHighlight()
     {
-        Bounds from = new Bounds(ElementBounds.X0, ElementBounds.Y0, ElementBounds.X0, ElementBounds.Y1);
-        Bounds to = ElementBounds;
+        var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.Y);
+        var to = borderBox;
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -111,8 +107,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             return;
         }
         
-        Bounds from = ElementBounds;
-        Bounds to = new Bounds(ElementBounds.X1, ElementBounds.Y0, ElementBounds.X1, ElementBounds.Y1);
+        var from = borderBox;
+        var to = new Box2(borderBox.Max.X, borderBox.Min.Y, borderBox.Max.X, borderBox.Max.Y);
         
         elementBackgroundEntity.Min = from.Min;
         elementBackgroundEntity.Max = from.Max;
@@ -137,8 +133,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
             elementBackgroundEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
             
-            elementBackgroundEntity.Min = ElementBounds.Min;
-            elementBackgroundEntity.Max = ElementBounds.Max;
+            elementBackgroundEntity.Min = borderBox.Min;
+            elementBackgroundEntity.Max = borderBox.Max;
         }
 
         interactivity.Update();
@@ -146,7 +142,7 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 
         if (interactivity.MouseOver)
         {
-            Vector2 scrollDelta = inputProvider.MouseScrollDelta;
+            var scrollDelta = inputProvider.MouseScrollDelta;
             
             if (scrollDelta.Y != 0.0f)
             {
@@ -174,43 +170,38 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         }
     }
 
-    public override void UpdateLayout(Bounds constraintBounds)
+    protected override void UpdateLayout(Box2 bounds)
     {
-        base.UpdateLayout(constraintBounds);
-        UpdateChildrenLayout(ContentBounds);
+        borderBox = bounds;
+        contentBox = new Box2(bounds.Min + new Vector2(16.0f), bounds.Max - new Vector2(16.0f)); // Shrink by 16px on each side
+        
+        interactivity.Bounds = borderBox;
 
-        interactivity.Bounds = ElementBounds;
-
-        sliderBackgroundEntity.Min = new Vector2(ContentBounds.X1 - SliderWidth, ContentBounds.Y0);
-        sliderBackgroundEntity.Max = ContentBounds.Max;
+        sliderBackgroundEntity.Min = new Vector2(contentBox.Max.X - SliderWidth, contentBox.Min.Y);
+        sliderBackgroundEntity.Max = contentBox.Max;
+        
+        textEntity.Bounds = contentBox;
         
         ResizeSlider(Value);
     }
 
     private void ResizeSlider(float value)
     {
-        Bounds scrubberBounds = new Bounds(
-            ContentBounds.X1 - SliderWidth + 4.0f, 
-            ContentBounds.Y0 + 4.0f, 
-            ContentBounds.X1 - 4.0f, 
-            ContentBounds.Y1 - 4.0f);
+        var scrubberBounds = new Box2(
+            contentBox.Max.X - SliderWidth + 4.0f, 
+            contentBox.Min.Y + 4.0f, 
+            contentBox.Max.X - 4.0f, 
+            contentBox.Max.Y - 4.0f);
         
-        float x = MathHelper.Lerp(scrubberBounds.X0, scrubberBounds.X1, value);
+        float x = MathHelper.Lerp(scrubberBounds.Min.X, scrubberBounds.Max.X, value);
         sliderEntity.Min = scrubberBounds.Min;
-        sliderEntity.Max = new Vector2(x, scrubberBounds.Y1);
+        sliderEntity.Max = new Vector2(x, scrubberBounds.Max.Y);
     }
 
     public override void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
-
         elementBackgroundEntity.Render(args);
-
-        matrixStack.Push();
-        matrixStack.Translate(ContentBounds.X0, ContentBounds.Y0, 0.0f);
         textEntity.Render(args);
-        matrixStack.Pop();
-        
         sliderBackgroundEntity.Render(args);
 
         if (Value > 0.0f)

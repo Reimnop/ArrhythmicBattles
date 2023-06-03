@@ -4,6 +4,7 @@ using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -11,69 +12,51 @@ namespace ArrhythmicBattles.Menu;
 
 public class SettingsScreen : Screen, IDisposable
 {
-    private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    private readonly IInputProvider inputProvider;
-    
-    private readonly Element root;
+    public override Node<ElementContainer> RootNode { get; }
 
-    public SettingsScreen(FlexFrameworkMain engine, ABScene scene, IInputProvider inputProvider)
+    public SettingsScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
     {
-        this.engine = engine;
-        this.scene = scene;
-        this.inputProvider = inputProvider;
-
-        root = BuildInterface();
-        root.UpdateLayout(scene.ScreenBounds);
-    }
-
-    private Element BuildInterface()
-    {
-        return new StackLayoutElement(
-            Direction.Vertical,
-            new ABButtonElement(engine, inputProvider, "VIDEO")  
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel)
-            },
-            new ABButtonElement(engine, inputProvider, "AUDIO")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                Click = () => scene.SwitchScreen(this, new AudioSettingsScreen(engine, scene, inputProvider))
-            },
-            new ABButtonElement(engine, inputProvider, "BACK")
-            {
-                Width = Length.Full,
-                Height = new Length(64.0f, Unit.Pixel),
-                Padding = new Length(16.0f, Unit.Pixel),
-                TextDefaultColor = new Color4(233, 81, 83, 255),
-                Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider))
-            })
-        {
-            Width = Length.Full
-        };
+        var font = context.Font;
+        RootNode = screenManager.BuildInterface(
+            new InterfaceTreeBuilder()
+                .SetAnchor(Anchor.FillTopEdge)
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "VIDEO")
+                    {
+                        // TODO: Add video settings screen
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(0.0f, -64.0f, 0.0f, 0.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "AUDIO")
+                    {
+                        Click = () => screenManager.Switch(this, new AudioSettingsScreen(engine, screenManager, context, inputProvider))
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                    {
+                        Click = () => screenManager.Switch(this, new SelectScreen(engine, screenManager, context, inputProvider)),
+                        TextDefaultColor = Colors.TextAlternate
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 128.0f)))
+        );
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursive(args);
-        
-        if (inputProvider.GetKeyDown(Keys.Escape))
-        {
-            scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider));
-        }
+        RootNode.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursive(args);
+        RootNode.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursive();
+        RootNode.DisposeRecursively();
     }
 }

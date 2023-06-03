@@ -1,4 +1,5 @@
 ﻿using FlexFramework.Core.Data;
+using FlexFramework.Util;
 using OpenTK.Mathematics;
 
 namespace FlexFramework.Modelling;
@@ -74,7 +75,7 @@ public class Model : IDisposable
 {
     private readonly ModelImporter modelImporter;
     
-    public ImmutableNode<ModelNode> RootNode { get; }
+    public Node<ModelNode> RootNode { get; }
     public IReadOnlyList<ModelBone> Bones { get; }
     public IReadOnlyDictionary<string, int> BoneIndexMap { get; }
     

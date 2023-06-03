@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Core.Physics;
+﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.Physics;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Game.Content;

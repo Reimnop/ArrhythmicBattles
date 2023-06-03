@@ -44,6 +44,8 @@ public class Texture : DataObject
     public Buffer Data { get; }
     public ITextureView ReadOnly => new ReadOnlyTexture(this);
     
+    private bool readOnly = false;
+    
     public Texture(string name, int width, int height, PixelFormat format) : base(name)
     {
         Width = width;
@@ -67,14 +69,26 @@ public class Texture : DataObject
         texture.SetData<Rgba32>(pixels);
         return texture;
     }
-
-    public void SetData<T>(ReadOnlySpan<T> data) where T : unmanaged
+    
+    public Texture SetReadOnly()
     {
+        readOnly = true;
+        Data.SetReadOnly();
+        return this;
+    }
+
+    public Texture SetData<T>(ReadOnlySpan<T> data) where T : unmanaged
+    {
+        if (readOnly)
+            throw new InvalidOperationException("Cannot modify read-only texture!");
+        
         var dataSize = data.Length * Unsafe.SizeOf<T>();
         var requiredSize = Width * Height * GetPixelSize(Format);
         if (dataSize != requiredSize)
             throw new ArgumentException($"Data size does not match texture size (expected {requiredSize}, got {dataSize})");
         Data.SetData(data);
+
+        return this;
     }
 
     public static int GetPixelSize(PixelFormat format)
