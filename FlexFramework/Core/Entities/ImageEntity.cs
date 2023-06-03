@@ -40,8 +40,16 @@ public class ImageEntity : Entity, IRenderable
         matrixStack.Translate(0.5f, 0.5f, 0.0f);
         switch (ImageMode)
         {
+            
             case ImageMode.Fill:
-                matrixStack.Scale(Size.X, Size.Y, 1.0f);
+                if (Size.X / Size.Y > Texture.Width / (float) Texture.Height)
+                {
+                    matrixStack.Scale(Size.X, Size.X * Texture.Height / Texture.Width, 1.0f);
+                }
+                else
+                {
+                    matrixStack.Scale(Size.Y * Texture.Width / Texture.Height, Size.Y, 1.0f);
+                }
                 break;
             case ImageMode.Fit:
                 if (Size.X / Size.Y > Texture.Width / (float) Texture.Height)
@@ -54,14 +62,7 @@ public class ImageEntity : Entity, IRenderable
                 }
                 break;
             case ImageMode.Stretch:
-                if (Size.X / Size.Y > Texture.Width / (float) Texture.Height)
-                {
-                    matrixStack.Scale(Size.X, Size.X * Texture.Height / Texture.Width, 1.0f);
-                }
-                else
-                {
-                    matrixStack.Scale(Size.Y * Texture.Width / Texture.Height, Size.Y, 1.0f);
-                }
+                matrixStack.Scale(Size.X, Size.Y, 1.0f);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

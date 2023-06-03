@@ -7,15 +7,11 @@ namespace ArrhythmicBattles.Core;
 
 public abstract class ABScene : Scene, IDisposable
 {
-    public virtual Box2 ScreenBounds => new(0.0f, 0.0f, Engine.ClientSize.X, Engine.ClientSize.Y);
-
     public ABContext Context { get; }
     protected EntityManager EntityManager { get; } = new();
     protected MatrixStack MatrixStack { get; } = new();
     protected GuiCamera GuiCamera { get; }
 
-    protected LayeredScreenHandler ScreenHandler { get; } = new();
-    
     // Rendering stuff
     private CommandList commandList = new();
 
@@ -31,22 +27,6 @@ public abstract class ABScene : Scene, IDisposable
     public override void Update(UpdateArgs args)
     {
         EntityManager.Update(args);
-        ScreenHandler.Update(args);
-    }
-
-    public virtual void OpenScreen(Screen screen)
-    {
-        ScreenHandler.OpenScreen(screen);
-    }
-
-    public virtual void CloseScreen(Screen screen)
-    {
-        ScreenHandler.CloseScreen(screen);
-    }
-
-    public virtual void SwitchScreen(Screen before, Screen after)
-    {
-        ScreenHandler.SwitchScreen(before, after);
     }
 
     public override void Render(Renderer renderer)
@@ -67,6 +47,5 @@ public abstract class ABScene : Scene, IDisposable
     public virtual void Dispose()
     {
         EntityManager.Dispose();
-        ScreenHandler.Dispose();
     }
 }

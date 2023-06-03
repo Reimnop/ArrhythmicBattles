@@ -1,70 +1,53 @@
-﻿using System.Diagnostics;
-using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Core;
+﻿using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Util;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Menu;
 
 public class EmotionalDamageScreen : Screen, IDisposable
 {
-    private readonly FlexFrameworkMain engine;
-    private readonly ABScene scene;
-    private readonly ScopedInputProvider inputProvider;
-    
-    private readonly Node<ElementContainer> root;
+    public override Node<ElementContainer> RootNode { get; }
 
-    public EmotionalDamageScreen(FlexFrameworkMain engine, ABScene scene, ScopedInputProvider inputProvider)
+    public EmotionalDamageScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
     {
-        this.engine = engine;
-        this.scene = scene;
-        this.inputProvider = inputProvider;
+        var font = context.Font;
 
-        root = BuildInterface();
-        LayoutEngine.Layout(root, scene.ScreenBounds);
-    }
-
-    private Node<ElementContainer> BuildInterface()
-    {
-        var font = scene.Context.Font;
-        var treeBuilder = new InterfaceTreeBuilder()
-            .SetAnchor(Anchor.FillTopEdge)
-            .AddChild(new InterfaceTreeBuilder()
-                .SetElement(new TextElement(font)
-                {
-                    Text = "I can't believe you fell for that...\nDid you really think a multiplayer demo existed??"
-                })
+        RootNode = screenManager.BuildInterface(
+            new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.FillTopEdge)
-                .SetEdges(0.0f, -48.0f, 0.0f, 0.0f))
-            .AddChild(new InterfaceTreeBuilder()
-                .SetElement(new ABButtonElement(font, inputProvider, "BACK")
-                {
-                    Click = () => scene.SwitchScreen(this, new SelectScreen(engine, scene, inputProvider)),
-                    TextDefaultColor = Colors.AlternateTextColor
-                })
-                .SetAnchor(Anchor.FillTopEdge)
-                .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, 64.0f)));
-
-        return treeBuilder.Build();
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new TextElement(font)
+                    {
+                        Text = "I can't believe you fell for that...\nDid you really think a multiplayer demo existed??"
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(0.0f, -TextHelper.CalculateTextHeight(font, 2), 0.0f, 0.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new ABButtonElement(font, inputProvider, "BACK")
+                    {
+                        Click = () => screenManager.Switch(this, new SelectScreen(engine, screenManager, context, inputProvider)),
+                        TextDefaultColor = Colors.TextAlternate
+                    })
+                    .SetAnchor(Anchor.FillTopEdge)
+                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, TextHelper.CalculateTextHeight(font, 2) + 16.0f)))
+        );
     }
 
     public override void Update(UpdateArgs args)
     {
-        root.UpdateRecursively(args);
+        RootNode.UpdateRecursively(args);
     }
 
     public override void Render(RenderArgs args)
     {
-        root.RenderRecursively(args);
+        RootNode.RenderRecursively(args);
     }
 
     public void Dispose()
     {
-        root.DisposeRecursively();
+        RootNode.DisposeRecursively();
     }
 }

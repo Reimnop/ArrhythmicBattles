@@ -4,11 +4,13 @@ using FlexFramework;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core;
+using FlexFramework.Core.UserInterface;
 using FlexFramework.Text;
+using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Game;
 
-public class DebugScreen : Screen
+public class DebugScreen : IUpdateable, IRenderable
 {
     private readonly TextEntity leftTextEntity;
     private readonly TextEntity rightTextEntity;
@@ -23,21 +25,19 @@ public class DebugScreen : Screen
     public DebugScreen(FlexFrameworkMain engine, ABScene scene)
     {
         this.engine = engine;
-        GpuInfo gpuInfo = engine.Renderer.GpuInfo;
-
-        leftTextEntity = new TextEntity(scene.Context.Font);
-        leftTextEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
+        var gpuInfo = engine.Renderer.GpuInfo;
         
+        leftTextEntity = new TextEntity(scene.Context.Font);
+
         rightTextEntity = new TextEntity(scene.Context.Font);
-        rightTextEntity.BaselineOffset = scene.Context.Font.Metrics.Height;
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +
                                $"Vendor: {gpuInfo.Vendor}\n" +
                                $"Version: {gpuInfo.Version}\n";
     }
-    
-    public override void Update(UpdateArgs args)
+
+    public void Update(UpdateArgs args)
     {
         time += args.DeltaTime;
         
@@ -59,9 +59,9 @@ public class DebugScreen : Screen
                           $"    - Windows 98, the vg moderator.";
     }
     
-    public override void Render(RenderArgs args)
+    public void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
         leftTextEntity.Render(args);

@@ -1,7 +1,7 @@
 ﻿using FlexFramework.Core.Audio;
 using FlexFramework.Modelling;
 
-namespace ArrhythmicBattles.Game.Content;
+namespace ArrhythmicBattles.Core;
 
 // Loads and caches content, such as models, textures, and sounds
 public class ContentLoader : IDisposable

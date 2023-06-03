@@ -41,6 +41,16 @@ public class TextEntity : Entity, IRenderable
         }
     }
 
+    public Box2 Bounds
+    {
+        get => bounds;
+        set
+        {
+            bounds = value;
+            InvalidateTextData();
+        }
+    }
+
     public Font Font
     {
         get => font;
@@ -50,11 +60,21 @@ public class TextEntity : Entity, IRenderable
             InvalidateTextData();
         }
     }
-    
+
+    public float EmSize
+    {
+        get => emSize;
+        set
+        {
+            emSize = value;
+            InvalidateTextData();
+        }
+    }
+
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Top;
-
-    public float EmSize { get; set; } = 1.0f;
+    private Box2 bounds = new(0.0f, 0.0f, 0.0f, 0.0f);
+    private float emSize = 1.0f;
 
     public Color4 Color { get; set; } = Color4.White;
     
@@ -89,7 +109,11 @@ public class TextEntity : Entity, IRenderable
 
     private void UpdateTextData()
     {
-        var shapedText = TextShaper.ShapeText(font, text, horizontalAlignment, verticalAlignment);
+        var boundsMinX = (int) (bounds.Min.X * 64.0f);
+        var boundsMinY = (int) (bounds.Min.Y * 64.0f);
+        var boundsMaxX = (int) (bounds.Max.X * 64.0f);
+        var boundsMaxY = (int) (bounds.Max.Y * 64.0f);
+        var shapedText = TextShaper.ShapeText(font, text, boundsMinX, boundsMinY, boundsMaxX, boundsMaxY, emSize, horizontalAlignment, verticalAlignment);
         var vertexSpan = meshGenerator.GenerateMesh(shapedText);
 
         mesh.SetData(vertexSpan, null);
@@ -109,11 +133,10 @@ public class TextEntity : Entity, IRenderable
         CameraData cameraData = args.CameraData;
         
         matrixStack.Push();
-        matrixStack.Scale(EmSize, EmSize, 1.0f);
         matrixStack.Translate(0.0f, BaselineOffset / 64.0f, 0.0f);
 
-        Matrix4 transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
-        TextDrawData textDrawData = new TextDrawData(mesh.ReadOnly, fontAtlas.ReadOnly, transformation, Color, 4.0f * EmSize);
+        var transformation = matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection;
+        var textDrawData = new TextDrawData(mesh.ReadOnly, fontAtlas.ReadOnly, transformation, Color, 4.0f * EmSize);
         
         commandList.AddDrawData(layerType, textDrawData);
         matrixStack.Pop();

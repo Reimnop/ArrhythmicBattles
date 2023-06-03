@@ -36,9 +36,12 @@ public class ABButtonElement : VisualElement, IUpdateable
         interactivity.MouseEnter += OnMouseEnter;
         interactivity.MouseLeave += OnMouseLeave;
 
-        textEntity = new TextEntity(font);
-        textEntity.BaselineOffset = font.Metrics.Height;
-        textEntity.Text = text;
+        textEntity = new TextEntity(font)
+        {
+            Text = text,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
 
     private void OnMouseEnter()
@@ -91,20 +94,15 @@ public class ABButtonElement : VisualElement, IUpdateable
     protected override void UpdateLayout(Box2 bounds)
     {
         borderBox = bounds;
-        contentBox = new Box2(bounds.Min + new Vector2(16.0f), bounds.Max - new Vector2(16.0f)); // Shrink by 16px on each side
+        contentBox = new Box2(borderBox.Min + new Vector2(16.0f), borderBox.Max - new Vector2(16.0f)); // Shrink by 16px on each side
 
         interactivity.Bounds = borderBox;
+        textEntity.Bounds = contentBox;
     }
 
     public override void Render(RenderArgs args)
     {
-        var matrixStack = args.MatrixStack;
-        
         rectEntity.Render(args);
-        
-        matrixStack.Push();
-        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
         textEntity.Render(args);
-        matrixStack.Pop();
     }
 }

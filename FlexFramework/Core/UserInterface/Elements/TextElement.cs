@@ -11,6 +11,24 @@ public class TextElement : VisualElement, IRenderable
         get => textEntity.Text;
         set => textEntity.Text = value;
     }
+    
+    public float EmSize
+    {
+        get => textEntity.EmSize;
+        set => textEntity.EmSize = value;
+    }
+    
+    public HorizontalAlignment HorizontalAlignment
+    {
+        get => textEntity.HorizontalAlignment;
+        set => textEntity.HorizontalAlignment = value;
+    }
+    
+    public VerticalAlignment VerticalAlignment
+    {
+        get => textEntity.VerticalAlignment;
+        set => textEntity.VerticalAlignment = value;
+    }
 
     public Color4 Color
     {
@@ -18,28 +36,20 @@ public class TextElement : VisualElement, IRenderable
         set => textEntity.Color = value;
     }
     
-    private Box2 bounds;
-
     private readonly TextEntity textEntity;
 
     public TextElement(Font font)
     {
         textEntity = new TextEntity(font);
-        textEntity.BaselineOffset = font.Metrics.Height;
     }
 
     protected override void UpdateLayout(Box2 bounds)
     {
-        this.bounds = bounds;
+        textEntity.Bounds = bounds;
     }
 
     public override void Render(RenderArgs args)
     {
-        var matrixStack = args.MatrixStack;
-        
-        matrixStack.Push();
-        matrixStack.Translate(bounds.Min.X, bounds.Min.Y, 0.0f);
         textEntity.Render(args);
-        matrixStack.Pop();
     }
 }

@@ -81,9 +81,12 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         interactivity.MouseEnter += AnimateHighlight;
         interactivity.MouseLeave += AnimateUnhighlight;
 
-        textEntity = new TextEntity(font);
-        textEntity.BaselineOffset = font.Metrics.Height;
-        textEntity.Text = text;
+        textEntity = new TextEntity(font)
+        {
+            Text = text,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
     
     private void AnimateHighlight()
@@ -177,6 +180,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
         sliderBackgroundEntity.Min = new Vector2(contentBox.Max.X - SliderWidth, contentBox.Min.Y);
         sliderBackgroundEntity.Max = contentBox.Max;
         
+        textEntity.Bounds = contentBox;
+        
         ResizeSlider(Value);
     }
 
@@ -195,15 +200,8 @@ public class ABSliderElement : VisualElement, IUpdateable, IDisposable
 
     public override void Render(RenderArgs args)
     {
-        var matrixStack = args.MatrixStack;
-
         elementBackgroundEntity.Render(args);
-
-        matrixStack.Push();
-        matrixStack.Translate(contentBox.Min.X, contentBox.Min.Y, 0.0f);
         textEntity.Render(args);
-        matrixStack.Pop();
-        
         sliderBackgroundEntity.Render(args);
 
         if (Value > 0.0f)
