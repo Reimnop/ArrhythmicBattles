@@ -9,22 +9,12 @@ namespace FlexFramework.Core.Entities;
 
 public class RectEntity : Entity, IRenderable
 {
-    public Vector2 Min
+    public Box2 Bounds
     {
-        get => min;
+        get => bounds;
         set
         {
-            min = value;
-            InvalidateMesh();
-        }
-    }
-    
-    public Vector2 Max
-    {
-        get => max;
-        set
-        {
-            max = value;
+            bounds = value;
             InvalidateMesh();
         }
     }
@@ -41,11 +31,10 @@ public class RectEntity : Entity, IRenderable
     
     public Color4 Color { get; set; } = Color4.White;
 
-    private Vector2 min;
-    private Vector2 max;
+    private Box2 bounds;
     private float radius;
     
-    private Vector2 lastSize;
+    private Box2 lastBounds;
 
     private bool meshValid = false;
     
@@ -64,38 +53,32 @@ public class RectEntity : Entity, IRenderable
 
     private void GenerateMesh()
     {
-        Vector2 size = max - min;
-        
+        var size = bounds.Size;
         if (size.X * size.Y == 0)
-        {
             return;
-        }
-
-        if (size == lastSize)
-        {
-            return;
-        }
         
+        if (bounds == lastBounds)
+            return;
+        lastBounds = bounds;
+
         vertexPositions.Clear();
-        MeshGenerator.GenerateRoundedRectangle(vertexPositions, Vector2.Zero, size, Radius);
+        MeshGenerator.GenerateRoundedRectangle(vertexPositions, bounds.Min, bounds.Max, Radius);
 
         Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
         for (int i = 0; i < vertexPositions.Count; i++)
         {
-            Vector2 pos = vertexPositions[i];
-            Vector2 uv = new Vector2(pos.X / size.X, pos.Y / size.Y);
-            vertices[i] = new Vertex(new Vector3(pos), uv);
+            var pos = vertexPositions[i];
+            var u = (pos.X - bounds.Min.X) / size.X;
+            var v = (pos.Y - bounds.Min.Y) / size.Y;
+            vertices[i] = new Vertex(pos.X, pos.Y, 0.0f, u, v);
         }
 
         mesh.SetData(vertices, null);
-
-        lastSize = size;
     }
 
     public void Render(RenderArgs args)
     {
-        Vector2 size = max - min;
-        
+        var size = bounds.Size;
         if (size.X * size.Y == 0)
         {
             return;
@@ -107,13 +90,12 @@ public class RectEntity : Entity, IRenderable
             GenerateMesh();
         }
 
-        CommandList commandList = args.CommandList;
-        LayerType layerType = args.LayerType;
-        MatrixStack matrixStack = args.MatrixStack;
-        CameraData cameraData = args.CameraData;
+        var commandList = args.CommandList;
+        var layerType = args.LayerType;
+        var matrixStack = args.MatrixStack;
+        var cameraData = args.CameraData;
 
         matrixStack.Push();
-        matrixStack.Translate(Min.X, Min.Y, 0.0f);
         VertexDrawData vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         commandList.AddDrawData(layerType, vertexDrawData);
         matrixStack.Pop();

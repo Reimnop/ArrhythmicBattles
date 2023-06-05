@@ -6,6 +6,7 @@ namespace FlexFramework.Core.UserInterface;
 public class ElementContainer
 {
     public Element Element { get; }
+    public Box2 Bounds => Element.Bounds;
     public Edges Edges { get; set; }
     public Anchor Anchor { get; set; } = Anchor.TopLeft;
 

@@ -17,29 +17,25 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     public Vector3 AmbientLight { get; set; } = Vector3.One * 0.4f;
     public DirectionalLight? DirectionalLight { get; set; }
 
-    public override GpuInfo GpuInfo => gpuInfo;
-    private GpuInfo gpuInfo = null!;
+    public override GpuInfo GpuInfo { get; }
+
+    private readonly Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
+
+    private readonly GLStateManager stateManager;
     
-    private Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
+    // Framebuffers for copying and blitting
+    private readonly FrameBuffer readFrameBuffer;
+    private readonly FrameBuffer drawFrameBuffer;
 
-    private GLStateManager stateManager;
-    private FrameBuffer readFrameBuffer;
-    private FrameBuffer drawFrameBuffer;
-
-    private int opaqueLayerId;
-    private int alphaClipLayerId;
-    private int transparentLayerId;
-    private int guiLayerId;
-
-    public override void Init()
+    public DefaultRenderer(FlexFrameworkMain engine) : base(engine)
     {
         stateManager = new GLStateManager();
         
         // Set GpuInfo
-        string name = GL.GetString(StringName.Renderer);
-        string vendor = GL.GetString(StringName.Vendor);
-        string version = GL.GetString(StringName.Version);
-        gpuInfo = new GpuInfo(name, vendor, version);
+        var name = GL.GetString(StringName.Renderer);
+        var vendor = GL.GetString(StringName.Vendor);
+        var version = GL.GetString(StringName.Version);
+        GpuInfo = new GpuInfo(name, vendor, version);
         
         // Create framebuffers
         readFrameBuffer = new FrameBuffer("read");

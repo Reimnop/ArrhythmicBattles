@@ -11,14 +11,13 @@ public abstract class Renderer
     public abstract GpuInfo GpuInfo { get; }
     public Color4 ClearColor { get; set; } = Color4.Black;
 
-    protected FlexFrameworkMain Engine { get; private set; } = null!;
+    protected FlexFrameworkMain Engine { get; }
 
-    internal void SetEngine(FlexFrameworkMain engine)
+    protected Renderer(FlexFrameworkMain engine)
     {
         Engine = engine;
     }
-
-    public abstract void Init();
+    
     public abstract IRenderBuffer CreateRenderBuffer(Vector2i size);
     public abstract void Update(UpdateArgs args);
     public abstract void Render(Vector2i size, CommandList commandList, IRenderBuffer renderBuffer);

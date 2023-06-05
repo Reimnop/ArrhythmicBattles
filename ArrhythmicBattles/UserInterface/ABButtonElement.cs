@@ -11,19 +11,19 @@ namespace ArrhythmicBattles.UserInterface;
 
 public class ABButtonElement : VisualElement, IUpdateable
 {
-    public Color4 TextDefaultColor { get; set; } = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-    public Color4 TextHoverColor { get; set; } = new Color4(0.0f, 0.0f, 0.0f, 1.0f);
+    public Color4 TextDefaultColor { get; set; } = new(1.0f, 1.0f, 1.0f, 1.0f);
+    public Color4 TextHoverColor { get; set; } = new(0.0f, 0.0f, 0.0f, 1.0f);
     public Action? Click { get; set; }
     
     private readonly Interactivity interactivity;
     
-    private readonly RectEntity rectEntity = new RectEntity()
+    private readonly RectEntity rectEntity = new()
     {
         Radius = 8.0f
     };
 
     private readonly TextEntity textEntity;
-    private readonly Tweener tweener = new Tweener();
+    private readonly Tweener tweener = new();
     private bool initialized = false;
     
     private Box2 borderBox;
@@ -48,10 +48,9 @@ public class ABButtonElement : VisualElement, IUpdateable
     {
         var from = new Box2(borderBox.Min.X, borderBox.Min.Y, borderBox.Min.X, borderBox.Max.Y);
         var to = borderBox;
-        
-        rectEntity.Min = from.Min;
-        rectEntity.Max = from.Max;
-        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
+
+        rectEntity.Bounds = from;
+        tweener.Tween(rectEntity, new {Bounds = to, Color = new Color4(1.0f, 1.0f, 1.0f, 1.0f)}, 0.2f).Ease(Ease.QuadInOut);
         tweener.Tween(textEntity, new {Color = TextHoverColor}, 0.2f).Ease(Ease.QuadInOut);
     }
     
@@ -59,10 +58,9 @@ public class ABButtonElement : VisualElement, IUpdateable
     {
         var from = borderBox;
         var to = new Box2(borderBox.Max.X, borderBox.Min.Y, borderBox.Max.X, borderBox.Max.Y);
-        
-        rectEntity.Min = from.Min;
-        rectEntity.Max = from.Max;
-        tweener.Tween(rectEntity, new {to.Min, to.Max, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Ease.QuadInOut);
+
+        rectEntity.Bounds = from;
+        tweener.Tween(rectEntity, new {Bounds = to, Color = new Color4(1.0f, 1.0f, 1.0f, 0.0f)}, 0.2f).Ease(Ease.QuadInOut);
         tweener.Tween(textEntity, new {Color = TextDefaultColor}, 0.2f).Ease(Ease.QuadInOut);
     }
 
@@ -83,8 +81,7 @@ public class ABButtonElement : VisualElement, IUpdateable
             rectEntity.Color = new Color4(0.0f, 0.0f, 0.0f, 0.0f);
             textEntity.Color = TextDefaultColor;
 
-            rectEntity.Min = borderBox.Min;
-            rectEntity.Max = borderBox.Max;
+            rectEntity.Bounds = borderBox;
         }
         
         interactivity.Update();

@@ -11,6 +11,9 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FlexFramework;
 
+public delegate Renderer RendererFactory(FlexFrameworkMain engine);
+public delegate void LogCallbackDelegate(object sender, LogEventArgs args);
+
 /// <summary>
 /// Main class for the FlexFramework
 /// </summary>
@@ -24,22 +27,24 @@ public class FlexFrameworkMain : NativeWindow
     /// <summary>
     /// Current renderer for rendering objects
     /// </summary>
-    public Renderer Renderer { get; private set; } = null!;
+    public Renderer Renderer { get; }
     
     private readonly SceneManager sceneManager;
     private readonly AudioManager audioManager;
+    
+    private LogCallbackDelegate? logCallback;
 
-    public event LogEventHandler? Log;
-
-    private float time = 0.0f;
+    private float time;
 
 #if DEBUG
     // This causes memory leaks, but the method needs to be pinned to prevent garbage collection
     private GCHandle leakedGcHandle;
 #endif
 
-    public FlexFrameworkMain(NativeWindowSettings nws) : base(nws)
+    public FlexFrameworkMain(NativeWindowSettings nws, RendererFactory rendererFactory, LogCallbackDelegate? logCallback = null) : base(nws)
     {
+        this.logCallback = logCallback;
+        
 #if DEBUG
         // init GL debug callback
         GL.Enable(EnableCap.DebugOutput);
@@ -53,12 +58,15 @@ public class FlexFrameworkMain : NativeWindow
         sceneManager = new SceneManager(this);
         audioManager = new AudioManager();
         Input = new Input(this);
+
+        Renderer = rendererFactory(this);
+        LogMessage(null, Severity.Info, null, $"Initialized renderer [{Renderer.GetType().Name}]");
     }
 
     internal void LogMessage(object? sender, Severity severity, string? type, string message)
     {
         sender ??= this;
-        Log?.Invoke(sender, new LogEventArgs(severity, type, message));
+        logCallback?.Invoke(sender, new LogEventArgs(severity, type, message));
     }
 
 #if DEBUG
@@ -97,22 +105,6 @@ public class FlexFrameworkMain : NativeWindow
     }
 #endif
 
-    public Renderer UseRenderer(Renderer renderer)
-    {
-        LogMessage(null, Severity.Info, null, $"Using renderer [{renderer.GetType().Name}]");
-        
-        if (Renderer is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
-        
-        renderer.SetEngine(this);
-        renderer.Init();
-
-        Renderer = renderer;
-        return renderer;
-    }
-
     public Scene LoadScene(Scene scene)
     {
         return sceneManager.LoadScene(scene);
@@ -123,14 +115,9 @@ public class FlexFrameworkMain : NativeWindow
         ProcessInputEvents();
         ProcessWindowEvents(false);
 
-        float currentTime = (float) GLFW.GetTime();
-        float deltaTime = currentTime - time;
+        var currentTime = (float) GLFW.GetTime();
+        var deltaTime = currentTime - time;
         time = currentTime;
-
-        if (deltaTime > 1.0f)
-        {
-            LogMessage(null, Severity.Warning, null, $"Last frame took {deltaTime * 1000.0f:0.0}ms! Is the thread being blocked?");
-        }
 
         Tick(deltaTime);
         Render();
@@ -143,10 +130,8 @@ public class FlexFrameworkMain : NativeWindow
             throw new NoSceneException();
         }
 
-        UpdateArgs args = new UpdateArgs(time, deltaTime);
-        
+        var args = new UpdateArgs(time, deltaTime);
         sceneManager.CurrentScene.Update(args);
-
         Renderer.Update(args);
     }
 

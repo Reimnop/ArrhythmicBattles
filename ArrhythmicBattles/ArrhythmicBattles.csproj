@@ -5,7 +5,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
+        <ApplicationIcon>Assets/AppIcon.ico</ApplicationIcon>
         <LangVersion>11</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Assets/**/*.*">
+        <Content Include="Assets/**/*.*" Exclude="Assets/AppIcon.ico">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>

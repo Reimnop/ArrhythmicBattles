@@ -21,8 +21,7 @@ public class RectElement : VisualElement, IRenderable
 
     protected override void UpdateLayout(Box2 bounds)
     {
-        rectEntity.Min = bounds.Min;
-        rectEntity.Max = bounds.Max;
+        rectEntity.Bounds = bounds;
     }
 
     public override void Render(RenderArgs args)

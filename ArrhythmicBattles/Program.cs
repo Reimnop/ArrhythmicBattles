@@ -1,5 +1,5 @@
 ﻿using ArrhythmicBattles.Core.Animation;
-using ArrhythmicBattles.Menu;
+using ArrhythmicBattles.Intro;
 using FlexFramework;
 using FlexFramework.Core.Rendering.Renderers;
 using OpenTK.Mathematics;
@@ -19,17 +19,18 @@ public class Program
     public static void Main(string[] args)
     {
         // Init glide
-        Tweener.SetLerper<Vector2Lerper>(typeof(Vector2));
+        Tweener.SetLerper<Box2Lerper>(typeof(Box2));
         Tweener.SetLerper<Color4Lerper>(typeof(Color4));
-        
-        Image imageS = GetImageFromFile("Assets/Icons/icon_s.png");
-        Image imageM = GetImageFromFile("Assets/Icons/icon_m.png");
-        Image imageL = GetImageFromFile("Assets/Icons/icon_l.png");
-        Image imageXl = GetImageFromFile("Assets/Icons/icon_xl.png");
+        Tweener.SetLerper<Vector2Lerper>(typeof(Vector2));
 
-        WindowIcon icon = new WindowIcon(imageS, imageM, imageL, imageXl);
+        var imageS = GetImageFromFile("Assets/Icons/icon_s.png");
+        var imageM = GetImageFromFile("Assets/Icons/icon_m.png");
+        var imageL = GetImageFromFile("Assets/Icons/icon_l.png");
+        var imageXl = GetImageFromFile("Assets/Icons/icon_xl.png");
 
-        NativeWindowSettings nws = new NativeWindowSettings()
+        var icon = new WindowIcon(imageS, imageM, imageL, imageXl);
+
+        var nws = new NativeWindowSettings()
         {
             Title = "Arrhythmic Battles",
             Size = new Vector2i(1366, 768),
@@ -40,17 +41,15 @@ public class Program
             Icon = icon
         };
 
-        using var flexFramework = new FlexFrameworkMain(nws);
-        flexFramework.Log += OnLog;
+        using var flexFramework = new FlexFrameworkMain(nws, engine => new DefaultRenderer(engine), OnLog);
         flexFramework.VSync = VSyncMode.On;
-        flexFramework.UseRenderer(new DefaultRenderer());
 
         using var context = new ABContext(flexFramework);
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
 #else
-        flexFramework.LoadScene(new MainMenuScene(context));
+        flexFramework.LoadScene(new IntroScene(context));
 #endif
 
         while (!flexFramework.ShouldClose())
@@ -62,7 +61,7 @@ public class Program
     
     private static void OnLog(object sender, LogEventArgs eventArgs)
     {
-        string msg = $"[FlexFramework -> {sender.GetType().Name}] {eventArgs.Message}";
+        var msg = $"[FlexFramework -> {sender.GetType().Name}] {eventArgs.Message}";
 
         switch (eventArgs.Severity)
         {
