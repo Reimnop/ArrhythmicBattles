@@ -63,7 +63,6 @@ public class PauseScreen : Screen, IDisposable
 
     public override void Update(UpdateArgs args)
     {
-        background.Update(args);
         RootNode.UpdateRecursively(args);
     }
     

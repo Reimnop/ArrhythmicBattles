@@ -2,6 +2,7 @@
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using PixelFormat = FlexFramework.Core.Data.PixelFormat;
 using Timer = FlexFramework.Util.Timer;
 
@@ -40,7 +41,10 @@ public class TextureHandler
         tex.SetData(texture.Data.Data, ConvertToPixelFormat(texture.Format), ConvertToPixelType(texture.Format));
         tex.SetMinFilter(TextureMinFilter.Linear);
         tex.SetMagFilter(TextureMagFilter.Linear);
-        
+        tex.SetWrapS(TextureWrapMode.ClampToBorder);
+        tex.SetWrapT(TextureWrapMode.ClampToBorder);
+        tex.SetBorderColor(Color4.Transparent);
+
         return tex;
     }
     

@@ -11,7 +11,7 @@ namespace FlexFramework.Modelling;
 // TODO: Implement support for non-zero mesh origins
 // Alright, I can't fix this
 // Please don't use non-zero mesh origins
-public class SkinnedModelEntity : Entity, IRenderable
+public class SkinnedModelEntity : Entity, IUpdateable, IRenderable
 {
     public AnimationHandler AnimationHandler { get; }
 
@@ -31,10 +31,8 @@ public class SkinnedModelEntity : Entity, IRenderable
         AnimationHandler = new AnimationHandler(model);
     }
 
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         time += args.DeltaTime;
         AnimationHandler.Update(time);
         

@@ -42,6 +42,11 @@ public class ElementContainer
         return SetAnchor(new Anchor(min, max));
     }
     
+    public ElementContainer SetAnchor(float minX, float minY, float maxX, float maxY)
+    {
+        return SetAnchor(new Anchor(minX, minY, maxX, maxY));
+    }
+    
     public ElementContainer SetAnchor(Vector2 position)
     {
         return SetAnchor(new Anchor(position));

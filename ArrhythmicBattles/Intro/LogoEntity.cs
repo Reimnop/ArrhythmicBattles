@@ -27,6 +27,41 @@ public class LogoEntity : Entity, IRenderable
     private readonly RectEntity rect3;
     private readonly RectEntity rect4;
     private readonly RectEntity rect5;
+
+    public float Time
+    {
+        get => time;
+        set
+        {
+            time = value;
+            
+            // rect1 t: 0 -> 1
+            // rect2 t: 0 -> 73/260
+            // rect3 t: 73/260 -> 119/260
+            // rect4 t: 119/260 -> 213/260
+            // rect5 t: 213/260 -> 1
+
+            var rect1T = value;
+            var rect2T = MathHelper.MapRange(value, 0.0f, 73.0f / 260.0f, 0.0f, 1.0f);
+            var rect3T = MathHelper.MapRange(value, 73.0f / 260.0f, 119.0f / 260.0f, 0.0f, 1.0f);
+            var rect4T = MathHelper.MapRange(value, 119.0f / 260.0f, 213.0f / 260.0f, 0.0f, 1.0f);
+            var rect5T = MathHelper.MapRange(value, 213.0f / 260.0f, 1.0f, 0.0f, 1.0f);
+            
+            rect1T = MathHelper.Clamp(rect1T, 0.0f, 1.0f);
+            rect2T = MathHelper.Clamp(rect2T, 0.0f, 1.0f);
+            rect3T = MathHelper.Clamp(rect3T, 0.0f, 1.0f);
+            rect4T = MathHelper.Clamp(rect4T, 0.0f, 1.0f);
+            rect5T = MathHelper.Clamp(rect5T, 0.0f, 1.0f);
+        
+            rect1.Bounds = LerpBox2(Rect1Initial, Rect1Final, rect1T);
+            rect2.Bounds = LerpBox2(Rect2Initial, Rect2Final, rect2T);
+            rect3.Bounds = LerpBox2(Rect3Initial, Rect3Final, rect3T);
+            rect4.Bounds = LerpBox2(Rect4Initial, Rect4Final, rect4T);
+            rect5.Bounds = LerpBox2(Rect5Initial, Rect5Final, rect5T);
+        }
+    }
+
+    private float time;
     
     public Color4 Color
     {
@@ -52,51 +87,13 @@ public class LogoEntity : Entity, IRenderable
 
     public LogoEntity()
     {
-        rect1 = new RectEntity()
-        {
-            Bounds = Rect1Initial
-        };
-
-        rect2 = new RectEntity()
-        {
-            Bounds = Rect2Initial
-        };
-
-        rect3 = new RectEntity()
-        {
-            Bounds = Rect3Initial
-        };
-
-        rect4 = new RectEntity()
-        {
-            Bounds = Rect4Initial
-        };
-
-        rect5 = new RectEntity()
-        {
-            Bounds = Rect5Initial
-        };
-    }
-
-    public void SetAnimationTime(float t)
-    {
-        // rect1 t: 0 -> 1
-        // rect2 t: 0 -> 73/260
-        // rect3 t: 73/260 -> 119/260
-        // rect4 t: 119/260 -> 213/260
-        // rect5 t: 213/260 -> 1
-
-        var rect1T = t;
-        var rect2T = MathHelper.MapRange(t, 0.0f, 73.0f / 260.0f, 0.0f, 1.0f);
-        var rect3T = MathHelper.MapRange(t, 73.0f / 260.0f, 119.0f / 260.0f, 0.0f, 1.0f);
-        var rect4T = MathHelper.MapRange(t, 119.0f / 260.0f, 213.0f / 260.0f, 0.0f, 1.0f);
-        var rect5T = MathHelper.MapRange(t, 213.0f / 260.0f, 1.0f, 0.0f, 1.0f);
+        rect1 = new RectEntity();
+        rect2 = new RectEntity();
+        rect3 = new RectEntity();
+        rect4 = new RectEntity();
+        rect5 = new RectEntity();
         
-        rect1.Bounds = LerpBox2(Rect1Initial, Rect1Final, rect1T);
-        rect2.Bounds = LerpBox2(Rect2Initial, Rect2Final, rect2T);
-        rect3.Bounds = LerpBox2(Rect3Initial, Rect3Final, rect3T);
-        rect4.Bounds = LerpBox2(Rect4Initial, Rect4Final, rect4T);
-        rect5.Bounds = LerpBox2(Rect5Initial, Rect5Final, rect5T);
+        Time = 0.0f;
     }
 
     private static Box2 LerpBox2(Box2 a, Box2 b, float t)
@@ -115,7 +112,8 @@ public class LogoEntity : Entity, IRenderable
         matrixStack.Push();
         matrixStack.Translate(-60.0f, -60.0f, 0.0f);
         matrixStack.Rotate(Vector3.UnitZ, MathF.PI / 4.0f); // 45 degrees
-        
+        matrixStack.Translate(0.0f, -16.0f, 0.0f); // Adjust to center
+
         rect1.Render(args);
         rect2.Render(args);
         rect3.Render(args);

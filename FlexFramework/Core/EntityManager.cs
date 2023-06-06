@@ -19,8 +19,11 @@ public class EntityManager : IUpdateable, IDisposable
             {
                 return;
             }
-            
-            entities[i].Update(args);
+
+            if (entities[i] is IUpdateable updateable)
+            {
+                updateable.Update(args);
+            }
         }
     }
 

@@ -51,6 +51,12 @@ public class InterfaceTreeBuilder
         return this;
     }
     
+    public InterfaceTreeBuilder SetAnchor(float minX, float minY, float maxX, float maxY)
+    {
+        element.SetAnchor(minX, minY, maxX, maxY);
+        return this;
+    }
+
     public InterfaceTreeBuilder SetAnchor(Vector2 position)
     {
         element.SetAnchor(position);

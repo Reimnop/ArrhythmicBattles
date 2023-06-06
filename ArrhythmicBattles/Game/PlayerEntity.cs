@@ -12,7 +12,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Game;
 
-public class PlayerEntity : Entity, IRenderable, IDisposable
+public class PlayerEntity : Entity, IUpdateable, IRenderable, IDisposable
 {
     private struct RayHitHandler : IRayHitHandler
     {
@@ -136,10 +136,8 @@ public class PlayerEntity : Entity, IRenderable, IDisposable
         jump = false;
     }
 
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         // get movement
         movementX = inputProvider.Movement.X;
 

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 namespace ArrhythmicBattles.Game.Content;
 
 // Contains props and soundtrack
-public class MapEntity : Entity, IRenderable, IDisposable
+public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
 {
     public MapMeta Meta { get; }
     
@@ -54,10 +54,8 @@ public class MapEntity : Entity, IRenderable, IDisposable
         }
     }
 
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         foreach (var updateable in props.OfType<IUpdateable>())
         {
             updateable.Update(args);

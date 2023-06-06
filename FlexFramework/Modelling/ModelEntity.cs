@@ -6,7 +6,7 @@ using FlexFramework.Util;
 
 namespace FlexFramework.Modelling;
 
-public class ModelEntity : Entity, IRenderable
+public class ModelEntity : Entity, IUpdateable, IRenderable
 {
     public AnimationHandler AnimationHandler { get; }
 
@@ -21,10 +21,8 @@ public class ModelEntity : Entity, IRenderable
         AnimationHandler = new AnimationHandler(model);
     }
 
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         time += args.DeltaTime;
         AnimationHandler.Update(time);
     }

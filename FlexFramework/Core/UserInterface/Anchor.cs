@@ -27,6 +27,10 @@ public struct Anchor
         Min = min;
         Max = max;
     }
+    
+    public Anchor(float minX, float minY, float maxX, float maxY) : this(new Vector2(minX, minY), new Vector2(maxX, maxY))
+    {
+    }
 
     public Anchor(Vector2 position) : this(position, position)
     {

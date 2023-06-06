@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using SharpEXR;
 using PixelType = OpenTK.Graphics.OpenGL4.PixelType;
 
@@ -88,6 +89,20 @@ public class Texture2D : IGpuObject, IDisposable
     public void SetWrapT(TextureWrapMode wrapMode)
     {
         GL.TextureParameter(Handle, TextureParameterName.TextureWrapT, (int) wrapMode);
+    }
+    
+    public unsafe void SetBorderColor(Color4 color)
+    {
+        Span<float> values = stackalloc float[4];
+        values[0] = color.R;
+        values[1] = color.G;
+        values[2] = color.B;
+        values[3] = color.A;
+
+        fixed (float* ptr = values)
+        {
+            GL.TextureParameter(Handle, TextureParameterName.TextureBorderColor, ptr);
+        }
     }
     
     public void GenerateMipmap()
