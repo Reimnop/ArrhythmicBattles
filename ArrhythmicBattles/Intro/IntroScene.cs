@@ -15,6 +15,8 @@ public class IntroScene : ABScene
     {
         tweener
             .Tween(bannerEntity, new {Time = 1.0f}, 3.5f, 0.25f)
+            .Repeat(1)
+            .Reflect()
             .OnComplete(() => Engine.LoadScene(new MainMenuScene(context)));
     }
 
