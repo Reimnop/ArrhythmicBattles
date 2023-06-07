@@ -95,7 +95,7 @@ public class MainMenuScene : ABScene
                     .AddChild(new InterfaceTreeBuilder()
                         .SetElement(new TextElement(font)
                         {
-                            Text = $"Version 0.0.1 BETA\n© {DateTime.Now.Year} Arrhythmic Battles",
+                            Text = $"Version {Constants.GameVersion}\n© {DateTime.Now.Year} {Constants.CompanyName}",
                             HorizontalAlignment = HorizontalAlignment.Right,
                             VerticalAlignment = VerticalAlignment.Center,
                             EmSize = 18.0f / 24.0f

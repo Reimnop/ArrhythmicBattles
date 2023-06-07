@@ -1,7 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using ArrhythmicBattles.Core.Animation;
+﻿using ArrhythmicBattles.Core.Animation;
+using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Intro;
-using ArrhythmicBattles.Menu;
 using FlexFramework;
 using FlexFramework.Core.Rendering.Renderers;
 using OpenTK.Mathematics;
@@ -34,7 +33,7 @@ public class Program
 
         var nws = new NativeWindowSettings()
         {
-            Title = "Arrhythmic Battles",
+            Title = Constants.GameName,
             Size = new Vector2i(1366, 768),
             API = ContextAPI.OpenGL,
             APIVersion = new Version(4, 3),
