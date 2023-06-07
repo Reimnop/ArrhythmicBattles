@@ -2,12 +2,14 @@
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using Sampler = FlexFramework.Core.Rendering.Data.Sampler;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class TextRenderStrategy : RenderStrategy, IDisposable
 {
     private readonly ShaderProgram textShader;
+    private readonly Sampler sampler;
     private readonly MeshHandler meshHandler = new(
             (VertexAttributeIntent.Position, 0),
             (VertexAttributeIntent.TexCoord0, 1)
@@ -21,6 +23,12 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         
         textShader = new ShaderProgram("text");
         textShader.LinkShaders(vertexShader, fragmentShader);
+        
+        sampler = new Sampler("text_sampler");
+        sampler.Parameter(SamplerParameterName.TextureMinFilter, (int) TextureMinFilter.Linear);
+        sampler.Parameter(SamplerParameterName.TextureMagFilter, (int) TextureMagFilter.Linear);
+        sampler.Parameter(SamplerParameterName.TextureWrapS, (int) TextureWrapMode.ClampToEdge);
+        sampler.Parameter(SamplerParameterName.TextureWrapT, (int) TextureWrapMode.ClampToEdge);
     }
 
     public override void Update(UpdateArgs args)
@@ -38,6 +46,7 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         glStateManager.UseProgram(textShader);
         glStateManager.BindVertexArray(mesh.VertexArray);
         glStateManager.BindTextureUnit(0, texture);
+        glStateManager.BindSampler(0, sampler);
 
         Matrix4 transformation = textDrawData.Transformation;
         GL.UniformMatrix4(0, true, ref transformation);
@@ -53,5 +62,6 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
     public void Dispose()
     {
         textShader.Dispose();
+        sampler.Dispose();
     }
 }

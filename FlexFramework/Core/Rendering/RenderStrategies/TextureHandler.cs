@@ -2,7 +2,6 @@
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using PixelFormat = FlexFramework.Core.Data.PixelFormat;
 using Timer = FlexFramework.Util.Timer;
 
