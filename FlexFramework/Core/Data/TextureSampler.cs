@@ -34,14 +34,7 @@ public class TextureSampler
         Texture = texture;
         Sampler = sampler;
     }
-    
-    public TextureSampler SetReadOnly()
-    {
-        Texture.SetReadOnly();
-        Sampler.SetReadOnly();
-        return this;
-    }
-    
+
     public TextureSampler SetData<T>(ReadOnlySpan<T> data) where T : unmanaged
     {
         Texture.SetData(data);
