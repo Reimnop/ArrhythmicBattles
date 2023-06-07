@@ -2,6 +2,7 @@
 
 public interface ITextureView
 {
+    string Name { get; }
     int Width { get; }
     int Height { get; }
     PixelFormat Format { get; }

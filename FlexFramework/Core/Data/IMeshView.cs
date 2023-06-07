@@ -2,6 +2,7 @@
 
 public interface IMeshView
 {
+    string Name { get; }
     IBufferView VertexBuffer { get; }
     IBufferView? IndexBuffer { get; }
     int VerticesCount { get; }

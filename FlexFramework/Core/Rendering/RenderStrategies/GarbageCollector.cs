@@ -1,4 +1,6 @@
-﻿namespace FlexFramework.Util;
+﻿using FlexFramework.Util;
+
+namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 // A simple GC implementation for OpenGL objects
 public class GarbageCollector<TInput, TOutput> : IDisposable where TOutput : IDisposable

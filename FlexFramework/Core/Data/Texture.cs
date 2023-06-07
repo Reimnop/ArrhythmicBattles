@@ -25,6 +25,7 @@ public class Texture : DataObject
 {
     private struct ReadOnlyTexture : ITextureView
     {
+        public string Name => texture.Name;
         public int Width => texture.Width;
         public int Height => texture.Height;
         public PixelFormat Format => texture.Format;
@@ -110,7 +111,7 @@ public class Texture : DataObject
             PixelFormat.R16i => 2,
             PixelFormat.R32f => 4,
             PixelFormat.R32i => 4,
-            _ => throw new ArgumentException(nameof(format))
+            _ => throw new ArgumentException(null, nameof(format))
         };
     }
 }

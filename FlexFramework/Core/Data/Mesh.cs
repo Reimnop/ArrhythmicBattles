@@ -105,6 +105,7 @@ public class Mesh<T> : DataObject where T : unmanaged
 {
     private struct ReadOnlyMesh : IMeshView
     {
+        public string Name => mesh.Name;
         public IBufferView VertexBuffer => mesh.VertexBuffer.ReadOnly;
         public IBufferView? IndexBuffer => mesh.IndexBuffer?.ReadOnly;
         public int VerticesCount => mesh.VerticesCount;

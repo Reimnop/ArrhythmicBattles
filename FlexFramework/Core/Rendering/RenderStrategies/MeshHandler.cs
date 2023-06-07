@@ -7,27 +7,6 @@ using Timer = FlexFramework.Util.Timer;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
-public class GpuMesh : IDisposable
-{
-    public VertexArray VertexArray { get; }
-    public Buffer VertexBuffer { get; }
-    public Buffer? IndexBuffer { get; }
-    
-    public GpuMesh(VertexArray vertexArray, Buffer vertexBuffer, Buffer? indexBuffer)
-    {
-        VertexArray = vertexArray;
-        VertexBuffer = vertexBuffer;
-        IndexBuffer = indexBuffer;
-    }
-    
-    public void Dispose()
-    {
-        VertexArray.Dispose();
-        VertexBuffer.Dispose();
-        IndexBuffer?.Dispose();
-    }
-}
-
 public class MeshHandler
 {
     private readonly IDictionary<VertexAttributeIntent, int> attributeLocations;
@@ -62,17 +41,17 @@ public class MeshHandler
 
     private GpuMesh CreateMesh(IMeshView mesh)
     {
-        Buffer vertexBuffer = new Buffer("vertex");
+        Buffer vertexBuffer = new Buffer($"{mesh.Name}_vtx");
         vertexBuffer.LoadData(mesh.VertexBuffer.Data);
         
         Buffer? indexBuffer = null;
         if (mesh.IndexBuffer != null)
         {
-            indexBuffer = new Buffer("index");
+            indexBuffer = new Buffer($"{mesh.Name}_idx");
             indexBuffer.LoadData(mesh.IndexBuffer.Data);
         }
         
-        VertexArray vertexArray = new VertexArray("mesh");
+        VertexArray vertexArray = new VertexArray($"{mesh.Name}");
         if (indexBuffer != null)
         {
             vertexArray.ElementBuffer(indexBuffer);
