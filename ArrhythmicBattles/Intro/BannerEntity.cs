@@ -22,10 +22,10 @@ public class BannerEntity : Entity, IRenderable
         {
             time = value;
 
-            var logoT = MathHelper.MapRange(value, 0.0f, 0.5f, 0.0f, 1.0f);
-            var titleT = MathHelper.MapRange(value, 0.5f, 1.0f, 0.0f, 1.0f);
-            var logoScaleT = MathHelper.MapRange(value, 0.125f, 0.5f, 0.0f, 1.0f);
-            var logoOffsetT = MathHelper.MapRange(value, 0.125f, 0.5f, 0.0f, 1.0f);
+            var logoT = MathHelper.MapRange(value, 0.0f, 0.75f, 0.0f, 1.0f);
+            var titleT = MathHelper.MapRange(value, 0.75f, 1.0f, 0.0f, 1.0f);
+            var logoScaleT = MathHelper.MapRange(value, 0.25f, 0.75f, 0.0f, 1.0f);
+            var logoOffsetT = MathHelper.MapRange(value, 0.25f, 0.75f, 0.0f, 1.0f);
             
             logoT = MathHelper.Clamp(logoT, 0.0f, 1.0f);
             titleT = MathHelper.Clamp(titleT, 0.0f, 1.0f);
