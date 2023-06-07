@@ -74,6 +74,8 @@ public class ModelImporter : IDisposable
     
     private Texture LoadTexture(EmbeddedTexture texture)
     {
+        var name = texture.Filename ?? "texture";
+
         // Check if texture is compressed
         if (texture.IsCompressed)
         {
@@ -83,7 +85,7 @@ public class ModelImporter : IDisposable
             var pixels = new byte[image.Width * image.Height * 4]; // 4 bytes per pixel
             image.CopyPixelDataTo(pixels);
                 
-            return new Texture(texture.Filename, image.Width, image.Height, PixelFormat.Rgba8, pixels);
+            var tex = new Texture(name, image.Width, image.Height, PixelFormat.Rgba8, pixels);
         }
             
         // Not compressed, use raw data
@@ -99,20 +101,21 @@ public class ModelImporter : IDisposable
         }
             
         // Create texture
-        return new Texture(texture.Filename, texture.Width, texture.Height, PixelFormat.Rgba8, rawData);
+        return new Texture(name, texture.Width, texture.Height, PixelFormat.Rgba8, rawData);
     }
     
     public IEnumerable<ModelMaterial> LoadMaterials()
     {
         return scene.Materials.Select(material =>
         {
-            Texture? albedoTexture = null;
+            TextureSampler? albedoTexture = null;
             if (material.HasTextureDiffuse)
             {
                 var texture = material.TextureDiffuse;
                 if (Textures.TryGetValue(texture.FilePath, out var tex))
                 {
-                    albedoTexture = tex;
+                    var sampler = new Sampler(tex.Name);
+                    albedoTexture = new TextureSampler(tex, sampler);
                 }
             }
 

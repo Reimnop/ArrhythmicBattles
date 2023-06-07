@@ -1,8 +1,7 @@
 ﻿namespace FlexFramework.Core.Data;
 
-public interface ITextureView
+public interface ITextureView : INamedObjectView
 {
-    string Name { get; }
     int Width { get; }
     int Height { get; }
     PixelFormat Format { get; }

@@ -1,6 +1,7 @@
 ﻿using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Mathematics;
+using TextureSampler = FlexFramework.Core.Data.TextureSampler;
 
 namespace FlexFramework.Core.Entities;
 
@@ -10,9 +11,9 @@ public class LitMeshEntity : Entity, IRenderable
     public Vector3 Albedo { get; set; } = Vector3.One; // White
     public float Metallic { get; set; } = 0.0f;
     public float Roughness { get; set; } = 1.0f;
-    public Texture? AlbedoTexture { get; set; }
-    public Texture? MetallicTexture { get; set; }
-    public Texture? RoughnessTexture { get; set; }
+    public TextureSampler? AlbedoTexture { get; set; }
+    public TextureSampler? MetallicTexture { get; set; }
+    public TextureSampler? RoughnessTexture { get; set; }
     
     public LitMeshEntity(Mesh<LitVertex> mesh)
     {
@@ -39,7 +40,21 @@ public class LitMeshEntity : Entity, IRenderable
         var vertexDrawData = new LitVertexDrawData(
             Mesh.ReadOnly, 
             matrixStack.GlobalTransformation, cameraData, 
-            AlbedoTexture?.ReadOnly, MetallicTexture?.ReadOnly, RoughnessTexture?.ReadOnly,
+            AlbedoTexture != null 
+                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
+                    AlbedoTexture.Texture.ReadOnly, 
+                    AlbedoTexture.Sampler.ReadOnly) 
+                : null,
+            MetallicTexture != null 
+                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
+                    MetallicTexture.Texture.ReadOnly, 
+                    MetallicTexture.Sampler.ReadOnly) 
+                : null,
+            RoughnessTexture != null
+                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
+                    RoughnessTexture.Texture.ReadOnly, 
+                    RoughnessTexture.Sampler.ReadOnly) 
+                : null,
             materialData);
 
         commandList.AddDrawData(layerType, vertexDrawData);

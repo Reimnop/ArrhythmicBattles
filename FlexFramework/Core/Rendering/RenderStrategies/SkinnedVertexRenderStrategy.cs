@@ -20,6 +20,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             (VertexAttributeIntent.BoneWeight, 5)
         );
     private readonly TextureHandler textureHandler = new();
+    private readonly SamplerHandler samplerHandler = new();
     private readonly Buffer materialBuffer;
     
     public SkinnedVertexRenderStrategy(ILighting lighting)
@@ -51,15 +52,9 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         materialBuffer.LoadData(material);
 
         var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
-        var albedoTexture = vertexDrawData.AlbedoTexture != null
-            ? textureHandler.GetTexture(vertexDrawData.AlbedoTexture)
-            : null;
-        var metallicTexture = vertexDrawData.MetallicTexture != null
-            ? textureHandler.GetTexture(vertexDrawData.MetallicTexture)
-            : null;
-        var roughnessTexture = vertexDrawData.RoughnessTexture != null
-            ? textureHandler.GetTexture(vertexDrawData.RoughnessTexture)
-            : null;
+        var albedo = vertexDrawData.Albedo;
+        var metallic = vertexDrawData.Metallic;
+        var roughness = vertexDrawData.Roughness;
         
         glStateManager.UseProgram(skinnedShader);
         glStateManager.BindVertexArray(mesh.VertexArray);
@@ -71,22 +66,34 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         GL.UniformMatrix4(0, true, ref mvp);
         GL.UniformMatrix4(1, true, ref model);
 
-        if (albedoTexture != null)
+        if (albedo.HasValue)
         {
+            var texture = textureHandler.GetTexture(albedo.Value.Texture);
+            var sampler = samplerHandler.GetSampler(albedo.Value.Sampler);
+            
             GL.Uniform1(2, 0);
-            glStateManager.BindTextureUnit(0, albedoTexture);
+            glStateManager.BindTextureUnit(0, texture);
+            glStateManager.BindSampler(0, sampler);
         }
         
-        if (metallicTexture != null)
+        if (metallic.HasValue)
         {
+            var texture = textureHandler.GetTexture(metallic.Value.Texture);
+            var sampler = samplerHandler.GetSampler(metallic.Value.Sampler);
+            
             GL.Uniform1(3, 1);
-            glStateManager.BindTextureUnit(1, metallicTexture);
+            glStateManager.BindTextureUnit(1, texture);
+            glStateManager.BindSampler(1, sampler);
         }
 
-        if (roughnessTexture != null)
+        if (roughness.HasValue)
         {
+            var texture = textureHandler.GetTexture(roughness.Value.Texture);
+            var sampler = samplerHandler.GetSampler(roughness.Value.Sampler);
+            
             GL.Uniform1(4, 2);
-            glStateManager.BindTextureUnit(2, roughnessTexture);
+            glStateManager.BindTextureUnit(2, texture);
+            glStateManager.BindSampler(2, sampler);
         }
 
         GL.Uniform3(5, lighting.AmbientLight); 

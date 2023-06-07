@@ -39,12 +39,6 @@ public class TextureHandler
         var internalFormat = ConvertToSizedInternalFormat(texture.Format);
         var tex = new Texture2D(texture.Name, texture.Width, texture.Height, internalFormat);
         tex.SetData(texture.Data.Data, ConvertToPixelFormat(texture.Format), ConvertToPixelType(texture.Format));
-        tex.SetMinFilter(TextureMinFilter.Linear);
-        tex.SetMagFilter(TextureMagFilter.Linear);
-        tex.SetWrapS(TextureWrapMode.ClampToBorder);
-        tex.SetWrapT(TextureWrapMode.ClampToBorder);
-        tex.SetBorderColor(Color4.Transparent);
-
         return tex;
     }
     

@@ -1,8 +1,7 @@
 ﻿namespace FlexFramework.Core.Data;
 
-public interface IMeshView
+public interface IMeshView : INamedObjectView
 {
-    string Name { get; }
     IBufferView VertexBuffer { get; }
     IBufferView? IndexBuffer { get; }
     int VerticesCount { get; }
