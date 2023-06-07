@@ -14,7 +14,7 @@ public class IntroScene : ABScene
     public IntroScene(ABContext context) : base(context)
     {
         tweener
-            .Tween(bannerEntity, new {Time = 1.0f}, 4.0f, 0.25f)
+            .Tween(bannerEntity, new {Time = 1.0f}, 3.5f, 0.25f)
             .OnComplete(() => Engine.LoadScene(new MainMenuScene(context)));
     }
 
