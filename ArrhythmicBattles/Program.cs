@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Core.Animation;
+﻿using System.Diagnostics.CodeAnalysis;
+using ArrhythmicBattles.Core.Animation;
 using ArrhythmicBattles.Intro;
 using ArrhythmicBattles.Menu;
 using FlexFramework;

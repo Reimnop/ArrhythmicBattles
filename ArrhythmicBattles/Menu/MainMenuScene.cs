@@ -65,8 +65,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init UI
-        var bannerPath = RandomHelper.RandomFromTime() < 0.002 ? "Assets/banner_alt.png" : "Assets/banner.png"; // Sneaky easter egg
-        var bannerTexture = Texture.FromFile("banner", bannerPath);
+        var bannerTexture = TextureSampler.FromFile("banner", "Assets/Banner.png");
         var font = Context.Font;
         
         screenManager = new ScreenManager(currentScreenBounds, child => 
@@ -78,7 +77,7 @@ public class MainMenuScene : ABScene
                         Color = Colors.Surface
                     })
                     .SetAnchor(Anchor.FillTopEdge)
-                    .SetEdges(0.0f, -192.0f, 0.0f, 0.0f)
+                    .SetEdges(0.0f, -201.0f, 0.0f, 0.0f)
                     .AddChild(new InterfaceTreeBuilder()
                         .SetElement(new ImageElement(bannerTexture)
                         {
@@ -105,7 +104,7 @@ public class MainMenuScene : ABScene
                         .SetEdges(12.0f, 12.0f, 12.0f, 12.0f)))
                 .AddChild(new InterfaceTreeBuilder()
                     .SetAnchor(Anchor.Fill)
-                    .SetEdges(224.0f, 96.0f, 32.0f, 32.0f)
+                    .SetEdges(233.0f, 96.0f, 32.0f, 32.0f)
                     .AddChild(child)) // Screen elements will be added here
             );
         

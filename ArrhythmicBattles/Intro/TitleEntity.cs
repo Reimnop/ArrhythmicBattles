@@ -39,7 +39,10 @@ public class TitleEntity : Entity, IRenderable
             Bounds = RevealRect1
         };
 
-        var texture = Texture.FromFile("title", "Assets/Title.png");
+        var texture = TextureSampler
+            .FromFile("title", "Assets/Title.png")
+            .SetWrapMode(WrapMode.ClampToBorder)
+            .SetBorderColor(Color4.Transparent);
         titleImage = new ImageEntity(texture);
     }
     

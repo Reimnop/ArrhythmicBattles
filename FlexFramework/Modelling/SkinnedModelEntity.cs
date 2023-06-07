@@ -5,7 +5,6 @@ using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
-using TextureSampler = FlexFramework.Core.Rendering.Data.TextureSampler;
 
 namespace FlexFramework.Modelling;
 
@@ -95,17 +94,17 @@ public class SkinnedModelEntity : Entity, IUpdateable, IRenderable
                 cameraData, 
                 boneMatrices,
                 material.AlbedoTexture != null 
-                    ? new TextureSampler(
+                    ? new TextureSamplerPair(
                         material.AlbedoTexture.Texture.ReadOnly, 
                         material.AlbedoTexture.Sampler.ReadOnly) 
                     : null,
                 material.MetallicTexture != null 
-                    ? new TextureSampler(
+                    ? new TextureSamplerPair(
                         material.MetallicTexture.Texture.ReadOnly, 
                         material.MetallicTexture.Sampler.ReadOnly) 
                     : null,
                 material.RoughnessTexture != null
-                    ? new TextureSampler(
+                    ? new TextureSamplerPair(
                         material.RoughnessTexture.Texture.ReadOnly, 
                         material.RoughnessTexture.Sampler.ReadOnly) 
                     : null,

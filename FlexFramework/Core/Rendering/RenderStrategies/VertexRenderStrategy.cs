@@ -14,6 +14,7 @@ public class VertexRenderStrategy : RenderStrategy
             (VertexAttributeIntent.Color, 2)
         );
     private readonly TextureHandler textureHandler = new();
+    private readonly SamplerHandler samplerHandler = new();
 
     public VertexRenderStrategy()
     {
@@ -32,11 +33,11 @@ public class VertexRenderStrategy : RenderStrategy
 
     public override void Draw(GLStateManager glStateManager, IDrawData drawData)
     {
-        VertexDrawData vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
+        var vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
         
         var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
-        Texture2D? texture = vertexDrawData.Texture != null ? textureHandler.GetTexture(vertexDrawData.Texture) : null;
-        
+        var texture = vertexDrawData.Texture;
+
         glStateManager.UseProgram(unlitShader);
         glStateManager.BindVertexArray(mesh.VertexArray);
 
@@ -44,9 +45,12 @@ public class VertexRenderStrategy : RenderStrategy
         GL.UniformMatrix4(0, true, ref transformation);
         GL.Uniform1(1, vertexDrawData.Texture == null ? 0 : 1);
 
-        if (texture != null)
+        if (texture.HasValue)
         {
-            glStateManager.BindTextureUnit(0, texture);
+            var tex = textureHandler.GetTexture(texture.Value.Texture);
+            var sampler = samplerHandler.GetSampler(texture.Value.Sampler);
+            glStateManager.BindTextureUnit(0, tex);
+            glStateManager.BindSampler(0, sampler);
         }
 
         GL.Uniform4(3, vertexDrawData.Color);

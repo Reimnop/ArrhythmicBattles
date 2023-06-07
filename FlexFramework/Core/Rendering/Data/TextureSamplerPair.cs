@@ -2,12 +2,12 @@
 
 namespace FlexFramework.Core.Rendering.Data;
 
-public struct TextureSampler
+public struct TextureSamplerPair
 {
     public ITextureView Texture { get; }
     public ISamplerView Sampler { get; }
     
-    public TextureSampler(ITextureView texture, ISamplerView sampler)
+    public TextureSamplerPair(ITextureView texture, ISamplerView sampler)
     {
         Texture = texture;
         Sampler = sampler;

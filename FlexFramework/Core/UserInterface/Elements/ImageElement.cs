@@ -18,7 +18,7 @@ public class ImageElement : Element, IRenderable
     private Box2 bounds;
     private readonly ImageEntity imageEntity;
 
-    public ImageElement(Texture texture)
+    public ImageElement(TextureSampler texture)
     {
         imageEntity = new ImageEntity(texture);
     }

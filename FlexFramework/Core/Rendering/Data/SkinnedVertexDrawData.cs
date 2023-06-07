@@ -9,9 +9,9 @@ public struct SkinnedVertexDrawData : IDrawData
     public Matrix4 Transformation { get; }
     public CameraData Camera { get; }
     public Matrix4[] Bones { get; }
-    public TextureSampler? Albedo { get; }
-    public TextureSampler? Metallic { get; }
-    public TextureSampler? Roughness { get; }
+    public TextureSamplerPair? Albedo { get; }
+    public TextureSamplerPair? Metallic { get; }
+    public TextureSamplerPair? Roughness { get; }
     public MaterialData Material { get; }
 
     public SkinnedVertexDrawData(
@@ -19,9 +19,9 @@ public struct SkinnedVertexDrawData : IDrawData
         Matrix4 transformation,
         CameraData camera, 
         Matrix4[] bones, 
-        TextureSampler? albedo, 
-        TextureSampler? metallic, 
-        TextureSampler? roughness,
+        TextureSamplerPair? albedo, 
+        TextureSamplerPair? metallic, 
+        TextureSamplerPair? roughness,
         MaterialData material)
     {
         Mesh = mesh;

@@ -40,21 +40,9 @@ public class LitMeshEntity : Entity, IRenderable
         var vertexDrawData = new LitVertexDrawData(
             Mesh.ReadOnly, 
             matrixStack.GlobalTransformation, cameraData, 
-            AlbedoTexture != null 
-                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
-                    AlbedoTexture.Texture.ReadOnly, 
-                    AlbedoTexture.Sampler.ReadOnly) 
-                : null,
-            MetallicTexture != null 
-                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
-                    MetallicTexture.Texture.ReadOnly, 
-                    MetallicTexture.Sampler.ReadOnly) 
-                : null,
-            RoughnessTexture != null
-                ? new FlexFramework.Core.Rendering.Data.TextureSampler(
-                    RoughnessTexture.Texture.ReadOnly, 
-                    RoughnessTexture.Sampler.ReadOnly) 
-                : null,
+            (Rendering.Data.TextureSamplerPair?) AlbedoTexture,
+            (Rendering.Data.TextureSamplerPair?) MetallicTexture,
+            (Rendering.Data.TextureSamplerPair?) RoughnessTexture,
             materialData);
 
         commandList.AddDrawData(layerType, vertexDrawData);

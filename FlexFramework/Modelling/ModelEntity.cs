@@ -3,7 +3,6 @@ using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
-using TextureSampler = FlexFramework.Core.Rendering.Data.TextureSampler;
 
 namespace FlexFramework.Modelling;
 
@@ -63,21 +62,9 @@ public class ModelEntity : Entity, IUpdateable, IRenderable
                 model.Meshes[modelMesh.MeshIndex].ReadOnly, 
                 matrixStack.GlobalTransformation, 
                 cameraData, 
-                material.AlbedoTexture != null 
-                    ? new TextureSampler(
-                        material.AlbedoTexture.Texture.ReadOnly, 
-                        material.AlbedoTexture.Sampler.ReadOnly) 
-                    : null,
-                material.MetallicTexture != null 
-                    ? new TextureSampler(
-                        material.MetallicTexture.Texture.ReadOnly, 
-                        material.MetallicTexture.Sampler.ReadOnly) 
-                    : null,
-                material.RoughnessTexture != null
-                    ? new TextureSampler(
-                        material.RoughnessTexture.Texture.ReadOnly, 
-                        material.RoughnessTexture.Sampler.ReadOnly) 
-                    : null,
+                (TextureSamplerPair?) material.AlbedoTexture,
+                (TextureSamplerPair?) material.MetallicTexture,
+                (TextureSamplerPair?) material.RoughnessTexture,
                 materialData);
             
             commandList.AddDrawData(layerType, vertexDrawData);
