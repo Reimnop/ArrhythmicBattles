@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core;
+﻿using ArrhythmicBattles.Core.Resource;
+using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
@@ -31,7 +32,7 @@ public class TitleEntity : Entity, IRenderable
         }
     }
     
-    public TitleEntity()
+    public TitleEntity(ResourceManager resourceManager)
     {
         revealRect = new RectEntity()
         {
@@ -39,8 +40,8 @@ public class TitleEntity : Entity, IRenderable
             Bounds = RevealRect1
         };
 
-        var texture = TextureSampler
-            .FromFile("title", "Assets/Title.png")
+        var texture = resourceManager
+            .Load<TextureSampler>("Textures/Title.png")
             .SetWrapMode(WrapMode.ClampToBorder)
             .SetBorderColor(Color4.Transparent);
         titleImage = new ImageEntity(texture);

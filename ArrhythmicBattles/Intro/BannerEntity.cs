@@ -1,4 +1,5 @@
-﻿using FlexFramework.Core;
+﻿using ArrhythmicBattles.Core.Resource;
+using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using Glide;
 using OpenTK.Mathematics;
@@ -10,8 +11,8 @@ public class BannerEntity : Entity, IRenderable
     private readonly LogoEntity logoEntity;
     private Vector2 logoScale = Vector2.One * 2.0f;
     private Vector2 logoOffset = Vector2.Zero;
-    
-    private readonly TitleEntity titleEntity = new();
+
+    private readonly TitleEntity titleEntity;
     
     private float time;
 
@@ -44,13 +45,13 @@ public class BannerEntity : Entity, IRenderable
         }
     }
 
-    public BannerEntity()
+    public BannerEntity(ResourceManager resourceManager)
     {
         logoEntity = new LogoEntity()
         {
             Color = new Color4(247, 203, 41, 255)
         };
-
+        titleEntity = new TitleEntity(resourceManager);
         Time = 0.0f;
     }
 

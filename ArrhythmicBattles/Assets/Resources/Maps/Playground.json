@@ -1,6 +1,6 @@
 ﻿{
   "name": "Playground",
-  "music": "Arrhythmic_Creating_Something_New.ogg",
+  "music": "Audio/Arrhythmic_Creating_Something_New.ogg",
   "props": [
     {
       "identifier": "arrhythmicbattles:grid",

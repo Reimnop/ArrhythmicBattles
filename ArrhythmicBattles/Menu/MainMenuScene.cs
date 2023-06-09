@@ -18,9 +18,7 @@ namespace ArrhythmicBattles.Menu;
 public class MainMenuScene : ABScene
 {
     // Other things
-    private readonly AudioStream musicAudioStream;
     private readonly AudioSource musicAudioSource;
-    private readonly AudioStream sfxAudioStream;
     private readonly AudioSource sfxAudioSource;
     private readonly ScreenManager screenManager;
     private readonly ScopedInputProvider inputProvider;
@@ -43,19 +41,18 @@ public class MainMenuScene : ABScene
         }
         
         // Init audio
+        var resourceManager = Context.ResourceManager;
         var settings = Context.Settings;
         
-        musicAudioStream = new VorbisAudioStream("Assets/Audio/Arrhythmic.ogg");
         musicAudioSource = new AudioSource();
         musicAudioSource.Gain = settings.MusicVolume;
-        musicAudioSource.AudioStream = musicAudioStream;
+        musicAudioSource.AudioStream = resourceManager.Load<AudioStream>("Audio/Arrhythmic.ogg");
         musicAudioSource.Play();
-
-        sfxAudioStream = new VorbisAudioStream("Assets/Audio/Select.ogg");
+        
         sfxAudioSource = new AudioSource();
         sfxAudioSource.Gain = settings.SfxVolume;
         sfxAudioSource.Looping = false;
-        sfxAudioSource.AudioStream = sfxAudioStream;
+        sfxAudioSource.AudioStream = resourceManager.Load<AudioStream>("Audio/Select.ogg");
 
         // Init bindings
         musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
@@ -65,7 +62,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init UI
-        var bannerTexture = TextureSampler.FromFile("banner", "Assets/Banner.png");
+        var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
         var font = Context.Font;
         
         screenManager = new ScreenManager(currentScreenBounds, child => 
@@ -147,13 +144,9 @@ public class MainMenuScene : ABScene
         
         musicVolumeBinding.Dispose();
         sfxVolumeBinding.Dispose();
-        
         inputProvider.Dispose();
         musicAudioSource.Dispose();
-        musicAudioStream.Dispose();
         sfxAudioSource.Dispose();
-        sfxAudioStream.Dispose();
-        
         screenManager.Dispose();
     }
 }

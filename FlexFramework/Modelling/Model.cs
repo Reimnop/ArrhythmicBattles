@@ -96,9 +96,9 @@ public class Model : IDisposable
     private readonly IEnumerable<ModelMaterial> lazyMaterials;
     private readonly IEnumerable<ModelAnimation> lazyAnimations;
 
-    public Model(string path)
+    public Model(Stream stream)
     {
-        modelImporter = new ModelImporter(path);
+        modelImporter = new ModelImporter(stream);
         
         RootNode = modelImporter.LoadModel();
         Bones = modelImporter.Bones;

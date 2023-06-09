@@ -1,4 +1,6 @@
 ﻿using ArrhythmicBattles.Core.Animation;
+using ArrhythmicBattles.Core.IO;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Intro;
 using FlexFramework;
@@ -23,12 +25,15 @@ public class Program
         Tweener.SetLerper<Box2Lerper>(typeof(Box2));
         Tweener.SetLerper<Color4Lerper>(typeof(Color4));
         Tweener.SetLerper<Vector2Lerper>(typeof(Vector2));
+        
+        // Init resources
+        var fileSystem = new RelativeFileSystem(Constants.GlobalResourcesPath);
+        var resourceManager = new ResourceManager(fileSystem);
 
-        var imageS = GetImageFromFile("Assets/Icons/icon_s.png");
-        var imageM = GetImageFromFile("Assets/Icons/icon_m.png");
-        var imageL = GetImageFromFile("Assets/Icons/icon_l.png");
-        var imageXl = GetImageFromFile("Assets/Icons/icon_xl.png");
-
+        var imageS = resourceManager.Load<Image>("Icons/icon_s.png");
+        var imageM = resourceManager.Load<Image>("Icons/icon_m.png");
+        var imageL = resourceManager.Load<Image>("Icons/icon_l.png");
+        var imageXl = resourceManager.Load<Image>("Icons/icon_xl.png");
         var icon = new WindowIcon(imageS, imageM, imageL, imageXl);
 
         var nws = new NativeWindowSettings()
@@ -45,7 +50,7 @@ public class Program
         using var flexFramework = new FlexFrameworkMain(nws, engine => new DefaultRenderer(engine), OnLog);
         flexFramework.VSync = VSyncMode.On;
 
-        using var context = new ABContext(flexFramework);
+        using var context = new ABContext(flexFramework, resourceManager);
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
@@ -81,14 +86,5 @@ public class Program
                 Console.WriteLine($"[{name}] {message}");
                 break;
         }
-    }
-
-    private static Image GetImageFromFile(string path)
-    {
-        using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
-        byte[] pixels = new byte[image.Width * image.Height * 4];
-        image.CopyPixelDataTo(pixels);
-        
-        return new Image(image.Width, image.Height, pixels);
     }
 }

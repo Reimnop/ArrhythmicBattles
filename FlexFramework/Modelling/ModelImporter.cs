@@ -15,15 +15,11 @@ public class ModelImporter : IDisposable
 
     private readonly AssimpContext context;
     private readonly Scene scene;
-    private readonly string directory;
 
-    public ModelImporter(string path)
+    public ModelImporter(Stream stream)
     {
-        path = Path.GetFullPath(path);
-        directory = Path.GetDirectoryName(path)!;
-        
         context = new AssimpContext();
-        scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs | PostProcessSteps.EmbedTextures);
+        scene = context.ImportFileFromStream(stream, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals | PostProcessSteps.FlipUVs | PostProcessSteps.EmbedTextures);
 
         // Collect all bones
         var boneNameToBone = new Dictionary<string, ModelBone>();

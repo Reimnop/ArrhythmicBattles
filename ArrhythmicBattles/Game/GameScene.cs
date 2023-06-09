@@ -1,5 +1,7 @@
 ﻿using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Core.IO;
 using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
@@ -18,23 +20,25 @@ public class GameScene : ABScene
     private readonly MapEntity mapEntity;
     private readonly PlayerEntity playerEntity;
 
-    // Other things
+    // Post processing
     private readonly Bloom bloom;
     private readonly Exposure tonemapper;
     private readonly EdgeDetect edgeDetect;
-
-    private readonly OrthographicCamera camera;
-    private readonly PhysicsWorld physicsWorld;
+    
+    // Rendering stuff
     private readonly ProceduralSkyboxRenderer skyboxRenderer;
     private readonly ScopedInputProvider inputProvider;
-    private DebugScreen? debugScreen;
-    
-    private ScreenManager screenManager;
+    private readonly OrthographicCamera camera;
+    private readonly ScreenManager screenManager;
     private Box2 currentScreenBounds;
+
+    // Other things
+    private readonly PhysicsWorld physicsWorld;
+    private DebugScreen? debugScreen;
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
-    private PerspectiveCamera freeCamCamera = new();
+    private readonly PerspectiveCamera freeCamCamera = new();
     private float freeCamYaw;
     private float freeCamPitch;
 #endif
@@ -44,7 +48,7 @@ public class GameScene : ABScene
         Engine.CursorState = CursorState.Grabbed;
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
         
-        // Init resources
+        // Init rendering stuff
         var renderer = Engine.Renderer;
         renderer.ClearColor = Color4.Black;
         if (renderer is ILighting lighting)
@@ -52,20 +56,21 @@ public class GameScene : ABScene
             lighting.DirectionalLight =
                 new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
         }
-        
-        // Init physics and input
-        inputProvider = Context.InputSystem.AcquireInputProvider();
-        physicsWorld = new PhysicsWorld();
-
-        // Init entities
-        mapEntity = EntityManager.Create(() => new MapEntity(Context.Settings, physicsWorld, "Assets/Maps/Playground"));
-        playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, physicsWorld, 0.0f, 0.0f));
-        playerEntity.Position = Vector3.UnitY * 4.0f;
-        
-        // Init other things
-        screenManager = new ScreenManager(currentScreenBounds, child => child);
         skyboxRenderer = new ProceduralSkyboxRenderer();
         
+        // Init resources
+        physicsWorld = new PhysicsWorld();
+        screenManager = new ScreenManager(currentScreenBounds, child => child);
+
+        // Init entities
+        var resourceManager = Context.ResourceManager;
+        var mapMeta = resourceManager.Load<MapMeta>("Maps/Playground.json");
+
+        mapEntity = EntityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
+        inputProvider = Context.InputSystem.AcquireInputProvider();
+        playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, resourceManager, physicsWorld, 0.0f, 0.0f));
+        playerEntity.Position = Vector3.UnitY * 4.0f;
+
         camera = new OrthographicCamera();
         camera.Size = 10.0f;
         camera.DepthNear = 0.1f;
@@ -211,7 +216,6 @@ public class GameScene : ABScene
         physicsWorld.Dispose();
         skyboxRenderer.Dispose();
         inputProvider.Dispose();
-        
         screenManager.Dispose();
     }
 }

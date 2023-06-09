@@ -8,11 +8,13 @@ namespace ArrhythmicBattles.Intro;
 
 public class IntroScene : ABScene
 {
-    private readonly BannerEntity bannerEntity = new();
+    private readonly BannerEntity bannerEntity;
     private readonly Tweener tweener = new();
 
     public IntroScene(ABContext context) : base(context)
     {
+        bannerEntity = new BannerEntity(context.ResourceManager);
+        
         tweener
             .Tween(bannerEntity, new {Time = 1.0f}, 3.5f, 0.25f)
             .Repeat(1)

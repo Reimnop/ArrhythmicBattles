@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
@@ -18,13 +19,13 @@ public class GridProp : Prop, IUpdateable, IRenderable, IDisposable
 
     private readonly TypedIndex shapeIndex;
 
-    public GridProp(ContentLoader contentLoader, PhysicsWorld physicsWorld, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation) 
-        : base(contentLoader, physicsWorld, initialPosition, initialScale, initialRotation)
+    public GridProp(ResourceManager resourceManager, PhysicsWorld physicsWorld, Vector3 initialPosition, Vector3 initialScale, Quaternion initialRotation) 
+        : base(resourceManager, physicsWorld, initialPosition, initialScale, initialRotation)
     {
         simulation = physicsWorld.Simulation;
         
-        // We don't need to dispose of the model because it's managed by the ContentLoader
-        var model = contentLoader.Load<Model>("Grid.dae");
+        // We don't need to dispose of the model because it's managed by the ResourceManager
+        var model = resourceManager.Load<Model>("Models/Grid.dae");
         modelEntity = entityManager.Create(() => new ModelEntity(model));
         
         // Create the physics body

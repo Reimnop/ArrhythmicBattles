@@ -1,11 +1,11 @@
 ﻿using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.Trees;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.UserInterface;
 using FlexFramework.Modelling;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -67,14 +67,14 @@ public class PlayerEntity : Entity, IUpdateable, IRenderable, IDisposable
     private float movementX = 0.0f;
     private bool jump = false;
 
-    public PlayerEntity(IInputProvider inputProvider, PhysicsWorld physicsWorld, float yaw, float pitch)
+    public PlayerEntity(IInputProvider inputProvider, ResourceManager resourceManager, PhysicsWorld physicsWorld, float yaw, float pitch)
     {
         this.inputProvider = inputProvider;
         this.physicsWorld = physicsWorld;
         this.yaw = yaw;
         this.pitch = pitch;
-        
-        model = new Model("Assets/Models/Capsule.dae");
+
+        model = resourceManager.Load<Model>("Models/Capsule.dae");
         modelEntity = entityManager.Create(() => new ModelEntity(model));
 
         // create shape
@@ -166,7 +166,6 @@ public class PlayerEntity : Entity, IUpdateable, IRenderable, IDisposable
     public void Dispose()
     {
         physicsWorld.Step -= OnStep;
-        model.Dispose();
         entityManager.Dispose();
     }
 }

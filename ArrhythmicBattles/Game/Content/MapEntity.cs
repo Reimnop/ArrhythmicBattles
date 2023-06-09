@@ -1,44 +1,27 @@
 ﻿using ArrhythmicBattles.Core;
 using ArrhythmicBattles.Core.Physics;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Settings;
 using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Entities;
-using Newtonsoft.Json.Linq;
 
 namespace ArrhythmicBattles.Game.Content;
 
 // Contains props and soundtrack
 public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
 {
-    public MapMeta Meta { get; }
-    
     private readonly AudioSource source;
-    private readonly ContentLoader contentLoader;
-    private readonly ContentLoader propContentLoader;
-    
-    private readonly AudioStream music;
-    private readonly List<Prop> props = new();
-
     private readonly Binding<float> musicVolumeBinding;
     
-    public MapEntity(ISettings settings, PhysicsWorld physicsWorld, string path)
+    private readonly List<Prop> props = new();
+
+    public MapEntity(ResourceManager resourceManager, MapMeta mapMeta, PhysicsWorld physicsWorld, ISettings settings)
     {
-        var fullPath = Path.GetFullPath(path);
-        
-        // Initialize resources
+        // Initialize audio
         source = new AudioSource();
-        contentLoader = new ContentLoader(fullPath);
-        propContentLoader = new ContentLoader(Path.GetFullPath("Assets/Props"));
-        
-        // Read the map file
-        string json = File.ReadAllText(Path.Combine(fullPath, "map.json"));
-        Meta = MapMeta.FromJson(JObject.Parse(json));
-        
-        // Load the music
-        music = contentLoader.Load<AudioStream>(Meta.Music);
-        source.AudioStream = music;
+        source.AudioStream = resourceManager.Load<AudioStream>(mapMeta.Music);
         source.Play();
         
         // Bind the music volume to the settings to automatically update volume when changed
@@ -46,10 +29,10 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
         
         // Load the props
         var propContent = new PropContent();
-        foreach (var propInfo in Meta.Props)
+        foreach (var propInfo in mapMeta.Props)
         {
             var location = propContent.Registry[propInfo.Identifier];
-            var prop = propContent.Registry[location](propContentLoader, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
+            var prop = propContent.Registry[location](resourceManager, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
             props.Add(prop);
         }
     }
@@ -72,15 +55,12 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
 
     public void Dispose()
     {
-        contentLoader.Dispose();
-        propContentLoader.Dispose();
         source.Dispose();
+        musicVolumeBinding.Dispose();
 
         foreach (var disposable in props.OfType<IDisposable>())
         {
             disposable.Dispose();
         }
-        
-        musicVolumeBinding.Dispose();
     }
 }
