@@ -6,7 +6,7 @@ using FlexFramework.Core.Rendering.Renderers;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using FlexFramework.Logging;
+using FlexFramework.Util.Logging;
 using Glide;
 using OpenTK.Windowing.Common.Input;
 using SixLabors.ImageSharp.PixelFormats;
@@ -59,36 +59,30 @@ public class Program
             flexFramework.Update();
         }
     }
-    
-    private static void OnLog(object sender, LogEventArgs eventArgs)
-    {
-        var msg = $"[FlexFramework -> {sender.GetType().Name}] {eventArgs.Message}";
 
-        switch (eventArgs.Severity)
+    private static void OnLog(LogLevel level, string name, string message, Exception? exception)
+    {
+        if (level < LogLevel.Info)
+            return;
+        
+        switch (level)
         {
-            case Severity.Debug:
-                Log("DEBUG", msg);
+            case LogLevel.Error:
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[{name}] {message}");
+                Console.ResetColor();
                 break;
-            case Severity.Info:
-                Log("INFO", msg);
+            case LogLevel.Warning:
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"[{name}] {message}");
+                Console.ResetColor();
                 break;
-            case Severity.Warning:
-                Log("WARN", msg);
-                break;
-            case Severity.Error:
-                Log("ERROR", msg);
-                break;
-            case Severity.Fatal:
-                Log("FATAL", msg);
+            default:
+                Console.WriteLine($"[{name}] {message}");
                 break;
         }
     }
-    
-    private static void Log(string severity, string message)
-    {
-        Console.WriteLine($"{DateTime.Now:hh:mm:ss} | {severity} | {message}");
-    }
-    
+
     private static Image GetImageFromFile(string path)
     {
         using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(path);

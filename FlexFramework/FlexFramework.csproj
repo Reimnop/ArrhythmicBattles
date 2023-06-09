@@ -13,6 +13,9 @@
 
         <!-- Show UI bounding boxes -->
         <!-- <DefineConstants>DEBUG_SHOW_BOUNDING_BOXES</DefineConstants> -->
+        
+        <!-- Print unhandled logs for debugging -->
+        <!-- <DefineConstants>PRINT_UNROUTED_LOGS</DefineConstants> -->
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,14 +1,9 @@
-﻿using System.Diagnostics;
-using FlexFramework.Core.Rendering.BackgroundRenderers;
-using FlexFramework.Core.Rendering.Data;
+﻿using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.RenderStrategies;
 using FlexFramework.Core.Rendering.PostProcessing;
-using FlexFramework.Logging;
-using FlexFramework.Util;
+using FlexFramework.Util.Logging;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-
-using Color = System.Drawing.Color;
 
 namespace FlexFramework.Core.Rendering.Renderers;
 
@@ -27,8 +22,11 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
     private readonly FrameBuffer readFrameBuffer;
     private readonly FrameBuffer drawFrameBuffer;
 
-    public DefaultRenderer(FlexFrameworkMain engine) : base(engine)
+    private readonly ILogger logger;
+
+    public DefaultRenderer(ILoggerFactory loggerFactory)
     {
+        logger = loggerFactory.CreateLogger<DefaultRenderer>();
         stateManager = new GLStateManager();
         
         // Set GpuInfo
@@ -69,7 +67,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
 
     private void RegisterRenderStrategy<TDrawData>(RenderStrategy strategy) where TDrawData : IDrawData
     {
-        Engine.LogMessage(this, Severity.Info, null, $"Initializing render strategy [{strategy.GetType().Name}] for [{typeof(TDrawData).Name}]");
+        logger.LogInfo($"Initializing render strategy [{strategy.GetType().Name}] for [{typeof(TDrawData).Name}]");
         renderStrategies.Add(typeof(TDrawData), strategy);
     }
 
@@ -172,14 +170,14 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         {
             if (processor.CurrentSize == Vector2i.Zero)
             {
-                Engine.LogMessage(this, Severity.Info, null, $"Initializing post processor [{processor.GetType().Name}] with size {size}");
+                logger.LogInfo($"Initializing post processor [{processor.GetType().Name}] with size {size}");
                 processor.Init(size);
                 return;
             }
             
             if (processor.CurrentSize != size)
             {
-                Engine.LogMessage(this, Severity.Info, null, $"Resizing post processor [{processor.GetType().Name}] from {processor.CurrentSize} to {size}");
+                logger.LogInfo($"Resizing post processor [{processor.GetType().Name}] from {processor.CurrentSize} to {size}");
                 processor.Resize(size);
             }
         }

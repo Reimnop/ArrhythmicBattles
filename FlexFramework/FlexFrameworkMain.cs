@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core;
-using FlexFramework.Logging;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Util.Exceptions;
+using FlexFramework.Util.Logging;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -12,13 +12,30 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace FlexFramework;
 
 public delegate Renderer RendererFactory(FlexFrameworkMain engine);
-public delegate void LogCallbackDelegate(object sender, LogEventArgs args);
+public delegate void LogCallbackDelegate(LogLevel level, string name, string message, Exception? exception);
 
 /// <summary>
 /// Main class for the FlexFramework
 /// </summary>
-public class FlexFrameworkMain : NativeWindow
+public class FlexFrameworkMain : NativeWindow, ILoggerFactory
 {
+    private class FlexFrameworkLogger : ILogger
+    {
+        private FlexFrameworkMain engine;
+        private string name;
+        
+        public FlexFrameworkLogger(FlexFrameworkMain engine, string name)
+        {
+            this.engine = engine;
+            this.name = name;
+        }
+        
+        public void Log(LogLevel level, string message, Exception? exception = null)
+        {
+            engine.logCallback?.Invoke(level, name, message, exception);
+        }
+    }
+    
     /// <summary>
     /// Input manager for the engine
     /// </summary>
@@ -32,6 +49,7 @@ public class FlexFrameworkMain : NativeWindow
     private readonly SceneManager sceneManager;
     private readonly AudioManager audioManager;
     
+    private readonly ILogger logger;
     private LogCallbackDelegate? logCallback;
 
     private float time;
@@ -41,9 +59,13 @@ public class FlexFrameworkMain : NativeWindow
     private GCHandle leakedGcHandle;
 #endif
 
-    public FlexFrameworkMain(NativeWindowSettings nws, RendererFactory rendererFactory, LogCallbackDelegate? logCallback = null) : base(nws)
+    public FlexFrameworkMain(
+        NativeWindowSettings nws, 
+        RendererFactory rendererFactory, 
+        LogCallbackDelegate? logCallback = null) : base(nws)
     {
         this.logCallback = logCallback;
+        logger = this.CreateLogger<FlexFrameworkMain>();
         
 #if DEBUG
         // init GL debug callback
@@ -60,48 +82,29 @@ public class FlexFrameworkMain : NativeWindow
         Input = new Input(this);
 
         Renderer = rendererFactory(this);
-        LogMessage(null, Severity.Info, null, $"Initialized renderer [{Renderer.GetType().Name}]");
+        logger.LogInfo($"Initialized renderer [{Renderer.GetType().Name}]");
     }
-
-    internal void LogMessage(object? sender, Severity severity, string? type, string message)
+    
+    public ILogger GetLogger(string name)
     {
-        sender ??= this;
-        logCallback?.Invoke(sender, new LogEventArgs(severity, type, message));
+        return new FlexFrameworkLogger(this, name);
     }
 
 #if DEBUG
     private void LogGlMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
     {
-        if (severity == DebugSeverity.DebugSeverityNotification)
+        var messageString = Marshal.PtrToStringAnsi(message, length);
+        var logLevel = severity switch
         {
-            return;
-        }
-        
-        string messageString = Marshal.PtrToStringAnsi(message, length);
-        
-        Severity severityEnum;
-        switch (severity)
-        {
-            case DebugSeverity.DebugSeverityHigh:
-                severityEnum = Severity.Error;
-                break;
-            case DebugSeverity.DebugSeverityMedium:
-                severityEnum = Severity.Warning;
-                break;
-            case DebugSeverity.DebugSeverityLow:
-                severityEnum = Severity.Info;
-                break;
-            default:
-                severityEnum = Severity.Debug;
-                break;
-        }
-        
-        LogMessage(null, severityEnum, "OpenGL", messageString);
-        
-        if (type == DebugType.DebugTypeError)
-        {
-            throw new Exception(messageString);
-        }
+            DebugSeverity.DontCare => LogLevel.Verbose,
+            DebugSeverity.DebugSeverityNotification => LogLevel.Debug,
+            DebugSeverity.DebugSeverityHigh => LogLevel.Error,
+            DebugSeverity.DebugSeverityMedium => LogLevel.Warning,
+            DebugSeverity.DebugSeverityLow => LogLevel.Info,
+            _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+        };
+
+        logger.Log(logLevel, messageString);
     }
 #endif
 
