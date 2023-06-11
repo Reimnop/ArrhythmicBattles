@@ -19,6 +19,7 @@
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="HalfMaid.Async" Version="0.9.2" />
         <PackageReference Include="NVorbis" Version="0.10.4" />
+        <PackageReference Include="OpenAL.Soft" Version="1.19.1" />
         <PackageReference Include="OpenTK" Version="4.7.7" />
         <PackageReference Include="SharpEXR" Version="1.0.0.19" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
@@ -34,12 +35,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\FlexFramework.Text\FlexFramework.Text.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="openal32.dll">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>
