@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.Core.IO;
 using ArrhythmicBattles.Core.Resource.Loaders;
+using FlexFramework.Util.Logging;
 
 namespace ArrhythmicBattles.Core.Resource;
 
@@ -15,16 +16,17 @@ public class ResourceManager : IDisposable
         new VorbisAudioLoader(),
         new ModelLoader(),
         new MapMetaLoader(),
-        new WindowIconLoader(),
         new FontLoader()
     };
 
     private readonly Dictionary<string, object> loadedResources = new();
     private readonly IFileSystem fileSystem;
+    private readonly ILogger logger;
     
-    public ResourceManager(IFileSystem fileSystem)
+    public ResourceManager(IFileSystem fileSystem, ILoggerFactory? loggerFactory = null)
     {
         this.fileSystem = fileSystem;
+        logger = loggerFactory.CreateLogger<ResourceManager>();
     }
 
     /// <summary>
@@ -48,6 +50,8 @@ public class ResourceManager : IDisposable
         {
             return resource;
         }
+        
+        logger.LogInfo($"Loading resource '{path}'");
         
         var resourceLoader = GetLoader(type, path);
         resource = resourceLoader.Load(type, fileSystem, path);

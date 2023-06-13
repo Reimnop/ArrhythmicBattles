@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Core.Resource;
+﻿using ArrhythmicBattles.Core.IO;
+using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Settings;
 using Config.Net;
 using Config.Net.Stores;
@@ -25,17 +26,17 @@ public class ABContext : IDisposable
 
     private readonly ILogger logger;
 
-    public ABContext(FlexFrameworkMain engine, ResourceManager resourceManager)
+    public ABContext(FlexFrameworkMain engine)
     {
         logger = engine.CreateLogger<ABContext>();
         
         Engine = engine;
-        ResourceManager = resourceManager;
+        ResourceManager = new ResourceManager(new RelativeFileSystem(Constants.GlobalResourcesPath), Engine);
         RenderBuffer = engine.Renderer.CreateRenderBuffer(Vector2i.One); // 1 * 1 init size
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
-        Font = resourceManager.Load<Font>("Fonts/Inconsolata-Regular.flexfont");
+        Font = ResourceManager.Load<Font>("Fonts/Inconsolata-Regular.flexfont");
 
         var configStore = new JsonConfigStore("settings.json", true);
         Settings = new ConfigurationBuilder<ISettings>()

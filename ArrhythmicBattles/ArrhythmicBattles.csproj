@@ -35,5 +35,9 @@
         <Content Include="Assets/Resources/**/*.*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+
+        <Content Include="Assets/Icons/*.*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 </Project>
