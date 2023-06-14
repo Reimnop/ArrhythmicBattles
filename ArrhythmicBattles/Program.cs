@@ -1,5 +1,4 @@
-﻿using ArrhythmicBattles.Core.Animation;
-using ArrhythmicBattles.Game;
+﻿using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Intro;
 using FlexFramework;
 using FlexFramework.Core.Rendering.Renderers;
@@ -7,7 +6,6 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using FlexFramework.Util.Logging;
-using Glide;
 using OpenTK.Windowing.Common.Input;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -19,11 +17,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Init glide
-        Tweener.SetLerper<Box2Lerper>(typeof(Box2));
-        Tweener.SetLerper<Color4Lerper>(typeof(Color4));
-        Tweener.SetLerper<Vector2Lerper>(typeof(Vector2));
-
         var imageS = GetImageFromFile("Assets/Icons/icon_s.png");
         var imageM = GetImageFromFile("Assets/Icons/icon_m.png");
         var imageL = GetImageFromFile("Assets/Icons/icon_l.png");

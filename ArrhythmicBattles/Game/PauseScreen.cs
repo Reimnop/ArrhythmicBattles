@@ -1,5 +1,4 @@
-﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Menu;
+﻿using ArrhythmicBattles.Menu;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
@@ -8,13 +7,12 @@ using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Game;
 
-public class PauseScreen : Screen, IDisposable
+public class PauseScreen : IScreen, IDisposable
 {
-    public override Node<ElementContainer> RootNode { get; }
+    public Node<ElementContainer> RootNode { get; }
 
     private readonly MeshEntity background;
 
@@ -35,40 +33,21 @@ public class PauseScreen : Screen, IDisposable
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.FillLeftEdge)
                 .SetEdges(16.0f, 0.0f, 16.0f, -512.0f)
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new TextElement(font)
-                    {
-                        Text = "Game paused!\nPress [Esc] to return to game.\n// or quit like a coward",
-                    })
-                    .SetAnchor(Anchor.FillTopEdge)
-                    .SetEdges(0.0f, -TextHelper.CalculateTextHeight(font, 3), 0.0f, 0.0f))
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new ABButtonElement(font, inputProvider, "BACK TO GAME")
-                    {
-                        Click = () => screenManager.Close(this),
-                        TextDefaultColor = Colors.TextAlternate
-                    })
-                    .SetAnchor(Anchor.FillTopEdge)
-                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, TextHelper.CalculateTextHeight(font, 3) + 16.0f)))
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new ABButtonElement(font, inputProvider, "QUIT COWARDLY") // what a coward
-                    {
-                        Click = () => engine.LoadScene(new MainMenuScene(context)),
-                        TextDefaultColor = Colors.TextAlternate
-                    })
-                    .SetAnchor(Anchor.FillTopEdge)
-                    .SetEdges(new Edges(0.0f, -64.0f, 0.0f, 0.0f).Translate(0.0f, TextHelper.CalculateTextHeight(font, 3) + 80.0f)))
+                .SetElement(new TextElement(font)
+                {
+                    Text = "Woops! It looks like I haven't implemented this yet.\nToo bad!\n\nOh and, you can't even unpause now. Tough luck."
+                })
         );
     }
 
-    public override void Update(UpdateArgs args)
+    public void Update(UpdateArgs args)
     {
         RootNode.UpdateRecursively(args);
     }
     
-    public override void Render(RenderArgs args)
+    public void Render(RenderArgs args)
     {
-        MatrixStack matrixStack = args.MatrixStack;
+        var matrixStack = args.MatrixStack;
         
         matrixStack.Push();
         matrixStack.Translate(0.5f, 0.5f, 0.0f);

@@ -64,7 +64,7 @@ public class Interactivity : IUpdateable // In case you want to cast it to IUpda
     
     private bool IsMouseOver()
     {
-        return inputProvider.InputAvailable && Bounds.Contains(inputProvider.MousePosition);
+        return inputProvider.InputAvailable && Bounds.ContainsInclusive(inputProvider.MousePosition);
     }
     
     private bool IsMouseButton(MouseButton button)

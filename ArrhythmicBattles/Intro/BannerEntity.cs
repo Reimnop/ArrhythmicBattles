@@ -1,7 +1,7 @@
 ﻿using ArrhythmicBattles.Core.Resource;
+using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
-using Glide;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Intro;

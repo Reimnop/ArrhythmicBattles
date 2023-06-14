@@ -63,49 +63,25 @@ public class MainMenuScene : ABScene
 
         // Init UI
         var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
-        var font = Context.Font;
         
+        // Magic numbers retrieved from design in Figma
         screenManager = new ScreenManager(currentScreenBounds, child => 
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new RectElement()
-                    {
-                        Color = Colors.Surface
-                    })
-                    .SetAnchor(Anchor.FillTopEdge)
-                    .SetEdges(0.0f, -201.0f, 0.0f, 0.0f)
-                    .AddChild(new InterfaceTreeBuilder()
-                        .SetElement(new ImageElement(bannerTexture)
-                        {
-                            ImageMode = ImageMode.Fit
-                        })
-                        .SetAnchor(Anchor.Fill)
-                        .SetEdges(32.0f)))
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new RectElement()
-                    {
-                        Color = Colors.Surface
-                    })
-                    .SetAnchor(Anchor.FillBottomEdge)
-                    .SetEdges(-64.0f, 0.0f, 0.0f, 0.0f)
-                    .AddChild(new InterfaceTreeBuilder()
-                        .SetElement(new TextElement(font)
-                        {
-                            Text = $"Version {Constants.GameVersion}\n© {DateTime.Now.Year} {Constants.CompanyName}",
-                            HorizontalAlignment = HorizontalAlignment.Right,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            EmSize = 18.0f / 24.0f
-                        })
-                        .SetAnchor(Anchor.Fill)
-                        .SetEdges(12.0f, 12.0f, 12.0f, 12.0f)))
-                .AddChild(new InterfaceTreeBuilder()
+                .AddChild(new InterfaceTreeBuilder() // Header
+                    .SetElement(new ImageElement(bannerTexture))
+                    .SetAnchor(Anchor.TopLeft)
+                    .SetEdges(16.0f, -144.0f, 16.0f, -720.0f))
+                .AddChild(new InterfaceTreeBuilder() // Body
                     .SetAnchor(Anchor.Fill)
-                    .SetEdges(233.0f, 96.0f, 32.0f, 32.0f)
-                    .AddChild(child)) // Screen elements will be added here
+                    .SetEdges(160.0f, 96.0f, 16.0f, 16.0f)
+                    .AddChild(new InterfaceTreeBuilder() // Body padding
+                        .SetAnchor(Anchor.Fill)
+                        .SetEdges(16.0f)
+                        .AddChild(child))) 
             );
         
-        screenManager.Open(new SelectScreen(Engine, screenManager, Context, inputProvider));
+        screenManager.Open(new MainScreen(Engine, screenManager, Context, inputProvider));
 
         screenManager.SwitchScreen += (_, _) => sfxAudioSource.Play();
         screenManager.CloseScreen += _ =>

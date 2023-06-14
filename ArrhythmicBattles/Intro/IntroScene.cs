@@ -2,31 +2,36 @@
 using ArrhythmicBattles.Menu;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
-using Glide;
+using HalfMaid.Async;
 
 namespace ArrhythmicBattles.Intro;
 
 public class IntroScene : ABScene
 {
     private readonly BannerEntity bannerEntity;
-    private readonly Tweener tweener = new();
+    private readonly GameTaskManager taskManager = new();
 
     public IntroScene(ABContext context) : base(context)
     {
         bannerEntity = new BannerEntity(context.ResourceManager);
-        
-        tweener
-            .Tween(bannerEntity, new {Time = 1.0f}, 3.5f, 0.25f)
-            .Repeat(1)
-            .Reflect()
-            .OnComplete(() => Engine.LoadScene(new MainMenuScene(context)));
+        taskManager.StartTaskImmediately(Animate);
+    }
+
+    private async GameTask Animate()
+    {
+        await taskManager.WaitSeconds(0.25f);
+        await taskManager.RunForSecondsNormalized(3.5f, t => bannerEntity.Time = t);
+        await taskManager.WaitSeconds(0.25f);
+        await taskManager.RunForSecondsNormalized(3.5f, t => bannerEntity.Time = 1.0f - t);
+        await taskManager.WaitSeconds(0.25f);
+        Engine.LoadScene(new MainMenuScene(Context));
     }
 
     public override void Update(UpdateArgs args)
     {
         base.Update(args);
 
-        tweener.Update(args.DeltaTime);
+        taskManager.Update(args);
     }
 
     protected override void RenderScene(CommandList commandList)

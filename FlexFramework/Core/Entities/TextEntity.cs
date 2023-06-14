@@ -1,9 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Text;
 using OpenTK.Mathematics;
+using Buffer = FlexFramework.Core.Data.Buffer;
 
 namespace FlexFramework.Core.Entities;
 
@@ -85,7 +87,8 @@ public class TextEntity : Entity, IRenderable
     
     private readonly Mesh<TextVertex> mesh;
     private readonly Texture fontAtlas;
-    private readonly MeshGenerator meshGenerator = new();
+    
+    private readonly Buffer buffer = new();
 
     public TextEntity(Font font)
     {
@@ -114,9 +117,13 @@ public class TextEntity : Entity, IRenderable
         var boundsMaxX = (int) (bounds.Max.X * 64.0f);
         var boundsMaxY = (int) (bounds.Max.Y * 64.0f);
         var shapedText = TextShaper.ShapeText(font, text, boundsMinX, boundsMinY, boundsMaxX, boundsMaxY, emSize, horizontalAlignment, verticalAlignment);
-        var vertexSpan = meshGenerator.GenerateMesh(shapedText);
-
-        mesh.SetData(vertexSpan, null);
+        
+        buffer.Clear();
+        MeshGenerator.GenerateMesh(v => buffer.Append(v), shapedText);
+        
+        // Convert ReadOnlySpan<byte> to ReadOnlySpan<TextVertex>
+        var textVertices = MemoryMarshal.Cast<byte, TextVertex>(buffer.Data);
+        mesh.SetData(textVertices, null);
     }
 
     public void Render(RenderArgs args)

@@ -1,29 +1,24 @@
 ﻿namespace FlexFramework.Text;
 
 /// <summary>
+/// Delegate for consuming vertices.
+/// </summary>
+public delegate void VertexConsumer(TextVertex vertex);
+
+/// <summary>
 /// Generates meshes from text.
 /// </summary>
-public class MeshGenerator
+public static class MeshGenerator
 {
-    // We don't want to allocate a new array every time we generate a mesh.
-    private TextVertex[] vertices;
-    private int count;
-    
-    public MeshGenerator(int capacity = 1024)
-    {
-        vertices = new TextVertex[capacity];
-    }
-
     /// <summary>
     /// Generates a mesh from the given text.
-    /// Will invalidate mesh from previous calls.
     /// </summary>
-    /// <returns>The generated text mesh vertices.</returns>
-    public ReadOnlySpan<TextVertex> GenerateMesh(ShapedText shapedText)
+    /// <returns>The amount of vertices generated.</returns>
+    public static int GenerateMesh(VertexConsumer vertexConsumer, ShapedText shapedText)
     {
         const float scale = 1.0f / 64.0f;
         
-        Clear(); // Clear previous mesh.
+        int count = 0;
         
         foreach (var line in shapedText.Lines)
         {
@@ -39,33 +34,19 @@ public class MeshGenerator
                 var maxTexY = shapedGlyph.MaxTextureCoordinateY;
                 
                 // Triangle 1
-                AddVertex(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
-                AddVertex(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
-                AddVertex(new TextVertex(minPosX, maxPosY, minTexX, minTexY));
+                vertexConsumer(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
+                vertexConsumer(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
+                vertexConsumer(new TextVertex(minPosX, maxPosY, minTexX, minTexY));
                 
                 // Triangle 2
-                AddVertex(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
-                AddVertex(new TextVertex(maxPosX, minPosY, maxTexX, maxTexY));
-                AddVertex(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
+                vertexConsumer(new TextVertex(minPosX, minPosY, minTexX, maxTexY));
+                vertexConsumer(new TextVertex(maxPosX, minPosY, maxTexX, maxTexY));
+                vertexConsumer(new TextVertex(maxPosX, maxPosY, maxTexX, minTexY));
+                
+                count += 6;
             }
         }
         
-        return new ReadOnlySpan<TextVertex>(vertices, 0, count);
-    }
-    
-    private void AddVertex(TextVertex vertex)
-    {
-        if (vertices.Length <= count)
-        {
-            // Double the capacity.
-            Array.Resize(ref vertices, count * 2);
-        }
-        
-        vertices[count++] = vertex;
-    }
-
-    private void Clear()
-    {
-        count = 0;
+        return count;
     }
 }

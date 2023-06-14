@@ -1,42 +1,83 @@
 ﻿using OpenTK.Mathematics;
+using Poly2Tri;
+using Poly2Tri.Triangulation.Polygon;
+using Poly2Tri.Utility;
 
 namespace FlexFramework.Util;
 
+public delegate void VertexConsumer(Vector2 vertex);
+
 public static class MeshGenerator
 {
-    public static void GenerateRoundedRectangle(IList<Vector2> vertices, Vector2 min, Vector2 max, float radius, int resolution = 8)
+    public static int GenerateRoundedRectangle(VertexConsumer vertexConsumer, Box2 bounds, float radius, float borderThickness = float.PositiveInfinity, int resolution = 8)
     {
-        if (radius == 0.0)
+        var polygon = GenerateRectanglePoly(bounds, radius, resolution);
+        
+        // Generate inner path if border thickness is less than half of the smallest dimension
+        var maxThickness = MathF.Min(bounds.HalfSize.X, bounds.HalfSize.Y);
+        if (borderThickness < maxThickness)
         {
-            GenerateRectangle(vertices, min, max);
-            return;
+            var innerBounds = new Box2(bounds.Min + new Vector2(borderThickness), bounds.Max - new Vector2(borderThickness));
+            polygon.AddHole(GenerateRectanglePoly(innerBounds, radius - borderThickness, resolution));
         }
         
-        float maxRadius = Math.Min(max.X - min.X, max.Y - min.Y) * 0.5f;
-        radius = Math.Min(radius, maxRadius);
+        // Triangulate
+        P2T.Triangulate(polygon);
         
-        Vector2 a = new Vector2(max.X - radius, max.Y - radius);
-        Vector2 b = new Vector2(min.X + radius, max.Y - radius);
-        Vector2 c = new Vector2(min.X + radius, min.Y + radius);
-        Vector2 d = new Vector2(max.X - radius, min.Y + radius);
-
-        GenerateCircleArch(vertices, a, radius, resolution, 0.0f, MathF.PI * 0.5f);
-        GenerateCircleArch(vertices, b, radius, resolution, MathF.PI * 0.5f, MathF.PI);
-        GenerateCircleArch(vertices, c, radius, resolution, MathF.PI, MathF.PI * 1.5f);
-        GenerateCircleArch(vertices, d, radius, resolution, MathF.PI * 1.5f, MathF.PI * 2.0f);
-        GenerateRectangle(vertices, new Vector2(min.X, min.Y + radius), b);
-        GenerateRectangle(vertices, d, new Vector2(max.X, max.Y - radius));
-        GenerateRectangle(vertices, new Vector2(min.X + radius, min.Y), new Vector2(max.X - radius, max.Y));
+        // Generate vertices
+        foreach (var triangle in polygon.Triangles)
+        {
+            vertexConsumer(Point2DToVector2(triangle.Points[0]));
+            vertexConsumer(Point2DToVector2(triangle.Points[1]));
+            vertexConsumer(Point2DToVector2(triangle.Points[2]));
+        }
+        
+        return polygon.Triangles.Count * 3;
+    }
+    
+    private static Vector2 Point2DToVector2(Point2D point)
+    {
+        return new Vector2((float) point.X, (float) point.Y);
     }
 
-    public static void GenerateRectangle(IList<Vector2> vertices, Vector2 min, Vector2 max)
+    private static Polygon GenerateRectanglePoly(Box2 bounds, float radius, int resolution)
     {
-        Vector2 lengths = max - min;
-        if (lengths.X * lengths.Y == 0.0)
-        {
-            return;
-        }
+        var min = bounds.Min;
+        var max = bounds.Max;
         
+        var result = new Polygon();
+        AppendCircleArch(result, new Vector2(max.X - radius, min.Y + radius), radius, resolution, MathF.PI * 0.0f, MathF.PI * 0.5f);
+        result.Add(new Point2D(max.X - radius, min.Y));
+        AppendCircleArch(result, new Vector2(min.X + radius, min.Y + radius), radius, resolution, MathF.PI * 0.5f, MathF.PI * 1.0f);
+        result.Add(new Point2D(min.X, min.Y + radius));
+        AppendCircleArch(result, new Vector2(min.X + radius, max.Y - radius), radius, resolution, MathF.PI * 1.0f, MathF.PI * 1.5f);
+        result.Add(new Point2D(min.X + radius, max.Y));
+        AppendCircleArch(result, new Vector2(max.X - radius, max.Y - radius), radius, resolution, MathF.PI * 1.5f, MathF.PI * 2.0f);
+        result.Add(new Point2D(max.X, max.Y - radius));
+        return result;
+    }
+
+    private static void AppendCircleArch(Polygon polygon, Vector2 center, float radius, int resolution, float startAngle, float endAngle)
+    {
+        if (radius == 0.0f)
+            return;
+        
+        for (int i = 0; i < resolution; i++)
+        {
+            var theta = MathHelper.Lerp(startAngle, endAngle, i / (float) resolution);
+            var point = new Point2D(MathF.Cos(theta) * radius + center.X, MathF.Sin(theta) * radius + center.Y);
+            polygon.Add(point);
+        }
+    }
+
+    public static void GenerateRectangle(IList<Vector2> vertices, Box2 bounds)
+    {
+        var max = bounds.Max;
+        var min = bounds.Min;
+        var lengths = max - min;
+        if (lengths.X * lengths.Y == 0.0)
+            return;
+
         vertices.Add(new Vector2(max.X, max.Y));
         vertices.Add(new Vector2(min.X, max.Y));
         vertices.Add(new Vector2(min.X, min.Y));
@@ -49,10 +90,10 @@ public static class MeshGenerator
     {
         for (int i = 0; i < resolution; i++)
         {
-            float alpha = MathHelper.Lerp(startAngle, endAngle, i / (float) resolution);
-            float beta = MathHelper.Lerp(startAngle, endAngle, (i + 1) / (float) resolution);
-            Vector2 a = new Vector2(MathF.Cos(alpha), MathF.Sin(alpha));
-            Vector2 b = new Vector2(MathF.Cos(beta), MathF.Sin(beta));
+            var alpha = MathHelper.Lerp(startAngle, endAngle, i / (float) resolution);
+            var beta = MathHelper.Lerp(startAngle, endAngle, (i + 1) / (float) resolution);
+            var a = new Vector2(MathF.Cos(alpha), MathF.Sin(alpha));
+            var b = new Vector2(MathF.Cos(beta), MathF.Sin(beta));
             vertices.Add(center);
             vertices.Add(a * radius + center);
             vertices.Add(b * radius + center);

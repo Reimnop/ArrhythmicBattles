@@ -1,4 +1,4 @@
-namespace Glide;
+namespace ArrhythmicBattles.Util;
 
 /// <summary>
 ///     Static class with useful easer functions that can be used by Tweens.

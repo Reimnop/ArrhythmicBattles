@@ -32,13 +32,24 @@ public class GameTaskManager : IUpdateable
         }
     }
     
-    public async GameTask RunForSeconds(float seconds, Func<GameTask> task)
+    public async GameTask RunForSeconds(float seconds, Action<float> task)
     {
         float t = 0;
         while (t < seconds)
         {
             t += deltaTime;
-            await task();
+            task(t);
+            await WaitUntilNextFrame(); // Prevents infinite loop
+        }
+    }
+    
+    public async GameTask RunForSecondsNormalized(float seconds, Action<float> task)
+    {
+        float t = 0;
+        while (t < seconds)
+        {
+            t += deltaTime;
+            task(t / seconds);
             await WaitUntilNextFrame(); // Prevents infinite loop
         }
     }

@@ -1,9 +1,11 @@
-﻿using FlexFramework.Core.Data;
+﻿using System.Runtime.InteropServices;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using Buffer = FlexFramework.Core.Data.Buffer;
 
 namespace FlexFramework.Core.Entities;
 
@@ -39,7 +41,7 @@ public class RectEntity : Entity, IRenderable
     private bool meshValid = false;
     
     private readonly Mesh<Vertex> mesh;
-    private readonly List<Vector2> vertexPositions = new List<Vector2>();
+    private readonly Buffer buffer = new();
 
     public RectEntity()
     {
@@ -61,19 +63,17 @@ public class RectEntity : Entity, IRenderable
             return;
         lastBounds = bounds;
 
-        vertexPositions.Clear();
-        MeshGenerator.GenerateRoundedRectangle(vertexPositions, bounds.Min, bounds.Max, Radius);
-
-        Span<Vertex> vertices = stackalloc Vertex[vertexPositions.Count];
-        for (int i = 0; i < vertexPositions.Count; i++)
+        buffer.Clear();
+        MeshGenerator.GenerateRoundedRectangle(pos =>
         {
-            var pos = vertexPositions[i];
             var u = (pos.X - bounds.Min.X) / size.X;
             var v = (pos.Y - bounds.Min.Y) / size.Y;
-            vertices[i] = new Vertex(pos.X, pos.Y, 0.0f, u, v);
-        }
+            var vertex = new Vertex(pos.X, pos.Y, 0.0f, u, v);
+            buffer.Append(vertex);
+        }, bounds, Radius);
 
-        mesh.SetData(vertices, null);
+        var vertexSpan = MemoryMarshal.Cast<byte, Vertex>(buffer.Data);
+        mesh.SetData(vertexSpan, null);
     }
 
     public void Render(RenderArgs args)

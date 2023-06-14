@@ -5,9 +5,9 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.UserInterface;
 
-public delegate void OpenScreenEventHandler(Screen screen);
-public delegate void CloseScreenEventHandler(Screen screen);
-public delegate void SwitchScreenEventHandler(Screen before, Screen after);
+public delegate void OpenScreenEventHandler(IScreen screen);
+public delegate void CloseScreenEventHandler(IScreen screen);
+public delegate void SwitchScreenEventHandler(IScreen before, IScreen after);
 
 public delegate InterfaceTreeBuilder InterfaceFactory(InterfaceTreeBuilder child);
 
@@ -17,10 +17,10 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
     public event CloseScreenEventHandler? CloseScreen;
     public event SwitchScreenEventHandler? SwitchScreen;
     
-    public IReadOnlyList<Screen> Screens => screens;
+    public IReadOnlyList<IScreen> Screens => screens;
     
-    private readonly List<Screen> screens = new();
-    private readonly List<Screen> currentScreens = new();
+    private readonly List<IScreen> screens = new();
+    private readonly List<IScreen> currentScreens = new();
 
     private Box2 bounds;
     private readonly InterfaceFactory interfaceFactory;
@@ -39,14 +39,14 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
         return node;
     }
 
-    public void Open(Screen screen)
+    public void Open(IScreen screen)
     {
         screens.Add(screen);
         
         OpenScreen?.Invoke(screen);
     }
     
-    public void Close(Screen screen)
+    public void Close(IScreen screen)
     {
         if (screen is IDisposable disposable)
         {
@@ -57,9 +57,9 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
         CloseScreen?.Invoke(screen);
     }
     
-    public void Switch(Screen before, Screen after)
+    public void Switch(IScreen before, IScreen after)
     {
-        int index = screens.IndexOf(before);
+        var index = screens.IndexOf(before);
         if (index == -1)
         {
             throw new ArgumentException("Screen not found", nameof(before));
@@ -97,7 +97,7 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
 
     public void Render(RenderArgs args)
     {
-        foreach (Screen screen in screens)
+        foreach (var screen in screens)
         {
             screen.Render(args);
         }
@@ -105,7 +105,7 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
 
     public void Dispose()
     {
-        foreach (IDisposable disposable in screens.OfType<IDisposable>())
+        foreach (var disposable in screens.OfType<IDisposable>())
         {
             disposable.Dispose();
         }
