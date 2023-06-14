@@ -44,59 +44,33 @@ public static class MeshGenerator
     {
         var min = bounds.Min;
         var max = bounds.Max;
+
+        // This is what LINQ does to you, kids
+        var points = EnumerateCircleArch(new Vector2(max.X - radius, max.Y - radius), radius, resolution,
+                MathF.PI * 0.0f, MathF.PI * 0.5f)
+            .Append(new PolygonPoint(max.X - radius, max.Y))
+            .Concat(EnumerateCircleArch(new Vector2(min.X + radius, max.Y - radius), radius, resolution,
+                MathF.PI * 0.5f, MathF.PI * 1.0f))
+            .Append(new PolygonPoint(min.X, max.Y - radius))
+            .Concat(EnumerateCircleArch(new Vector2(min.X + radius, min.Y + radius), radius, resolution,
+                MathF.PI * 1.0f, MathF.PI * 1.5f))
+            .Append(new PolygonPoint(min.X + radius, min.Y))
+            .Concat(EnumerateCircleArch(new Vector2(max.X - radius, min.Y + radius), radius, resolution,
+                MathF.PI * 1.5f, MathF.PI * 2.0f))
+            .Append(new PolygonPoint(max.X, min.Y + radius));
         
-        var result = new Polygon();
-        AppendCircleArch(result, new Vector2(max.X - radius, min.Y + radius), radius, resolution, MathF.PI * 0.0f, MathF.PI * 0.5f);
-        result.Add(new Point2D(max.X - radius, min.Y));
-        AppendCircleArch(result, new Vector2(min.X + radius, min.Y + radius), radius, resolution, MathF.PI * 0.5f, MathF.PI * 1.0f);
-        result.Add(new Point2D(min.X, min.Y + radius));
-        AppendCircleArch(result, new Vector2(min.X + radius, max.Y - radius), radius, resolution, MathF.PI * 1.0f, MathF.PI * 1.5f);
-        result.Add(new Point2D(min.X + radius, max.Y));
-        AppendCircleArch(result, new Vector2(max.X - radius, max.Y - radius), radius, resolution, MathF.PI * 1.5f, MathF.PI * 2.0f);
-        result.Add(new Point2D(max.X, max.Y - radius));
-        return result;
+        return new Polygon(points.ToArray());
     }
 
-    private static void AppendCircleArch(Polygon polygon, Vector2 center, float radius, int resolution, float startAngle, float endAngle)
+    private static IEnumerable<PolygonPoint> EnumerateCircleArch(Vector2 center, float radius, int resolution, float startAngle, float endAngle)
     {
         if (radius == 0.0f)
-            return;
+            yield break;
         
         for (int i = 0; i < resolution; i++)
         {
             var theta = MathHelper.Lerp(startAngle, endAngle, i / (float) resolution);
-            var point = new Point2D(MathF.Cos(theta) * radius + center.X, MathF.Sin(theta) * radius + center.Y);
-            polygon.Add(point);
-        }
-    }
-
-    public static void GenerateRectangle(IList<Vector2> vertices, Box2 bounds)
-    {
-        var max = bounds.Max;
-        var min = bounds.Min;
-        var lengths = max - min;
-        if (lengths.X * lengths.Y == 0.0)
-            return;
-
-        vertices.Add(new Vector2(max.X, max.Y));
-        vertices.Add(new Vector2(min.X, max.Y));
-        vertices.Add(new Vector2(min.X, min.Y));
-        vertices.Add(new Vector2(max.X, max.Y));
-        vertices.Add(new Vector2(min.X, min.Y));
-        vertices.Add(new Vector2(max.X, min.Y));
-    }
-    
-    public static void GenerateCircleArch(IList<Vector2> vertices, Vector2 center, float radius, int resolution = 8, float startAngle = 0.0f, float endAngle = MathF.PI * 2.0f)
-    {
-        for (int i = 0; i < resolution; i++)
-        {
-            var alpha = MathHelper.Lerp(startAngle, endAngle, i / (float) resolution);
-            var beta = MathHelper.Lerp(startAngle, endAngle, (i + 1) / (float) resolution);
-            var a = new Vector2(MathF.Cos(alpha), MathF.Sin(alpha));
-            var b = new Vector2(MathF.Cos(beta), MathF.Sin(beta));
-            vertices.Add(center);
-            vertices.Add(a * radius + center);
-            vertices.Add(b * radius + center);
+            yield return new PolygonPoint(MathF.Cos(theta) * radius + center.X, MathF.Sin(theta) * radius + center.Y);
         }
     }
 }

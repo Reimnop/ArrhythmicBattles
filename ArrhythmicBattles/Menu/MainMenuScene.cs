@@ -72,6 +72,14 @@ public class MainMenuScene : ABScene
                     .SetElement(new ImageElement(bannerTexture))
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -144.0f, 16.0f, -720.0f))
+                .AddChild(new InterfaceTreeBuilder() // Footer
+                    .SetElement(new RectElement()
+                    {
+                        Color = Color4.White,
+                        Radius = 8.0f
+                    })
+                    .SetAnchor(Anchor.FillBottomEdge)
+                    .SetEdges(-80.0f, 16.0f, 16.0f, 16.0f))
                 .AddChild(new InterfaceTreeBuilder() // Body
                     .SetAnchor(Anchor.Fill)
                     .SetEdges(160.0f, 96.0f, 16.0f, 16.0f)
