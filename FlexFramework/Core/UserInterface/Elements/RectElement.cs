@@ -5,16 +5,22 @@ namespace FlexFramework.Core.UserInterface.Elements;
 
 public class RectElement : VisualElement, IRenderable
 {
+    public Color4 Color
+    {
+        get => rectEntity.Color;
+        set => rectEntity.Color = value;
+    }
+    
     public float Radius
     {
         get => rectEntity.Radius;
         set => rectEntity.Radius = value;
     }
-
-    public Color4 Color
+    
+    public float BorderThickness
     {
-        get => rectEntity.Color;
-        set => rectEntity.Color = value;
+        get => rectEntity.BorderThickness;
+        set => rectEntity.BorderThickness = value;
     }
 
     private readonly RectEntity rectEntity = new();

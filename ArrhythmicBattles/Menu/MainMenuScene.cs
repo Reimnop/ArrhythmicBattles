@@ -76,11 +76,40 @@ public class MainMenuScene : ABScene
                     .SetElement(new RectElement()
                     {
                         Color = Color4.White,
-                        Radius = 8.0f
+                        Radius = 8.0f,
+                        BorderThickness = 1.5f
                     })
                     .SetAnchor(Anchor.FillBottomEdge)
-                    .SetEdges(-80.0f, 16.0f, 16.0f, 16.0f))
+                    .SetEdges(-80.0f, 16.0f, 16.0f, 16.0f)
+                    .AddChild(new InterfaceTreeBuilder()
+                        .SetElement(new TextElement(Context.Font)
+                        {
+                            Color = Color4.White,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            EmSize = 32.0f / 24.0f,
+                            Text = Constants.CompanyName
+                        })
+                        .SetAnchor(Anchor.Fill)
+                        .SetEdges(0.0f, 0.0f, 16.0f, 16.0f))
+                    .AddChild(new InterfaceTreeBuilder()
+                        .SetElement(new TextElement(Context.Font)
+                        {
+                            Color = Color4.White,
+                            HorizontalAlignment = HorizontalAlignment.Right,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            EmSize = 32.0f / 24.0f,
+                            Text = Constants.GameVersion
+                        })
+                        .SetAnchor(Anchor.Fill)
+                        .SetEdges(0.0f, 0.0f, 16.0f, 16.0f)))
                 .AddChild(new InterfaceTreeBuilder() // Body
+                    .SetElement(new RectElement()
+                        {
+                            Color = Color4.White,
+                            Radius = 8.0f,
+                            BorderThickness = 1.5f
+                        })
                     .SetAnchor(Anchor.Fill)
                     .SetEdges(160.0f, 96.0f, 16.0f, 16.0f)
                     .AddChild(new InterfaceTreeBuilder() // Body padding
