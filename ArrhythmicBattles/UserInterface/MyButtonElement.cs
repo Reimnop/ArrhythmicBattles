@@ -3,29 +3,28 @@ using ArrhythmicBattles.Util;
 using FlexFramework.Core;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Entities;
+using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Text;
 using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.UserInterface;
 
-public class MyButtonElement : Element, IRenderable
+public class MyButtonElement : Element, IUpdateable, IRenderable
 {
+    private readonly Interactivity interactivity;
+    
     private readonly RectEntity border;
     private readonly ImageEntity icon;
     private readonly TextEntity text;
 
-    // TODO: Render icons and text
-    private readonly TextureSampler defaultIcon;
-    private readonly TextureSampler hoveredIcon;
-
     private Vector2 iconPosition;
 
-    public MyButtonElement(ResourceManager resourceManager, string stylePath) 
+    public MyButtonElement(IInputProvider inputProvider, ResourceManager resourceManager, string stylePath) 
     {
         var resourceDictionary = resourceManager.Load<ResourceDictionary>(stylePath);
-        defaultIcon = resourceDictionary.LoadResource<TextureSampler>("DefaultIcon", resourceManager);
-        // hoveredIcon = resourceDictionary.LoadResource<TextureSampler>("HoveredIcon", resourceManager);
+        var defaultIcon = resourceDictionary.LoadResource<TextureSampler>("DefaultIcon", resourceManager);
+        var hoveredIcon = resourceDictionary.LoadResource<TextureSampler>("HoveredIcon", resourceManager);
         
         var colorHex = resourceDictionary.GetRaw("Color");
         var color = ColorUtil.ParseHex(colorHex);
@@ -46,13 +45,33 @@ public class MyButtonElement : Element, IRenderable
             Color = color,
             VerticalAlignment = VerticalAlignment.Center
         };
+        
+        interactivity = new Interactivity(inputProvider);
+        interactivity.MouseEnter += () =>
+        {
+            border.BorderThickness = float.PositiveInfinity;
+            icon.Texture = hoveredIcon;
+            text.Color = Color4.Black;
+        };
+        interactivity.MouseLeave += () =>
+        {
+            border.BorderThickness = 2.0f;
+            icon.Texture = defaultIcon;
+            text.Color = color;
+        };
     }
 
     protected override void UpdateLayout(Box2 bounds)
     {
         border.Bounds = bounds;
+        interactivity.Bounds = bounds;
         iconPosition = new Vector2(bounds.Min.X + 32.0f, bounds.Center.Y);
         text.Bounds = new Box2(bounds.Min + new Vector2(80.0f, 16.0f), bounds.Max - new Vector2(16.0f, 16.0f));
+    }
+    
+    public void Update(UpdateArgs args)
+    {
+        interactivity.Update(args);
     }
 
     public void Render(RenderArgs args)
