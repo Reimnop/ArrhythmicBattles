@@ -10,7 +10,7 @@ public class MainScreen : IScreen
 {
     public Node<ElementContainer> RootNode { get; }
     
-    public MainScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
+    public MainScreen(ABContext context, ScreenManager screenManager, ScopedInputProvider inputProvider)
     {
         // TODO: Implement interaction
         RootNode = screenManager.BuildInterface(

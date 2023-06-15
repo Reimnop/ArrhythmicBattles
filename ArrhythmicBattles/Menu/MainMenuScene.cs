@@ -117,7 +117,7 @@ public class MainMenuScene : ABScene
                     .AddChild(child)) 
             );
         
-        screenManager.Open(new MainScreen(Engine, screenManager, Context, inputProvider));
+        screenManager.Open(new MainScreen(Context, screenManager, inputProvider));
 
         screenManager.SwitchScreen += (_, _) => sfxAudioSource.Play();
         screenManager.CloseScreen += _ =>
