@@ -63,6 +63,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
 
         // Init UI
+        var backgroundTexture = resourceManager.Load<TextureSampler>("Textures/Background.png");
         var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
         var boldFont = resourceManager.Load<Font>(Constants.BoldFontPath);
         
@@ -70,6 +71,9 @@ public class MainMenuScene : ABScene
         screenManager = new ScreenManager(currentScreenBounds, child => 
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
+                .AddChild(new InterfaceTreeBuilder() // Background
+                    .SetElement(new MouseAffectedImageElement(inputProvider, backgroundTexture))
+                    .SetAnchor(Anchor.Fill)) 
                 .AddChild(new InterfaceTreeBuilder() // Header
                     .SetElement(new ImageElement(bannerTexture))
                     .SetAnchor(Anchor.TopLeft)
@@ -144,10 +148,9 @@ public class MainMenuScene : ABScene
 
     protected override void RenderScene(CommandList commandList)
     {
-        var cameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        var args = new RenderArgs(commandList, LayerType.Gui, MatrixStack, cameraData);
-        
-        screenManager.Render(args);
+        var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
+        var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
+        screenManager.Render(guiArgs);
     }
 
     public override void Dispose()
