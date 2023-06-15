@@ -21,7 +21,6 @@ public class ABContext : IDisposable
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
     public InputSystem InputSystem { get; }
-    public Font Font { get; }
     public ISettings Settings { get; }
 
     private readonly ILogger logger;
@@ -36,8 +35,7 @@ public class ABContext : IDisposable
         DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
-        Font = ResourceManager.Load<Font>("Fonts/Inconsolata-Regular.flexfont");
-
+        
         var configStore = new JsonConfigStore("settings.json", true);
         Settings = new ConfigurationBuilder<ISettings>()
             .UseConfigStore(configStore)

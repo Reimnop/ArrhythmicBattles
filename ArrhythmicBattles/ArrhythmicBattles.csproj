@@ -39,4 +39,8 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Assets\Resources\Styles\PlayButton.json" />
+    </ItemGroup>
 </Project>

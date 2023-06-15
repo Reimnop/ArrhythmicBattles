@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Play.png",
+    "HoveredIcon": "Textures/PlayHovered.png",
+    "Color": "#F7CB29",
+    "Text": "PLAY"
+}

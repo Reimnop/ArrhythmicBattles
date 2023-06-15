@@ -5,7 +5,6 @@ using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
-using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
@@ -43,16 +42,18 @@ public class MainMenuScene : ABScene
         // Init audio
         var resourceManager = Context.ResourceManager;
         var settings = Context.Settings;
-        
-        musicAudioSource = new AudioSource();
-        musicAudioSource.Gain = settings.MusicVolume;
-        musicAudioSource.AudioStream = resourceManager.Load<AudioStream>("Audio/Arrhythmic.ogg");
+
+        musicAudioSource = new AudioSource
+        {
+            AudioStream = resourceManager.Load<AudioStream>("Audio/Arrhythmic.ogg")
+        };
         musicAudioSource.Play();
-        
-        sfxAudioSource = new AudioSource();
-        sfxAudioSource.Gain = settings.SfxVolume;
-        sfxAudioSource.Looping = false;
-        sfxAudioSource.AudioStream = resourceManager.Load<AudioStream>("Audio/Select.ogg");
+
+        sfxAudioSource = new AudioSource
+        {
+            Looping = false,
+            AudioStream = resourceManager.Load<AudioStream>("Audio/Select.ogg")
+        };
 
         // Init bindings
         musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
@@ -63,6 +64,7 @@ public class MainMenuScene : ABScene
 
         // Init UI
         var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
+        var boldFont = resourceManager.Load<Font>(Constants.BoldFontPath);
         
         // Magic numbers retrieved from design in Figma
         screenManager = new ScreenManager(currentScreenBounds, child => 
@@ -77,12 +79,12 @@ public class MainMenuScene : ABScene
                     {
                         Color = Color4.White,
                         Radius = 8.0f,
-                        BorderThickness = 1.5f
+                        BorderThickness = 2.0f
                     })
                     .SetAnchor(Anchor.FillBottomEdge)
                     .SetEdges(-80.0f, 16.0f, 16.0f, 16.0f)
                     .AddChild(new InterfaceTreeBuilder()
-                        .SetElement(new TextElement(Context.Font)
+                        .SetElement(new TextElement(boldFont)
                         {
                             Color = Color4.White,
                             HorizontalAlignment = HorizontalAlignment.Left,
@@ -91,9 +93,9 @@ public class MainMenuScene : ABScene
                             Text = Constants.CompanyName
                         })
                         .SetAnchor(Anchor.Fill)
-                        .SetEdges(0.0f, 0.0f, 16.0f, 16.0f))
+                        .SetEdges(16.0f, 16.0f, 16.0f, 16.0f))
                     .AddChild(new InterfaceTreeBuilder()
-                        .SetElement(new TextElement(Context.Font)
+                        .SetElement(new TextElement(boldFont)
                         {
                             Color = Color4.White,
                             HorizontalAlignment = HorizontalAlignment.Right,
@@ -102,20 +104,17 @@ public class MainMenuScene : ABScene
                             Text = Constants.GameVersion
                         })
                         .SetAnchor(Anchor.Fill)
-                        .SetEdges(0.0f, 0.0f, 16.0f, 16.0f)))
+                        .SetEdges(16.0f, 16.0f, 16.0f, 16.0f)))
                 .AddChild(new InterfaceTreeBuilder() // Body
                     .SetElement(new RectElement()
                         {
                             Color = Color4.White,
                             Radius = 8.0f,
-                            BorderThickness = 1.5f
+                            BorderThickness = 2.0f
                         })
                     .SetAnchor(Anchor.Fill)
                     .SetEdges(160.0f, 96.0f, 16.0f, 16.0f)
-                    .AddChild(new InterfaceTreeBuilder() // Body padding
-                        .SetAnchor(Anchor.Fill)
-                        .SetEdges(16.0f)
-                        .AddChild(child))) 
+                    .AddChild(child)) 
             );
         
         screenManager.Open(new MainScreen(Engine, screenManager, Context, inputProvider));

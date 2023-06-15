@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Settings.png",
+    "HoveredIcon": "Textures/SettingsHovered.png",
+    "Color": "#FFFFFF",
+    "Text": "SETTINGS"
+}

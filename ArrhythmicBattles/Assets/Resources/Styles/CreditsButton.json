@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Credits.png",
+    "HoveredIcon": "Textures/CreditsHovered.png",
+    "Color": "#FFFFFF",
+    "Text": "CREDITS"
+}

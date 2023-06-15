@@ -1,0 +1,72 @@
+﻿using ArrhythmicBattles.Core.Resource;
+using ArrhythmicBattles.Util;
+using FlexFramework.Core;
+using FlexFramework.Core.Data;
+using FlexFramework.Core.Entities;
+using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
+using OpenTK.Mathematics;
+
+namespace ArrhythmicBattles.UserInterface;
+
+public class MyButtonElement : Element, IRenderable
+{
+    private readonly RectEntity border;
+    private readonly ImageEntity icon;
+    private readonly TextEntity text;
+
+    // TODO: Render icons and text
+    private readonly TextureSampler defaultIcon;
+    private readonly TextureSampler hoveredIcon;
+
+    private Vector2 iconPosition;
+
+    public MyButtonElement(ResourceManager resourceManager, string stylePath) 
+    {
+        var resourceDictionary = resourceManager.Load<ResourceDictionary>(stylePath);
+        defaultIcon = resourceDictionary.LoadResource<TextureSampler>("DefaultIcon", resourceManager);
+        // hoveredIcon = resourceDictionary.LoadResource<TextureSampler>("HoveredIcon", resourceManager);
+        
+        var colorHex = resourceDictionary.GetRaw("Color");
+        var color = ColorUtil.ParseHex(colorHex);
+
+        border = new RectEntity()
+        {
+            Color = color,
+            BorderThickness = 2.0f,
+            Radius = 8.0f
+        };
+        
+        icon = new ImageEntity(defaultIcon);
+        
+        var font = resourceManager.Load<Font>(Constants.BoldFontPath);
+        text = new TextEntity(font)
+        {
+            Text = resourceDictionary.GetRaw("Text"),
+            Color = color,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+    }
+
+    protected override void UpdateLayout(Box2 bounds)
+    {
+        border.Bounds = bounds;
+        iconPosition = new Vector2(bounds.Min.X + 32.0f, bounds.Center.Y);
+        text.Bounds = new Box2(bounds.Min + new Vector2(80.0f, 16.0f), bounds.Max - new Vector2(16.0f, 16.0f));
+    }
+
+    public void Render(RenderArgs args)
+    {
+        var matrixStack = args.MatrixStack;
+        
+        border.Render(args);
+        
+        matrixStack.Push();
+        matrixStack.Scale(32.0f, 32.0f, 1.0f);
+        matrixStack.Translate(iconPosition.X, iconPosition.Y, 0.0f);
+        icon.Render(args);
+        matrixStack.Pop();
+        
+        text.Render(args);
+    }
+}

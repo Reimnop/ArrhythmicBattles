@@ -27,9 +27,12 @@ public class DebugScreen : IUpdateable, IRenderable
         this.engine = engine;
         var gpuInfo = engine.Renderer.GpuInfo;
         
-        leftTextEntity = new TextEntity(scene.Context.Font);
+        var resourceManager = scene.Context.ResourceManager;
+        var font = resourceManager.Load<Font>(Constants.RegularFontPath);
+        
+        leftTextEntity = new TextEntity(font);
 
-        rightTextEntity = new TextEntity(scene.Context.Font);
+        rightTextEntity = new TextEntity(font);
         rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
         rightTextEntity.Text = $"[INFO]\n\n" +
                                $"GPU: {gpuInfo.Name}\n" +

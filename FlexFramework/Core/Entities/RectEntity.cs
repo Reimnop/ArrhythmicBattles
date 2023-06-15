@@ -96,10 +96,7 @@ public class RectEntity : Entity, IRenderable
         var layerType = args.LayerType;
         var matrixStack = args.MatrixStack;
         var cameraData = args.CameraData;
-
-        matrixStack.Push();
-        VertexDrawData vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
+        var vertexDrawData = new VertexDrawData(mesh.ReadOnly, matrixStack.GlobalTransformation * cameraData.View * cameraData.Projection, null, Color, PrimitiveType.Triangles);
         commandList.AddDrawData(layerType, vertexDrawData);
-        matrixStack.Pop();
     }
 }

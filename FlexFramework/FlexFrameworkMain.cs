@@ -21,8 +21,8 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
 {
     private class FlexFrameworkLogger : ILogger
     {
-        private FlexFrameworkMain engine;
-        private string name;
+        private readonly FlexFrameworkMain engine;
+        private readonly string name;
         
         public FlexFrameworkLogger(FlexFrameworkMain engine, string name)
         {
@@ -50,7 +50,7 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
     private readonly AudioManager audioManager;
     
     private readonly ILogger logger;
-    private LogCallbackDelegate? logCallback;
+    private readonly LogCallbackDelegate? logCallback;
 
     private float time;
 

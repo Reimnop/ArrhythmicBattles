@@ -164,7 +164,7 @@ public static class TextShaper
         return verticalAlignment switch
         {
             VerticalAlignment.Bottom => -CalculateTextHeight(font, line, emSize) + (int) ((font.Metrics.Height + font.Metrics.Descent) * emSize) + maxY,
-            VerticalAlignment.Center => -(CalculateTextHeight(font, line, emSize) >> 1) + ((maxY - minY) >> 1) - (int) (font.Metrics.Descent * emSize) + (int) ((font.Metrics.Height >> 1) * emSize) + minY, // Divide by 2
+            VerticalAlignment.Center => -(CalculateTextHeight(font, line, emSize) >> 1) + ((maxY - minY) >> 1) + (int) (font.Metrics.Height * emSize) + (int) (font.Metrics.Descent * emSize) + minY, // Divide by 2
             VerticalAlignment.Top => (int) (font.Metrics.Ascent * emSize) + minY,
             _ => throw new ArgumentOutOfRangeException(nameof(verticalAlignment), verticalAlignment, null)
         };

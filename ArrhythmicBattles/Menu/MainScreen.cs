@@ -2,7 +2,6 @@
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
-using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Menu;
@@ -13,13 +12,26 @@ public class MainScreen : IScreen
     
     public MainScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context, ScopedInputProvider inputProvider)
     {
+        // TODO: Implement interaction
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
-                .SetElement(new TextElement(context.Font)
-                {
-                    Text = "Arrhythmic Battles"
-                })
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new MyButtonElement(context.ResourceManager, "Styles/PlayButton.json"))
+                    .SetAnchor(Anchor.TopLeft)
+                    .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new MyButtonElement(context.ResourceManager, "Styles/SettingsButton.json"))
+                    .SetAnchor(Anchor.TopLeft)
+                    .SetEdges(96.0f, -160.0f, 16.0f, -336.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new MyButtonElement(context.ResourceManager, "Styles/CreditsButton.json"))
+                    .SetAnchor(Anchor.TopLeft)
+                    .SetEdges(176.0f, -240.0f, 16.0f, -336.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new MyButtonElement(context.ResourceManager, "Styles/ExitButton.json"))
+                    .SetAnchor(Anchor.BottomLeft)
+                    .SetEdges(-80.0f, 16.0f, 16.0f, -336.0f))
         );
     }
 

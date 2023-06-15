@@ -1,10 +1,10 @@
-﻿using ArrhythmicBattles.Menu;
-using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Text;
 using FlexFramework.Util;
 using OpenTK.Mathematics;
 
@@ -28,7 +28,9 @@ public class PauseScreen : IScreen, IDisposable
         background = new MeshEntity(DefaultAssets.QuadMesh);
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
         
-        var font = context.Font;
+        var resourceManager = context.ResourceManager;
+        var font = resourceManager.Load<Font>(Constants.RegularFontPath);
+        
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.FillLeftEdge)

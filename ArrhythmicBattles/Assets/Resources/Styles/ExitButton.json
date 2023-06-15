@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Exit.png",
+    "HoveredIcon": "Textures/ExitHovered.png",
+    "Color": "#FF4949",
+    "Text": "EXIT"
+}
