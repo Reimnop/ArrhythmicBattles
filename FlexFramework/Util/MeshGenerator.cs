@@ -18,7 +18,8 @@ public static class MeshGenerator
         if (borderThickness < maxThickness)
         {
             var innerBounds = new Box2(bounds.Min + new Vector2(borderThickness), bounds.Max - new Vector2(borderThickness));
-            polygon.AddHole(GenerateRectanglePoly(innerBounds, radius, resolution));
+            var innerRadius = MathF.Max(radius - borderThickness, 0.0f);
+            polygon.AddHole(GenerateRectanglePoly(innerBounds, innerRadius, resolution));
         }
         
         // Triangulate
