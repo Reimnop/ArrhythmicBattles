@@ -11,7 +11,7 @@ public class Aces : PostProcessor, IDisposable
 
     public Aces()
     {
-        using Shader shader = new Shader("aces", File.ReadAllText("Assets/Shaders/Compute/aces.comp"),
+        using var shader = new Shader("aces", File.ReadAllText("Assets/Shaders/Compute/aces.comp"),
             ShaderType.ComputeShader);
         program = new ShaderProgram("aces");
         program.LinkShaders(shader);

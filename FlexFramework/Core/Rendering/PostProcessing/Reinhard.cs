@@ -11,7 +11,7 @@ public class Reinhard : PostProcessor, IDisposable
 
     public Reinhard()
     {
-        using Shader shader = new Shader("reinhard", File.ReadAllText("Assets/Shaders/Compute/reinhard.comp"),
+        using var shader = new Shader("reinhard", File.ReadAllText("Assets/Shaders/Compute/reinhard.comp"),
             ShaderType.ComputeShader);
         program = new ShaderProgram("reinhard");
         program.LinkShaders(shader);

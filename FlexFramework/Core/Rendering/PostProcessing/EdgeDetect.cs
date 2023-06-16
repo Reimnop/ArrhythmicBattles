@@ -11,7 +11,7 @@ public class EdgeDetect : PostProcessor
 
     public EdgeDetect()
     {
-        using Shader shader = new Shader("sobel", File.ReadAllText("Assets/Shaders/Compute/sobel.comp"), ShaderType.ComputeShader);
+        using var shader = new Shader("sobel", File.ReadAllText("Assets/Shaders/Compute/sobel.comp"), ShaderType.ComputeShader);
         program = new ShaderProgram("sobel");
         program.LinkShaders(shader);
     }
@@ -40,9 +40,9 @@ public class EdgeDetect : PostProcessor
         }
         
         stateManager.UseProgram(program);
-        GL.Uniform1(0, 0);
-        GL.Uniform1(1, 1);
-        GL.Uniform1(2, 2);
+        GL.Uniform1(program.GetUniformLocation("positionTexture"), 0);
+        GL.Uniform1(program.GetUniformLocation("normalTexture"), 1);
+        GL.Uniform1(program.GetUniformLocation("colorTexture"), 2);
 
         stateManager.BindTextureUnit(0, gBuffer.WorldPosition);
         stateManager.BindTextureUnit(1, gBuffer.WorldNormal);

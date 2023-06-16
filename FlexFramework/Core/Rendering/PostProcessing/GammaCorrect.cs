@@ -38,6 +38,7 @@ public class GammaCorrect : PostProcessor, IDisposable
     {
         stateManager.UseProgram(program);
         stateManager.BindTextureUnit(0, texture);
+        GL.Uniform1(program.GetUniformLocation("gamma"), Gamma);
         GL.BindImageTexture(0, tonemappedTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(DivideIntCeil(CurrentSize.X, 8), DivideIntCeil(CurrentSize.Y, 8), 1);

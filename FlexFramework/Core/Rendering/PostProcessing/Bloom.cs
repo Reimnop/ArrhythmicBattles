@@ -88,16 +88,18 @@ public class Bloom : PostProcessor, IDisposable
     {
         stateManager.BindSampler(0, sampler);
         
+        // Prefiltering
         stateManager.UseProgram(prefilterShader);
-        GL.Uniform1(1, HardThreshold);
-        GL.Uniform1(2, SoftThreshold);
+        GL.Uniform1(prefilterShader.GetUniformLocation("hardThreshold"), HardThreshold);
+        GL.Uniform1(prefilterShader.GetUniformLocation("softThreshold"), SoftThreshold);
         stateManager.BindTextureUnit(0, texture);
         GL.BindImageTexture(0, prefilteredTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
         GL.DispatchCompute(DivideIntCeil(CurrentSize.X, 8), DivideIntCeil(CurrentSize.Y, 8), 1);
 
+        // Downsampling
         stateManager.UseProgram(downsampleShader);
-        GL.Uniform1(2, 0);
+        GL.Uniform1(downsampleShader.GetUniformLocation("inputTexture"), 0);
         
         for (int i = 0; i < MipCount; i++)
         {
@@ -105,16 +107,17 @@ public class Bloom : PostProcessor, IDisposable
             var outputTexture = i == MipCount - 1 ? smallestTexture : downsampleMipChain[i];
             
             stateManager.BindTextureUnit(0, inputTexture);
-            GL.Uniform2(1, 1.0f / inputTexture.Width, 1.0f / inputTexture.Height); // input texture pixel size
+            GL.Uniform2(downsampleShader.GetUniformLocation("inputPixelSize"), 1.0f / inputTexture.Width, 1.0f / inputTexture.Height); // input texture pixel size
             GL.BindImageTexture(0, outputTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(DivideIntCeil(outputTexture.Width, 8), DivideIntCeil(outputTexture.Height, 8), 1);
         }
         
+        // Upsampling
         stateManager.UseProgram(upsampleShader);
-        GL.Uniform1(0, 0);
-        GL.Uniform1(1, 1);
-        GL.Uniform1(2, Strength);
+        GL.Uniform1(upsampleShader.GetUniformLocation("inputTexture1"), 0);
+        GL.Uniform1(upsampleShader.GetUniformLocation("inputTexture2"), 1);
+        GL.Uniform1(upsampleShader.GetUniformLocation("strength"), Strength);
         
         for (int i = 0; i < MipCount - 1; i++)
         {
@@ -129,9 +132,10 @@ public class Bloom : PostProcessor, IDisposable
             GL.DispatchCompute(DivideIntCeil(outputTexture.Width, 8), DivideIntCeil(outputTexture.Height, 8), 1);
         }
         
+        // Combining
         stateManager.UseProgram(combineShader);
-        GL.Uniform1(0, 0);
-        GL.Uniform1(1, 1);
+        GL.Uniform1(combineShader.GetUniformLocation("inputTexture1"), 0);
+        GL.Uniform1(combineShader.GetUniformLocation("inputTexture2"), 1);
         stateManager.BindTextureUnit(0, upsampleMipChain[^1]);
         stateManager.BindTextureUnit(1, texture);
         GL.BindImageTexture(0, finalTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
