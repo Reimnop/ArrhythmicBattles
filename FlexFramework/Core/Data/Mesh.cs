@@ -47,6 +47,7 @@ public struct VertexAttribute
     }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 public class VertexAttributeAttribute : Attribute
 {
     public VertexAttributeIntent Intent { get; set; }

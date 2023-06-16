@@ -1,12 +1,8 @@
-﻿using ArrhythmicBattles.UserInterface;
-using ArrhythmicBattles.Core;
+﻿using ArrhythmicBattles.Core;
 using FlexFramework;
 using FlexFramework.Core.Entities;
-using FlexFramework.Core.Rendering;
 using FlexFramework.Core;
-using FlexFramework.Core.UserInterface;
 using FlexFramework.Text;
-using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Game;
 
@@ -32,12 +28,14 @@ public class DebugScreen : IUpdateable, IRenderable
         
         leftTextEntity = new TextEntity(font);
 
-        rightTextEntity = new TextEntity(font);
-        rightTextEntity.HorizontalAlignment = HorizontalAlignment.Right;
-        rightTextEntity.Text = $"[INFO]\n\n" +
-                               $"GPU: {gpuInfo.Name}\n" +
-                               $"Vendor: {gpuInfo.Vendor}\n" +
-                               $"Version: {gpuInfo.Version}\n";
+        rightTextEntity = new TextEntity(font)
+        {
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Text = $"[INFO]\n\n" +
+                   $"GPU: {gpuInfo.Name}\n" +
+                   $"Vendor: {gpuInfo.Vendor}\n" +
+                   $"Version: {gpuInfo.Version}\n"
+        };
     }
 
     public void Update(UpdateArgs args)
@@ -56,10 +54,10 @@ public class DebugScreen : IUpdateable, IRenderable
         }
         
         leftTextEntity.Text = $"[DEBUG]\n\n" +
-                          $"Delta time: {args.DeltaTime * 1000.0f:0.0}ms\n" +
-                          $"FPS: {fps}\n\n" +
-                          $"\"uwaaa <3\"\n" +
-                          $"    - Windows 98, the vg moderator.";
+                              $"Delta time: {args.DeltaTime * 1000.0f:0.0}ms\n" +
+                              $"FPS: {fps}\n\n" +
+                              $"\"uwaaa <3\"\n" +
+                              $"    - Windows 98, the vg moderator.";
     }
     
     public void Render(RenderArgs args)

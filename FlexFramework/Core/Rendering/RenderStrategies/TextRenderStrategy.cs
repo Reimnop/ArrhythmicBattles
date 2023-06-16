@@ -8,7 +8,7 @@ namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class TextRenderStrategy : RenderStrategy, IDisposable
 {
-    private readonly ShaderProgram textShader;
+    private readonly ShaderProgram program;
     private readonly Sampler sampler;
     private readonly MeshHandler meshHandler = new(
             (VertexAttributeIntent.Position, 0),
@@ -21,8 +21,8 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         using var vertexShader = new Shader("text_vert", File.ReadAllText("Assets/Shaders/text.vert"), ShaderType.VertexShader);
         using var fragmentShader = new Shader("text_frag", File.ReadAllText("Assets/Shaders/text.frag"), ShaderType.FragmentShader);
         
-        textShader = new ShaderProgram("text");
-        textShader.LinkShaders(vertexShader, fragmentShader);
+        program = new ShaderProgram("text");
+        program.LinkShaders(vertexShader, fragmentShader);
         
         sampler = new Sampler("text_sampler");
         sampler.Parameter(SamplerParameterName.TextureMinFilter, (int) TextureMinFilter.Linear);
@@ -36,22 +36,22 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
         meshHandler.Update(args.DeltaTime);
     }
 
-    public override void Draw(GLStateManager glStateManager, IDrawData drawData)
+    public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
     {
         var textDrawData = EnsureDrawDataType<TextDrawData>(drawData);
         
         var mesh = meshHandler.GetMesh(textDrawData.Mesh);
         var texture = textureHandler.GetTexture(textDrawData.FontAtlas);
         
-        glStateManager.UseProgram(textShader);
+        glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
         glStateManager.BindTextureUnit(0, texture);
         glStateManager.BindSampler(0, sampler);
 
         Matrix4 transformation = textDrawData.Transformation;
-        GL.UniformMatrix4(0, true, ref transformation);
-        GL.Uniform4(2, textDrawData.Color);
-        GL.Uniform1(3, textDrawData.DistanceRange);
+        GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref transformation);
+        GL.Uniform4(program.GetUniformLocation("overlayColor"), textDrawData.Color);
+        GL.Uniform1(program.GetUniformLocation("distanceRange"), textDrawData.DistanceRange);
         
         if (textDrawData.Mesh.IndicesCount > 0)
             GL.DrawElements(PrimitiveType.Triangles, textDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
@@ -61,7 +61,7 @@ public class TextRenderStrategy : RenderStrategy, IDisposable
 
     public void Dispose()
     {
-        textShader.Dispose();
+        program.Dispose();
         sampler.Dispose();
     }
 }

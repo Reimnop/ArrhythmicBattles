@@ -7,7 +7,7 @@ namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class VertexRenderStrategy : RenderStrategy
 {
-    private readonly ShaderProgram unlitShader;
+    private readonly ShaderProgram program;
     private readonly MeshHandler meshHandler = new (
             (VertexAttributeIntent.Position, 0),
             (VertexAttributeIntent.TexCoord0, 1),
@@ -21,8 +21,8 @@ public class VertexRenderStrategy : RenderStrategy
         using var vertexShader = new Shader("unlit-vert", File.ReadAllText("Assets/Shaders/unlit.vert"), ShaderType.VertexShader);
         using var fragmentShader = new Shader("unlit-frag", File.ReadAllText("Assets/Shaders/unlit.frag"), ShaderType.FragmentShader);
         
-        unlitShader = new ShaderProgram("unlit");
-        unlitShader.LinkShaders(vertexShader, fragmentShader);
+        program = new ShaderProgram("unlit");
+        program.LinkShaders(vertexShader, fragmentShader);
     }
 
     public override void Update(UpdateArgs args)
@@ -31,19 +31,19 @@ public class VertexRenderStrategy : RenderStrategy
         textureHandler.Update(args.DeltaTime);
     }
 
-    public override void Draw(GLStateManager glStateManager, IDrawData drawData)
+    public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
     {
         var vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
         
         var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
         var texture = vertexDrawData.Texture;
 
-        glStateManager.UseProgram(unlitShader);
+        glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
 
         Matrix4 transformation = vertexDrawData.Transformation;
-        GL.UniformMatrix4(0, true, ref transformation);
-        GL.Uniform1(1, vertexDrawData.Texture == null ? 0 : 1);
+        GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref transformation);
+        GL.Uniform1(program.GetUniformLocation("hasTexture"), vertexDrawData.Texture == null ? 0 : 1);
 
         if (texture.HasValue)
         {
@@ -53,7 +53,7 @@ public class VertexRenderStrategy : RenderStrategy
             glStateManager.BindSampler(0, sampler);
         }
 
-        GL.Uniform4(3, vertexDrawData.Color);
+        GL.Uniform4(program.GetUniformLocation("color"), vertexDrawData.Color);
 
         if (vertexDrawData.Mesh.IndicesCount > 0)
             GL.DrawElements(vertexDrawData.PrimitiveType, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);

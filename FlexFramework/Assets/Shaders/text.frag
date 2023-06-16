@@ -3,9 +3,9 @@ layout(location = 0) out vec4 fragColor;
 
 in vec2 UV;
 
-layout(location = 1) uniform sampler2D atlas;
-layout(location = 2) uniform vec4 overlayColor;
-layout(location = 3) uniform float distanceRange = 4.0;
+uniform sampler2D atlas;
+uniform vec4 overlayColor;
+uniform float distanceRange = 4.0;
 
 void main() {
     vec3 msdf = texture(atlas, UV).rgb;

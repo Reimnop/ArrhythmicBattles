@@ -1,15 +1,15 @@
-﻿using FlexFramework.Core.Data;
+﻿using OpenTK.Mathematics;
+using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
+using FlexFramework.Core.Rendering.Lighting;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class LitVertexRenderStrategy : RenderStrategy
 {
-    private readonly ILighting lighting;
-    private readonly ShaderProgram litShader;
+    private readonly ShaderProgram program;
     
     private readonly MeshHandler meshHandler = new(
             (VertexAttributeIntent.Position, 0),
@@ -21,16 +21,14 @@ public class LitVertexRenderStrategy : RenderStrategy
     private readonly SamplerHandler samplerHandler = new();
     private readonly Buffer materialBuffer;
 
-    public LitVertexRenderStrategy(ILighting lighting)
+    public LitVertexRenderStrategy()
     {
-        this.lighting = lighting;
-        
         // Shader init
-        using var vertexShader = new Shader("lit-vert", File.ReadAllText("Assets/Shaders/lit.vert"), ShaderType.VertexShader);
-        using var fragmentShader = new Shader("lit-frag", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        using var vertexShader = new Shader("lit_vert", File.ReadAllText("Assets/Shaders/lit.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("lit_frag", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
         
-        litShader = new ShaderProgram("lit");
-        litShader.LinkShaders(vertexShader, fragmentShader);
+        program = new ShaderProgram("lit");
+        program.LinkShaders(vertexShader, fragmentShader);
         
         // Buffer init
         materialBuffer = new Buffer("material");
@@ -42,7 +40,7 @@ public class LitVertexRenderStrategy : RenderStrategy
         textureHandler.Update(args.DeltaTime);
     }
 
-    public override void Draw(GLStateManager glStateManager, IDrawData drawData)
+    public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
     {
         var vertexDrawData = EnsureDrawDataType<LitVertexDrawData>(drawData);
         var material = vertexDrawData.Material;
@@ -54,22 +52,22 @@ public class LitVertexRenderStrategy : RenderStrategy
         var metallic = vertexDrawData.Metallic;
         var roughness = vertexDrawData.Roughness;
 
-        glStateManager.UseProgram(litShader);
+        glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
         
         GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, materialBuffer.Handle);
 
         var mvp = vertexDrawData.Transformation * vertexDrawData.Camera.View * vertexDrawData.Camera.Projection;
         var model = vertexDrawData.Transformation;
-        GL.UniformMatrix4(0, true, ref mvp);
-        GL.UniformMatrix4(1, true, ref model);
+        GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref mvp);
+        GL.UniformMatrix4(program.GetUniformLocation("model"), true, ref model);
 
         if (albedo.HasValue)
         {
             var texture = textureHandler.GetTexture(albedo.Value.Texture);
             var sampler = samplerHandler.GetSampler(albedo.Value.Sampler);
             
-            GL.Uniform1(2, 0);
+            GL.Uniform1(program.GetUniformLocation("albedoTex"), 0);
             glStateManager.BindTextureUnit(0, texture);
             glStateManager.BindSampler(0, sampler);
         }
@@ -79,7 +77,7 @@ public class LitVertexRenderStrategy : RenderStrategy
             var texture = textureHandler.GetTexture(metallic.Value.Texture);
             var sampler = samplerHandler.GetSampler(metallic.Value.Sampler);
             
-            GL.Uniform1(3, 1);
+            GL.Uniform1(program.GetUniformLocation("metallicTex"), 1);
             glStateManager.BindTextureUnit(1, texture);
             glStateManager.BindSampler(1, sampler);
         }
@@ -89,20 +87,21 @@ public class LitVertexRenderStrategy : RenderStrategy
             var texture = textureHandler.GetTexture(roughness.Value.Texture);
             var sampler = samplerHandler.GetSampler(roughness.Value.Sampler);
             
-            GL.Uniform1(4, 2);
+            GL.Uniform1(program.GetUniformLocation("roughnessTex"), 2);
             glStateManager.BindTextureUnit(2, texture);
             glStateManager.BindSampler(2, sampler);
         }
-        
-        GL.Uniform3(5, lighting.AmbientLight); 
 
-        if (lighting.DirectionalLight.HasValue)
-        {
-            GL.Uniform3(6, lighting.DirectionalLight.Value.Direction);
-            GL.Uniform3(7, lighting.DirectionalLight.Value.Color * lighting.DirectionalLight.Value.Intensity);
-        }
+        // Lighting
+        // TODO: Implement point lights
+        commandList.TryGetLighting(out var lighting);
+        var ambient = lighting?.GetAmbientLight() ?? Vector3.Zero;
+        var directional = lighting?.GetDirectionalLight() ?? DirectionalLight.None;
         
-        GL.Uniform3(8, vertexDrawData.Camera.Position);
+        GL.Uniform3(program.GetUniformLocation("ambientColor"), ambient); 
+        GL.Uniform3(program.GetUniformLocation("lightDirection"), directional.Direction);
+        GL.Uniform3(program.GetUniformLocation("lightColor"), directional.Color * directional.Intensity);
+        GL.Uniform3(program.GetUniformLocation("cameraPos"), vertexDrawData.Camera.Position);
 
         if (vertexDrawData.Mesh.IndicesCount > 0)
             GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);

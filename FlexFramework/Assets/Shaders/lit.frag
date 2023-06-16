@@ -5,13 +5,13 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragNormal;
 layout(location = 2) out vec4 fragPosition;
 
-layout(location = 2) uniform sampler2D albedoTex;
-layout(location = 3) uniform sampler2D metallicTex;
-layout(location = 4) uniform sampler2D roughnessTex;
-layout(location = 5) uniform vec3 ambientColor;
-layout(location = 6) uniform vec3 lightDirection;
-layout(location = 7) uniform vec3 lightColor;
-layout(location = 8) uniform vec3 cameraPos;
+uniform sampler2D albedoTex;
+uniform sampler2D metallicTex;
+uniform sampler2D roughnessTex;
+uniform vec3 ambientColor;
+uniform vec3 lightDirection;
+uniform vec3 lightColor;
+uniform vec3 cameraPos;
 
 layout(binding = 0, std140) uniform Material {
     bool useAlbedoTex; // 0
@@ -78,16 +78,8 @@ float getRoughness() {
     return useRoughnessTex ? texture(roughnessTex, Uv).r : roughnessValue;
 }
 
-void main() {
-    vec3 albedo = getAlbedo();
-    float metallic = getMetallic();
-    float roughness = getRoughness();
-    vec3 normal = normalize(Normal);
-    vec3 cameraDir = normalize(cameraPos - WorldPos);
-    vec3 lightDir = normalize(-lightDirection);
-
-    // PBR calculations
-    vec3 N = normal;
+vec3 pbr(vec3 normalVec, vec3 cameraDir, vec3 lightDir, vec3 albedo, float metallic, float roughness) {
+    vec3 N = normalVec;
     vec3 V = cameraDir;
     vec3 L = lightDir;
     vec3 H = normalize(V + L);
@@ -118,9 +110,20 @@ void main() {
     vec3 specularLight = lightColor.rgb * specularStrength;
 
     // Final color
-    vec3 finalColor = (kD * diffuse + specularLight) * albedo + specular;
+    return (kD * diffuse + specularLight) * albedo + specular;
+}
 
-    fragColor = vec4(finalColor + ambient, 1.0);
+void main() {
+    vec3 albedo = getAlbedo();
+    float metallic = getMetallic();
+    float roughness = getRoughness();
+    vec3 normal = normalize(Normal);
+    vec3 cameraDir = normalize(cameraPos - WorldPos);
+    vec3 lightDir = normalize(-lightDirection);
+    
+    vec3 finalColor = pbr(normal, cameraDir, lightDir, albedo, metallic, roughness);
+    
+    fragColor = vec4(finalColor + ambientColor, 1.0);
     fragNormal = vec4(normal, 1.0);
     fragPosition = vec4(WorldPos, 1.0);
 }

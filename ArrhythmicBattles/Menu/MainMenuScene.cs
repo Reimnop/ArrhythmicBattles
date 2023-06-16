@@ -30,15 +30,8 @@ public class MainMenuScene : ABScene
     public MainMenuScene(ABContext context) : base(context)
     {
         Engine.CursorState = CursorState.Normal;
-
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
 
-        // Reset lightings
-        if (Engine.Renderer is ILighting lightings)
-        {
-            lightings.DirectionalLight = null;
-        }
-        
         // Init audio
         var resourceManager = Context.ResourceManager;
         var settings = Context.Settings;

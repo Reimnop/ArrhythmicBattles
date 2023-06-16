@@ -7,14 +7,11 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.Renderers;
 
-public class DefaultRenderer : Renderer, ILighting, IDisposable
+public class DefaultRenderer : Renderer, IDisposable
 {
-    public Vector3 AmbientLight { get; set; } = Vector3.One * 0.4f;
-    public DirectionalLight? DirectionalLight { get; set; }
-
     public override GpuInfo GpuInfo { get; }
 
-    private readonly Dictionary<Type, RenderStrategy> renderStrategies = new Dictionary<Type, RenderStrategy>();
+    private readonly Dictionary<Type, RenderStrategy> renderStrategies = new();
 
     private readonly GLStateManager stateManager;
     
@@ -41,8 +38,8 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
 
         // Register render strategies
         RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
-        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy(this));
-        RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy(this));
+        RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy());
+        RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy());
         RegisterRenderStrategy<TextDrawData>(new TextRenderStrategy());
 
         // Set GL modes
@@ -90,10 +87,8 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         
         // Render background
         if (commandList.TryGetBackgroundRenderer(out var backgroundRenderer, out var backgroundCameraData))
-        {
-            backgroundRenderer.Render(this, stateManager, drb, backgroundCameraData);
-        }
-        
+            backgroundRenderer.Render(commandList, stateManager, drb, backgroundCameraData);
+
         // Opaque
         if (commandList.TryGetLayer(LayerType.Opaque, out var opaqueLayer))
         {
@@ -102,7 +97,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetCapability(EnableCap.CullFace, true);
             stateManager.SetCapability(EnableCap.Blend, false);
             stateManager.SetDepthMask(true);
-            RenderLayer(opaqueLayer);
+            RenderLayer(commandList, opaqueLayer);
         }
 
         // Alpha clip
@@ -113,7 +108,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetCapability(EnableCap.CullFace, false);
             stateManager.SetCapability(EnableCap.Blend, false);
             stateManager.SetDepthMask(true);
-            RenderLayer(alphaClipLayer);
+            RenderLayer(commandList, alphaClipLayer);
         }
 
         // Transparent
@@ -124,7 +119,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetCapability(EnableCap.CullFace, false);
             stateManager.SetCapability(EnableCap.Blend, true);
             stateManager.SetDepthMask(false);
-            RenderLayer(transparentLayer);
+            RenderLayer(commandList, transparentLayer);
         }
         
         // Unbind
@@ -155,7 +150,7 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
             stateManager.SetCapability(EnableCap.CullFace, false);
             stateManager.SetCapability(EnableCap.Blend, true);
             stateManager.SetDepthMask(true);
-            RenderLayer(guiLayer);
+            RenderLayer(commandList, guiLayer);
         }
         
         // Unbind
@@ -188,12 +183,12 @@ public class DefaultRenderer : Renderer, ILighting, IDisposable
         }
     }
 
-    private void RenderLayer(IReadOnlyList<IDrawData> layer)
+    private void RenderLayer(CommandList commandList, IReadOnlyList<IDrawData> layer)
     {
         foreach (var drawData in layer)
         {
-            RenderStrategy strategy = renderStrategies[drawData.GetType()];
-            strategy.Draw(stateManager, drawData);
+            var strategy = renderStrategies[drawData.GetType()];
+            strategy.Draw(stateManager, commandList, drawData);
         }
     }
     

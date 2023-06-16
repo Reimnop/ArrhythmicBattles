@@ -4,7 +4,7 @@ layout(location = 1) in vec2 aUv;
 
 out vec2 UV;
 
-layout(location = 0) uniform mat4 mvp;
+uniform mat4 mvp;
 
 void main() {
     UV = aUv;

@@ -26,7 +26,8 @@ public class GameScene : ABScene
     private readonly EdgeDetect edgeDetect;
     
     // Rendering stuff
-    private readonly ProceduralSkyboxRenderer skyboxRenderer;
+    private readonly ProceduralSkyboxRenderer skyboxRenderer = new();
+    private readonly GameLighting lighting = new();
     private readonly ScopedInputProvider inputProvider;
     private readonly OrthographicCamera camera;
     private readonly ScreenManager screenManager;
@@ -47,17 +48,7 @@ public class GameScene : ABScene
     {
         Engine.CursorState = CursorState.Grabbed;
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
-        
-        // Init rendering stuff
-        var renderer = Engine.Renderer;
-        renderer.ClearColor = Color4.Black;
-        if (renderer is ILighting lighting)
-        {
-            lighting.DirectionalLight =
-                new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
-        }
-        skyboxRenderer = new ProceduralSkyboxRenderer();
-        
+
         // Init resources
         physicsWorld = new PhysicsWorld();
         screenManager = new ScreenManager(currentScreenBounds, child => child);
@@ -186,6 +177,7 @@ public class GameScene : ABScene
 #endif
 
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
+        commandList.UseLighting(lighting);
         
         var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);
         var opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);

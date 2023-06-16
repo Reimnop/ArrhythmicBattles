@@ -19,7 +19,7 @@ public class SkyboxRenderer : BackgroundRenderer, IDisposable
         program.LinkShaders(shader);
     }
     
-    public override void Render(Renderer renderer, GLStateManager stateManager, IRenderBuffer renderBuffer, CameraData cameraData)
+    public override void Render(CommandList commandList, GLStateManager stateManager, IRenderBuffer renderBuffer, CameraData cameraData)
     {
         if (Texture == null)
         {

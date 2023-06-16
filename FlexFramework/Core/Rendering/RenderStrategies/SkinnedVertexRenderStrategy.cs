@@ -1,5 +1,6 @@
 ﻿using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Core.Rendering.Lighting;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using Buffer = FlexFramework.Core.Rendering.Data.Buffer;
@@ -8,8 +9,7 @@ namespace FlexFramework.Core.Rendering.RenderStrategies;
 
 public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
 {
-    private readonly ILighting lighting;
-    private readonly ShaderProgram skinnedShader;
+    private readonly ShaderProgram program;
     
     private readonly MeshHandler meshHandler = new(
             (VertexAttributeIntent.Position, 0),
@@ -23,16 +23,14 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     private readonly SamplerHandler samplerHandler = new();
     private readonly Buffer materialBuffer;
     
-    public SkinnedVertexRenderStrategy(ILighting lighting)
+    public SkinnedVertexRenderStrategy()
     {
-        this.lighting = lighting;
-        
         // Shader init
-        using var vertexShader = new Shader("skinned-vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
-        using var fragmentShader = new Shader("skinned-fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
+        using var vertexShader = new Shader("skinned_vs", File.ReadAllText("Assets/Shaders/skinned.vert"), ShaderType.VertexShader);
+        using var fragmentShader = new Shader("skinned_fs", File.ReadAllText("Assets/Shaders/lit.frag"), ShaderType.FragmentShader);
 
-        skinnedShader = new ShaderProgram("skinned");
-        skinnedShader.LinkShaders(vertexShader, fragmentShader);
+        program = new ShaderProgram("skinned");
+        program.LinkShaders(vertexShader, fragmentShader);
         
         // Buffer init
         materialBuffer = new Buffer("material");
@@ -44,7 +42,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         textureHandler.Update(args.DeltaTime);
     }
 
-    public override void Draw(GLStateManager glStateManager, IDrawData drawData)
+    public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
     {
         var vertexDrawData = EnsureDrawDataType<SkinnedVertexDrawData>(drawData);
         var material = vertexDrawData.Material;
@@ -56,22 +54,22 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
         var metallic = vertexDrawData.Metallic;
         var roughness = vertexDrawData.Roughness;
         
-        glStateManager.UseProgram(skinnedShader);
+        glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
         
         GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, materialBuffer.Handle);
 
         Matrix4 mvp = vertexDrawData.Transformation * vertexDrawData.Camera.View * vertexDrawData.Camera.Projection;
         Matrix4 model = vertexDrawData.Transformation;
-        GL.UniformMatrix4(0, true, ref mvp);
-        GL.UniformMatrix4(1, true, ref model);
+        GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref mvp);
+        GL.UniformMatrix4(program.GetUniformLocation("model"), true, ref model);
 
         if (albedo.HasValue)
         {
             var texture = textureHandler.GetTexture(albedo.Value.Texture);
             var sampler = samplerHandler.GetSampler(albedo.Value.Sampler);
             
-            GL.Uniform1(2, 0);
+            GL.Uniform1(program.GetUniformLocation("albedoTex"), 0);
             glStateManager.BindTextureUnit(0, texture);
             glStateManager.BindSampler(0, sampler);
         }
@@ -81,7 +79,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             var texture = textureHandler.GetTexture(metallic.Value.Texture);
             var sampler = samplerHandler.GetSampler(metallic.Value.Sampler);
             
-            GL.Uniform1(3, 1);
+            GL.Uniform1(program.GetUniformLocation("metallicTex"), 1);
             glStateManager.BindTextureUnit(1, texture);
             glStateManager.BindSampler(1, sampler);
         }
@@ -91,26 +89,27 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
             var texture = textureHandler.GetTexture(roughness.Value.Texture);
             var sampler = samplerHandler.GetSampler(roughness.Value.Sampler);
             
-            GL.Uniform1(4, 2);
+            GL.Uniform1(program.GetUniformLocation("roughnessTex"), 2);
             glStateManager.BindTextureUnit(2, texture);
             glStateManager.BindSampler(2, sampler);
         }
-
-        GL.Uniform3(5, lighting.AmbientLight); 
-
-        if (lighting.DirectionalLight.HasValue)
-        {
-            GL.Uniform3(6, lighting.DirectionalLight.Value.Direction);
-            GL.Uniform3(7, lighting.DirectionalLight.Value.Color * lighting.DirectionalLight.Value.Intensity);
-        }
         
-        GL.Uniform3(8, vertexDrawData.Camera.Position);
-
+        var bonesLocation = program.GetUniformLocation("bones");
         for (int i = 0; i < vertexDrawData.Bones.Length; i++)
         {
             Matrix4 bone = vertexDrawData.Bones[i];
-            GL.UniformMatrix4(9 + i, true, ref bone);
+            GL.UniformMatrix4(bonesLocation + i, true, ref bone);
         }
+
+        // Lighting
+        commandList.TryGetLighting(out var lighting);
+        var ambient = lighting?.GetAmbientLight() ?? Vector3.Zero;
+        var directional = lighting?.GetDirectionalLight() ?? DirectionalLight.None;
+        
+        GL.Uniform3(program.GetUniformLocation("ambientColor"), ambient); 
+        GL.Uniform3(program.GetUniformLocation("lightDirection"), directional.Direction);
+        GL.Uniform3(program.GetUniformLocation("lightColor"), directional.Color * directional.Intensity);
+        GL.Uniform3(program.GetUniformLocation("cameraPos"), vertexDrawData.Camera.Position);
 
         if (vertexDrawData.Mesh.IndicesCount > 0)
             GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
@@ -120,6 +119,6 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
 
     public void Dispose()
     {
-        skinnedShader.Dispose();
+        program.Dispose();
     }
 }

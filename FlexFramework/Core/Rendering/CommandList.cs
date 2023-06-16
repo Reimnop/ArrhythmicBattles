@@ -1,15 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
+using FlexFramework.Core.Rendering.Lighting;
 using FlexFramework.Core.Rendering.PostProcessing;
 
 namespace FlexFramework.Core.Rendering;
 
 public class CommandList
 {
-    private Dictionary<LayerType, List<IDrawData>> drawDatas = new();
-    private List<PostProcessor> postProcessors = new();
+    private readonly Dictionary<LayerType, List<IDrawData>> drawDatas = new();
+    private readonly List<PostProcessor> postProcessors = new();
     private BackgroundRenderer? backgroundRenderer;
+    private ILighting? lighting;
     private CameraData backgroundCameraData;
 
     public bool TryGetLayer(LayerType layerType, [NotNullWhen(true)] out IReadOnlyList<IDrawData>? layer)
@@ -44,6 +46,12 @@ public class CommandList
         return false;
     }
 
+    public bool TryGetLighting([NotNullWhen(true)] out ILighting? lighting)
+    {
+        lighting = this.lighting;
+        return lighting != null;
+    }
+
     public void AddDrawData(LayerType layerType, IDrawData drawData)
     {
         var layer = GetLayerInternal(layerType);
@@ -59,6 +67,11 @@ public class CommandList
     {
         this.backgroundRenderer = backgroundRenderer;
         backgroundCameraData = cameraData;
+    }
+
+    public void UseLighting(ILighting lighting)
+    {
+        this.lighting = lighting;
     }
 
     private List<IDrawData> GetLayerInternal(LayerType layerType)

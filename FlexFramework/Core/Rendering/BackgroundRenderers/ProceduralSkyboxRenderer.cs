@@ -17,23 +17,18 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
         program.LinkShaders(shader);
     }
     
-    public override void Render(Renderer renderer, GLStateManager stateManager, IRenderBuffer renderBuffer, CameraData cameraData)
+    public override void Render(CommandList commandList, GLStateManager stateManager, IRenderBuffer renderBuffer, CameraData cameraData)
     {
-        if (renderer is not ILighting lighting)
-        {
-            return;
-        }
-        
         if (renderBuffer is not IGBuffer gBuffer)
-        {
             return;
-        }
-
-        if (!lighting.DirectionalLight.HasValue)
-        {
-            return;
-        }
         
+        if (!commandList.TryGetLighting(out var lighting))
+            return;
+        
+        var directionalLight = lighting.GetDirectionalLight();
+        if (directionalLight.Direction == Vector3.Zero)
+            return;
+
         stateManager.UseProgram(program);
 
         Matrix4 inverseView = Matrix4.Invert(cameraData.View);
@@ -41,8 +36,8 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
         
         GL.UniformMatrix4(0, true, ref inverseProjection);
         GL.UniformMatrix4(1, true, ref inverseView);
-        GL.Uniform3(2, lighting.DirectionalLight.Value.Direction);
-        GL.Uniform3(3, (lighting.DirectionalLight.Value.Color * lighting.DirectionalLight.Value.Intensity + lighting.AmbientLight) * 2.0f);
+        GL.Uniform3(2, directionalLight.Direction);
+        GL.Uniform3(3, (directionalLight.Color * directionalLight.Intensity + lighting.GetAmbientLight()) * 2.0f);
 
         GL.BindImageTexture(0, gBuffer.WorldColor.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.BindImageTexture(1, gBuffer.WorldNormal.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
