@@ -106,8 +106,7 @@ public class Bloom : PostProcessor, IDisposable
             var inputTexture = i == 0 ? prefilteredTexture : downsampleMipChain[i - 1];
             var outputTexture = i == MipCount - 1 ? smallestTexture : downsampleMipChain[i];
             
-            stateManager.BindTextureUnit(0, inputTexture);
-            GL.Uniform2(downsampleShader.GetUniformLocation("inputPixelSize"), 1.0f / inputTexture.Width, 1.0f / inputTexture.Height); // input texture pixel size
+            stateManager.BindTextureUnit(0, inputTexture); 
             GL.BindImageTexture(0, outputTexture.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(DivideIntCeil(outputTexture.Width, 8), DivideIntCeil(outputTexture.Height, 8), 1);

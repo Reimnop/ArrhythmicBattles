@@ -1,13 +1,16 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using ArrhythmicBattles.Core;
+using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core.Data;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
+using FlexFramework.Modelling;
 using FlexFramework.Text;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -16,6 +19,21 @@ namespace ArrhythmicBattles.Menu;
 
 public class MainMenuScene : ABScene
 {
+    // Background
+    private readonly Model backgroundModel;
+    private readonly ModelEntity backgroundEntity;
+    private readonly Fxaa fxaa;
+    private readonly Bloom bloom;
+    private readonly Aces tonemapper;
+
+    private readonly PerspectiveCamera camera = new()
+    {
+        // Magic numbers... It just looks good, okay?
+        Position = new Vector3(-17.22786f, 1.9510581f, 27.581179f), 
+        Rotation = Quaternion.FromEulerAngles(0.168749139f,     -0.41874975f, 0.0f),
+        Fov = MathHelper.DegreesToRadians(40.0f)
+    };
+
     // Other things
     private readonly AudioSource musicAudioSource;
     private readonly AudioSource sfxAudioSource;
@@ -54,9 +72,15 @@ public class MainMenuScene : ABScene
         
         // Init input
         inputProvider = Context.InputSystem.AcquireInputProvider();
+        
+        // Init background
+        backgroundModel = resourceManager.Load<Model>("Models/Background.fbx");
+        backgroundEntity = EntityManager.Create(() => new ModelEntity(backgroundModel));
+        fxaa = new Fxaa();
+        bloom = new Bloom();
+        tonemapper = new Aces();
 
         // Init UI
-        var backgroundTexture = resourceManager.Load<TextureSampler>("Textures/Background.png");
         var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
         var boldFont = resourceManager.Load<Font>(Constants.BoldFontPath);
         
@@ -64,9 +88,6 @@ public class MainMenuScene : ABScene
         screenManager = new ScreenManager(currentScreenBounds, child => 
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
-                .AddChild(new InterfaceTreeBuilder() // Background
-                    .SetElement(new MouseAffectedImageElement(inputProvider, backgroundTexture))
-                    .SetAnchor(Anchor.Fill)) 
                 .AddChild(new InterfaceTreeBuilder() // Header
                     .SetElement(new ImageElement(bannerTexture))
                     .SetAnchor(Anchor.TopLeft)
@@ -141,6 +162,14 @@ public class MainMenuScene : ABScene
 
     protected override void RenderScene(CommandList commandList)
     {
+        commandList.AddPostProcessor(fxaa);
+        commandList.AddPostProcessor(bloom);
+        commandList.AddPostProcessor(tonemapper);
+
+        var cameraData = camera.GetCameraData(Engine.ClientSize);
+        var args = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
+        backgroundEntity.Render(args);
+        
         var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
         screenManager.Render(guiArgs);
@@ -156,5 +185,9 @@ public class MainMenuScene : ABScene
         musicAudioSource.Dispose();
         sfxAudioSource.Dispose();
         screenManager.Dispose();
+        backgroundModel.Dispose();
+        fxaa.Dispose();
+        bloom.Dispose();
+        tonemapper.Dispose();
     }
 }

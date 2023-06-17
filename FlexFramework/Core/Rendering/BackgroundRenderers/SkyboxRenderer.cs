@@ -37,8 +37,8 @@ public class SkyboxRenderer : BackgroundRenderer, IDisposable
         Matrix4 inverseView = Matrix4.Invert(cameraData.View);
         Matrix4 inverseProjection = Matrix4.Invert(cameraData.Projection);
             
-        GL.UniformMatrix4(1, true, ref inverseProjection);
-        GL.UniformMatrix4(2, true, ref inverseView);
+        GL.UniformMatrix4(program.GetUniformLocation("inverseProjection"), true, ref inverseProjection);
+        GL.UniformMatrix4(program.GetUniformLocation("inverseView"), true, ref inverseView);
             
         GL.BindImageTexture(0, gBuffer.WorldColor.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.BindImageTexture(1, gBuffer.WorldNormal.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);

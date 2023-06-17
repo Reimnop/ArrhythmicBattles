@@ -81,7 +81,7 @@ public class ModelImporter : IDisposable
             var pixels = new byte[image.Width * image.Height * 4]; // 4 bytes per pixel
             image.CopyPixelDataTo(pixels);
                 
-            var tex = new Texture(name, image.Width, image.Height, PixelFormat.Rgba8, pixels);
+            return new Texture(name, image.Width, image.Height, PixelFormat.Rgba8, pixels);
         }
             
         // Not compressed, use raw data
@@ -118,8 +118,9 @@ public class ModelImporter : IDisposable
             var albedo = new Vector3(material.ColorDiffuse.R, material.ColorDiffuse.G, material.ColorDiffuse.B);
             var metallic = material.Reflectivity;
             var roughness = 1.0f - material.Shininess;
+            var emissive = new Vector3(material.ColorEmissive.R, material.ColorEmissive.G, material.ColorEmissive.B);
 
-            return new ModelMaterial(material.Name, albedo, metallic, roughness, albedoTexture, null, null);
+            return new ModelMaterial(material.Name, albedo, emissive, metallic, roughness, albedoTexture, null, null);
         });
     }
 

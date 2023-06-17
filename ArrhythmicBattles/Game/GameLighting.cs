@@ -16,6 +16,7 @@ public class GameLighting : ILighting
         return new DirectionalLight(new Vector3(0.5f, -1, 0.5f).Normalized(), Vector3.One, 0.7f);
     }
 
+    public int GetPointLightsCount() => 0;
     public IEnumerable<PointLight> GetPointLights()
     {
         yield break;

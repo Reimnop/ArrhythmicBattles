@@ -38,6 +38,7 @@ public class Program
         flexFramework.VSync = VSyncMode.On;
 
         using var context = new ABContext(flexFramework);
+        flexFramework.UpdateEvent += context.Update;
 
 #if DEBUG_SKIP_MENU
         flexFramework.LoadScene(new GameScene(context));
@@ -47,7 +48,6 @@ public class Program
 
         while (!flexFramework.ShouldClose())
         {
-            context.Update();
             flexFramework.Update();
         }
     }

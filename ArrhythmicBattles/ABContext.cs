@@ -7,7 +7,6 @@ using DiscordRPC;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
-using FlexFramework.Text;
 using FlexFramework.Util.Logging;
 using OpenTK.Mathematics;
 
@@ -17,6 +16,7 @@ public class ABContext : IDisposable
 {
     public FlexFrameworkMain Engine { get; }
     public ResourceManager ResourceManager { get; }
+    public GameTaskManager TaskManager { get; } = new();
     public IRenderBuffer RenderBuffer { get; }
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
@@ -52,8 +52,9 @@ public class ABContext : IDisposable
         return client;
     }
 
-    public void Update()
+    public void Update(UpdateArgs args)
     {
+        TaskManager.Update(args);
         DiscordRpcClient.Invoke();
         InputSystem.Update();
     }

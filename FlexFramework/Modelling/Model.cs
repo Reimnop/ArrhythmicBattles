@@ -8,21 +8,23 @@ public class ModelMaterial
 {
     public string Name { get; }
     public Vector3 Albedo { get; set; }
+    public Vector3 Emissive { get; set; }
     public float Metallic { get; set; } 
-    public float Roughness { get; set; } 
+    public float Roughness { get; set; }
     public TextureSampler? AlbedoTexture { get; set; }
     public TextureSampler? MetallicTexture { get; set; }
     public TextureSampler? RoughnessTexture { get; set; }
 
     public ModelMaterial(
         string name, 
-        Vector3 albedo, float metallic, float roughness, 
+        Vector3 albedo, Vector3 emissive, float metallic, float roughness,
         TextureSampler? albedoTexture, TextureSampler? metallicTexture, TextureSampler? roughnessTexture)
     {
         Name = name;
         Albedo = albedo;
         Metallic = metallic;
         Roughness = roughness;
+        Emissive = emissive;
         AlbedoTexture = albedoTexture;
         MetallicTexture = metallicTexture;
         RoughnessTexture = roughnessTexture;

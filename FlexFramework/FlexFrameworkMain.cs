@@ -14,6 +14,8 @@ namespace FlexFramework;
 public delegate Renderer RendererFactory(FlexFrameworkMain engine);
 public delegate void LogCallbackDelegate(LogLevel level, string name, string message, Exception? exception);
 
+public delegate void UpdateEventHandler(UpdateArgs args);
+
 /// <summary>
 /// Main class for the FlexFramework
 /// </summary>
@@ -45,6 +47,8 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
     /// Current renderer for rendering objects
     /// </summary>
     public Renderer Renderer { get; }
+    
+    public event UpdateEventHandler? UpdateEvent;
     
     private readonly SceneManager sceneManager;
     private readonly AudioManager audioManager;
@@ -134,6 +138,7 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
         }
 
         var args = new UpdateArgs(time, deltaTime);
+        UpdateEvent?.Invoke(args);
         sceneManager.CurrentScene.Update(args);
         Renderer.Update(args);
     }

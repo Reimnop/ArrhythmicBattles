@@ -34,10 +34,10 @@ public class ProceduralSkyboxRenderer : BackgroundRenderer, IDisposable
         Matrix4 inverseView = Matrix4.Invert(cameraData.View);
         Matrix4 inverseProjection = Matrix4.Invert(cameraData.Projection);
         
-        GL.UniformMatrix4(0, true, ref inverseProjection);
-        GL.UniformMatrix4(1, true, ref inverseView);
-        GL.Uniform3(2, directionalLight.Direction);
-        GL.Uniform3(3, (directionalLight.Color * directionalLight.Intensity + lighting.GetAmbientLight()) * 2.0f);
+        GL.UniformMatrix4(program.GetUniformLocation("inverseProjection"), true, ref inverseProjection);
+        GL.UniformMatrix4(program.GetUniformLocation("inverseView"), true, ref inverseView);
+        GL.Uniform3(program.GetUniformLocation("lightDir"), directionalLight.Direction);
+        GL.Uniform3(program.GetUniformLocation("lightColor"), (directionalLight.Color * directionalLight.Intensity + lighting.GetAmbientLight()) * 2.0f);
 
         GL.BindImageTexture(0, gBuffer.WorldColor.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);
         GL.BindImageTexture(1, gBuffer.WorldNormal.Handle, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba16f);

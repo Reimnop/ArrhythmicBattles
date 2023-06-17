@@ -39,6 +39,7 @@ public class GameScene : ABScene
 
 #if DEBUG
     private ScopedInputProvider? freeCamInputProvider;
+
     private readonly PerspectiveCamera freeCamCamera = new();
     private float freeCamYaw;
     private float freeCamPitch;

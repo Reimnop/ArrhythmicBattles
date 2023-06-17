@@ -1,5 +1,6 @@
 ﻿#version 430
 const float PI = 3.14159265359;
+const int MAX_LIGHTS = 16;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragNormal;
@@ -8,18 +9,26 @@ layout(location = 2) out vec4 fragPosition;
 uniform sampler2D albedoTex;
 uniform sampler2D metallicTex;
 uniform sampler2D roughnessTex;
+uniform vec3 cameraPos;
 uniform vec3 ambientColor;
+
+// Directional light
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
-uniform vec3 cameraPos;
+
+// Point lights
+uniform int pointLightsCount;
+uniform vec3 pointLightPositions[MAX_LIGHTS];
+uniform vec3 pointLightColors[MAX_LIGHTS];
 
 layout(binding = 0, std140) uniform Material {
     bool useAlbedoTex; // 0
     bool useMetallicTex; // 4
     bool useRoughnessTex; // 8
     vec3 albedoValue; // 16 // ignored if useAlbedoTex is true
-    float metallicValue; // 32 // ignored if useMetallicTex is true
-    float roughnessValue; // 36 // ignored if useRoughnessTex is true
+    vec3 emissiveValue; // 32
+    float metallicValue; // 48 // ignored if useMetallicTex is true
+    float roughnessValue; // 52 // ignored if useRoughnessTex is true
 };
 
 in vec2 Uv;
@@ -97,9 +106,6 @@ vec3 pbr(vec3 normalVec, vec3 cameraDir, vec3 lightDir, vec3 albedo, float metal
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
     vec3 specular = nominator / max(denominator, 0.001); // prevent division by zero
 
-    // Ambient lighting
-    vec3 ambient = ambientColor * albedo;
-
     // Diffuse lighting
     float NdotL = max(dot(N, L), 0.0);
     vec3 diffuse = NdotL * lightColor.rgb;
@@ -121,9 +127,23 @@ void main() {
     vec3 cameraDir = normalize(cameraPos - WorldPos);
     vec3 lightDir = normalize(-lightDirection);
     
-    vec3 finalColor = pbr(normal, cameraDir, lightDir, albedo, metallic, roughness);
+    // Directional light
+    vec3 totalLight = pbr(normal, cameraDir, lightDir, albedo, metallic, roughness);
     
-    fragColor = vec4(finalColor + ambientColor, 1.0);
+    // Point lights
+    for (int i = 0; i < pointLightsCount; i++) {
+        vec3 pointLightDir = normalize(pointLightPositions[i] - WorldPos);
+        float pointLightDistance = length(pointLightPositions[i] - WorldPos);
+        
+        // Inverse square falloff
+        float attenuation = 1.0 / (pointLightDistance * pointLightDistance);
+        
+        totalLight += pbr(normal, cameraDir, pointLightDir, albedo, metallic, roughness) * attenuation * pointLightColors[i];
+    }
+    
+    vec3 ambient = ambientColor * albedo;
+    
+    fragColor = vec4(totalLight + emissiveValue + ambient, 1.0);
     fragNormal = vec4(normal, 1.0);
     fragPosition = vec4(WorldPos, 1.0);
 }

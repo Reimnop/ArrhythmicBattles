@@ -9,29 +9,23 @@ namespace ArrhythmicBattles.Intro;
 public class IntroScene : ABScene
 {
     private readonly BannerEntity bannerEntity;
-    private readonly GameTaskManager taskManager = new();
 
     public IntroScene(ABContext context) : base(context)
     {
         bannerEntity = new BannerEntity(context.ResourceManager);
-        taskManager.StartTaskImmediately(Animate);
+        Context.TaskManager.StartImmediately(Animate);
     }
 
     private async GameTask Animate()
     {
+        var taskManager = Context.TaskManager;
+        
         await taskManager.WaitSeconds(0.25f);
         await taskManager.RunForSecondsNormalized(3.5f, t => bannerEntity.Time = t);
         await taskManager.WaitSeconds(0.25f);
         await taskManager.RunForSecondsNormalized(3.5f, t => bannerEntity.Time = 1.0f - t);
         await taskManager.WaitSeconds(0.25f);
         Engine.LoadScene(new MainMenuScene(Context));
-    }
-
-    public override void Update(UpdateArgs args)
-    {
-        base.Update(args);
-
-        taskManager.Update(args);
     }
 
     protected override void RenderScene(CommandList commandList)

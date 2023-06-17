@@ -7,11 +7,14 @@ using FlexFramework.Core.UserInterface;
 using FlexFramework.Core.UserInterface.Elements;
 using FlexFramework.Text;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.UserInterface;
 
 public class MyButtonElement : Element, IUpdateable, IRenderable
 {
+    public Action? Click { get; set; }
+    
     private readonly Interactivity interactivity;
     
     private readonly RectEntity border;
@@ -58,6 +61,11 @@ public class MyButtonElement : Element, IUpdateable, IRenderable
             border.BorderThickness = 2.0f;
             icon.Texture = defaultIcon;
             text.Color = color;
+        };
+        interactivity.MouseButtonUp += button =>
+        {
+            if (button == MouseButton.Left)
+                Click?.Invoke();
         };
     }
 

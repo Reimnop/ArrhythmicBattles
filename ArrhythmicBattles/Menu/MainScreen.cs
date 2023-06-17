@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.Game;
+using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
 using FlexFramework.Util;
@@ -16,7 +17,11 @@ public class MainScreen : IScreen
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json"))
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json")
+                    {
+                        // TODO: Switch to play screen
+                        Click = () => context.Engine.LoadScene(new GameScene(context))
+                    })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()

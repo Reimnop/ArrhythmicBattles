@@ -93,15 +93,36 @@ public class LitVertexRenderStrategy : RenderStrategy
         }
 
         // Lighting
-        // TODO: Implement point lights
         commandList.TryGetLighting(out var lighting);
         var ambient = lighting?.GetAmbientLight() ?? Vector3.Zero;
         var directional = lighting?.GetDirectionalLight() ?? DirectionalLight.None;
         
         GL.Uniform3(program.GetUniformLocation("ambientColor"), ambient); 
+        GL.Uniform3(program.GetUniformLocation("cameraPos"), vertexDrawData.Camera.Position);
+        
+        // Directional light
         GL.Uniform3(program.GetUniformLocation("lightDirection"), directional.Direction);
         GL.Uniform3(program.GetUniformLocation("lightColor"), directional.Color * directional.Intensity);
-        GL.Uniform3(program.GetUniformLocation("cameraPos"), vertexDrawData.Camera.Position);
+        
+        // Point lights
+        const int maxPointLights = 16;
+        
+        var pointLights = lighting?.GetPointLights() ?? Enumerable.Empty<PointLight>();
+        var pointLightsCount = Math.Min(lighting?.GetPointLightsCount() ?? 0, maxPointLights);
+        
+        GL.Uniform1(program.GetUniformLocation("pointLightsCount"), pointLightsCount);
+        var offset = 0;
+        var pointLightPositionsLocation = program.GetUniformLocation("pointLightPositions");
+        var pointLightColorsLocation = program.GetUniformLocation("pointLightColors");
+        foreach (var pointLight in pointLights)
+        {
+            if (offset >= maxPointLights)
+                break;
+            
+            GL.Uniform3(pointLightPositionsLocation + offset, pointLight.Position);
+            GL.Uniform3(pointLightColorsLocation + offset, pointLight.Color * pointLight.Intensity);
+            offset++;
+        }
 
         if (vertexDrawData.Mesh.IndicesCount > 0)
             GL.DrawElements(PrimitiveType.Triangles, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);

@@ -84,6 +84,7 @@ public class SkinnedModelEntity : Entity, IUpdateable, IRenderable
                 UseMetallicTexture = material.MetallicTexture != null,
                 UseRoughnessTexture = material.RoughnessTexture != null,
                 Albedo = material.Albedo,
+                Emissive = material.Emissive,
                 Metallic = material.Metallic,
                 Roughness = material.Roughness
             };
