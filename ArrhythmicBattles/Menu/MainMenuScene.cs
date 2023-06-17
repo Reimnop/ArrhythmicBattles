@@ -1,7 +1,6 @@
 ﻿using ArrhythmicBattles.UserInterface;
 using ArrhythmicBattles.Util;
 using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Settings;
 using FlexFramework.Core;
 using FlexFramework.Core.Audio;
@@ -20,6 +19,9 @@ namespace ArrhythmicBattles.Menu;
 public class MainMenuScene : ABScene
 {
     // Background
+    private Quaternion backgroundRotation = Quaternion.Identity;
+    private Vector2 mousePositionSmoothed = Vector2.Zero;
+    
     private readonly Model backgroundModel;
     private readonly ModelEntity backgroundEntity;
     private readonly Fxaa fxaa;
@@ -29,8 +31,7 @@ public class MainMenuScene : ABScene
     private readonly PerspectiveCamera camera = new()
     {
         // Magic numbers... It just looks good, okay?
-        Position = new Vector3(-17.22786f, 1.9510581f, 27.581179f), 
-        Rotation = Quaternion.FromEulerAngles(0.168749139f,     -0.41874975f, 0.0f),
+        Position = new Vector3(-6.0f, 3.0f, 35.0f),
         Fov = MathHelper.DegreesToRadians(40.0f)
     };
 
@@ -74,7 +75,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
         
         // Init background
-        backgroundModel = resourceManager.Load<Model>("Models/Background.fbx");
+        backgroundModel = resourceManager.Load<Model>("Models/ArrowBackground.fbx");
         backgroundEntity = EntityManager.Create(() => new ModelEntity(backgroundModel));
         fxaa = new Fxaa();
         bloom = new Bloom();
@@ -149,6 +150,22 @@ public class MainMenuScene : ABScene
     {
         base.Update(args);
         
+        // Update background rotation
+        var backgroundYaw = MathHelper.DegreesToRadians(MathF.Sin(args.Time * 0.25f * MathF.PI) * 15.0f);
+        var backgroundPitch = MathHelper.DegreesToRadians(MathF.Sin(args.Time * 0.0625f * MathF.PI) * 15.0f);
+        var backgroundRoll = MathHelper.DegreesToRadians(MathF.Sin(args.Time * 0.125f * MathF.PI) * 15.0f);
+        
+        var mousePosition = inputProvider.MousePosition;
+        mousePosition.X = Math.Clamp(mousePosition.X, 0.0f, Engine.ClientSize.X);
+        mousePosition.Y = Math.Clamp(mousePosition.Y, 0.0f, Engine.ClientSize.Y);
+        mousePositionSmoothed = Vector2.Lerp(mousePositionSmoothed, mousePosition, args.DeltaTime * 6.0f);
+        var mouseYNormalized = mousePositionSmoothed.Y / Engine.ClientSize.Y * 2.0f - 1.0f;
+        var mouseXNormalized = mousePositionSmoothed.X / Engine.ClientSize.X * 2.0f - 1.0f;
+        backgroundYaw += MathHelper.DegreesToRadians(mouseXNormalized * 10.0f);
+        backgroundPitch += MathHelper.DegreesToRadians(mouseYNormalized * 10.0f);
+
+        backgroundRotation = Quaternion.FromEulerAngles(backgroundPitch, backgroundYaw, backgroundRoll);
+        
         var screenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
         
         if (currentScreenBounds != screenBounds)
@@ -168,7 +185,11 @@ public class MainMenuScene : ABScene
 
         var cameraData = camera.GetCameraData(Engine.ClientSize);
         var args = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
+        
+        MatrixStack.Push();
+        MatrixStack.Rotate(backgroundRotation);
         backgroundEntity.Render(args);
+        MatrixStack.Pop();
         
         var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
         var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
