@@ -31,7 +31,7 @@ public class MainMenuScene : ABScene
     private readonly PerspectiveCamera camera = new()
     {
         // Magic numbers... It just looks good, okay?
-        Position = new Vector3(-6.0f, 3.0f, 35.0f),
+        Position = new Vector3(-2.0f, 0.0f, 15.0f),
         Fov = MathHelper.DegreesToRadians(40.0f)
     };
 
@@ -75,10 +75,13 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
         
         // Init background
-        backgroundModel = resourceManager.Load<Model>("Models/ArrowBackground.fbx");
+        backgroundModel = resourceManager.Load<Model>("Models/LogoBackground.fbx");
         backgroundEntity = EntityManager.Create(() => new ModelEntity(backgroundModel));
         fxaa = new Fxaa();
-        bloom = new Bloom();
+        bloom = new Bloom()
+        {
+            Strength = 0.85f
+        };
         tonemapper = new Aces();
 
         // Init UI
@@ -161,8 +164,8 @@ public class MainMenuScene : ABScene
         mousePositionSmoothed = Vector2.Lerp(mousePositionSmoothed, mousePosition, args.DeltaTime * 6.0f);
         var mouseYNormalized = mousePositionSmoothed.Y / Engine.ClientSize.Y * 2.0f - 1.0f;
         var mouseXNormalized = mousePositionSmoothed.X / Engine.ClientSize.X * 2.0f - 1.0f;
-        backgroundYaw += MathHelper.DegreesToRadians(mouseXNormalized * 10.0f);
-        backgroundPitch += MathHelper.DegreesToRadians(mouseYNormalized * 10.0f);
+        backgroundYaw += MathHelper.DegreesToRadians(mouseXNormalized * 20.0f);
+        backgroundPitch += MathHelper.DegreesToRadians(mouseYNormalized * 20.0f);
 
         backgroundRotation = Quaternion.FromEulerAngles(backgroundPitch, backgroundYaw, backgroundRoll);
         
