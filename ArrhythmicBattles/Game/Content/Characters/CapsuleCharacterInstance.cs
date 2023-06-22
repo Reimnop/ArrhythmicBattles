@@ -9,8 +9,6 @@ public class CapsuleCharacterInstance : CharacterInstance
 {
     private readonly IInputMethod inputMethod;
     private readonly ResourceManager resourceManager;
-
-    private readonly Model model;
     private readonly ModelEntity entity;
 
     public CapsuleCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager)
@@ -18,7 +16,7 @@ public class CapsuleCharacterInstance : CharacterInstance
         this.inputMethod = inputMethod;
         this.resourceManager = resourceManager;
 
-        model = resourceManager.Get<Model>("Models/Capsule");
+        var model = resourceManager.Get<Model>("Models/Capsule");
         entity = new ModelEntity(model);
     }
 

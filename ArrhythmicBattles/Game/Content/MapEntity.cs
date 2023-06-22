@@ -15,7 +15,7 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
     private readonly AudioSource source;
     private readonly Binding<float> musicVolumeBinding;
     
-    private readonly List<Prop> props = new();
+    private readonly List<PropInstance> propInstances = new();
 
     public MapEntity(ResourceManager resourceManager, MapMeta mapMeta, PhysicsWorld physicsWorld, ISettings settings)
     {
@@ -32,14 +32,15 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
         foreach (var propInfo in mapMeta.Props)
         {
             var location = propContent.Registry[propInfo.Identifier];
-            var prop = propContent.Registry[location](resourceManager, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
-            props.Add(prop);
+            var prop = propContent.Registry[location];
+            var propInstance = prop.CreateInstance(resourceManager, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
+            propInstances.Add(propInstance);
         }
     }
 
     public void Update(UpdateArgs args)
     {
-        foreach (var updateable in props.OfType<IUpdateable>())
+        foreach (var updateable in propInstances.OfType<IUpdateable>())
         {
             updateable.Update(args);
         }
@@ -47,7 +48,7 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
 
     public void Render(RenderArgs args)
     {
-        foreach (var renderable in props.OfType<IRenderable>())
+        foreach (var renderable in propInstances.OfType<IRenderable>())
         {
             renderable.Render(args);
         }
@@ -58,7 +59,7 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
         source.Dispose();
         musicVolumeBinding.Dispose();
 
-        foreach (var disposable in props.OfType<IDisposable>())
+        foreach (var disposable in propInstances.OfType<IDisposable>())
         {
             disposable.Dispose();
         }

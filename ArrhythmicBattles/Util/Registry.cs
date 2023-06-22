@@ -1,5 +1,8 @@
 ﻿namespace ArrhythmicBattles.Util;
 
+public delegate RegistryLocation<T> RegisterDelegate<T>(Identifier identifier, T item) where T : class;
+public delegate void RegisterCallback<T>(RegisterDelegate<T> registerDelegate) where T : class;
+
 public class Registry<T> : IDisposable where T : class
 {
     public int Count => items.Count;
@@ -9,13 +12,18 @@ public class Registry<T> : IDisposable where T : class
     private readonly Dictionary<Identifier, RegistryLocation<T>> locations = new();
     private readonly List<T> items = new();
     
-    public Registry(IEnumerable<(Identifier, T)> items)
+    public Registry(RegisterCallback<T> registerCallback)
     {
-        foreach (var (id, item) in items)
-        {
-            locations.Add(id, new RegistryLocation<T>(this, this.items.Count));
-            this.items.Add(item);
-        }
+        var registerDelegate = new RegisterDelegate<T>(Register);
+        registerCallback(registerDelegate);
+    }
+
+    private RegistryLocation<T> Register(Identifier identifier, T item) 
+    {
+        var location = new RegistryLocation<T>(this, items.Count);
+        locations.Add(identifier, location);
+        items.Add(item);
+        return location;
     }
 
     public RegistryLocation<T> this[Identifier id]

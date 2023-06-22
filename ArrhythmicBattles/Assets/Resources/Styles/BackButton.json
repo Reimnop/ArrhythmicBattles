@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Back.png",
+    "HoveredIcon": "Textures/BackHovered.png",
+    "Color": "#FF4949",
+    "Text": "BACK"
+}

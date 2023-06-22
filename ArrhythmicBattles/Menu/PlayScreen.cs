@@ -23,7 +23,7 @@ public class PlayScreen : IScreen
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/ExitButton.json") 
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/BackButton.json") 
                     {
                         Click = () => screenManager.Switch(this, new MainScreen(context, screenManager, inputProvider))
                     })
