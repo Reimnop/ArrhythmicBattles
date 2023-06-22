@@ -56,7 +56,7 @@ public class GameScene : ABScene
 
         // Init entities
         var resourceManager = Context.ResourceManager;
-        var mapMeta = resourceManager.Load<MapMeta>("Maps/Playground.json");
+        var mapMeta = resourceManager.Get<MapMeta>("Maps/Playground.json");
 
         mapEntity = EntityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
         inputProvider = Context.InputSystem.AcquireInputProvider();

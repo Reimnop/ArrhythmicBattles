@@ -24,7 +24,7 @@ public class DebugScreen : IUpdateable, IRenderable
         var gpuInfo = engine.Renderer.GpuInfo;
         
         var resourceManager = scene.Context.ResourceManager;
-        var font = resourceManager.Load<Font>(Constants.RegularFontPath);
+        var font = resourceManager.Get<Font>(Constants.RegularFontPath);
         
         leftTextEntity = new TextEntity(font);
 

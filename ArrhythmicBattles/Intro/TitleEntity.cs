@@ -41,7 +41,7 @@ public class TitleEntity : Entity, IRenderable
         };
 
         var texture = resourceManager
-            .Load<TextureSampler>("Textures/Title.png")
+            .Get<TextureSampler>("Textures/Title.png")
             .SetWrapMode(WrapMode.ClampToBorder)
             .SetBorderColor(Color4.Transparent);
         titleImage = new ImageEntity(texture);

@@ -74,7 +74,7 @@ public class PlayerEntity : Entity, IUpdateable, IRenderable, IDisposable
         this.yaw = yaw;
         this.pitch = pitch;
 
-        model = resourceManager.Load<Model>("Models/Capsule.dae");
+        model = resourceManager.Get<Model>("Models/Capsule.dae");
         modelEntity = entityManager.Create(() => new ModelEntity(model));
 
         // create shape

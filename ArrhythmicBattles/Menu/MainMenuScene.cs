@@ -57,14 +57,14 @@ public class MainMenuScene : ABScene
 
         musicAudioSource = new AudioSource
         {
-            AudioStream = resourceManager.Load<AudioStream>("Audio/Arrhythmic.ogg")
+            AudioStream = resourceManager.Get<AudioStream>("Audio/Arrhythmic.ogg")
         };
         musicAudioSource.Play();
 
         sfxAudioSource = new AudioSource
         {
             Looping = false,
-            AudioStream = resourceManager.Load<AudioStream>("Audio/Select.ogg")
+            AudioStream = resourceManager.Get<AudioStream>("Audio/Select.ogg")
         };
 
         // Init bindings
@@ -75,7 +75,7 @@ public class MainMenuScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
         
         // Init background
-        backgroundModel = resourceManager.Load<Model>("Models/LogoBackground.fbx");
+        backgroundModel = resourceManager.Get<Model>("Models/LogoBackground.fbx");
         backgroundEntity = EntityManager.Create(() => new ModelEntity(backgroundModel));
         fxaa = new Fxaa();
         bloom = new Bloom()
@@ -85,8 +85,8 @@ public class MainMenuScene : ABScene
         tonemapper = new Aces();
 
         // Init UI
-        var bannerTexture = resourceManager.Load<TextureSampler>("Textures/Banner.png");
-        var boldFont = resourceManager.Load<Font>(Constants.BoldFontPath);
+        var bannerTexture = resourceManager.Get<TextureSampler>("Textures/Banner.png");
+        var boldFont = resourceManager.Get<Font>(Constants.BoldFontPath);
         
         // Magic numbers retrieved from design in Figma
         screenManager = new ScreenManager(currentScreenBounds, child => 

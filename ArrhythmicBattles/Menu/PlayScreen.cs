@@ -6,11 +6,11 @@ using FlexFramework.Util;
 
 namespace ArrhythmicBattles.Menu;
 
-public class MainScreen : IScreen
+public class PlayScreen : IScreen
 {
     public Node<ElementContainer> RootNode { get; }
     
-    public MainScreen(ABContext context, ScreenManager screenManager, ScopedInputProvider inputProvider)
+    public PlayScreen(ABContext context, ScreenManager screenManager, ScopedInputProvider inputProvider)
     {
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
@@ -18,22 +18,14 @@ public class MainScreen : IScreen
                 .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json")
                     {
-                        Click = () => screenManager.Switch(this, new PlayScreen(context, screenManager, inputProvider))
+                        Click = () => context.Engine.LoadScene(new GameScene(context))
                     })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/SettingsButton.json"))
-                    .SetAnchor(Anchor.TopLeft)
-                    .SetEdges(96.0f, -160.0f, 16.0f, -336.0f))
-                .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/CreditsButton.json"))
-                    .SetAnchor(Anchor.TopLeft)
-                    .SetEdges(176.0f, -240.0f, 16.0f, -336.0f))
-                .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/ExitButton.json") 
                     {
-                        Click = () => screenManager.Close(this)
+                        Click = () => screenManager.Switch(this, new MainScreen(context, screenManager, inputProvider))
                     })
                     .SetAnchor(Anchor.BottomLeft)
                     .SetEdges(-80.0f, 16.0f, 16.0f, -336.0f))

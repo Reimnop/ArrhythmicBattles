@@ -25,7 +25,7 @@ public class MyButtonElement : Element, IUpdateable, IRenderable
 
     public MyButtonElement(IInputProvider inputProvider, ResourceManager resourceManager, string stylePath) 
     {
-        var resourceDictionary = resourceManager.Load<ResourceDictionary>(stylePath);
+        var resourceDictionary = resourceManager.Get<ResourceDictionary>(stylePath);
         var defaultIcon = resourceDictionary.LoadResource<TextureSampler>("DefaultIcon", resourceManager);
         var hoveredIcon = resourceDictionary.LoadResource<TextureSampler>("HoveredIcon", resourceManager);
         
@@ -41,7 +41,7 @@ public class MyButtonElement : Element, IUpdateable, IRenderable
         
         icon = new ImageEntity(defaultIcon);
         
-        var font = resourceManager.Load<Font>(Constants.BoldFontPath);
+        var font = resourceManager.Get<Font>(Constants.BoldFontPath);
         text = new TextEntity(font)
         {
             Text = resourceDictionary.GetRaw("Text"),

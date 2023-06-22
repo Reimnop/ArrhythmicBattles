@@ -38,7 +38,7 @@ public class ResourceDictionary
     public object LoadResource(Type type, string key, ResourceManager resourceManager)
     {
         var value = GetRaw(key);
-        return resourceManager.Load(type, value);
+        return resourceManager.Get(type, value);
     }
     
     /// <summary>

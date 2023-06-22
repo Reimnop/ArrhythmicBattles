@@ -30,22 +30,23 @@ public class ResourceManager : IDisposable
     }
 
     /// <summary>
-    /// <para>Loads a resource from the file system.</para>
+    /// <para>Gets a resource from the file system.</para>
     /// <para>DO NOT dispose the returned object!</para>
     /// </summary>
     /// <returns>The resource.</returns>
-    public T Load<T>(string path)
+    public T Get<T>(string path)
     {
-        return (T) Load(typeof(T), path);
+        return (T) Get(typeof(T), path);
     }
 
     /// <summary>
-    /// <para>Loads a resource from the file system.</para>
+    /// <para>Gets a resource from the file system.</para>
     /// <para>DO NOT dispose the returned object!</para>
     /// </summary>
     /// <returns>The resource.</returns>
-    public object Load(Type type, string path)
+    public object Get(Type type, string path)
     {
+        // Try to get the resource from loaded resources
         if (loadedResources.TryGetValue(path, out var resource))
         {
             return resource;

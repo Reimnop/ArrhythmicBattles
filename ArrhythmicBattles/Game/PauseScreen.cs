@@ -29,7 +29,7 @@ public class PauseScreen : IScreen, IDisposable
         background.Color = new Color4(0.0f, 0.0f, 0.0f, 0.5f);
         
         var resourceManager = context.ResourceManager;
-        var font = resourceManager.Load<Font>(Constants.RegularFontPath);
+        var font = resourceManager.Get<Font>(Constants.RegularFontPath);
         
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()

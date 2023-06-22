@@ -25,7 +25,7 @@ public class GridProp : Prop, IUpdateable, IRenderable, IDisposable
         simulation = physicsWorld.Simulation;
         
         // We don't need to dispose of the model because it's managed by the ResourceManager
-        var model = resourceManager.Load<Model>("Models/Grid.dae");
+        var model = resourceManager.Get<Model>("Models/Grid.dae");
         modelEntity = entityManager.Create(() => new ModelEntity(model));
         
         // Create the physics body
