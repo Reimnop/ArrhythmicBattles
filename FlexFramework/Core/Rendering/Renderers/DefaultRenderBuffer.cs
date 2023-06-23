@@ -12,6 +12,7 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
     public FrameBuffer GuiFrameBuffer { get; }
 
     // Texture attachments
+    public Texture2D Texture => worldFinal;
     public Texture2D WorldFinal => worldFinal;
     public Texture2D WorldColor => worldColor;
     public Texture2D WorldNormal => worldNormal;

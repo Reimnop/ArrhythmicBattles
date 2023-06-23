@@ -37,6 +37,7 @@ public class DefaultRenderer : Renderer, IDisposable
         drawFrameBuffer = new FrameBuffer("draw");
 
         // Register render strategies
+        RegisterRenderStrategy<RenderBufferDrawData>(new RenderBufferRenderStrategy());
         RegisterRenderStrategy<VertexDrawData>(new VertexRenderStrategy());
         RegisterRenderStrategy<LitVertexDrawData>(new LitVertexRenderStrategy());
         RegisterRenderStrategy<SkinnedVertexDrawData>(new SkinnedVertexRenderStrategy());

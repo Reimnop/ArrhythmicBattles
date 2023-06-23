@@ -5,7 +5,7 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering.RenderStrategies;
 
-public class VertexRenderStrategy : RenderStrategy
+public class RenderBufferRenderStrategy : RenderStrategy
 {
     private readonly ShaderProgram program;
     private readonly MeshHandler meshHandler = new (
@@ -16,7 +16,7 @@ public class VertexRenderStrategy : RenderStrategy
     private readonly TextureHandler textureHandler = new();
     private readonly SamplerHandler samplerHandler = new();
 
-    public VertexRenderStrategy()
+    public RenderBufferRenderStrategy()
     {
         using var vertexShader = new Shader("unlit_vert", File.ReadAllText("Assets/Shaders/unlit.vert"), ShaderType.VertexShader);
         using var fragmentShader = new Shader("unlit_frag", File.ReadAllText("Assets/Shaders/unlit.frag"), ShaderType.FragmentShader);
@@ -33,31 +33,26 @@ public class VertexRenderStrategy : RenderStrategy
 
     public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
     {
-        var vertexDrawData = EnsureDrawDataType<VertexDrawData>(drawData);
+        var renderBufferDrawData = EnsureDrawDataType<RenderBufferDrawData>(drawData);
         
-        var mesh = meshHandler.GetMesh(vertexDrawData.Mesh);
-        var texture = vertexDrawData.Texture;
+        var mesh = meshHandler.GetMesh(renderBufferDrawData.Mesh);
+        var texture = renderBufferDrawData.RenderBuffer.Texture;
 
         glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
 
-        Matrix4 transformation = vertexDrawData.Transformation;
+        Matrix4 transformation = renderBufferDrawData.Transformation;
         GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref transformation);
-        GL.Uniform1(program.GetUniformLocation("hasTexture"), vertexDrawData.Texture == null ? 0 : 1);
+        GL.Uniform1(program.GetUniformLocation("hasTexture"), 1);
 
-        if (texture.HasValue)
-        {
-            var tex = textureHandler.GetTexture(texture.Value.Texture);
-            var sampler = samplerHandler.GetSampler(texture.Value.Sampler);
-            glStateManager.BindTextureUnit(0, tex);
-            glStateManager.BindSampler(0, sampler);
-        }
+        glStateManager.BindTextureUnit(0, texture);
+        glStateManager.BindSampler(0, null);
 
-        GL.Uniform4(program.GetUniformLocation("color"), vertexDrawData.Color);
+        GL.Uniform4(program.GetUniformLocation("color"), Color4.White);
 
-        if (vertexDrawData.Mesh.IndicesCount > 0)
-            GL.DrawElements(vertexDrawData.PrimitiveType, vertexDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
+        if (renderBufferDrawData.Mesh.IndicesCount > 0)
+            GL.DrawElements(renderBufferDrawData.PrimitiveType, renderBufferDrawData.Mesh.IndicesCount, DrawElementsType.UnsignedInt, 0);
         else
-            GL.DrawArrays(vertexDrawData.PrimitiveType, 0, vertexDrawData.Mesh.VerticesCount);
+            GL.DrawArrays(renderBufferDrawData.PrimitiveType, 0, renderBufferDrawData.Mesh.VerticesCount);
     }
 }
