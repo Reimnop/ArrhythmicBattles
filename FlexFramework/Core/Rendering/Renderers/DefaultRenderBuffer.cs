@@ -99,5 +99,6 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
         worldPosition.Dispose();
         worldDepth.Dispose();
         guiColor.Dispose();
+        guiFinal.Dispose();
     }
 }
