@@ -3,6 +3,7 @@ using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Core.Rendering.Lighting;
 using FlexFramework.Core.Rendering.PostProcessing;
+using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.Rendering;
 
@@ -13,6 +14,7 @@ public class CommandList
     private BackgroundRenderer? backgroundRenderer;
     private ILighting? lighting;
     private CameraData backgroundCameraData;
+    private Color4 clearColor = Color4.Black;
 
     public bool TryGetLayer(LayerType layerType, [NotNullWhen(true)] out IReadOnlyList<IDrawData>? layer)
     {
@@ -51,6 +53,11 @@ public class CommandList
         lighting = this.lighting;
         return lighting != null;
     }
+    
+    public Color4 GetClearColor()
+    {
+        return clearColor;
+    }
 
     public void AddDrawData(LayerType layerType, IDrawData drawData)
     {
@@ -72,6 +79,11 @@ public class CommandList
     public void UseLighting(ILighting lighting)
     {
         this.lighting = lighting;
+    }
+    
+    public void UseClearColor(Color4 clearColor)
+    {
+        this.clearColor = clearColor;
     }
 
     private List<IDrawData> GetLayerInternal(LayerType layerType)
@@ -95,5 +107,7 @@ public class CommandList
         
         postProcessors.Clear();
         backgroundRenderer = null;
+        lighting = null;
+        clearColor = Color4.Black;
     }
 }

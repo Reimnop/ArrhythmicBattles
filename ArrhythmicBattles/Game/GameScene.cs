@@ -29,7 +29,12 @@ public class GameScene : ABScene
     private readonly ProceduralSkyboxRenderer skyboxRenderer = new();
     private readonly GameLighting lighting = new();
     private readonly ScopedInputProvider inputProvider;
-    private readonly OrthographicCamera camera;
+    private readonly OrthographicCamera camera = new()
+    {
+        Size = 10.0f,
+        DepthNear = 0.1f,
+        DepthFar = 1000.0f
+    };
     private readonly ScreenManager screenManager;
     private Box2 currentScreenBounds;
 
@@ -62,12 +67,7 @@ public class GameScene : ABScene
         inputProvider = Context.InputSystem.AcquireInputProvider();
         playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, resourceManager, physicsWorld, 0.0f, 0.0f));
         playerEntity.Position = Vector3.UnitY * 4.0f;
-
-        camera = new OrthographicCamera();
-        camera.Size = 10.0f;
-        camera.DepthNear = 0.1f;
-        camera.DepthFar = 1000.0f;
-
+        
         // Init post processing
         bloom = new Bloom();
         tonemapper = new Exposure();
@@ -84,14 +84,7 @@ public class GameScene : ABScene
 
         if (inputProvider.GetKeyDown(Keys.F3))
         {
-            if (debugScreen == null)
-            {
-                debugScreen = new DebugScreen(Engine, this);
-            }
-            else
-            {
-                debugScreen = null;
-            }
+            debugScreen = debugScreen == null ? new DebugScreen(Engine, this) : null;
         }
         
         if (inputProvider.GetKeyDown(Keys.Escape))

@@ -6,9 +6,9 @@ using OpenTK.Mathematics;
 
 namespace FlexFramework.Core.UserInterface.Elements;
 
-public delegate void RenderCallback(Renderer renderer, CommandList commandList);
+public delegate void RenderCallback(Vector2i viewportSize, CommandList commandList);
 
-public class ViewportElement : VisualElement, IRenderable
+public class ViewportElement : VisualElement, IRenderable, IDisposable
 {
     private readonly Renderer renderer;
     private readonly CommandList commandList = new();
@@ -32,12 +32,31 @@ public class ViewportElement : VisualElement, IRenderable
 
     public override void Render(RenderArgs args)
     {
-        commandList.Clear();
-        renderCallback(renderer, commandList);
-        renderer.Render((Vector2i) bounds.Size, commandList, renderBuffer);
+        var viewportSize = (Vector2i) bounds.Size;
         
-        var transformation = args.MatrixStack.GlobalTransformation * args.CameraData.View * args.CameraData.Projection;
+        commandList.Clear();
+        renderCallback(viewportSize, commandList);
+        renderer.Render(viewportSize, commandList, renderBuffer);
+        
+        var matrixStack = args.MatrixStack;
+        matrixStack.Push();
+        matrixStack.Scale(1.0f, -1.0f, 0.0f);
+        matrixStack.Translate(0.5f, 0.5f, 0.0f);
+        matrixStack.Scale(bounds.Size.X, bounds.Size.Y, 1.0f);
+        matrixStack.Translate(bounds.Min.X, bounds.Min.Y, 0.0f);
+        
+        var transformation = matrixStack.GlobalTransformation * args.CameraData.View * args.CameraData.Projection;
         var drawData = new RenderBufferDrawData(DefaultAssets.QuadMesh.ReadOnly, transformation, renderBuffer, PrimitiveType.Triangles);
         args.CommandList.AddDrawData(LayerType.Gui, drawData);
+        
+        matrixStack.Pop();
+    }
+
+    public void Dispose()
+    {
+        if (renderBuffer is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 }

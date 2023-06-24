@@ -16,6 +16,11 @@ public class CapsuleCharacterPreview : CharacterPreview
 
     public override void Render(RenderArgs args)
     {
+        var matrixStack = args.MatrixStack;
+        
+        matrixStack.Push();
+        matrixStack.Scale(0.4f, 0.4f, 0.4f);
         entity.Render(args);
+        matrixStack.Pop();
     }
 }

@@ -4,6 +4,7 @@ using FlexFramework.Core.Rendering.PostProcessing;
 using FlexFramework.Util.Logging;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using Half = OpenTK.Mathematics.Half;
 
 namespace FlexFramework.Core.Rendering.Renderers;
 
@@ -77,15 +78,17 @@ public class DefaultRenderer : Renderer, IDisposable
             renderBuffer.Resize(size);
         }
         
-        DefaultRenderBuffer drb = (DefaultRenderBuffer) renderBuffer;
+        var drb = (DefaultRenderBuffer) renderBuffer;
 
-        stateManager.BindFramebuffer(drb.WorldFrameBuffer); // Bind world framebuffer
+        // Bind world framebuffer
+        stateManager.BindFramebuffer(drb.WorldFrameBuffer);
 
         GL.Viewport(0, 0, drb.Size.X, drb.Size.Y);
-        
-        GL.ClearColor(ClearColor);
+
+        // Clear screen
+        GL.ClearColor(commandList.GetClearColor());
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        
+
         // Render background
         if (commandList.TryGetBackgroundRenderer(out var backgroundRenderer, out var backgroundCameraData))
             backgroundRenderer.Render(commandList, stateManager, drb, backgroundCameraData);
@@ -153,6 +156,9 @@ public class DefaultRenderer : Renderer, IDisposable
             stateManager.SetDepthMask(true);
             RenderLayer(commandList, guiLayer);
         }
+        
+        // Finally, copy gui color to final texture
+        CopyImageFbo(drb.GuiColor, drb.GuiFinal, drb.Size);
         
         // Unbind
         stateManager.BindFramebuffer(null);

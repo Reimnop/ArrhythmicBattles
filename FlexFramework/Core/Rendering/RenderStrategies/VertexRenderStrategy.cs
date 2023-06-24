@@ -41,7 +41,7 @@ public class VertexRenderStrategy : RenderStrategy
         glStateManager.UseProgram(program);
         glStateManager.BindVertexArray(mesh.VertexArray);
 
-        Matrix4 transformation = vertexDrawData.Transformation;
+        var transformation = vertexDrawData.Transformation;
         GL.UniformMatrix4(program.GetUniformLocation("mvp"), true, ref transformation);
         GL.Uniform1(program.GetUniformLocation("hasTexture"), vertexDrawData.Texture == null ? 0 : 1);
 

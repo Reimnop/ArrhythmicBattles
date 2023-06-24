@@ -8,5 +8,4 @@ public interface IRenderBuffer
     Texture2D Texture { get; }
     Vector2i Size { get; }
     void Resize(Vector2i size);
-    void BlitToBackBuffer(Vector2i size);
 }

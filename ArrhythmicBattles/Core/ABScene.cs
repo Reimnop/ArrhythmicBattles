@@ -18,9 +18,6 @@ public abstract class ABScene : Scene, IDisposable
     public ABScene(ABContext context) : base(context.Engine)
     {
         Context = context;
-
-        var renderer = Engine.Renderer;
-        renderer.ClearColor = Color4.Black;
         GuiCamera = new GuiCamera(Engine);
     }
 

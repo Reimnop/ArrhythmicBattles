@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using FlexFramework.Core.Audio;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
+using FlexFramework.Core.Rendering.Data;
 using FlexFramework.Util.Exceptions;
 using FlexFramework.Util.Logging;
 using OpenTK.Graphics.OpenGL4;
@@ -55,6 +56,8 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
     
     private readonly ILogger logger;
     private readonly LogCallbackDelegate? logCallback;
+    
+    private readonly FrameBuffer readFrameBuffer;
 
     private float time;
 
@@ -87,6 +90,9 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
 
         Renderer = rendererFactory(this);
         logger.LogInfo($"Initialized renderer [{Renderer.GetType().Name}]");
+        
+        // Initialize framebuffer
+        readFrameBuffer = new FrameBuffer("read");
     }
     
     public ILogger GetLogger(string name)
@@ -155,7 +161,13 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
 
     public unsafe void Present(IRenderBuffer buffer)
     {
-        buffer.BlitToBackBuffer(ClientSize);
+        readFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, buffer.Texture);
+        
+        GL.BlitNamedFramebuffer(readFrameBuffer.Handle, 0, 
+            0, 0, Size.X, Size.Y, 
+            0, 0, ClientSize.X, ClientSize.Y,
+            ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+        
         GLFW.SwapBuffers(WindowPtr);
     }
 
