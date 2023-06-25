@@ -50,26 +50,26 @@ public class DefaultRenderBuffer : IRenderBuffer, IGBuffer, IDisposable
 
     public void Resize(Vector2i size)
     {
-        if (Size != size)
-        {
-            Size = size;
-
-            // Dispose old textures
-            worldColor.Dispose();
-            worldNormal.Dispose();
-            worldDepth.Dispose();
-            guiColor.Dispose();
-            
-            // Initialize textures
-            CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldPosition, out worldDepth, out guiColor, out guiFinal);
+        if (Size == size) 
+            return;
         
-            // Attach textures to framebuffers
-            WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, worldColor);
-            WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment1, worldNormal);
-            WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment2, worldPosition);
-            WorldFrameBuffer.Texture(FramebufferAttachment.DepthAttachment, worldDepth);
-            GuiFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, guiColor);
-        }
+        Size = size;
+
+        // Dispose old textures
+        worldColor.Dispose();
+        worldNormal.Dispose();
+        worldDepth.Dispose();
+        guiColor.Dispose();
+            
+        // Initialize textures
+        CreateTextures(size, out worldFinal, out worldColor, out worldNormal, out worldPosition, out worldDepth, out guiColor, out guiFinal);
+        
+        // Attach textures to framebuffers
+        WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, worldColor);
+        WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment1, worldNormal);
+        WorldFrameBuffer.Texture(FramebufferAttachment.ColorAttachment2, worldPosition);
+        WorldFrameBuffer.Texture(FramebufferAttachment.DepthAttachment, worldDepth);
+        GuiFrameBuffer.Texture(FramebufferAttachment.ColorAttachment0, guiColor);
     }
 
     private static void CreateTextures(Vector2i size, 

@@ -41,9 +41,9 @@ public class Program
         flexFramework.UpdateEvent += context.Update;
 
 #if DEBUG_SKIP_MENU
-        flexFramework.LoadScene(new GameScene(context));
+        flexFramework.LoadScene(() => new GameScene(context));
 #else
-        flexFramework.LoadScene(new IntroScene(context));
+        flexFramework.LoadScene(() => new IntroScene(context));
 #endif
 
         while (!flexFramework.ShouldClose())

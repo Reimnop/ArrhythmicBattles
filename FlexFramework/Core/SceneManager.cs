@@ -13,17 +13,16 @@ public class SceneManager
         logger = loggerFactory.CreateLogger<SceneManager>();
     }
 
-    public Scene LoadScene(Scene scene)
+    public Scene LoadScene(Func<Scene> sceneFactory)
     {
+        var scene = sceneFactory();
+        
         logger.LogInfo($"Loading scene [{scene.GetType().Name}]");
-
         if (CurrentScene is IDisposable disposable)
         {
             disposable.Dispose();
         }
-        
         CurrentScene = scene;
-
         return scene;
     }
 }

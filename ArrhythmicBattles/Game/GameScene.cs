@@ -14,7 +14,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Game;
 
-public class GameScene : ABScene
+public class GameScene : ABScene, IDisposable
 {
     // Entities
     private readonly MapEntity mapEntity;
@@ -29,6 +29,7 @@ public class GameScene : ABScene
     private readonly ProceduralSkyboxRenderer skyboxRenderer = new();
     private readonly GameLighting lighting = new();
     private readonly ScopedInputProvider inputProvider;
+    private readonly GuiCamera guiCamera = new();
     private readonly OrthographicCamera camera = new()
     {
         Size = 10.0f,
@@ -39,7 +40,9 @@ public class GameScene : ABScene
     private Box2 currentScreenBounds;
 
     // Other things
-    private readonly PhysicsWorld physicsWorld;
+    private readonly EntityManager entityManager = new();
+    private readonly PhysicsWorld physicsWorld = new();
+    private readonly MatrixStack matrixStack = new();
     private DebugScreen? debugScreen;
 
 #if DEBUG
@@ -56,16 +59,15 @@ public class GameScene : ABScene
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
 
         // Init resources
-        physicsWorld = new PhysicsWorld();
         screenManager = new ScreenManager(currentScreenBounds, child => child);
 
         // Init entities
         var resourceManager = Context.ResourceManager;
         var mapMeta = resourceManager.Get<MapMeta>("Maps/Playground.json");
 
-        mapEntity = EntityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
+        mapEntity = entityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
         inputProvider = Context.InputSystem.AcquireInputProvider();
-        playerEntity = EntityManager.Create(() => new PlayerEntity(inputProvider, resourceManager, physicsWorld, 0.0f, 0.0f));
+        playerEntity = entityManager.Create(() => new PlayerEntity(inputProvider, resourceManager, physicsWorld, 0.0f, 0.0f));
         playerEntity.Position = Vector3.UnitY * 4.0f;
         
         // Init post processing
@@ -77,9 +79,8 @@ public class GameScene : ABScene
 
     public override void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
-        // Update physics before everything else
+        // Update entities and physics before everything else
+        entityManager.Update(args);
         physicsWorld.Update(args);
 
         if (inputProvider.GetKeyDown(Keys.F3))
@@ -152,9 +153,8 @@ public class GameScene : ABScene
             screenManager.Resize(currentScreenBounds);
         }
         
+        // Update screens
         screenManager.Update(args);
-        
-        // Update debug screen
         debugScreen?.Update(args);
     }
 
@@ -173,18 +173,18 @@ public class GameScene : ABScene
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
         commandList.UseLighting(lighting);
         
-        var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, MatrixStack, cameraData);
-        var opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
+        var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, matrixStack, cameraData);
+        var opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, matrixStack, cameraData);
         
         // render player
-        EntityManager.Invoke(playerEntity, entity => entity.Render(opaqueArgs));
+        entityManager.Invoke(playerEntity, entity => entity.Render(opaqueArgs));
         
         // render map
-        EntityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
+        entityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
 
         // render gui
-        var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
+        var guiCameraData = guiCamera.GetCameraData(Engine.ClientSize);
+        var guiArgs = new RenderArgs(commandList, LayerType.Gui, matrixStack, guiCameraData);
         
         screenManager.Render(guiArgs);
         
@@ -192,10 +192,9 @@ public class GameScene : ABScene
         debugScreen?.Render(guiArgs);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        base.Dispose();
-        
+        entityManager.Dispose();
         bloom.Dispose();
         tonemapper.Dispose();
         edgeDetect.Dispose();

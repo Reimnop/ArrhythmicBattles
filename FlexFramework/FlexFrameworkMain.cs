@@ -118,9 +118,9 @@ public class FlexFrameworkMain : NativeWindow, ILoggerFactory
     }
 #endif
 
-    public Scene LoadScene(Scene scene)
+    public Scene LoadScene(Func<Scene> sceneFactory)
     {
-        return sceneManager.LoadScene(scene);
+        return sceneManager.LoadScene(sceneFactory);
     }
 
     public void Update()

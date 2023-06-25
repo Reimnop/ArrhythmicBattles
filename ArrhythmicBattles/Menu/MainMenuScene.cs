@@ -16,7 +16,7 @@ using OpenTK.Windowing.Common;
 
 namespace ArrhythmicBattles.Menu;
 
-public class MainMenuScene : ABScene
+public class MainMenuScene : ABScene, IDisposable
 {
     // Background
     private Quaternion backgroundRotation = Quaternion.Identity;
@@ -36,6 +36,9 @@ public class MainMenuScene : ABScene
     };
 
     // Other things
+    private readonly GuiCamera guiCamera = new();
+    private readonly EntityManager entityManager = new();
+    private readonly MatrixStack matrixStack = new();
     private readonly AudioSource musicAudioSource;
     private readonly AudioSource sfxAudioSource;
     private readonly ScreenManager screenManager;
@@ -76,7 +79,7 @@ public class MainMenuScene : ABScene
         
         // Init background
         backgroundModel = resourceManager.Get<Model>("Models/LogoBackground.fbx");
-        backgroundEntity = EntityManager.Create(() => new ModelEntity(backgroundModel));
+        backgroundEntity = entityManager.Create(() => new ModelEntity(backgroundModel));
         fxaa = new Fxaa();
         bloom = new Bloom()
         {
@@ -151,8 +154,6 @@ public class MainMenuScene : ABScene
 
     public override void Update(UpdateArgs args)
     {
-        base.Update(args);
-        
         // Update background rotation
         var backgroundYaw = MathHelper.DegreesToRadians(MathF.Sin(args.Time * 0.25f * MathF.PI) * 15.0f);
         var backgroundPitch = MathHelper.DegreesToRadians(MathF.Sin(args.Time * 0.0625f * MathF.PI) * 15.0f);
@@ -187,22 +188,21 @@ public class MainMenuScene : ABScene
         commandList.AddPostProcessor(tonemapper);
 
         var cameraData = camera.GetCameraData(Engine.ClientSize);
-        var args = new RenderArgs(commandList, LayerType.Opaque, MatrixStack, cameraData);
+        var args = new RenderArgs(commandList, LayerType.Opaque, matrixStack, cameraData);
         
-        MatrixStack.Push();
-        MatrixStack.Rotate(backgroundRotation);
+        matrixStack.Push();
+        matrixStack.Rotate(backgroundRotation);
         backgroundEntity.Render(args);
-        MatrixStack.Pop();
+        matrixStack.Pop();
         
-        var guiCameraData = GuiCamera.GetCameraData(Engine.ClientSize);
-        var guiArgs = new RenderArgs(commandList, LayerType.Gui, MatrixStack, guiCameraData);
+        var guiCameraData = guiCamera.GetCameraData(Engine.ClientSize);
+        var guiArgs = new RenderArgs(commandList, LayerType.Gui, matrixStack, guiCameraData);
         screenManager.Render(guiArgs);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        base.Dispose();
-        
+        entityManager.Dispose();
         musicVolumeBinding.Dispose();
         sfxVolumeBinding.Dispose();
         inputProvider.Dispose();

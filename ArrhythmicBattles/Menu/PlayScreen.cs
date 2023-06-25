@@ -38,7 +38,7 @@ public class PlayScreen : IScreen
                 .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json")
                     {
-                        Click = () => context.Engine.LoadScene(new GameScene(context))
+                        Click = () => context.Engine.LoadScene(() => new GameScene(context))
                     })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
