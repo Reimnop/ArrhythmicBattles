@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.Core.IO;
 using ArrhythmicBattles.Core.Resource;
+using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.Settings;
 using Config.Net;
 using Config.Net.Stores;
@@ -17,6 +18,7 @@ public class ABContext : IDisposable
     public FlexFrameworkMain Engine { get; }
     public ResourceManager ResourceManager { get; }
     public GameTaskManager TaskManager { get; } = new();
+    public CharacterRegistry CharacterRegistry { get; } = new();
     public IRenderBuffer RenderBuffer { get; }
     public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }

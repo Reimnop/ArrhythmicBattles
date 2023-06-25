@@ -7,7 +7,7 @@ public class Registry<T> : IDisposable where T : class
 {
     public int Count => items.Count;
     public IEnumerable<Identifier> Identifiers => locations.Keys;
-    public IEnumerable<T> Items => items;
+    public IReadOnlyList<T> Items => items;
     
     private readonly Dictionary<Identifier, RegistryLocation<T>> locations = new();
     private readonly List<T> items = new();

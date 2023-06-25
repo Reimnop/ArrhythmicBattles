@@ -11,7 +11,7 @@ public class CapsuleCharacter : Character
 
     public override CharacterInstance CreateInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld)
     {
-        return new CapsuleCharacterInstance(inputMethod, resourceManager);
+        return new CapsuleCharacterInstance(inputMethod, resourceManager, physicsWorld);
     }
 
     public override CharacterPreview CreatePreview(ResourceManager resourceManager)

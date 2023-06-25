@@ -1,7 +1,6 @@
 ﻿using ArrhythmicBattles.Core;
-using ArrhythmicBattles.Core.IO;
+using ArrhythmicBattles.Core.Input;
 using ArrhythmicBattles.Core.Physics;
-using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
@@ -38,6 +37,9 @@ public class GameScene : ABScene, IDisposable
     };
     private readonly ScreenManager screenManager;
     private Box2 currentScreenBounds;
+    
+    // Game content
+    private readonly Character character;
 
     // Other things
     private readonly EntityManager entityManager = new();
@@ -53,8 +55,10 @@ public class GameScene : ABScene, IDisposable
     private float freeCamPitch;
 #endif
 
-    public GameScene(ABContext context) : base(context)
+    public GameScene(ABContext context, Character character) : base(context)
     {
+        this.character = character;
+        
         Engine.CursorState = CursorState.Grabbed;
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
 
@@ -64,10 +68,12 @@ public class GameScene : ABScene, IDisposable
         // Init entities
         var resourceManager = Context.ResourceManager;
         var mapMeta = resourceManager.Get<MapMeta>("Maps/Playground.json");
+        
+        inputProvider = Context.InputSystem.AcquireInputProvider();
+        var inputMethod = new KeyboardInputMethod(inputProvider);
 
         mapEntity = entityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
-        inputProvider = Context.InputSystem.AcquireInputProvider();
-        playerEntity = entityManager.Create(() => new PlayerEntity(inputProvider, resourceManager, physicsWorld, 0.0f, 0.0f));
+        playerEntity = entityManager.Create(() => new PlayerEntity(character, inputMethod, resourceManager, physicsWorld));
         playerEntity.Position = Vector3.UnitY * 4.0f;
         
         // Init post processing
@@ -119,14 +125,8 @@ public class GameScene : ABScene, IDisposable
         if (freeCamInputProvider == null)
         {
 #endif
-            Quaternion rotation = Quaternion.FromAxisAngle(Vector3.UnitY, playerEntity.Yaw) * Quaternion.FromAxisAngle(Vector3.UnitX, playerEntity.Pitch);
-            // Vector3 backward = Vector3.Transform(Vector3.UnitZ, rotation);
-            // camera.Position = playerEntity.Position + new Vector3(0.0f, 0.75f, 0.0f) + backward * 3.5f;
-            // camera.Rotation = rotation;
-
-            Vector3 cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 500.0f);
+            var cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 500.0f);
             camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
-            camera.Rotation = rotation;
 #if DEBUG
         }
         else

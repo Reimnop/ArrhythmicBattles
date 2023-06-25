@@ -28,11 +28,10 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
         musicVolumeBinding = new Binding<float>(settings, nameof(settings.MusicVolume), source, nameof(AudioSource.Gain));
         
         // Load the props
-        var propContent = new PropContent();
+        var propRegistry = new PropRegistry();
         foreach (var propInfo in mapMeta.Props)
         {
-            var location = propContent.Registry[propInfo.Identifier];
-            var prop = propContent.Registry[location];
+            var prop = propRegistry[propInfo.Identifier];
             var propInstance = prop.CreateInstance(resourceManager, physicsWorld, propInfo.Position, propInfo.Scale, propInfo.Rotation);
             propInstances.Add(propInstance);
         }

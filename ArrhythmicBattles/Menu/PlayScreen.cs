@@ -11,7 +11,7 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Menu;
 
-public class PlayScreen : IScreen
+public class PlayScreen : IScreen, IDisposable
 {
     public Node<ElementContainer> RootNode { get; }
 
@@ -23,6 +23,7 @@ public class PlayScreen : IScreen
         DepthFar = 1000.0f
     };
 
+    private Character character;
     private CharacterPreview preview;
     
     private readonly MatrixStack matrixStack = new();
@@ -30,15 +31,17 @@ public class PlayScreen : IScreen
 
     public PlayScreen(ABContext context, ScreenManager screenManager, ScopedInputProvider inputProvider)
     {
-        preview = new CapsuleCharacterPreview(context.ResourceManager);
-        
+        var characterRegistry = context.CharacterRegistry;
+        character = characterRegistry[0];
+        preview = character.CreatePreview(context.ResourceManager);
+
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
                 .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json")
                     {
-                        Click = () => context.Engine.LoadScene(() => new GameScene(context))
+                        Click = () => context.Engine.LoadScene(() => new GameScene(context, character))
                     })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
@@ -74,5 +77,11 @@ public class PlayScreen : IScreen
     public void Render(RenderArgs args)
     {
         RootNode.RenderRecursively(args);
+    }
+
+    public void Dispose()
+    {
+        if (preview is IDisposable disposable)
+            disposable.Dispose();
     }
 }
