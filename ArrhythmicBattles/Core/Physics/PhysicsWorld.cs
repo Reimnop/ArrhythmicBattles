@@ -12,6 +12,7 @@ public class PhysicsWorld : IDisposable, IUpdateable
 {
     public Simulation Simulation => simulation;
     public float TimeStep { get; set; } = 1.0f / 50.0f;
+    public float Gravity { get; }
     public event Action? Step;
     
     private readonly BufferPool bufferPool;
@@ -21,15 +22,17 @@ public class PhysicsWorld : IDisposable, IUpdateable
     private readonly Dictionary<IShape, TypedIndex> shapeIndexMap = new Dictionary<IShape, TypedIndex>();
 
     private float t = 0.0f;
-    
-    public PhysicsWorld()
+
+    public PhysicsWorld(float gravity = -19.62f)
     {
+        Gravity = gravity;
+        
         bufferPool = new BufferPool();
         threadDispatcher = new ThreadDispatcher(Environment.ProcessorCount - 2);
         
         simulation = Simulation.Create(bufferPool, 
             new NarrowPhaseCallbacks(new SpringSettings(30.0f, 1.0f)), 
-            new PoseIntegratorCallbacks(new Vector3(0.0f, -19.62f, 0.0f), 0.1f, 0.1f), 
+            new PoseIntegratorCallbacks(new Vector3(0.0f, gravity, 0.0f), 0.1f, 0.1f), 
             new SolveDescription(8, 1));
     }
 
@@ -55,7 +58,7 @@ public class PhysicsWorld : IDisposable, IUpdateable
 
         
         // Reset time if we've reached the maximum number of steps
-        // This is to prevent the simulation from getting too far behind
+        // This is to prevent the simulation from lagging too far behind
         // and causing the simulation to explode
         if (i == maxSteps)
         {

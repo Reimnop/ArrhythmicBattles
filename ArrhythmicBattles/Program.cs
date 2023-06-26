@@ -1,5 +1,6 @@
 ﻿using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Intro;
+using ArrhythmicBattles.Menu;
 using FlexFramework;
 using FlexFramework.Core.Rendering.Renderers;
 using OpenTK.Mathematics;
@@ -40,8 +41,8 @@ public class Program
         using var context = new ABContext(flexFramework);
         flexFramework.UpdateEvent += context.Update;
 
-#if DEBUG_SKIP_MENU
-        flexFramework.LoadScene(() => new GameScene(context));
+#if DEBUG_SKIP_INTRO
+        flexFramework.LoadScene(() => new MainMenuScene(context));
 #else
         flexFramework.LoadScene(() => new IntroScene(context));
 #endif

@@ -13,8 +13,8 @@
     <PropertyGroup>
         <DefineConstants>$(DefineConstants)</DefineConstants>
         
-        <!-- Skip the menu and go straight to the game -->
-        <!-- <DefineConstants>DEBUG_SKIP_MENU</DefineConstants> -->
+        <!-- Skip the intro and go straight to the menu -->
+        <DefineConstants>DEBUG_SKIP_INTRO</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

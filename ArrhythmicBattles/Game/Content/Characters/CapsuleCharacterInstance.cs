@@ -39,6 +39,8 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
             Hit = collidable;
         }
     }
+    
+    private const float mass = 40.0f;
 
     public override Vector3 Position
     {
@@ -77,7 +79,7 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
         var rigidPose = new RigidPose(System.Numerics.Vector3.Zero, System.Numerics.Quaternion.Identity);
         var bodyDescription = BodyDescription.CreateDynamic(
             rigidPose, 
-            new BodyInertia { InverseMass = 1.0f / 40.0f },
+            new BodyInertia { InverseMass = 1.0f / mass },
             new CollidableDescription(capsuleIndex, 0.1f, float.MaxValue, ContinuousDetection.Passive),
             0.01f);
         physicsEntity = new PhysicsEntity(physicsWorld, bodyDescription);
@@ -102,11 +104,9 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
         // Apply movement
         if (movementX != 0.0f)
         {
-            // Get speed values
             var targetSpeed = grounded 
                 ? character.GetAttributeValue(this, AttributeType.GroundSpeed) 
                 : character.GetAttributeValue(this, AttributeType.AirSpeed);
-
             var currentSpeed = bodyReference.Velocity.Linear.Length();
             
             // Calculate force from speed and drag coefficient
@@ -119,8 +119,13 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
         // Apply jump
         if (grounded && jump)
         {
+            var jumpHeight = character.GetAttributeValue(this, AttributeType.JumpHeight);
+            
+            // Calculate force
+            var force = Vector3.UnitY * MathF.Sqrt((2.0f * jumpHeight * -physicsWorld.Gravity * mass) / dragCoefficient);
+            
             bodyReference.Awake = true; 
-            bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 500.0f, 0.0f));
+            bodyReference.ApplyLinearImpulse(force.ToSystem());
         }
         
         // Apply drag
