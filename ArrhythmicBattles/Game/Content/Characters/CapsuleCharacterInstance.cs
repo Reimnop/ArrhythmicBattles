@@ -13,33 +13,6 @@ namespace ArrhythmicBattles.Game.Content.Characters;
 
 public class CapsuleCharacterInstance : CharacterInstance, IDisposable
 {
-    private struct RayHitHandler : IRayHitHandler
-    {
-        public CollidableReference? Hit { get; private set; } = null;
-
-        private readonly CollidableReference collidable;
-        
-        public RayHitHandler(CollidableReference collidable)
-        {
-            this.collidable = collidable;
-        }
-        
-        public bool AllowTest(CollidableReference collidable)
-        {
-            return collidable != this.collidable;
-        }
-
-        public bool AllowTest(CollidableReference collidable, int childIndex)
-        {
-            return collidable != this.collidable;
-        }
-
-        public void OnRayHit(in RayData ray, ref float maximumT, float t, in System.Numerics.Vector3 normal, CollidableReference collidable, int childIndex)
-        {
-            Hit = collidable;
-        }
-    }
-    
     private const float mass = 40.0f;
 
     public override Vector3 Position
@@ -91,12 +64,10 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
 
     private void OnStep()
     {
-        const float dragCoefficient = 0.15f;
-        
         var bodyReference = physicsEntity.Reference;
         
         // Raycast to check if player is grounded
-        var handler = new RayHitHandler(bodyReference.CollidableReference);
+        var handler = new SimpleRayHitHandler(bodyReference.CollidableReference);
         var rayStart = new Vector3(Position.X, Position.Y, Position.Z);
         physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 1.0f, ref handler);
         grounded = handler.Hit != null;
@@ -107,10 +78,17 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
             var targetSpeed = grounded 
                 ? character.GetAttributeValue(this, AttributeType.GroundSpeed) 
                 : character.GetAttributeValue(this, AttributeType.AirSpeed);
-            var currentSpeed = bodyReference.Velocity.Linear.Length();
+
+            var targetVelocity = Vector3.UnitX * targetSpeed * movementX;
+            var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
             
-            // Calculate force from speed and drag coefficient
-            var force = Vector3.UnitX * movementX * ((targetSpeed - currentSpeed) / dragCoefficient);
+            // Zero out Y velocity
+            currentVelocity.Y = 0.0f;
+
+            // Calculate force
+            var velocity = targetVelocity - currentVelocity;
+            velocity /= 1.0f - physicsWorld.Damping;
+            var force = velocity * mass;
 
             bodyReference.Awake = true;
             bodyReference.ApplyLinearImpulse(force.ToSystem()); // Why does this not wake the body?
@@ -122,21 +100,14 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
             var jumpHeight = character.GetAttributeValue(this, AttributeType.JumpHeight);
             
             // Calculate force
-            var force = Vector3.UnitY * MathF.Sqrt((2.0f * jumpHeight * -physicsWorld.Gravity * mass) / dragCoefficient);
+            var velocity = MathF.Sqrt(2.0f * -physicsWorld.Gravity * jumpHeight);
+            velocity /= 1.0f - physicsWorld.Damping;
+            var force = Vector3.UnitY * velocity * mass;
             
             bodyReference.Awake = true; 
             bodyReference.ApplyLinearImpulse(force.ToSystem());
         }
-        
-        // Apply drag
-        var velocity = bodyReference.Velocity.Linear.ToOpenTK();
-        if (velocity != Vector3.Zero)
-        {
-            var velocityDirection = velocity.Normalized();
-            var drag = velocityDirection * -dragCoefficient * velocity.LengthSquared;
-            bodyReference.ApplyLinearImpulse(drag.ToSystem());
-        }
-        
+
         // Reset jump
         jump = false;
     }

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using ArrhythmicBattles.Util;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.Constraints;
@@ -13,6 +14,8 @@ public class PhysicsWorld : IDisposable, IUpdateable
     public Simulation Simulation => simulation;
     public float TimeStep { get; set; } = 1.0f / 50.0f;
     public float Gravity { get; }
+    public float Damping { get; }
+
     public event Action? Step;
     
     private readonly BufferPool bufferPool;
@@ -23,16 +26,17 @@ public class PhysicsWorld : IDisposable, IUpdateable
 
     private float t = 0.0f;
 
-    public PhysicsWorld(float gravity = -19.62f)
+    public PhysicsWorld(float gravity, float damping)
     {
         Gravity = gravity;
+        Damping = damping;
         
         bufferPool = new BufferPool();
         threadDispatcher = new ThreadDispatcher(Environment.ProcessorCount - 2);
         
         simulation = Simulation.Create(bufferPool, 
             new NarrowPhaseCallbacks(new SpringSettings(30.0f, 1.0f)), 
-            new PoseIntegratorCallbacks(new Vector3(0.0f, gravity, 0.0f), 0.1f, 0.1f), 
+            new PoseIntegratorCallbacks(Vector3.UnitY * gravity, damping, damping), 
             new SolveDescription(8, 1));
     }
 

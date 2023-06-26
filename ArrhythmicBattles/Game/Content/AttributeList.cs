@@ -6,10 +6,10 @@ public class AttributeList
         new CharacterAttribute(AttributeType.Health, 100),
         new CharacterAttribute(AttributeType.Attack, 10),
         new CharacterAttribute(AttributeType.Defense, 10),
-        new CharacterAttribute(AttributeType.BaseSpeed, 10),
+        new CharacterAttribute(AttributeType.BaseSpeed, 8),
         new CharacterAttribute(AttributeType.AirSpeed, 10),
-        new CharacterAttribute(AttributeType.GroundSpeed, 10),
-        new CharacterAttribute(AttributeType.JumpHeight, 10),
+        new CharacterAttribute(AttributeType.GroundSpeed, 8),
+        new CharacterAttribute(AttributeType.JumpHeight, 3),
         new CharacterAttribute(AttributeType.JumpCount, 2)
     );
 

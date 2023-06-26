@@ -7,9 +7,7 @@ namespace ArrhythmicBattles.Game.Content.Characters;
 public class CapsuleCharacter : Character
 {
     public override string Name => "Capsule";
-    public override AttributeList Attributes { get; } = new(
-        new CharacterAttribute(AttributeType.JumpHeight, 20),
-        new CharacterAttribute(AttributeType.AirSpeed, 15));
+    public override AttributeList Attributes => AttributeList.Default;
 
     public override CharacterInstance CreateInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld)
     {

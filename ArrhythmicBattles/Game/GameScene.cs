@@ -43,7 +43,7 @@ public class GameScene : ABScene, IDisposable
 
     // Other things
     private readonly EntityManager entityManager = new();
-    private readonly PhysicsWorld physicsWorld = new();
+    private readonly PhysicsWorld physicsWorld = new(-19.62f, 0.15f);
     private readonly MatrixStack matrixStack = new();
     private DebugScreen? debugScreen;
 
