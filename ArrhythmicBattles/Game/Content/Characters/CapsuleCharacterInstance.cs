@@ -54,6 +54,7 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
 
     private readonly IInputMethod inputMethod;
     private readonly PhysicsWorld physicsWorld;
+    private readonly CapsuleCharacter character;
     private readonly PhysicsEntity physicsEntity;
     private readonly ModelEntity entity;
     
@@ -61,10 +62,11 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
     private float movementX = 0.0f;
     private bool jump = false;
 
-    public CapsuleCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld)
+    public CapsuleCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld, CapsuleCharacter character)
     {
         this.inputMethod = inputMethod;
         this.physicsWorld = physicsWorld;
+        this.character = character;
 
         var model = resourceManager.Get<Model>("Models/Capsule.dae");
         entity = new ModelEntity(model);
@@ -87,35 +89,44 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
 
     private void OnStep()
     {
+        const float dragCoefficient = 0.15f;
+        
         var bodyReference = physicsEntity.Reference;
         
-        // raycast to check if player is grounded
+        // Raycast to check if player is grounded
         var handler = new RayHitHandler(bodyReference.CollidableReference);
         var rayStart = new Vector3(Position.X, Position.Y, Position.Z);
         physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 1.0f, ref handler);
         grounded = handler.Hit != null;
 
-        // apply movement
+        // Apply movement
         if (movementX != 0.0f)
         {
-            var force = Vector3.UnitX * movementX * (grounded ? 30.0f : 16.0f);
+            // Get speed values
+            var targetSpeed = grounded 
+                ? character.GetAttributeValue(this, AttributeType.GroundSpeed) 
+                : character.GetAttributeValue(this, AttributeType.AirSpeed);
+
+            var currentSpeed = bodyReference.Velocity.Linear.Length();
             
+            // Calculate force from speed and drag coefficient
+            var force = Vector3.UnitX * movementX * ((targetSpeed - currentSpeed) / dragCoefficient);
+
             bodyReference.Awake = true;
             bodyReference.ApplyLinearImpulse(force.ToSystem()); // Why does this not wake the body?
         }
 
-        // apply jump
+        // Apply jump
         if (grounded && jump)
         {
             bodyReference.Awake = true; 
             bodyReference.ApplyLinearImpulse(new System.Numerics.Vector3(0.0f, 500.0f, 0.0f));
         }
         
+        // Apply drag
         var velocity = bodyReference.Velocity.Linear.ToOpenTK();
         if (velocity != Vector3.Zero)
         {
-            const float dragCoefficient = 0.15f;
-            
             var velocityDirection = velocity.Normalized();
             var drag = velocityDirection * -dragCoefficient * velocity.LengthSquared;
             bodyReference.ApplyLinearImpulse(drag.ToSystem());

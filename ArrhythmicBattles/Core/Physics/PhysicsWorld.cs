@@ -67,6 +67,10 @@ public class PhysicsWorld : IDisposable, IUpdateable
     {
         simulation.Dispose();
         threadDispatcher.Dispose();
-        ((IDisposable) bufferPool).Dispose();
+        
+       if (bufferPool is IDisposable disposable)
+       {
+           disposable.Dispose();
+       } 
     }
 }

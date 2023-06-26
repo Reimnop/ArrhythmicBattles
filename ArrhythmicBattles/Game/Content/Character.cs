@@ -12,4 +12,14 @@ public abstract class Character
 
     public abstract CharacterInstance CreateInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld);
     public abstract CharacterPreview CreatePreview(ResourceManager resourceManager);
+    
+    public float GetAttributeValue(CharacterInstance instance, AttributeType type)
+    {
+        return GetAttributeValue(this, instance, type);
+    }
+    
+    public static float GetAttributeValue(Character character, CharacterInstance instance, AttributeType type)
+    {
+        return character.Attributes.GetAttribute(type).Value * instance.GetAttributeMultiplier(type);
+    }
 }
