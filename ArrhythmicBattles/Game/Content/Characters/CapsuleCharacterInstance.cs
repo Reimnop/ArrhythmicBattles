@@ -24,15 +24,12 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
         get => controller.Rotation;
         set => controller.Rotation = value;
     }
-
-    private readonly CapsuleCharacter character;
+    
     private readonly ModelEntity entity;
     private readonly CharacterController controller;
 
     public CapsuleCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld, CapsuleCharacter character)
     {
-        this.character = character;
-
         var model = resourceManager.Get<Model>("Models/Capsule.dae");
         entity = new ModelEntity(model);
         
