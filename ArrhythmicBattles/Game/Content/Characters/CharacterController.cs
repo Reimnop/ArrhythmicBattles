@@ -45,7 +45,8 @@ public class CharacterController : IUpdateable, IDisposable
     
     private bool grounded = false;
     private bool groundedLastFrame = false; // Frame means physics frame, not game frame
-    private float movementX = 0.0f;
+    
+    private Vector2 movement = Vector2.Zero;
     private bool jump = false;
     private int jumpCount = 0;
 
@@ -82,48 +83,70 @@ public class CharacterController : IUpdateable, IDisposable
         
         groundedLastFrame = grounded;
 
-        // Apply movement
-        if (movementX != 0.0f)
+        // Check to ensure that there is input
+        if (movement != Vector2.Zero)
         {
-            var targetSpeed = grounded 
-                ? character.GetAttributeValue(instance, AttributeType.GroundSpeed) 
-                : character.GetAttributeValue(instance, AttributeType.AirSpeed);
+            // Apply movement
+            if (movement.X != 0.0f)
+            {
+                var targetSpeed = grounded 
+                    ? character.GetAttributeValue(instance, AttributeType.GroundSpeed) 
+                    : character.GetAttributeValue(instance, AttributeType.AirSpeed);
 
-            var targetVelocity = Vector3.UnitX * targetSpeed * movementX;
-            var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
+                var targetVelocity = Vector3.UnitX * targetSpeed * movement.X;
+                var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
             
-            // Zero out Y velocity
-            currentVelocity.Y = 0.0f;
+                // Zero out Y velocity
+                currentVelocity.Y = 0.0f;
 
-            // Calculate force
-            var velocity = targetVelocity - currentVelocity;
-            velocity /= 1.0f - physicsWorld.Damping;
-            var force = velocity * mass;
+                // Calculate force
+                var velocity = targetVelocity - currentVelocity;
+                velocity /= 1.0f - physicsWorld.Damping;
+                var force = velocity * mass;
+                
+                // Limit force using acceleration
+                var acceleration = character.GetAttributeValue(instance, AttributeType.Acceleration);
+                var maxForce = acceleration * mass;
+                if (force.LengthSquared > maxForce * maxForce)
+                    force = force.Normalized() * maxForce;
+                
+                // If force is opposite of velocity, dampen force
+                const float oppositeDampingFactor = 0.25f;
+                if (Vector3.Dot(force, currentVelocity) < 0.0f)
+                    force *= oppositeDampingFactor;
+                
+                // If body isn't grounded, dampen force
+                const float airDampingFactor = 0.25f;
+                if (!grounded)
+                    force *= airDampingFactor;
 
-            bodyReference.Awake = true;
-            bodyReference.ApplyLinearImpulse(force.ToSystem()); // Why does this not wake the body?
-        }
+                bodyReference.Awake = true;
+                bodyReference.ApplyLinearImpulse(force.ToSystem()); // Why does this not wake the body?
+            }
 
-        // Apply jump
-        if (jump && jumpCount < character.GetAttributeValue(instance, AttributeType.JumpCount))
-        {
-            jumpCount++;
-            var jumpHeight = character.GetAttributeValue(instance, AttributeType.JumpHeight);
+            // Apply jump
+            if (jump && jumpCount < character.GetAttributeValue(instance, AttributeType.JumpCount))
+            {
+                jumpCount++;
+                var jumpDistance = character.GetAttributeValue(instance, AttributeType.JumpDistance);
+                var dotAngle = Vector2.Dot(Vector2.UnitY, movement);
+                var angle = MathF.Acos(dotAngle);
+                var jumpDirection = !grounded || angle < MathHelper.DegreesToRadians(60.0f) ? movement : Vector2.UnitY * movement.Length;
+                var targetVelocity = new Vector3(jumpDirection) * MathF.Sqrt(2.0f * -physicsWorld.Gravity * jumpDistance);
+                var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
             
-            // Calculate force
-            var targetVelocity = Vector3.UnitY * MathF.Sqrt(2.0f * -physicsWorld.Gravity * jumpHeight);
-            var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
-            
-            // Zero out X and Z velocity
-            currentVelocity.X = 0.0f;
-            currentVelocity.Z = 0.0f;
-            
-            var velocity = targetVelocity - currentVelocity;
-            velocity /= 1.0f - physicsWorld.Damping;
-            var force = velocity * mass;
-            
-            bodyReference.Awake = true; 
-            bodyReference.ApplyLinearImpulse(force.ToSystem());
+                // Zero out X and Z velocity
+                currentVelocity.X = 0.0f;
+                currentVelocity.Z = 0.0f;
+                
+                // Calculate force
+                var velocity = targetVelocity - currentVelocity;
+                velocity /= 1.0f - physicsWorld.Damping;
+                var force = velocity * mass;
+                
+                bodyReference.Awake = true; 
+                bodyReference.ApplyLinearImpulse(force.ToSystem());
+            }
         }
 
         // Reset jump
@@ -137,7 +160,7 @@ public class CharacterController : IUpdateable, IDisposable
     public void Update(UpdateArgs args)
     {
         // Get movement
-        movementX = inputMethod.GetMovement().X;
+        movement = inputMethod.GetMovement();
 
         // Jump
         if (inputMethod.GetJump())

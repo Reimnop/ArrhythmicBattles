@@ -2,12 +2,12 @@
 
 public enum AttributeType
 {
-    Health,
     Attack,
     Defense,
     BaseSpeed,
     AirSpeed,
     GroundSpeed,
-    JumpHeight,
+    Acceleration,
+    JumpDistance,
     JumpCount
 }

@@ -2,10 +2,6 @@
 using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Core.Resource;
 using ArrhythmicBattles.Game.Content;
-using ArrhythmicBattles.Util;
-using BepuPhysics;
-using BepuPhysics.Collidables;
-using BepuPhysics.Trees;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
 using OpenTK.Mathematics;
@@ -51,8 +47,6 @@ public class PlayerEntity : Entity, IUpdateable, IRenderable, IDisposable
     public void Dispose()
     {
         if (characterInstance is IDisposable disposable)
-        {
             disposable.Dispose();
-        }
     }
 }

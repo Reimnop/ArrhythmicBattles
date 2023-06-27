@@ -4,6 +4,8 @@ using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
+using FlexFramework.Core.Data;
+using FlexFramework.Core.Entities;
 using FlexFramework.Core.Rendering;
 using FlexFramework.Core.Rendering.BackgroundRenderers;
 using FlexFramework.Core.Rendering.PostProcessing;
@@ -39,7 +41,9 @@ public class GameScene : ABScene, IDisposable
     private Box2 currentScreenBounds;
     
     // Game content
-    private readonly Character character;
+    private readonly IInputMethod inputMethod;
+    private readonly ImageEntity inputIndicator;
+    private Vector2 movement;
 
     // Other things
     private readonly EntityManager entityManager = new();
@@ -55,9 +59,9 @@ public class GameScene : ABScene, IDisposable
     private float freeCamPitch;
 #endif
 
-    public GameScene(ABContext context, Character character) : base(context)
+    public GameScene(ABContext context, IInputMethod inputMethod, Character character) : base(context)
     {
-        this.character = character;
+        this.inputMethod = inputMethod;
         
         Engine.CursorState = CursorState.Grabbed;
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
@@ -68,9 +72,10 @@ public class GameScene : ABScene, IDisposable
         // Init entities
         var resourceManager = Context.ResourceManager;
         var mapMeta = resourceManager.Get<MapMeta>("Maps/Playground.json");
+        var inputIndicatorTexture = resourceManager.Get<TextureSampler>("Textures/InputIndicator.png");
+        inputIndicator = new ImageEntity(inputIndicatorTexture);
         
         inputProvider = Context.InputSystem.AcquireInputProvider();
-        var inputMethod = new KeyboardInputMethod(inputProvider);
 
         mapEntity = entityManager.Create(() => new MapEntity(resourceManager, mapMeta, physicsWorld, Context.Settings));
         playerEntity = entityManager.Create(() => new PlayerEntity(character, inputMethod, resourceManager, physicsWorld));
@@ -88,12 +93,17 @@ public class GameScene : ABScene, IDisposable
         // Update entities and physics before everything else
         entityManager.Update(args);
         physicsWorld.Update(args);
+        
+        // Update movement
+        movement = inputMethod.GetMovement();
 
+        // Open debug screen
         if (inputProvider.GetKeyDown(Keys.F3))
         {
             debugScreen = debugScreen == null ? new DebugScreen(Engine, this) : null;
         }
         
+        // Pause game
         if (inputProvider.GetKeyDown(Keys.Escape))
         {
             screenManager.Open(new PauseScreen(Engine, screenManager, Context));
@@ -126,7 +136,7 @@ public class GameScene : ABScene, IDisposable
         {
 #endif
             var cameraPos = playerEntity.Position + new Vector3(0.0f, 0.0f, 500.0f);
-            camera.Position = Vector3.Lerp(camera.Position, cameraPos, 2.5f * args.DeltaTime);
+            camera.Position = Vector3.Lerp(camera.Position, cameraPos, 5.0f * args.DeltaTime);
 #if DEBUG
         }
         else
@@ -146,14 +156,14 @@ public class GameScene : ABScene, IDisposable
         }
 #endif
         
+        // Update screens
         var screenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
         if (screenBounds != currentScreenBounds)
         {
             currentScreenBounds = screenBounds;
             screenManager.Resize(currentScreenBounds);
         }
-        
-        // Update screens
+
         screenManager.Update(args);
         debugScreen?.Update(args);
     }
@@ -173,22 +183,43 @@ public class GameScene : ABScene, IDisposable
         commandList.UseBackgroundRenderer(skyboxRenderer, cameraData);
         commandList.UseLighting(lighting);
         
-        var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, matrixStack, cameraData);
+        // var alphaClipArgs = new RenderArgs(commandList, LayerType.AlphaClip, matrixStack, cameraData);
         var opaqueArgs = new RenderArgs(commandList, LayerType.Opaque, matrixStack, cameraData);
         
-        // render player
+        // Render player and map
         entityManager.Invoke(playerEntity, entity => entity.Render(opaqueArgs));
-        
-        // render map
         entityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
 
-        // render gui
+        // Render gui
         var guiCameraData = guiCamera.GetCameraData(Engine.ClientSize);
         var guiArgs = new RenderArgs(commandList, LayerType.Gui, matrixStack, guiCameraData);
+
+        // Render input indicator
+        if (movement != Vector2.Zero)
+        {
+            // Project player center onto screen
+            var playerPosition = playerEntity.Position;
+            var playerPositionProjected = new Vector4(playerPosition, 1.0f) * cameraData.View * cameraData.Projection;
+            playerPositionProjected /= playerPositionProjected.W;
+            
+            // Unproject player center onto gui
+            var playerPositionUnprojected = new Vector4(playerPositionProjected.X, playerPositionProjected.Y, 0.0f, 1.0f) * guiCameraData.Projection.Inverted() * guiCameraData.View.Inverted();
+            playerPositionUnprojected /= playerPositionUnprojected.W;
+            var playerPositionGui = playerPositionUnprojected.Xy;
+            
+            // Calculate indicator angle
+            var indicatorAngle = MathF.Atan2(movement.Y, movement.X);
+            
+            // Render indicator
+            matrixStack.Push();
+            matrixStack.Rotate(-Vector3.UnitZ, indicatorAngle);
+            matrixStack.Scale(384.0f, 384.0f, 1.0f);
+            matrixStack.Translate(playerPositionGui.X, playerPositionGui.Y, 0.0f);
+            inputIndicator.Render(guiArgs);
+            matrixStack.Pop();
+        }
         
         screenManager.Render(guiArgs);
-        
-        // Render debug screen
         debugScreen?.Render(guiArgs);
     }
 

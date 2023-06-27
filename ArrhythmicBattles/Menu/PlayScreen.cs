@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Game;
+﻿using ArrhythmicBattles.Core.Input;
+using ArrhythmicBattles.Game;
 using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
@@ -32,6 +33,7 @@ public class PlayScreen : IScreen, IDisposable
     public PlayScreen(ABContext context, ScreenManager screenManager, ScopedInputProvider inputProvider)
     {
         var characterRegistry = context.CharacterRegistry;
+        var inputMethod = new JoystickInputMethod(context.Engine.JoystickStates[0]);
         
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
@@ -39,7 +41,7 @@ public class PlayScreen : IScreen, IDisposable
                 .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/PlayButton.json")
                     {
-                        Click = () => context.Engine.LoadScene(() => new GameScene(context, character))
+                        Click = () => context.Engine.LoadScene(() => new GameScene(context, inputMethod, character))
                     })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))

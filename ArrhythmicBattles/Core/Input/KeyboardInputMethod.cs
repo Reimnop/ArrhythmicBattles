@@ -1,25 +1,29 @@
-﻿using FlexFramework.Core;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace ArrhythmicBattles.Core.Input;
 
 public class KeyboardInputMethod : IInputMethod
 {
-    private readonly IInputProvider inputProvider;
+    private readonly KeyboardState keyboardState;
 
-    public KeyboardInputMethod(IInputProvider inputProvider)
+    public KeyboardInputMethod(KeyboardState keyboardState)
     {
-        this.inputProvider = inputProvider;
+        this.keyboardState = keyboardState;
     }
 
-    public bool GetAttack() => inputProvider.GetKeyDown(Keys.E);
+    public bool GetAttack() => keyboardState.IsKeyDown(Keys.E) && !keyboardState.WasKeyDown(Keys.E);
 
-    public bool GetJump() => inputProvider.GetKeyDown(Keys.Space);
+    public bool GetJump() => keyboardState.IsKeyDown(Keys.Space) && !keyboardState.WasKeyDown(Keys.Space);
 
-    public bool GetPrimarySpecial() => inputProvider.GetKeyDown(Keys.F);
+    public bool GetPrimarySpecial() => keyboardState.IsKeyDown(Keys.F) && !keyboardState.WasKeyDown(Keys.F);
 
-    public bool GetSecondarySpecial() => inputProvider.GetKeyDown(Keys.V);
+    public bool GetSecondarySpecial() => keyboardState.IsKeyDown(Keys.V) && !keyboardState.WasKeyDown(Keys.V);
 
-    public Vector2 GetMovement() => inputProvider.Movement;
+    public Vector2 GetMovement()
+    {
+        var x = (keyboardState.IsKeyDown(Keys.A) ? -1.0f : 0.0f) + (keyboardState.IsKeyDown(Keys.D) ? 1.0f : 0.0f);
+        var y = (keyboardState.IsKeyDown(Keys.S) ? -1.0f : 0.0f) + (keyboardState.IsKeyDown(Keys.W) ? 1.0f : 0.0f);
+        return Vector2.Normalize(new Vector2(x, y));
+    }
 }
