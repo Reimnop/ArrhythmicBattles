@@ -4,11 +4,11 @@ using FlexFramework.Modelling;
 
 namespace ArrhythmicBattles.Game.Content.Characters;
 
-public class CapsuleCharacterPreview : CharacterPreview
+public class BeanCharacterPreview : CharacterPreview
 {
     private readonly ModelEntity entity;
 
-    public CapsuleCharacterPreview(ResourceManager resourceManager)
+    public BeanCharacterPreview(ResourceManager resourceManager)
     {
         var model = resourceManager.Get<Model>("Models/Capsule.dae");
         entity = new ModelEntity(model);

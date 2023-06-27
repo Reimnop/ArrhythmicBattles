@@ -1,5 +1,4 @@
-﻿using ArrhythmicBattles.Core.Input;
-using FlexFramework.Core;
+﻿using FlexFramework.Core;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 

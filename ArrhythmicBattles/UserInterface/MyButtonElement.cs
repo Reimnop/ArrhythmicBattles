@@ -32,7 +32,7 @@ public class MyButtonElement : Element, IUpdateable, IRenderable
         var colorHex = resourceDictionary.GetRaw("Color");
         var color = ColorUtil.ParseHex(colorHex);
 
-        border = new RectEntity()
+        border = new RectEntity
         {
             Color = color,
             BorderThickness = 2.0f,

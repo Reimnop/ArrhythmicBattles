@@ -20,7 +20,7 @@ public class CharacterRegistry : IReadOnlyList<Character>
 
     private static void Register(RegisterDelegate<Character> register)
     {
-        register(new Identifier("capsule"), new CapsuleCharacter());
+        register(new Identifier("capsule"), new BeanCharacter());
     }
 
     public IEnumerator<Character> GetEnumerator()

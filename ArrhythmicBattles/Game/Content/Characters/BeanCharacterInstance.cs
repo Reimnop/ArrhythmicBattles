@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 
 namespace ArrhythmicBattles.Game.Content.Characters;
 
-public class CapsuleCharacterInstance : CharacterInstance, IDisposable
+public class BeanCharacterInstance : CharacterInstance, IDisposable
 {
     private const float Mass = 40.0f;
 
@@ -28,7 +28,7 @@ public class CapsuleCharacterInstance : CharacterInstance, IDisposable
     private readonly ModelEntity entity;
     private readonly CharacterController controller;
 
-    public CapsuleCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld, CapsuleCharacter character)
+    public BeanCharacterInstance(IInputMethod inputMethod, ResourceManager resourceManager, PhysicsWorld physicsWorld, BeanCharacter character)
     {
         var model = resourceManager.Get<Model>("Models/Capsule.dae");
         entity = new ModelEntity(model);

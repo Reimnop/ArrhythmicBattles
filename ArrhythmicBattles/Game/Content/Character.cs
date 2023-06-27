@@ -1,11 +1,12 @@
 ﻿using ArrhythmicBattles.Core.Input;
 using ArrhythmicBattles.Core.Physics;
 using ArrhythmicBattles.Core.Resource;
+using ArrhythmicBattles.UserInterface;
 using BepuPhysics.Collidables;
 
 namespace ArrhythmicBattles.Game.Content;
 
-public abstract class Character
+public abstract class Character : INamed
 {
     public abstract string Name { get; }
     public abstract AttributeList Attributes { get; }
