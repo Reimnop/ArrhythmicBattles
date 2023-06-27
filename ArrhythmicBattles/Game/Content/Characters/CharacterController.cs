@@ -131,7 +131,11 @@ public class CharacterController : IUpdateable, IDisposable
                 var jumpDistance = character.GetAttributeValue(instance, AttributeType.JumpDistance);
                 var dotAngle = Vector2.Dot(Vector2.UnitY, movement);
                 var angle = MathF.Acos(dotAngle);
-                var jumpDirection = !grounded || angle < MathHelper.DegreesToRadians(60.0f) ? movement : Vector2.UnitY * movement.Length;
+                var jumpDirection = !grounded || angle < MathHelper.DegreesToRadians(60.0f) 
+                    ? movement // If not grounded or angle is less than 60 degrees, jump in direction of movement
+                    : new Vector2(
+                        MathF.Cos(MathF.PI / 3.0f) * movement.X < 0.0f ? -1.0f : 1.0f, 
+                        MathF.Sin(MathF.PI / 3.0f)) * movement.Length; // Else jump in direction of 60 degrees from horizontal
                 var targetVelocity = new Vector3(jumpDirection) * MathF.Sqrt(2.0f * -physicsWorld.Gravity * jumpDistance);
                 var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
                 
