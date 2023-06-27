@@ -77,7 +77,7 @@ public class CharacterController : IUpdateable, IDisposable
         physicsWorld.Simulation.RayCast(rayStart.ToSystem(), -System.Numerics.Vector3.UnitY, 1.0f, ref handler);
         grounded = handler.Hit != null;
         
-        // Reset jump count if grounded
+        // Reset jump count if just landed
         if (grounded && !groundedLastFrame)
             jumpCount = 0;
         
@@ -134,10 +134,6 @@ public class CharacterController : IUpdateable, IDisposable
                 var jumpDirection = !grounded || angle < MathHelper.DegreesToRadians(60.0f) ? movement : Vector2.UnitY * movement.Length;
                 var targetVelocity = new Vector3(jumpDirection) * MathF.Sqrt(2.0f * -physicsWorld.Gravity * jumpDistance);
                 var currentVelocity = bodyReference.Velocity.Linear.ToOpenTK();
-            
-                // Zero out X and Z velocity
-                currentVelocity.X = 0.0f;
-                currentVelocity.Z = 0.0f;
                 
                 // Calculate force
                 var velocity = targetVelocity - currentVelocity;
