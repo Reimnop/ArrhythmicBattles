@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.UserInterface;
+﻿using ArrhythmicBattles.Menu;
+using ArrhythmicBattles.UserInterface;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Entities;
@@ -17,11 +18,16 @@ public class PauseScreen : IScreen, IDisposable
     private readonly MeshEntity background;
 
     private readonly FlexFrameworkMain engine;
+    private readonly ABContext context;
     private readonly ScopedInputProvider inputProvider;
+    
+    private readonly TextElement textElement;
+    private float t;
 
     public PauseScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context)
     {
         this.engine = engine;
+        this.context = context;
 
         inputProvider = context.InputSystem.AcquireInputProvider();
 
@@ -35,15 +41,24 @@ public class PauseScreen : IScreen, IDisposable
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.FillLeftEdge)
                 .SetEdges(16.0f, 0.0f, 16.0f, -512.0f)
-                .SetElement(new TextElement(font)
+                .SetElement(textElement = new TextElement(font)
                 {
-                    Text = "Woops! It looks like I haven't implemented this yet.\nToo bad!\n\nOh and, you can't even unpause now. Tough luck."
+                    Text = "Woops! It looks like I haven't implemented this yet."
                 })
         );
     }
 
     public void Update(UpdateArgs args)
     {
+        t += args.DeltaTime;
+        textElement.Text = $"Woops! It looks like I haven't implemented this yet.\n\nReturning to menu in {(int)(3.0f - t) + 1}";
+        
+        // Return to menu after 3 seconds
+        if (t >= 3.0f)
+        {
+            engine.LoadScene(() => new MainMenuScene(context));
+        }
+        
         RootNode.UpdateRecursively(args);
     }
     

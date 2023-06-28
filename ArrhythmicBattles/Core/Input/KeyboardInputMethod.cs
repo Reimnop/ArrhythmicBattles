@@ -24,6 +24,7 @@ public class KeyboardInputMethod : IInputMethod
     {
         var x = (keyboardState.IsKeyDown(Keys.A) ? -1.0f : 0.0f) + (keyboardState.IsKeyDown(Keys.D) ? 1.0f : 0.0f);
         var y = (keyboardState.IsKeyDown(Keys.S) ? -1.0f : 0.0f) + (keyboardState.IsKeyDown(Keys.W) ? 1.0f : 0.0f);
-        return Vector2.Normalize(new Vector2(x, y));
+        var movement = new Vector2(x, y);
+        return movement == Vector2.Zero ? movement : Vector2.Normalize(movement);
     }
 }
