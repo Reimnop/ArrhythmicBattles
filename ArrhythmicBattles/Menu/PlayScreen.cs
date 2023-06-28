@@ -54,7 +54,7 @@ public class PlayScreen : IScreen, IDisposable
             .Append(new InputMethodAdapter("Keyboard", new KeyboardInputMethod(engine.KeyboardState)))
             .Concat(engine.JoystickStates
                 .Where(x => x != null)
-                .Select(x => new InputMethodAdapter(x.Name, new JoystickInputMethod(x))));
+                .Select((x, i) => new InputMethodAdapter($"[{i}] {x.Name}", new JoystickInputMethod(x))));
         
         RootNode = screenManager.BuildInterface(
             new InterfaceTreeBuilder()
