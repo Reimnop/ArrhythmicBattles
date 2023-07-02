@@ -13,6 +13,8 @@ public delegate InterfaceTreeBuilder InterfaceFactory(InterfaceTreeBuilder child
 
 public class ScreenManager : IUpdateable, IRenderable, IDisposable
 {
+    public Box2 ComputedBounds => new(bounds.Min / dpiScale, bounds.Max / dpiScale);
+    
     public event OpenScreenEventHandler? OpenScreen;
     public event CloseScreenEventHandler? CloseScreen;
     public event SwitchScreenEventHandler? SwitchScreen;
@@ -23,20 +25,33 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
     private readonly List<IScreen> currentScreens = new();
 
     private Box2 bounds;
+    private float dpiScale;
     private readonly InterfaceFactory interfaceFactory;
 
-    public ScreenManager(Box2 bounds, InterfaceFactory interfaceFactory)
+    public ScreenManager(Box2 bounds, float dpiScale, InterfaceFactory interfaceFactory)
     {
         this.bounds = bounds;
+        this.dpiScale = dpiScale;
         this.interfaceFactory = interfaceFactory;
     }
     
     public Node<ElementContainer> BuildInterface(InterfaceTreeBuilder child)
     {
         var node = interfaceFactory(child).Build();
-        LayoutEngine.Layout(node, bounds);
+        LayoutEngine.Layout(node, ComputedBounds, dpiScale);
         
         return node;
+    }
+    
+    public void Resize(Box2 bounds, float dpiScale)
+    {
+        this.bounds = bounds;
+        this.dpiScale = dpiScale;
+
+        foreach (var rootNode in screens.Select(screen => screen.RootNode).Where(rootNode => rootNode is not null))
+        {
+            LayoutEngine.Layout(rootNode!, ComputedBounds, dpiScale);
+        }
     }
 
     public void Open(IScreen screen)
@@ -74,16 +89,6 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
         SwitchScreen?.Invoke(before, after);
     }
 
-    public void Resize(Box2 bounds)
-    {
-        this.bounds = bounds;
-
-        foreach (var rootNode in screens.Select(screen => screen.RootNode).Where(rootNode => rootNode is not null))
-        {
-            LayoutEngine.Layout(rootNode!, bounds);
-        }
-    }
-    
     public void Update(UpdateArgs args)
     {
         currentScreens.Clear();

@@ -69,12 +69,14 @@ public class MyButtonElement : Element, IUpdateable, IRenderable
         };
     }
 
-    protected override void UpdateLayout(Box2 bounds)
+    protected override void UpdateLayout(Box2 bounds, float dpiScale)
     {
         border.Bounds = bounds;
         interactivity.Bounds = bounds;
+        interactivity.DpiScale = dpiScale;
         iconPosition = new Vector2(bounds.Min.X + 32.0f, bounds.Center.Y);
         text.Bounds = new Box2(bounds.Min + new Vector2(80.0f, 16.0f), bounds.Max - new Vector2(16.0f, 16.0f));
+        text.DpiScale = dpiScale;
     }
     
     public void Update(UpdateArgs args)
