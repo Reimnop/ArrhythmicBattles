@@ -92,7 +92,7 @@ public class MainMenuScene : ABScene, IDisposable
         var boldFont = resourceManager.Get<Font>(Constants.BoldFontPath);
         
         // Magic numbers retrieved from design in Figma
-        screenManager = new ScreenManager(currentScreenBounds, child => 
+        screenManager = new ScreenManager(currentScreenBounds, Engine.DpiScale, child => 
             new InterfaceTreeBuilder()
                 .SetAnchor(Anchor.Fill)
                 .AddChild(new InterfaceTreeBuilder() // Header
@@ -175,7 +175,7 @@ public class MainMenuScene : ABScene, IDisposable
         if (currentScreenBounds != screenBounds)
         {
             currentScreenBounds = screenBounds;
-            screenManager.Resize(currentScreenBounds);
+            screenManager.Resize(currentScreenBounds, Engine.DpiScale);
         }
         
         screenManager.Update(args);
@@ -195,7 +195,7 @@ public class MainMenuScene : ABScene, IDisposable
         backgroundEntity.Render(args);
         matrixStack.Pop();
         
-        var guiCameraData = guiCamera.GetCameraData(Engine.ClientSize);
+        var guiCameraData = guiCamera.GetCameraData((Vector2i) screenManager.ComputedBounds.Size);
         var guiArgs = new RenderArgs(commandList, LayerType.Gui, matrixStack, guiCameraData);
         screenManager.Render(guiArgs);
     }

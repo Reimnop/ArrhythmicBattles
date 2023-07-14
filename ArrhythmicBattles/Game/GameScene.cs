@@ -67,7 +67,7 @@ public class GameScene : ABScene, IDisposable
         currentScreenBounds = new Box2(Vector2.Zero, Engine.ClientSize);
 
         // Init resources
-        screenManager = new ScreenManager(currentScreenBounds, child => child);
+        screenManager = new ScreenManager(currentScreenBounds, Engine.DpiScale, child => child);
 
         // Init entities
         var resourceManager = Context.ResourceManager;
@@ -161,7 +161,7 @@ public class GameScene : ABScene, IDisposable
         if (screenBounds != currentScreenBounds)
         {
             currentScreenBounds = screenBounds;
-            screenManager.Resize(currentScreenBounds);
+            screenManager.Resize(currentScreenBounds, Engine.DpiScale);
         }
 
         screenManager.Update(args);
@@ -191,7 +191,7 @@ public class GameScene : ABScene, IDisposable
         entityManager.Invoke(mapEntity, entity => entity.Render(opaqueArgs));
 
         // Render gui
-        var guiCameraData = guiCamera.GetCameraData(Engine.ClientSize);
+        var guiCameraData = guiCamera.GetCameraData((Vector2i) screenManager.ComputedBounds.Size);
         var guiArgs = new RenderArgs(commandList, LayerType.Gui, matrixStack, guiCameraData);
 
         // Render input indicator

@@ -91,10 +91,11 @@ public class MySelectorElement<T> : Element, IUpdateable, IRenderable where T : 
         SelectionChanged?.Invoke(items[index]);
     }
 
-    protected override void UpdateLayout(Box2 bounds)
+    protected override void UpdateLayout(Box2 bounds, float dpiScale)
     {
         border.Bounds = bounds;
         text.Bounds = bounds;
+        text.DpiScale = dpiScale;
         
         // Magic Figma numbers
         leftIconPosition = new Vector2(bounds.Min.X + 32.0f, bounds.Min.Y + bounds.Size.Y / 2.0f);
@@ -103,7 +104,9 @@ public class MySelectorElement<T> : Element, IUpdateable, IRenderable where T : 
         var leftIconBounds = new Box2(leftIconPosition - new Vector2(16.0f, 16.0f), leftIconPosition + new Vector2(16.0f, 16.0f));
         var rightIconBounds = new Box2(rightIconPosition - new Vector2(16.0f, 16.0f), rightIconPosition + new Vector2(16.0f, 16.0f));
         leftInteractivity.Bounds = leftIconBounds;
+        leftInteractivity.DpiScale = dpiScale;
         rightInteractivity.Bounds = rightIconBounds;
+        rightInteractivity.DpiScale = dpiScale;
     }
 
     public void Render(RenderArgs args)

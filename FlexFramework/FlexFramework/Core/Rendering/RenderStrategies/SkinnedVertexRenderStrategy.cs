@@ -40,6 +40,7 @@ public class SkinnedVertexRenderStrategy : RenderStrategy, IDisposable
     {
         meshHandler.Update(args.DeltaTime);
         textureHandler.Update(args.DeltaTime);
+        samplerHandler.Update(args.DeltaTime);
     }
 
     public override void Draw(GLStateManager glStateManager, CommandList commandList, IDrawData drawData)
