@@ -21,13 +21,9 @@
       <PackageReference Include="BepuPhysics" Version="2.4.0" />
       <PackageReference Include="Config.Net" Version="5.1.5" />
       <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+      <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
       <PackageReference Include="System.Runtime.Experimental" Version="6.0.2" />
       <PackageReference Include="TextCopy" Version="6.2.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\FlexFramework.Text\FlexFramework.Text.csproj" />
-      <ProjectReference Include="..\FlexFramework\FlexFramework.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -42,5 +38,10 @@
 
     <ItemGroup>
       <None Remove="Assets\Resources\Styles\PlayButton.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FlexFramework\FlexFramework.Text\FlexFramework.Text.csproj" />
+      <ProjectReference Include="..\FlexFramework\FlexFramework\FlexFramework.csproj" />
     </ItemGroup>
 </Project>
