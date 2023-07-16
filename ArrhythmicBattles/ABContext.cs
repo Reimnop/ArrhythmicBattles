@@ -4,7 +4,6 @@ using ArrhythmicBattles.Game.Content;
 using ArrhythmicBattles.Settings;
 using Config.Net;
 using Config.Net.Stores;
-using DiscordRPC;
 using FlexFramework;
 using FlexFramework.Core;
 using FlexFramework.Core.Rendering;
@@ -20,7 +19,6 @@ public class ABContext : IDisposable
     public GameTaskManager TaskManager { get; } = new();
     public CharacterRegistry CharacterRegistry { get; } = new();
     public IRenderBuffer RenderBuffer { get; }
-    public DiscordRpcClient DiscordRpcClient { get; }
     public DateTime GameStartedTime { get; }
     public InputSystem InputSystem { get; }
     public ISettings Settings { get; }
@@ -34,7 +32,6 @@ public class ABContext : IDisposable
         Engine = engine;
         ResourceManager = new ResourceManager(new RelativeFileSystem(Constants.GlobalResourcesPath), Engine);
         RenderBuffer = engine.Renderer.CreateRenderBuffer(Vector2i.One); // 1 * 1 init size
-        DiscordRpcClient = InitDiscord();
         GameStartedTime = DateTime.UtcNow;
         InputSystem = new InputSystem(engine.Input);
         
@@ -44,25 +41,14 @@ public class ABContext : IDisposable
             .Build();
     }
 
-    private DiscordRpcClient InitDiscord()
-    {
-        var client = new DiscordRpcClient("1002257911063531520");
-        
-        if (!client.Initialize())
-            logger.LogError("Failed to initialize Discord RPC client!");
-
-        return client;
-    }
-
     public void Update(UpdateArgs args)
     {
         TaskManager.Update(args);
-        DiscordRpcClient.Invoke();
         InputSystem.Update();
     }
 
     public void Dispose()
     {
-        DiscordRpcClient.Dispose();
+        ResourceManager.Dispose();
     }
 }
