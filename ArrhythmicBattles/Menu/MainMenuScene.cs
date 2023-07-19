@@ -39,10 +39,11 @@ public class MainMenuScene : ABScene, IDisposable
     private readonly GuiCamera guiCamera = new();
     private readonly EntityManager entityManager = new();
     private readonly MatrixStack matrixStack = new();
-    private readonly AudioSource musicAudioSource;
-    private readonly AudioSource sfxAudioSource;
     private readonly ScreenManager screenManager;
     private readonly ScopedInputProvider inputProvider;
+    
+    private readonly AudioSource musicAudioSource;
+    private readonly AudioSource sfxAudioSource;
     
     private readonly Binding<float> musicVolumeBinding;
     private readonly Binding<float> sfxVolumeBinding;
@@ -58,17 +59,14 @@ public class MainMenuScene : ABScene, IDisposable
         var resourceManager = Context.ResourceManager;
         var settings = Context.Settings;
 
-        musicAudioSource = new AudioSource
-        {
-            AudioStream = resourceManager.Get<AudioStream>("Audio/Arrhythmic.ogg")
-        };
-        musicAudioSource.Play();
+        musicAudioSource = new AudioSource();
+        var musicAudioData = resourceManager.Get<AudioData>("Audio/Arrhythmic.ogg");
+        var musicAudioStream = musicAudioSource.CreateStream(musicAudioData, true);
+        musicAudioStream.Play();
 
-        sfxAudioSource = new AudioSource
-        {
-            Looping = false,
-            AudioStream = resourceManager.Get<AudioStream>("Audio/Select.ogg")
-        };
+        sfxAudioSource = new AudioSource();
+        var sfxAudioData = resourceManager.Get<AudioData>("Audio/Select.ogg");
+        var sfxAudioStream = sfxAudioSource.CreateStream(sfxAudioData);
 
         // Init bindings
         musicVolumeBinding = new Binding<float>(settings, nameof(ISettings.MusicVolume), musicAudioSource, nameof(AudioSource.Gain));
@@ -144,7 +142,7 @@ public class MainMenuScene : ABScene, IDisposable
         
         screenManager.Open(new MainScreen(Context, screenManager, inputProvider));
 
-        screenManager.SwitchScreen += (_, _) => sfxAudioSource.Play();
+        screenManager.SwitchScreen += (_, _) => sfxAudioStream.Play();
         screenManager.CloseScreen += _ =>
         {
             if (screenManager.Screens.Count == 0)

@@ -21,8 +21,9 @@ public class MapEntity : Entity, IUpdateable, IRenderable, IDisposable
     {
         // Initialize audio
         source = new AudioSource();
-        source.AudioStream = resourceManager.Get<AudioStream>(mapMeta.Music);
-        source.Play();
+        var audioData = resourceManager.Get<AudioData>(mapMeta.Music);
+        var stream = source.CreateStream(audioData, true);
+        stream.Play();
         
         // Bind the music volume to the settings to automatically update volume when changed
         musicVolumeBinding = new Binding<float>(settings, nameof(settings.MusicVolume), source, nameof(AudioSource.Gain));

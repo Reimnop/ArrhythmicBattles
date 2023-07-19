@@ -13,7 +13,7 @@ public class ResourceManager : IDisposable
     {
         new ResourceDictionaryLoader(),
         new TextureSamplerLoader(),
-        new VorbisAudioLoader(),
+        new AudioLoader(),
         new ModelLoader(),
         new MapMetaLoader(),
         new FontLoader()
