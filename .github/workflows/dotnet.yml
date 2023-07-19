@@ -13,11 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 7.0.x
-        submodules: recursive
     - name: Build and Publish
       run: dotnet publish ArrhythmicBattles --configuration Release --self-contained true --os win --arch x64 -p:PublishSingleFile=true
     - name: Upload artifacts
