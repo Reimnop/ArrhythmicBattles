@@ -27,17 +27,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Assets/Resources/**/*.*">
+        <None Include="Assets/Resources/**">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-
-        <Content Include="Assets/Icons/*.*">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Assets\Resources\Styles\PlayButton.json" />
+        </None>
+        <None Include="Assets/Icons/*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
