@@ -1,4 +1,5 @@
-﻿using ArrhythmicBattles.Game;
+﻿using ArrhythmicBattles.Editor;
+using ArrhythmicBattles.Game;
 using ArrhythmicBattles.UserInterface;
 using FlexFramework.Core;
 using FlexFramework.Core.UserInterface;
@@ -23,13 +24,20 @@ public class MainScreen : IScreen
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(16.0f, -80.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/SettingsButton.json"))
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/EditorButton.json")
+                    {
+                        Click = () => context.Engine.SceneManager.LoadScene(() => new EditorScene(context))
+                    })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(96.0f, -160.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/CreditsButton.json"))
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/SettingsButton.json"))
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(176.0f, -240.0f, 16.0f, -336.0f))
+                .AddChild(new InterfaceTreeBuilder()
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/CreditsButton.json"))
+                    .SetAnchor(Anchor.TopLeft)
+                    .SetEdges(256.0f, -320.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
                     .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/ExitButton.json") 
                     {

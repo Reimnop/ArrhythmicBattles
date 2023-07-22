@@ -1,0 +1,6 @@
+{
+    "DefaultIcon": "Textures/Editor.png",
+    "HoveredIcon": "Textures/EditorHovered.png",
+    "Color": "#FFFFFF",
+    "Text": "EDITOR"
+}

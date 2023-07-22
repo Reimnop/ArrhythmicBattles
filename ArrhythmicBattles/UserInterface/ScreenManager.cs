@@ -77,7 +77,7 @@ public class ScreenManager : IUpdateable, IRenderable, IDisposable
         var index = screens.IndexOf(before);
         if (index == -1)
         {
-            throw new ArgumentException("Screen not found", nameof(before));
+            throw new ArgumentException("Screen not found!", nameof(before));
         }
         
         if (before is IDisposable disposable)
