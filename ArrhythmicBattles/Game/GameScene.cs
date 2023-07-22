@@ -142,13 +142,11 @@ public class GameScene : ABScene, IDisposable
         else
         {
             // Free cam
-            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, freeCamCamera.Rotation);
-            Vector3 right = Vector3.Transform(Vector3.UnitX, freeCamCamera.Rotation);
-            Vector2 move = freeCamInputProvider.Movement;
-            
-            Vector3 moveDir = (forward * move.Y + right * move.X) * 5.0f;
+            var forward = Vector3.Transform(-Vector3.UnitZ, freeCamCamera.Rotation);
+            var right = Vector3.Transform(Vector3.UnitX, freeCamCamera.Rotation);
+            var move = freeCamInputProvider.Movement;
+            var moveDir = (forward * move.Y + right * move.X) * 5.0f;
             freeCamCamera.Position += moveDir * args.DeltaTime;
-            
             freeCamYaw -= freeCamInputProvider.MouseDelta.X / 480.0f;
             freeCamPitch -= freeCamInputProvider.MouseDelta.Y / 480.0f;
             freeCamPitch = Math.Clamp(freeCamPitch, -MathF.PI * 0.5f, MathF.PI * 0.5f);

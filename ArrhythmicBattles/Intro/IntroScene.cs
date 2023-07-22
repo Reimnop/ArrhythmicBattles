@@ -28,7 +28,7 @@ public class IntroScene : ABScene
         await taskManager.WaitSeconds(0.25f);
         await taskManager.RunForSecondsNormalized(3.5f, t => bannerEntity.Time = 1.0f - t);
         await taskManager.WaitSeconds(0.25f);
-        Engine.LoadScene(() => new MainMenuScene(Context));
+        Engine.SceneManager.LoadScene(() => new MainMenuScene(Context));
     }
 
     protected override void RenderScene(CommandList commandList)

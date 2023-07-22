@@ -11,14 +11,14 @@ public class DebugScreen : IUpdateable, IRenderable
     private readonly TextEntity leftTextEntity;
     private readonly TextEntity rightTextEntity;
     
-    private readonly FlexFrameworkMain engine;
+    private readonly FlexFrameworkApplication engine;
 
     private float time = 0.0f;
     
     private int fps = 0;
     private int counter = 0;
 
-    public DebugScreen(FlexFrameworkMain engine, ABScene scene)
+    public DebugScreen(FlexFrameworkApplication engine, ABScene scene)
     {
         this.engine = engine;
         var gpuInfo = engine.Renderer.GpuInfo;

@@ -17,14 +17,14 @@ public class PauseScreen : IScreen, IDisposable
 
     private readonly MeshEntity background;
 
-    private readonly FlexFrameworkMain engine;
+    private readonly FlexFrameworkApplication engine;
     private readonly ABContext context;
     private readonly ScopedInputProvider inputProvider;
     
     private readonly TextElement textElement;
     private float t;
 
-    public PauseScreen(FlexFrameworkMain engine, ScreenManager screenManager, ABContext context)
+    public PauseScreen(FlexFrameworkApplication engine, ScreenManager screenManager, ABContext context)
     {
         this.engine = engine;
         this.context = context;
@@ -56,7 +56,7 @@ public class PauseScreen : IScreen, IDisposable
         // Return to menu after 3 seconds
         if (t >= 3.0f)
         {
-            engine.LoadScene(() => new MainMenuScene(context));
+            engine.SceneManager.LoadScene(() => new MainMenuScene(context));
         }
         
         RootNode.UpdateRecursively(args);

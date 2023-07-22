@@ -35,16 +35,18 @@ public class Program
             Icon = icon
         };
 
-        using var flexFramework = new FlexFrameworkMain(nws, engine => new DefaultRenderer(engine), OnLog);
+        using var flexFramework = new FlexFrameworkApplication(nws, engine => new DefaultRenderer(engine), OnLog);
         flexFramework.VSync = VSyncMode.On;
 
         using var context = new ABContext(flexFramework);
         flexFramework.UpdateEvent += context.Update;
+        
+        var sceneManager = flexFramework.SceneManager;
 
 #if DEBUG_SKIP_INTRO
-        flexFramework.LoadScene(() => new MainMenuScene(context));
+        sceneManager.LoadScene(() => new MainMenuScene(context));
 #else
-        flexFramework.LoadScene(() => new IntroScene(context));
+        sceneManager.LoadScene(() => new IntroScene(context));
 #endif
 
         while (!flexFramework.ShouldClose())

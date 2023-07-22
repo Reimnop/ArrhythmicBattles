@@ -14,7 +14,7 @@ namespace ArrhythmicBattles;
 
 public class ABContext : IDisposable
 {
-    public FlexFrameworkMain Engine { get; }
+    public FlexFrameworkApplication Engine { get; }
     public ResourceManager ResourceManager { get; }
     public GameTaskManager TaskManager { get; } = new();
     public CharacterRegistry CharacterRegistry { get; } = new();
@@ -25,7 +25,7 @@ public class ABContext : IDisposable
 
     private readonly ILogger logger;
 
-    public ABContext(FlexFrameworkMain engine)
+    public ABContext(FlexFrameworkApplication engine)
     {
         logger = engine.CreateLogger<ABContext>();
         
