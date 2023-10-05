@@ -35,7 +35,10 @@ public class MainScreen : IScreen
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(176.0f, -240.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
-                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/CreditsButton.json"))
+                    .SetElement(new MyButtonElement(inputProvider, context.ResourceManager, "Styles/CreditsButton.json")
+                    {
+                        Click = () => screenManager.Switch(this, new CreditsScreen(context, screenManager, inputProvider))
+                    })
                     .SetAnchor(Anchor.TopLeft)
                     .SetEdges(256.0f, -320.0f, 16.0f, -336.0f))
                 .AddChild(new InterfaceTreeBuilder()
