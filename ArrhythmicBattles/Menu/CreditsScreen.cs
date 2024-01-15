@@ -34,7 +34,6 @@ public class CreditsScreen : IScreen
                     .SetElement(new TextElement(regularFont)
                     {
                         Text = "Programming - Reimnop\n" +
-                               "Music       - Winky Silverbrok\n" +
                                "Management  - MekaniQ\n\n" +
                                "\"uwaaa <3\" - Windows 98, a Vitamin Games moderator."
                     })

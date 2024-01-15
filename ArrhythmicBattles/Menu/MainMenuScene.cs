@@ -60,9 +60,10 @@ public class MainMenuScene : ABScene, IDisposable
         var settings = Context.Settings;
 
         musicAudioSource = new AudioSource();
-        var musicAudioData = resourceManager.Get<AudioData>("Audio/Arrhythmic.ogg");
-        var musicAudioStream = musicAudioSource.CreateStream(musicAudioData, true);
-        musicAudioStream.Play();
+        // TODO: Replace with actual music
+        // var musicAudioData = resourceManager.Get<AudioData>("Audio/Arrhythmic.ogg");
+        // var musicAudioStream = musicAudioSource.CreateStream(musicAudioData, true);
+        // musicAudioStream.Play();
 
         sfxAudioSource = new AudioSource();
         var sfxAudioData = resourceManager.Get<AudioData>("Audio/Select.ogg");
